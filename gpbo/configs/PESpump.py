@@ -3,11 +3,10 @@
 # and open the template in the editor.
 
 #random search on a test function
-import acquisitions
-import reccomenders
-import objectives
-import optimize
-
+import gpbo.core.acquisitions as acquisitions
+import gpbo.core.reccomenders as reccomenders
+import gpbo.core.objectives as objectives
+import gpbo.core.optimize as optimize
 import scipy as sp
 import os
 

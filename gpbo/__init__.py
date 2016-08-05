@@ -1,5 +1,7 @@
 import os
-from .pythonfile import *
+from . import core
+from . import test
+from . import examples
 
 
 
