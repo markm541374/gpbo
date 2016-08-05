@@ -14,7 +14,7 @@ import sys
 from copy import deepcopy as dc
 from scipy.stats import norm as norms
 #print os.path.join(os.path.split(__file__)[0],'../../dist/Release/GNU-Linux/libGPshared.so')
-libGP = ct.cdll.LoadLibrary(os.path.join(os.path.split(__file__)[0],'../cproj/dist/Release/GNU-Linux/libcproj.so')) #path to c-shared library
+libGP = ct.cdll.LoadLibrary(os.path.join(os.path.split(__file__)[0],'../cproj/libcproj.so')) #path to c-shared library
 #print libGP
 libGP.k.restype = ct.c_double
 
