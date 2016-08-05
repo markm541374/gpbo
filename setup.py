@@ -19,5 +19,5 @@ setup(name='gpbo',
       license='MIT',
       packages=['gpbo','gpbo.core','gpbo.examples','gpbo.test','gpbo.configs'],
       package_dir={'gpbo':'gpbo'},
-      package_data={'gpbo':['cproj/*','VERSION','README.rst']},
+      package_data={'gpbo':['cproj/*','cproj/dist/Release/GNU-Linux/libcproj.so','VERSION','README.rst']},
       zip_safe=False)
