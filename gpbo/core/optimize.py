@@ -111,7 +111,8 @@ class optimizer:
             pickle.dump(pobj,open(os.path.join(self.dirpath,'step{}.p'.format(stepn)),'wb'))
         pickle.dump(self.state,open(os.path.join(self.dirpath,'state.p'),'wb'))
         logger.info('endopt')
-        return
+
+        return rx,reaux
     
 
 def nstopfn(optstate,nmax = 1):
@@ -122,7 +123,12 @@ def cstopfn(optstate,cmax = 1):
 
 
 
+def search(optconfig):
+    O = optimizer(optconfig.path, optconfig.aqpara, optconfig.aqfn, optconfig.stoppara,
+                                     optconfig.stopfn, optconfig.reccpara, optconfig.reccfn, optconfig.ojf,
+                                     optconfig.ojfchar, checkrecc=True)
 
+    return O.run()
 
 
 

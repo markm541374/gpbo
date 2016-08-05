@@ -11,7 +11,12 @@ import gpbo.core.optimize as optimize
 import scipy as sp
 import os
 
-path = os.path.join(os.path.expanduser('~'),'Dropbox/workspace/GPshared/results/randomsh')
+import os
+if not os.path.exists(os.path.join('.','results')):
+    os.mkdir('results')
+if not os.path.exists(os.path.join('.','results/randomsh')):
+    os.mkdir('results/randomsh')
+path = 'results/randomsh'
 aqfn,aqpara = acquisitions.random
 aqpara['lb']=[-1.,-1.]
 aqpara['ub']=[1.,1.]

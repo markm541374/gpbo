@@ -8,15 +8,18 @@ import gpbo.core.reccomenders as reccomenders
 import gpbo.core.objectives as objectives
 import gpbo.core.optimize as optimize
 
-import scipy as sp
-import os
 
-path = os.path.join(os.path.expanduser('~'),'Dropbox/workspace/GPshared/results/EIMLsh')
+import os
+if not os.path.exists(os.path.join('.','results')):
+    os.mkdir('results')
+if not os.path.exists(os.path.join('.','results/EIMLsh')):
+    os.mkdir('results/EIMLsh')
+path = 'results/EIMLsh'
 aqfn,aqpara = acquisitions.EIMAP
 aqpara['lb']=[-1.,-1.]
 aqpara['ub']=[1.,1.]
 
-stoppara= {'nmax':100}
+stoppara= {'nmax':40}
 stopfn = optimize.nstopfn
 
 reccfn,reccpara = reccomenders.gpmap

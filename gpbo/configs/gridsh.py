@@ -10,8 +10,12 @@ import gpbo.core.optimize as optimize
 
 import scipy as sp
 import os
+if not os.path.exists(os.path.join('.','results')):
+    os.mkdir('results')
+if not os.path.exists(os.path.join('.','results/gridsh')):
+    os.mkdir('results/gridsh')
+path = 'results/gridsh'#os.path.join(os.path.expanduser('~'),'Dropbox/workspace/GPshared/results/gridsh')
 
-path = os.path.join(os.path.expanduser('~'),'Dropbox/workspace/GPshared/results/gridsh')
 aqfn,aqpara = acquisitions.brute
 aqpara['lb']=[-1.,-1.]
 aqpara['ub']=[1.,1.]

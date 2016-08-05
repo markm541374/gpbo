@@ -60,7 +60,7 @@ brute = bruteaq, bruteprior
 
 #EIMAP
 def EIMAPaq(optstate,persist,ev=None, ub = None, lb=None, nrandinit=None, mprior=None,sprior=None,kindex = None,directmaxiter=None):
-    para = copy.deepcopy(para)
+    #para = copy.deepcopy(para)
     if persist==None:
         persist = {'n':0,'d':len(ub)}
     n = persist['n']

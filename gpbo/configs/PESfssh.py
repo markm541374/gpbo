@@ -10,7 +10,12 @@ import gpbo.core.optimize as optimize
 import scipy as sp
 import os
 
-path = os.path.join(os.path.expanduser('~'),'Dropbox/workspace/GPshared/results/PESfssh')
+import os
+if not os.path.exists(os.path.join('.','results')):
+    os.mkdir('results')
+if not os.path.exists(os.path.join('.','results/PESfssh')):
+    os.mkdir('results/PESfssh')
+path = 'results/PESfssh'
 aqfn,aqpara = acquisitions.PESfs
 aqpara['lb']=[-1.,-1.]
 aqpara['ub']=[1.,1.]

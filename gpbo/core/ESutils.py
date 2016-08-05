@@ -116,6 +116,9 @@ def draw_support(g, lb, ub, n, method, para=1.):
             
         sp.clip(X,-1,1,out=X)
         if True:
+            if not os.path.exists(os.path.join('.', 'dbout')):
+                os.mkdir('dbout')
+
             #print 'inits'
             #print Xst
             
@@ -149,7 +152,9 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 xp = [x[0]+cls[j][0],x[0],x[0]-cls[j][0],x[0],x[0]+cls[j][0]]
                 yp = [x[1],x[1]+cls[j][1],x[1],x[1]-cls[j][1],x[1]]
                 ax[0].plot(xp,yp,'r-')
-            fig.savefig(os.path.join(os.path.expanduser('~'),'Dropbox/debugoutput','drawlapapr'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+            fig.savefig(os.path.join('dbout','drawlapapr'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+            del(fig)
+
     elif method==SUPPORT_SLICELCB:
         def f(x):
             if all(x>lb) and all(x<ub):
@@ -230,6 +235,8 @@ def draw_min(g,support,n):
     
     debugoutput=True
     if debugoutput:
+        if not os.path.exists(os.path.join('.', 'dbout')):
+            os.mkdir('dbout')
         from matplotlib import pyplot as plt
         import time
         #2d plot assuming [-1,1]^2 support
@@ -249,8 +256,8 @@ def draw_min(g,support,n):
         ax[1].clabel(CS, inline=1, fontsize=10)
         for i in xrange(Z.shape[0]):
             ax[0].plot(R[i,1],R[i,2],'ro')
-        fig.savefig(os.path.join(os.path.expanduser('~'),'Dropbox/debugoutput','drawmin'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
-        #plt.show()
+        fig.savefig(os.path.join('dbout','drawmin'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+        del(fig)
     return R
 
 #fake gp class that 9looks like a d-1 gp becuase an extra vaue is added before callind

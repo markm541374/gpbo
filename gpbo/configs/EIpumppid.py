@@ -11,7 +11,12 @@ import gpbo.core.optimize as optimize
 import scipy as sp
 import os
 
-path = os.path.join(os.path.expanduser('~'),'Dropbox/workspace/GPshared/results/EIpump')
+import os
+if not os.path.exists(os.path.join('.','results')):
+    os.mkdir('results')
+if not os.path.exists(os.path.join('.','results/EIpumppid')):
+    os.mkdir('results/EIpumppid')
+path = 'results/EIpumppid'
 aqfn,aqpara = acquisitions.EIMAP
 aqpara['lb']=[-2.,-2.,-2.]
 aqpara['ub']=[1.,1.,1.]

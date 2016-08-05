@@ -11,7 +11,12 @@ import gpbo.core.optimize as optimize
 import scipy as sp
 import os
 
-path = os.path.join(os.path.expanduser('~'),'Dropbox/workspace/GPshared/results/PESbssh')
+import os
+if not os.path.exists(os.path.join('.','results')):
+    os.mkdir('results')
+if not os.path.exists(os.path.join('.','results/PESbssh')):
+    os.mkdir('results/PESbssh')
+path = 'results/PESbssh'
 aqfn,aqpara = acquisitions.PESbs
 aqpara['lb']=[-1.,-1.]
 aqpara['ub']=[1.,1.]
@@ -20,7 +25,7 @@ cfn = objectives.cfaexp(1.,0.75)
 
 aqpara['traincfn'] = True
 
-stoppara= {'nmax':100}
+stoppara= {'nmax':14}
 stopfn = optimize.nstopfn
 
 reccfn,reccpara = reccomenders.gpashin
@@ -33,6 +38,10 @@ reccpara['onlyafter']=aqpara['nrandinit']+1
 
 ojfw,xmin,ymin = objectives.genbiasedmat52ojf(len(aqpara['lb']),aqpara['lb'],aqpara['ub'],0.5)
 ojf = objectives.costfnwrap(ojfw,cfn)
+
+if not os.path.exists(os.path.join('.','results/PESbssh/dbout')):
+    os.mkdir('results/PESbssh/dbout')
+dbpath ='results/PESbssh/dbout'
 if True:
     from matplotlib import pyplot as plt
     import time
@@ -51,6 +60,7 @@ if True:
     ax.clabel(CS, inline=1, fontsize=8)
     
     ax.plot(xmin[0],xmin[1],'ro')
-    fig.savefig(os.path.join(os.path.expanduser('~'),'Dropbox/debugoutput','truegeneratedobjective'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
 
+    fig.savefig(os.path.join(dbpath,'truegeneratedobjective'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+    del(fig)
 ojfchar = {'dx':len(aqpara['lb']),'dev':len(aqpara['ev'])}
