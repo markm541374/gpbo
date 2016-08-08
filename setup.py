@@ -20,5 +20,5 @@ setup(name='gpbo',
       packages=['gpbo','gpbo.core','gpbo.examples','gpbo.test','gpbo.configs'],
       package_dir={'gpbo':'gpbo'},
       package_data={'gpbo':['cproj/*','VERSION','README.rst']},
-      install_requires=['tqdm','direct','convertdate'],
+      install_requires=['tqdm','direct'],
       zip_safe=False)
