@@ -154,6 +154,8 @@ def gphinasrecc(optstate,**para):
     logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
     
     if True:
+        if not os.path.exists(os.path.join('.', 'dbout')):
+            os.mkdir('dbout')
         l = sp.mean([h[3] for h in optstate.aux['HYPdraws']])
         from matplotlib import pyplot as plt
         fig, ax = plt.subplots( nrows=3, ncols=1 ,figsize=(10,30))
@@ -182,8 +184,9 @@ def gphinasrecc(optstate,**para):
         ax[0].add_patch(circle)
         ax[0].axis([-1.,1.,-1.,1.])
         ax[1].plot(xmin[0],xmin[1],'ro')
-        
-        fig.savefig(os.path.join(os.path.expanduser('~'),'Dropbox/debugoutput','datavis'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+        fig.savefig(os.path.join('dbout', 'datavis' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+        del (fig)
+
     return [i for i in xmin],{'ymin':ymin}
 
 gphinasprior = {
