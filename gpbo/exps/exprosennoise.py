@@ -6,9 +6,9 @@
 
 import scipy as sp
 from matplotlib import pyplot as plt
-import GPdc
-import OPTutils
-import search
+import gpbo.core.GPdc
+import gpbo.core.OPTutils
+import gpbo.core.search
 import os
 import pickle
 
@@ -18,8 +18,8 @@ lb = sp.array([[-1.]*d])
 ub = sp.array([[1.]*d])
 pwr = 0.2
 cfn = lambda s:((1e-6)/s)**pwr
-ojf = OPTutils.genbanana(cfn=cfn)
-kindex = GPdc.MAT52
+ojf = gpbo.core.OPTutils.genbanana(cfn=cfn)
+kindex = gpbo.core.GPdc.MAT52
 prior = sp.array([0.]+[-1.]*d)
 sprior = sp.array([1.]*(d+1))
 kernel = [kindex,prior,sprior]
@@ -31,12 +31,12 @@ f,a = plt.subplots(2)
 for s in slist:
     
     names = ["../cache/rosennoise/EIMLE_"+str(int(100*sp.log10(s)))+"_"+str(pwr)+"_"+str(i)+".p" for i in xrange(nreps)]
-    results = search.multiMLEFS(ojf,lb,ub,kernel,s,bd,names)
+    results = gpbo.core.search.multiMLEFS(ojf, lb, ub, kernel, s, bd, names)
     yr = [r[11].flatten() for r in results]
     C = results[0][5]
     
     names = ["../cache/rosennoise/PESFS_"+str(int(100*sp.log10(s)))+"_"+str(pwr)+"_"+str(i)+".p" for i in xrange(nreps)]
-    results = search.multiPESFS(ojf,lb,ub,kernel,s,bd,names)
+    results = gpbo.core.search.multiPESFS(ojf, lb, ub, kernel, s, bd, names)
     zr = [r[11].flatten() for r in results]
     C = results[0][5]
         
@@ -69,7 +69,7 @@ s=1e-1
 #    fname = "../cache/rosennoise/PESVS_"+str(int(100*sp.log10(s)))+"_"+str(pwr)+"_"+str(i)+".p"
 #    [X,Y,S,D,R,C2,T,Tr,Ymin,Xmin,Yreg, Rreg] = search.PESVS(ojf,lb,ub,kernel,s,ba,lambda x,s:cfn(s),-9,-1,fname)
 names = ["../cache/rosennoise/PESVS_"+str(int(100*sp.log10(s)))+"_"+str(pwr)+"_"+str(i)+".p" for i in xrange(nreps)]
-results = search.multiPESVS(ojf,lb,ub,kernel,s,bd,lambda x,s:cfn(s),-9,-1,names)
+results = gpbo.core.search.multiPESVS(ojf, lb, ub, kernel, s, bd, lambda x, s:cfn(s), -9, -1, names)
 Rz = [sp.log10(sp.array(r[11])).flatten() for r in results]
 Cz = [[sum(r[5][:j]) for j in xrange(len(r[5]))] for r in results]
 #for i in xrange(nreps):

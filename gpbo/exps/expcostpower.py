@@ -6,9 +6,9 @@
 
 import scipy as sp
 from matplotlib import pyplot as plt
-import GPdc
-import OPTutils
-import search
+import gpbo.core.GPdc
+import gpbo.core.OPTutils
+import gpbo.core.search
 import os
 import pickle
 print 'start'
@@ -21,9 +21,9 @@ def cfn(s):
     #print s
     #print 'cfn'+str(((1e-6)/s)**pwr)
     return ((1e-6)/s)**pwr
-ojf = OPTutils.genbranin(cfn=cfn)
+ojf = gpbo.core.OPTutils.genbranin(cfn=cfn)
 braninmin = 0.39788735772973816
-kindex = GPdc.MAT52
+kindex = gpbo.core.GPdc.MAT52
 prior = sp.array([0.]+[-1.]*d)
 sprior = sp.array([1.]*(d+1))
 kernel = [kindex,prior,sprior]
@@ -47,7 +47,7 @@ for l,pwr in enumerate(plist):
     for k,s in enumerate(slist):
     
         names = ["../cache/costpower/PESFS_"+str(int(100*sp.log10(s)))+"_"+str(pwr)+"_"+str(i)+".p" for i in xrange(nreps)]
-        results = search.multiPESFS(ojf,lb,ub,kernel,s,bd,names)
+        results = gpbo.core.search.multiPESFS(ojf, lb, ub, kernel, s, bd, names)
         zr = [r[11].flatten() for r in results]
         C = results[0][5]
 
@@ -65,7 +65,7 @@ for l,pwr in enumerate(plist):
         lines[k][3].append(m[-1]+sq[-1])
     
     names = ["../cache/braninnoise/PESVS_"+str(int(100*sp.log10(s)))+"_"+str(pwr)+"_"+str(i)+".p" for i in xrange(nreps)]
-    results = search.multiPESVS(ojf,lb,ub,kernel,s,bd,lambda x,s:cfn(s),-7,-4,names)
+    results = gpbo.core.search.multiPESVS(ojf, lb, ub, kernel, s, bd, lambda x, s:cfn(s), -7, -4, names)
     zr = [sp.log10(r[11].flatten()-braninmin) for r in results]
     
     m = sp.mean(sp.log10(Z),axis=0)

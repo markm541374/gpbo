@@ -4,12 +4,12 @@
 #Run the env variable PES on synthetic functions, compare regular PES fixed at s=0, 0.25, 1. The !=0 should converge to a high regret according to the min in the plane they are in, the =0 and env var should kee[p improving
 
 
-import OPTutils
+import gpbo.core.OPTutils
 import scipy as sp
 from matplotlib import pyplot as plt
-import GPdc
-import ESutils
-import search
+import gpbo.core.GPdc
+import gpbo.core.ESutils
+import gpbo.core.search
 from tqdm import tqdm, tqdm_gui
 import DIRECT
 
@@ -26,7 +26,7 @@ fls = 1.0
 sls = (su-sl)*fls
 dcc=1.0
 cfn = lambda x: sp.exp(-dcc*x.flatten()[0])
-[ojf,truexmin,ymin] = OPTutils.gensquexpIPdraw(d,lb,ub,sl,su,sfn,sls,cfn)
+[ojf,truexmin,ymin] = gpbo.core.OPTutils.gensquexpIPdraw(d, lb, ub, sl, su, sfn, sls, cfn)
 
 #what are the best mins in planes away from true?
 def planemin(xp):
@@ -46,13 +46,13 @@ plane10 = planemin(1.)
 nreps=6
 bd=35
 
-kindex = GPdc.MAT52CS
+kindex = gpbo.core.GPdc.MAT52CS
 prior = sp.array([0.]+[-1.]*(d+1)+[-2.])
 sprior = sp.array([1.]*(d+2)+[2.])
 kernel = [kindex,prior,sprior]
 
 names = ["../cache/IPS_/PESIPS_"+str(dcc)+"_"+str(fls)+"_"+str(seed)+"_"+str(i)+".p" for i in xrange(nreps)]
-results = search.multiPESIPS(ojf,lb,ub,kernel,bd,names)
+results = gpbo.core.search.multiPESIPS(ojf, lb, ub, kernel, bd, names)
 
 f,a = plt.subplots(2)
 aot = a[0].twinx()
@@ -73,11 +73,11 @@ for r in results:
     #a[0].plot([sum(r[5][:j]) for j in xrange(len(r[5]))],(r[11].flatten()-ymin),'b')
     w.append([sum(r[5][:j]) for j in xrange(len(r[5]))])
 
-X_,Y_,lb_,ub_ = OPTutils.mergelines(w,y)
+X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(w, y)
 a[0].fill_between(X_,lb_,ub_,facecolor='lightblue',edgecolor='lightblue',alpha=0.5)
 a[0].plot(X_,Y_,'b')
 
-X_,Y_,lb_,ub_ = OPTutils.mergelines(x,y)
+X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(x, y)
 a[1].fill_between(X_,lb_,ub_,facecolor='lightblue',edgecolor='lightblue',alpha=0.5)
 a[1].plot(X_,Y_,'b')
 
@@ -102,7 +102,7 @@ print plane001
 #a[2].plot([1.,bd],[sp.log10(plane001[3])]*2,color='k',linestyle='--')
 print "XXX"
 
-kindex = GPdc.MAT52CS
+kindex = gpbo.core.GPdc.MAT52CS
 priora = sp.array([0.]+[-1.]*(d)+[-2.])
 spriora = sp.array([1.]*(d+1)+[2.])
 kernela = [kindex,priora,spriora]
@@ -111,7 +111,7 @@ for i,xs in enumerate(subset):
     def ojfa(x,s,d,override=False):
         return ojf(sp.hstack([[xs],x.flatten()]),s,d,override=override)
     names = ["../cache/IPS_/PESIS_"+str(xs)+"_"+str(dcc)+"_"+str(fls)+"_"+str(seed)+"_"+str(k)+".p" for k in xrange(nreps)]
-    results = search.multiPESIS(ojfa,lb,ub,kernela,bd,names)
+    results = gpbo.core.search.multiPESIS(ojfa, lb, ub, kernela, bd, names)
     Rg = sp.log10(sp.vstack([(sp.array([ojf(sp.hstack([0.,r[4][j,:]]) ,0.,[sp.NaN],override=True)[0] for j in xrange(r[4].shape[0])])-ymin) for r in results]))
     mr = sp.mean(Rg,axis=0)
     sr = sp.sqrt(sp.var(Rg,axis=0))
@@ -126,7 +126,7 @@ for i,xs in enumerate(subset):
         #a[1].plot(sp.log10((z-ymin)),color=c[i])
         y.append(sp.log10((z-ymin)))
         x.append(range(len(y[-1])))
-    X_,Y_,lb_,ub_ = OPTutils.mergelines(x,y)
+    X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(x, y)
     a[1].fill_between(X_,lb_,ub_,facecolor=c[i],edgecolor=c[i],alpha=0.5)
     a[1].plot(X_,Y_,c[i])
         

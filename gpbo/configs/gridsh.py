@@ -20,7 +20,7 @@ aqfn,aqpara = acquisitions.brute
 aqpara['lb']=[-1.,-1.]
 aqpara['ub']=[1.,1.]
 
-stoppara= {'nmax':8000}
+stoppara= {'nmax':400}
 stopfn = optimize.nstopfn
 
 reccfn,reccpara = reccomenders.argmin

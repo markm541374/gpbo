@@ -9,9 +9,9 @@ import pandas as pd
 from matplotlib import pyplot as plt
 #import seaborn as sns
 import time
-import GPdc
-import search
-import OPTutils
+import gpbo.core.GPdc
+import gpbo.core.search
+import gpbo.core.OPTutils
 
 days = 32
 t0=time.clock()
@@ -56,7 +56,8 @@ def ojf(x,s,d,override=False):
     
     print hyp
     t0=time.clock()
-    llk = sp.clip(GPdc.GP_LKonly(X,Y,S,D,GPdc.kernel(GPdc.MAT52,1,sp.array(hyp))).plk(pm,ps),-1e60,1e60)
+    llk = sp.clip(
+        gpbo.core.GPdc.GP_LKonly(X, Y, S, D, gpbo.core.GPdc.kernel(gpbo.core.GPdc.MAT52, 1, sp.array(hyp))).plk(pm, ps), -1e60, 1e60)
     
     t1=time.clock()
     if llk<-1.:
@@ -96,7 +97,7 @@ def ojfa(x,s,d,override=False):
     Sd = sp.vstack([S[i] for i in ps])
     Dd = [[sp.NaN]]*npts
     
-    llk = GPdc.GP_LKonly(Xd,Yd,Sd,Dd,GPdc.kernel(GPdc.MAT52,1,sp.array(hyp))).plk(pm,ps)
+    llk = gpbo.core.GPdc.GP_LKonly(Xd, Yd, Sd, Dd, gpbo.core.GPdc.kernel(gpbo.core.GPdc.MAT52, 1, sp.array(hyp))).plk(pm, ps)
     t1=time.clock()
     if llk<-1.:
         out = sp.log(-llk)+1.
@@ -108,7 +109,7 @@ def ojfa(x,s,d,override=False):
 
 
 d=2
-kindex = GPdc.MAT52CS
+kindex = gpbo.core.GPdc.MAT52CS
 prior = sp.array([0.]+[-1.]*d+[-2.])
 sprior = sp.array([1.]+[1.]*d+[2.])
 kernel = [kindex,prior,sprior]
@@ -120,20 +121,20 @@ ub = sp.array([[1]*d])
 
 budget = 20
 fnames = ['../cache/fith/EI{}.p'.format(i) for i in xrange(5)]
-statesEI=search.multiMLEFS(ojf,lb,ub,kernel,1.,budget,fnames)
+statesEI= gpbo.core.search.multiMLEFS(ojf, lb, ub, kernel, 1., budget, fnames)
 
 
 fnames = ['../cache/fith/PE{}.p'.format(i) for i in xrange(5)]
-statesPE=search.multiPESFS(ojf,lb,ub,kernel,1.,budget,fnames)
+statesPE= gpbo.core.search.multiPESFS(ojf, lb, ub, kernel, 1., budget, fnames)
 
 
-kindex = GPdc.MAT52CS
+kindex = gpbo.core.GPdc.MAT52CS
 prior = sp.array([0.]+[-1.]*(d+1)+[-2.])
 sprior = sp.array([1.]*(d+2)+[2.])
 kernel = [kindex,prior,sprior]
 
 fnames = ["../cache/fith/PI{}.p".format(i) for i in xrange(5)]
-statesPI = search.multiPESIPS(ojfa,lb,ub,kernel,10,fnames)
+statesPI = gpbo.core.search.multiPESIPS(ojfa, lb, ub, kernel, 10, fnames)
 
 
 x=[]
@@ -144,7 +145,7 @@ for stateEI in statesEI:
     x.append([sum(stateEI[5][:i]) for i in xrange(len(stateEI[5]))])
     y.append(stateEI[11].flatten())
     print 'reccomended under EI: {} : {}'.format([10**i for i in stateEI[4][-1]],ojf(stateEI[4][-1],None,None)[0])
-X_,Y_,lb_,ub_ = OPTutils.mergelines(x,y)
+X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(x, y)
 a[3].fill_between(X_,lb_,ub_,facecolor='lightcoral',edgecolor='lightcoral',alpha=0.5)
 a[3].plot(X_,Y_,'r')
 
@@ -157,7 +158,7 @@ for statePE in statesPE:
     y.append(statePE[11].flatten())
     print 'reccomended under PE: {} : {}'.format([10**i for i in statePE[4][-1]],ojf(statePE[4][-1],None,None)[0])
     
-X_,Y_,lb_,ub_ = OPTutils.mergelines(x,y)
+X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(x, y)
 a[3].fill_between(X_,lb_,ub_,facecolor='lightblue',edgecolor='lightblue',alpha=0.5)
 a[3].plot(X_,Y_,'b')
 
@@ -172,7 +173,7 @@ for statePI in statesPI:
 
     print 'reccomended under PI: {} : {}'.format([10**i for i in statePI[4][-1][1:]],ojf(statePI[4][-1][1:],None,None)[0])
 
-X_,Y_,lb_,ub_ = OPTutils.mergelines(x,y)
+X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(x, y)
 a[3].fill_between(X_,lb_,ub_,facecolor='lightgreen',edgecolor='lightgreen',alpha=0.5)
 a[3].plot(X_,Y_,'g')
 a[3].set_xscale('log')

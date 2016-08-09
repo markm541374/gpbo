@@ -6,9 +6,9 @@
 
 import scipy as sp
 from matplotlib import pyplot as plt
-import GPdc
-import OPTutils
-import search
+import gpbo.core.GPdc
+import gpbo.core.OPTutils
+import gpbo.core.search
 import os
 import pickle
 print 'start'
@@ -21,9 +21,9 @@ def cfn(s):
     ##print s
     #print 'cfn'+str(((1e-6)/s)**pwr)
     return ((1e-6)/s)**pwr
-ojf = OPTutils.genbranin(cfn=cfn)
+ojf = gpbo.core.OPTutils.genbranin(cfn=cfn)
 braninmin = 0.39788735772973816
-kindex = GPdc.MAT52
+kindex = gpbo.core.GPdc.MAT52
 prior = sp.array([0.]+[-1.]*d)
 sprior = sp.array([1.]*(d+1))
 kernel = [kindex,prior,sprior]
@@ -47,7 +47,7 @@ for ii,s in enumerate(slist):
     #print 'start'
     b_ = min(bd,200.*cfn(s))
     names = ["../cache/braninnoise/PESFS_"+str(int(100*sp.log10(s)))+"_"+str(pwr)+"_"+str(i)+".p" for i in xrange(nreps)]
-    results = search.multiPESFS(ojf,lb,ub,kernel,s,b_,names)
+    results = gpbo.core.search.multiPESFS(ojf, lb, ub, kernel, s, b_, names)
     zr = [r[11].flatten() for r in results]
     C = results[0][5]
     tmp.append([ len(r[5]) for r in results])
@@ -84,7 +84,7 @@ s=1e-1
 lsu = 3
 lsl = -7
 names = ["../cache/braninnoise/PESVS_"+str(int(100*sp.log10(s)))+"_"+str(pwr)+"_"+str(i)+"_"+str(lsl)+"_"+str(lsu)+".p" for i in xrange(nreps)]
-results = search.multiPESVS(ojf,lb,ub,kernel,s,bd,lambda x,s:cfn(s),lsl,lsu,names)
+results = gpbo.core.search.multiPESVS(ojf, lb, ub, kernel, s, bd, lambda x, s:cfn(s), lsl, lsu, names)
 Rz = [sp.log10(sp.array(r[11])-braninmin).flatten() for r in results]
 Cz = [[sum(r[5][:j]) for j in xrange(len(r[5]))] for r in results]
 #for i in xrange(nreps):
@@ -96,7 +96,7 @@ for r in results:
     y.append(sp.array(sp.log10([1e-6/(c**(1./pwr)) for c in r[5]])))
     print y
     x.append(range(len(r[5])))
-X_,Y_,lb_,ub_ = OPTutils.mergelines(x,y)
+X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(x, y)
 a[1].fill_between(X_,lb_,ub_,facecolor='lightcoral',edgecolor='lightcoral',alpha=0.5)
 a[1].plot(X_,Y_,'r')
     #a[2].plot(sp.array([sum(C2[:j]) for j in xrange(len(C2))]).flatten(),(sp.log(Yreg)).flatten(),'ro-')

@@ -6,12 +6,12 @@
 
 import scipy as sp
 from matplotlib import pyplot as plt
-import GPdc
-import OPTutils
-import search
+import gpbo.core.GPdc
+import gpbo.core.OPTutils
+import gpbo.core.search
 import os
 import pickle
-import wrappingLogistic
+import gpbo.core.wrappingLogistic
 import time
 
 print 'start'
@@ -38,13 +38,13 @@ def ojf(x,s,d,override=False):
     for i in xrange(4):
         xscale[i] = truelb[i]+(x[0,i]+1.)*0.5*(trueub[i]-truelb[i])
     t0 = time.clock()
-    f = wrappingLogistic.main({'lrate':xscale[0],'l2_reg':xscale[1],'batchsize':xscale[2],'n_epochs':80},fold=1,folds=1,downsize=1)
+    f = gpbo.core.wrappingLogistic.main({'lrate':xscale[0], 'l2_reg':xscale[1], 'batchsize':xscale[2], 'n_epochs':80}, fold=1, folds=1, downsize=1)
     t1 = time.clock()
     return [f,t1-t0]
 
 
 braninmin = 0.
-kindex = GPdc.MAT52
+kindex = gpbo.core.GPdc.MAT52
 prior = sp.array([0.]+[-1.]*d)
 sprior = sp.array([1.]*(d+1))
 kernel = [kindex,prior,sprior]
@@ -58,7 +58,7 @@ import os
 for s in slist:
     
     names = ["../cache/mnist/EIMLE_5mnist"+str(int(100*sp.log10(s)))+"_"+"_"+str(i)+".p" for i in xrange(nreps)]
-    results = search.multiMLEFS(ojf,lb,ub,kernel,s,bd,names)
+    results = gpbo.core.search.multiMLEFS(ojf, lb, ub, kernel, s, bd, names)
     yr = [r[11].flatten() for r in results]
     C = [r[5] for r in results]
     

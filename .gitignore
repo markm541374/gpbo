@@ -208,3 +208,5 @@ crashlytics-build.properties
 fabric.properties
 
 results/
+/gpbo/examples/results/
+/gpbo/examples/dbout/

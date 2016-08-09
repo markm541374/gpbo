@@ -6,20 +6,20 @@
 import scipy as sp
 from scipy import linalg as spl
 from matplotlib import pyplot as plt
-import GPdc
-import OPTutils
-import ESutils
+import gpbo.core.GPdc
+import gpbo.core.OPTutils
+import gpbo.core.ESutils
 import DIRECT
 
 #base dimension
 d = 2
-kindex = GPdc.MAT52
+kindex = gpbo.core.GPdc.MAT52
 nt = 34
 lb = sp.array([0.]+[-1.]*d)
 ub = sp.array([5.]+[1.]*d)
 Htrue = sp.array([1.4,4.]+[0.25]*d)
-[X,Y,S,D] = ESutils.gen_dataset(nt,d+1,lb,ub,kindex,Htrue, s=1e-8)
-G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(kindex,d+1,Htrue))
+[X,Y,S,D] = gpbo.core.ESutils.gen_dataset(nt, d + 1, lb, ub, kindex, Htrue, s=1e-8)
+G = gpbo.core.GPdc.GPcore(X, Y, S, D, gpbo.core.GPdc.kernel(kindex, d + 1, Htrue))
 
 def ojfaugnn(x):
     return G.infer_m(x,[[sp.NaN]])[0,0]
