@@ -11,6 +11,7 @@ from matplotlib import pyplot as plt
 from scipy.optimize import minimize as spomin
 from scipy.stats import multivariate_normal as mnv
 import time
+import tqdm
 
 SUPPORT_UNIFORM = 0
 SUPPORT_SLICELCB = 1
@@ -65,7 +66,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 #print 'offedge {}'.format(x)
                 bound=(1e3*(r-1))**6
             return y+bound
-        for i in xrange(para):
+        for i in range(para):
             res = spomin(f,Xst[i,:],method='Nelder-Mead',options={'xtol':0.0001,'maxfev':2000})
             if not res.success:
                 class MJMError(Exception):
@@ -115,7 +116,9 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 X[i*neach:(i+1)*neach,j]+=unq[i][j]
             
         sp.clip(X,-1,1,out=X)
-        if True:
+        #if True:
+        if False:
+            print "plotting draw_support...",
             if not os.path.exists(os.path.join('.', 'dbout')):
                 os.mkdir('dbout')
 
@@ -154,6 +157,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 ax[0].plot(xp,yp,'r-')
             fig.savefig(os.path.join('dbout','drawlapapr'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
             del(fig)
+            print 'done'
 
     elif method==SUPPORT_SLICELCB:
         def f(x):
@@ -233,8 +237,10 @@ def draw_min(g,support,n):
     amins = [len(list(group)) for key, group in groupby(sorted(args))]
     print "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(support.shape[0],len(amins),100.*max(amins)/float(n))
     
-    debugoutput=True
-    if debugoutput:
+
+    #if True:
+    if False:
+        print 'plotting draw_min...',
         if not os.path.exists(os.path.join('.', 'dbout')):
             os.mkdir('dbout')
         from matplotlib import pyplot as plt
@@ -258,6 +264,7 @@ def draw_min(g,support,n):
             ax[0].plot(R[i,1],R[i,2],'ro')
         fig.savefig(os.path.join('dbout','drawmin'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
         del(fig)
+        print 'done'
     return R
 
 #fake gp class that 9looks like a d-1 gp becuase an extra vaue is added before callind

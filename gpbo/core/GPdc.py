@@ -6,6 +6,8 @@
 
 __author__ = "mark"
 __date__ = "$22-Nov-2015 21:27:19$"
+
+#TODO draw doesn't work correclty on a GP created with no data
 import numpy as np
 import scipy as sp
 import ctypes as ct
