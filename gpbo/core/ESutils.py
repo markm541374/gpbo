@@ -116,8 +116,8 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 X[i*neach:(i+1)*neach,j]+=unq[i][j]
             
         sp.clip(X,-1,1,out=X)
-        #if True:
-        if False:
+        if True:
+        #if False:
             print "plotting draw_support...",
             if not os.path.exists(os.path.join('.', 'dbout')):
                 os.mkdir('dbout')
@@ -238,8 +238,8 @@ def draw_min(g,support,n):
     print "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(support.shape[0],len(amins),100.*max(amins)/float(n))
     
 
-    #if True:
-    if False:
+    if True:
+    #if False:
         print 'plotting draw_min...',
         if not os.path.exists(os.path.join('.', 'dbout')):
             os.mkdir('dbout')

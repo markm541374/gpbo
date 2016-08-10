@@ -135,9 +135,10 @@ def gphinasrecc(optstate,**para):
         return [sp.NaN for i in para['lb']],{'didnotrun':True}
     logger.info('gpmapas reccomender')
     d=len(para['lb'])
-    
-    x=sp.hstack([sp.vstack(optstate.x),sp.vstack([e['xa'] for e in optstate.ev])])
-    
+
+
+    x=sp.hstack([sp.vstack([e['xa'] for e in optstate.ev]),sp.vstack(optstate.x)])
+
     
     y=sp.vstack(optstate.y)
     s= sp.vstack([e['s'] for e in optstate.ev])
@@ -146,7 +147,7 @@ def gphinasrecc(optstate,**para):
     G = GPdc.GPcore(x,y,s,dx,[GPdc.kernel(optstate.aux['kindex'],d+1,h) for h in optstate.aux['HYPdraws']])
     def directwrap(xq,y):
         xq.resize([1,d])
-        xe = sp.hstack([xq,sp.array([[0.]])])
+        xe = sp.hstack([sp.array([[0.]]),xq])
         #print xe
         a = G.infer_m_post(xe,[[sp.NaN]])
         return (a[0,0],0)
@@ -168,7 +169,7 @@ def gphinasrecc(optstate,**para):
         s_ = sp.empty([n,n])
         for i in xrange(n):
             for j in xrange(n):
-                m_,v_ = G.infer_diag_post(sp.array([y_[j],x_[i],0.]),[[sp.NaN]])
+                m_,v_ = G.infer_diag_post(sp.array([0.,y_[j],x_[i]]),[[sp.NaN]])
                 z_[i,j] = m_[0,0]
                 s_[i,j] = sp.sqrt(v_[0,0])
         CS = ax[1].contour(x_,y_,z_,20)

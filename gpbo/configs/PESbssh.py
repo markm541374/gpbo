@@ -25,7 +25,7 @@ cfn = objectives.cfaexp(1.,0.75)
 
 aqpara['traincfn'] = True
 
-stoppara= {'nmax':25}
+stoppara= {'nmax':12}
 stopfn = optimize.nstopfn
 
 reccfn,reccpara = reccomenders.gpashin
