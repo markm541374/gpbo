@@ -107,8 +107,8 @@ def gpmapasrecc(optstate,**para):
         CS = ax[2].contour(x_,y_,s_,20)
         ax[2].clabel(CS, inline=1, fontsize=10)
         for i in xrange(x.shape[0]):
-            ax[0].plot(x[i,0],x[i,1],'b.')
-            circle = plt.Circle([x[i,0],x[i,1]], radius=0.5*x[i,2]*l, edgecolor="none",color='lightblue',alpha=0.8-0.6*x[i,2])
+            ax[0].plot(x[i,1],x[i,2],'b.')
+            circle = plt.Circle([x[i,1],x[i,2]], radius=0.5*x[i,0]*l, edgecolor="none",color='lightblue',alpha=0.8-0.6*x[i,2])
             ax[0].add_patch(circle)
             
         ax[0].axis([-1.,1.,-1.,1.])
