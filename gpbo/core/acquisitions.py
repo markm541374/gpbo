@@ -212,10 +212,34 @@ def PESbsaq(optstate,persist,**para):
         persist = {'n':0,'d':len(para['ub'])}
     n = persist['n']
     d = persist['d']
-    if n<para['nrandinit']:
+    if n<para['nrandinit'] and para['startmode']=='full':
         persist['n']+=1
         para['ev']['xa'] = sp.random.uniform(para['xal'],para['xau'])
         return randomaq(optstate,persist,**para)
+    elif n<para['nrandinit'] and para['startmode']=='inline':
+
+        r=persist['n']%len(para['initpoints'])
+        if r==0:
+            _x,_par,_per,_d=randomaq(optstate, persist, **para)
+            persist['_x']=_x
+            persist['_par'] = _par
+            persist['_per'] = _per
+            persist['_d'] = _d
+        else:
+            _x = persist['_x']
+            _par = persist['_par']
+            _per = persist['_per']
+            _d = persist['_d']
+
+        persist['n'] += 1
+
+
+        _par['xa'] = para['initpoints'][r]
+        return _x,_par,_per,_d
+    elif n < para['nrandinit']:
+        raise
+    else:
+        pass
     logger.info('PESssaq')
     
     x=sp.hstack([sp.vstack([e['xa'] for e in optstate.ev]),sp.vstack(optstate.x)])
@@ -276,7 +300,9 @@ PESbsprior = {
             'cfn':lambda x,ev:42.,
             'traincfn':False,
             'xau':1.,
-            'xal':0.
+            'xal':0.,
+            'startmode':'inline',
+            'initpoints':[0.5,0.75,0.875]
             }
             
 PESbs = PESbsaq,PESbsprior
