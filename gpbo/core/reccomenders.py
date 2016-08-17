@@ -56,6 +56,7 @@ gpmapprior = {
                 'kindex':GPdc.MAT52,
                 'volper':1e-6,
                 'onlyafter':10,
+                'check':False,
                 'everyn':1
                 }
 
@@ -84,8 +85,8 @@ def gpmapasrecc(optstate,**para):
         return (a[0,0],0)
     [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
     logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
-    
-    if True:
+    from gpbo.core import debugoutput
+    if debugoutput:
         A2 = MAP[0]
         l = MAP[3]
         from matplotlib import pyplot as plt
@@ -107,8 +108,8 @@ def gpmapasrecc(optstate,**para):
         CS = ax[2].contour(x_,y_,s_,20)
         ax[2].clabel(CS, inline=1, fontsize=10)
         for i in xrange(x.shape[0]):
-            ax[0].plot(x[i,1],x[i,2],'b.')
-            circle = plt.Circle([x[i,1],x[i,2]], radius=0.5*x[i,0]*l, edgecolor="none",color='lightblue',alpha=0.8-0.6*x[i,2])
+            ax[0].plot(x[i,0],x[i,1],'b.')
+            circle = plt.Circle([x[i,0],x[i,1]], radius=0.5*x[i,2]*l, edgecolor="none",color='lightblue',alpha=0.8-0.6*x[i,2])
             ax[0].add_patch(circle)
             
         ax[0].axis([-1.,1.,-1.,1.])
@@ -125,6 +126,7 @@ gpmapasprior = {
                 'kindex':GPdc.MAT52,
                 'volper':1e-6,
                 'onlyafter':10,
+                'check':False,
                 'everyn':1,
                 }
 
@@ -153,10 +155,13 @@ def gphinasrecc(optstate,**para):
         return (a[0,0],0)
     [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
     logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
-    
-    if True:
-        if not os.path.exists(os.path.join('.', 'dbout')):
-            os.mkdir('dbout')
+
+    from gpbo.core import debugoutput
+    if debugoutput:
+        from gpbo.core import debugpath
+        if not os.path.exists(debugpath):
+            os.mkdir(debugpath)
+
         l = sp.mean([h[3] for h in optstate.aux['HYPdraws']])
         from matplotlib import pyplot as plt
         fig, ax = plt.subplots( nrows=3, ncols=1 ,figsize=(10,30))
@@ -177,15 +182,15 @@ def gphinasrecc(optstate,**para):
         CS = ax[2].contour(x_,y_,s_,20)
         ax[2].clabel(CS, inline=1, fontsize=10)
         for i in xrange(x.shape[0]-1):
-            ax[0].plot(x[i,0],x[i,1],'b.')
-            circle = plt.Circle([x[i,0],x[i,1]], radius=0.5*x[i,2]*l, edgecolor="none",color='lightblue',alpha=0.8-0.6*x[i,2])
+            ax[0].plot(x[i,1],x[i,2],'b.')
+            circle = plt.Circle([x[i,1],x[i,2]], radius=0.5*x[i,0]*l, edgecolor="none",color='lightblue',alpha=0.8-0.6*x[i,2])
             ax[0].add_patch(circle)
-        ax[0].plot(x[i+1,0],x[i+1,1],'r.')
-        circle = plt.Circle([x[i+1,0],x[i+1,1]], radius=0.5*x[i,2]*l, edgecolor="none",color='lightblue',alpha=0.8-0.6*x[i,2])
+        ax[0].plot(x[i+1,1],x[i+1,2],'r.')
+        circle = plt.Circle([x[i+1,1],x[i+1,2]], radius=0.5*x[i,0]*l, edgecolor="none",color='lightblue',alpha=0.8-0.6*x[i,2])
         ax[0].add_patch(circle)
         ax[0].axis([-1.,1.,-1.,1.])
         ax[1].plot(xmin[0],xmin[1],'ro')
-        fig.savefig(os.path.join('dbout', 'datavis' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+        fig.savefig(os.path.join(debugpath, 'datavis' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
         del (fig)
 
     return [i for i in xmin],{'ymin':ymin}
@@ -200,6 +205,7 @@ gphinasprior = {
                 #'kindex':GPdc.MAT52,
                 'volper':1e-6,
                 'onlyafter':10,
+                'check':False,
                 'everyn':1,
                 }
 

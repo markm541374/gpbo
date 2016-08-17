@@ -116,18 +116,14 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 X[i*neach:(i+1)*neach,j]+=unq[i][j]
             
         sp.clip(X,-1,1,out=X)
-        if True:
-        #if False:
-            print "plotting draw_support...",
-            if not os.path.exists(os.path.join('.', 'dbout')):
-                os.mkdir('dbout')
+        from gpbo.core import debugoutput
 
-            #print 'inits'
-            #print Xst
-            
-            #print 'cls'
-            #print cls
-            
+        if debugoutput:
+            print "plotting draw_support...",
+            from gpbo.core import debugpath
+            if not os.path.exists(debugpath):
+                os.mkdir(debugpath)
+
             np = para
             #print 'para{}'.format(para)
             #print Xst.shape
@@ -155,7 +151,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 xp = [x[0]+cls[j][0],x[0],x[0]-cls[j][0],x[0],x[0]+cls[j][0]]
                 yp = [x[1],x[1]+cls[j][1],x[1],x[1]-cls[j][1],x[1]]
                 ax[0].plot(xp,yp,'r-')
-            fig.savefig(os.path.join('dbout','drawlapapr'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+            fig.savefig(os.path.join(debugpath,'drawlapapr'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
             del(fig)
             print 'done'
 
@@ -236,13 +232,13 @@ def draw_min(g,support,n):
     from itertools import groupby
     amins = [len(list(group)) for key, group in groupby(sorted(args))]
     print "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(support.shape[0],len(amins),100.*max(amins)/float(n))
-    
 
-    if True:
-    #if False:
+    from gpbo.core import debugoutput
+    if debugoutput:
         print 'plotting draw_min...',
-        if not os.path.exists(os.path.join('.', 'dbout')):
-            os.mkdir('dbout')
+        from gpbo.core import debugpath
+        if not os.path.exists(debugpath):
+            os.mkdir(debugpath)
         from matplotlib import pyplot as plt
         import time
         #2d plot assuming [-1,1]^2 support
@@ -262,7 +258,7 @@ def draw_min(g,support,n):
         ax[1].clabel(CS, inline=1, fontsize=10)
         for i in xrange(Z.shape[0]):
             ax[0].plot(R[i,1],R[i,2],'ro')
-        fig.savefig(os.path.join('dbout','drawmin'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+        fig.savefig(os.path.join(debugpath,'drawmin'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
         del(fig)
         print 'done'
     return R

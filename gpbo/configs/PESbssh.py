@@ -39,9 +39,10 @@ reccpara['onlyafter']=aqpara['nrandinit']+1
 ojfw,xmin,ymin = objectives.genbiasedmat52ojf(len(aqpara['lb']),aqpara['lb'],aqpara['ub'],0.5)
 ojf = objectives.costfnwrap(ojfw,cfn)
 
-if not os.path.exists(os.path.join('.','results/PESbssh/dbout')):
-    os.mkdir('results/PESbssh/dbout')
-dbpath ='results/PESbssh/dbout'
+from gpbo.core import debugpath
+if not os.path.exists(debugpath):
+    os.mkdir(debugpath)
+
 if True:
     from matplotlib import pyplot as plt
     import time
@@ -61,6 +62,6 @@ if True:
     
     ax.plot(xmin[0],xmin[1],'ro')
 
-    fig.savefig(os.path.join(dbpath,'truegeneratedobjective'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+    fig.savefig(os.path.join(debugpath,'truegeneratedobjective'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
     del(fig)
 ojfchar = {'dx':len(aqpara['lb']),'dev':len(aqpara['ev'])}

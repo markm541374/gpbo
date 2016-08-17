@@ -35,9 +35,9 @@ class optstate:
 
 
 class optimizer:
-    def __init__(self,dirpath,aqpara,aqfn,stoppara,stopfn,reccpara,reccfn,ojf,ojfchar,checkrecc=False):
+    def __init__(self,dirpath,aqpara,aqfn,stoppara,stopfn,reccpara,reccfn,ojf,ojfchar):
         print aqpara
-        self.checkrecc=checkrecc
+
         self.dirpath = dirpath
         self.setaq(aqpara,aqfn)
         self.setstopcon(stoppara,stopfn)
@@ -93,7 +93,7 @@ class optimizer:
             rx,reaux = self.reccfn(self.state,**self.reccpara)
             t3 = time.time()
             
-            if self.checkrecc:
+            if self.reccpara['check']:
                 logger.info("checkin {} : {}".format(rx,self.aqpara['ev']))
                 checky,checkc,checkojaux  = self.ojf(rx,**self.aqpara['ev'])
                 logger.info("checkout {} : {} : {}".format(checky,checkc,checkojaux))
@@ -126,7 +126,7 @@ def cstopfn(optstate,cmax = 1):
 def search(optconfig):
     O = optimizer(optconfig.path, optconfig.aqpara, optconfig.aqfn, optconfig.stoppara,
                                      optconfig.stopfn, optconfig.reccpara, optconfig.reccfn, optconfig.ojf,
-                                     optconfig.ojfchar, checkrecc=True)
+                                     optconfig.ojfchar)
 
     return O.run()
 
