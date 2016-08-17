@@ -18,12 +18,12 @@ nt=12
 d=1
 lb = sp.array([-1.]*d)
 ub = sp.array([1.]*d)
-[X,Y,S,D] = ESutils.gen_dataset(nt,d,lb,ub,GPdc.SQUEXP,sp.array([1.5,0.15]))
+[X,Y,S,D] = ESutils.gen_dataset(nt, d, lb, ub, GPdc.SQUEXP, sp.array([1.5, 0.15]))
 
-G = PES.makeG(X,Y,S,D,GPdc.SQUEXP,sp.array([0.,-1.]),sp.array([1.,1.]),12)
+G = PES.makeG(X, Y, S, D, GPdc.SQUEXP, sp.array([0., -1.]), sp.array([1., 1.]), 12)
 Z=PES.drawmins(G,8,sp.array([-1.]),sp.array([1.]),SUPPORT=400,SLICELCB_PARA=1.)
 
-Ga = GPdc.GPcore(*PES.addmins(G,X,Y,S,D,Z[0,:])+[G.kf])
+Ga = GPdc.GPcore(*PES.addmins(G, X, Y, S, D, Z[0, :]) + [G.kf])
 
 np=100
 sup = sp.linspace(-1,1,np)
@@ -51,13 +51,13 @@ nt=50
 d=3
 lb = sp.array([-1.]*d)
 ub = sp.array([1.]*d)
-[X,Y,S,D] = ESutils.gen_dataset(nt,d,lb,ub,GPdc.SQUEXP,sp.array([1.5,0.35,0.25,0.30]))
+[X,Y,S,D] = ESutils.gen_dataset(nt, d, lb, ub, GPdc.SQUEXP, sp.array([1.5, 0.35, 0.25, 0.30]))
 
-G = PES.makeG(X,Y,S,D,GPdc.SQUEXP,sp.array([0.,-1.,-1.,-1.]),sp.array([1.,1.,1.,1.]),6)
+G = PES.makeG(X, Y, S, D, GPdc.SQUEXP, sp.array([0., -1., -1., -1.]), sp.array([1., 1., 1., 1.]), 6)
 nz=8
 Z=PES.drawmins(G,nz,sp.array([-1.]*d),sp.array([1.]*d),SUPPORT=400,SLICELCB_PARA=1.)
 print Z
-Ga = [GPdc.GPcore(*PES.addmins(G,X,Y,S,D,Z[i,:])+[G.kf]) for i in xrange(nz)]
+Ga = [GPdc.GPcore(*PES.addmins(G, X, Y, S, D, Z[i, :]) + [G.kf]) for i in xrange(nz)]
 
 
 

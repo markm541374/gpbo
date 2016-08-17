@@ -15,9 +15,9 @@ nt=2
 d=1
 lb = sp.array([-1.])
 ub = sp.array([1.])
-[X,Y,S,D] = ESutils.gen_dataset(nt,d,lb,ub,GPdc.SQUEXP,sp.array([1.5,0.35]),s=1e-3)
+[X,Y,S,D] = ESutils.gen_dataset(nt, d, lb, ub, GPdc.SQUEXP, sp.array([1.5, 0.35]), s=1e-3)
 
-g = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.SQUEXP,1,sp.array([1.5,0.35])))
+g = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, 1, sp.array([1.5, 0.35])))
 
 np=100
 sup = sp.linspace(-1,1,np)

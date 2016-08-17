@@ -17,9 +17,9 @@ nt=20
 d=1
 lb = sp.array([-1.]*d)
 ub = sp.array([1.]*d)
-[X,Y,S,D] = ESutils.gen_dataset(nt,d,lb,ub,GPdc.SQUEXP,sp.array([1.5,0.15]))
+[X,Y,S,D] = ESutils.gen_dataset(nt, d, lb, ub, GPdc.SQUEXP, sp.array([1.5, 0.15]))
 
-G = PES.makeG(X,Y,S,D,GPdc.SQUEXP,sp.array([0.,-1.]),sp.array([1.,1.]),18)
+G = PES.makeG(X, Y, S, D, GPdc.SQUEXP, sp.array([0., -1.]), sp.array([1., 1.]), 18)
 H = sp.vstack([i.hyp for i in G.kf])
 f,a = plt.subplots(1)
 a.plot(H[:,0],H[:,1],'r.')

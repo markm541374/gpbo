@@ -28,10 +28,10 @@ a0.plot(sp.array(X[:,0]).flatten(),Y,'g.')
 
 lb = sp.array([-2.,-1.,-2.])
 ub = sp.array([2.,1.,2.])
-MLEH =  GPdc.searchMLEhyp(X,Y,S,D,lb,ub,GPdc.LIN1,mx=10000)
+MLEH =  GPdc.searchMLEhyp(X, Y, S, D, lb, ub, GPdc.LIN1, mx=10000)
 
 print MLEH
-G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.LIN1,2,MLEH))
+G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.LIN1, 2, MLEH))
 print G.llk()
 
 

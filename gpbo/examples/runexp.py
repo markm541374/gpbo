@@ -11,12 +11,12 @@ def run():
     #import gpbo.configs.PESfssh as optconfig
 
 
-    O = gpbo.search(optconfig)
+    #O = gpbo.search(optconfig)
 
     import pstats, cProfile
     cProfile.runctx("O = gpbo.search(optconfig)", globals(), locals(), "Profile.prof")
     pstats.Stats("Profile.prof").strip_dirs().sort_stats("time").print_stats()
-    print "RESULT: {}".format(O)
+    #print "RESULT: {}".format(O)
     return
 
 if __name__=="__main__":

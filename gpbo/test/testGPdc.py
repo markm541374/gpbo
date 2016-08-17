@@ -25,7 +25,7 @@ def main():
     a[1].plot([0.25],[2.5],'ro')
     a[2].plot([0.8],[50],'ro')
 
-    k= GPdc.kernel(GPdc.SQUEXP,1,sp.array([0.5,0.2]))
+    k= GPdc.kernel(GPdc.SQUEXP, 1, sp.array([0.5, 0.2]))
     K = sp.empty([4,4])
     for i in xrange(4):
         for j in xrange(i,4):
@@ -33,7 +33,7 @@ def main():
         K[i,i]+=1e-6
 
 
-    g = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.SQUEXP,1,sp.array([0.5,0.2])))
+    g = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, 1, sp.array([0.5, 0.2])))
     #g.printc()
     C= g.get_cho()
     print C

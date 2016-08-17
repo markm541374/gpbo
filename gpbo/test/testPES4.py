@@ -19,7 +19,7 @@ nt=30
 d=2
 lb = sp.array([0.]+[-1.]*(d-1))
 ub = sp.array([1.]*d)
-[X,Y,S,D] = ESutils.gen_dataset(nt,d,lb,ub,GPdc.SQUEXP,sp.array([1.5,0.55,0.25]))
+[X,Y,S,D] = ESutils.gen_dataset(nt, d, lb, ub, GPdc.SQUEXP, sp.array([1.5, 0.55, 0.25]))
 
 kindex = GPdc.SQUEXP
 mprior = sp.array([0.]+[-1.]*d)

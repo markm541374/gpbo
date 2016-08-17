@@ -1,6 +1,7 @@
 # Classes to run PES. Classes for constant or variable obs noise and augmented space
 
 #make a single posterior gp form data and take draws on this
+
 import ESutils
 import GPdc
 import eprop
@@ -9,6 +10,7 @@ from scipy import stats as sps
 import DIRECT
 from matplotlib import pyplot as plt
 import logging
+from libc.math cimport log10, log, exp, M_E
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +19,7 @@ def makeG(X,Y,S,D,kindex,mprior,sprior,nh):
     #print "RRRRRRRRRRRRRR"+str([X,Y,S,D,kindex,mprior,sprior,nh])
     H = ESutils.drawhyp_plk(X,Y,S,D,kindex,mprior,sprior,nh)
     
-    G = GPdc.GPcore(X,Y,S,D,[GPdc.kernel(kindex,X.shape[1],i) for i in H])
+    G = GPdc.GPcore(X, Y, S, D, [GPdc.kernel(kindex, X.shape[1], i) for i in H])
     
     return G
 
@@ -50,8 +52,9 @@ def drawmins_inplane(G,n,lb,ub,axis,value, SUPPORT=300, mode=ESutils.SUPPORT_SLI
 OFFHESSZERO=0
 OFFHESSINFER=1
 
-def addmins(G,X,Y,S,D,xmin,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,EPROP_LOOPS=20):
-    dim=X.shape[1]
+def addmins(G,X,Y,S,D,xmin,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,int EPROP_LOOPS=20):
+    cdef int i
+    cdef int dim=X.shape[1]
     #grad elements are zero
     Xg = sp.vstack([xmin]*dim)
     Yg = sp.zeros([dim,1])
@@ -104,7 +107,8 @@ def addmins(G,X,Y,S,D,xmin,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,EPR
 
 NOMIN=0
 def addmins_inplane(G,X,Y,S,D,xmin,axis,value,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,EPROP_LOOPS=20,MINPOLICY=NOMIN):
-    dim=X.shape[1]
+    cdef int i,j
+    cdef int dim=X.shape[1]
     #grad elements are zero
     Xg = sp.vstack([xmin]*(dim-1))
     Yg = sp.zeros([dim-1,1])
@@ -172,7 +176,7 @@ def PESgain(g0,G1,Z,X,D,s):
     
     #print X.shape
     for j in xrange(X.shape[0]):
-        H[j]-= len(G1)*0.5*sp.log(2*sp.pi*sp.e*(v0[0,j]+s[j]))
+        H[j]-= len(G1)*0.5*log(2*sp.pi*M_E*(v0[0,j]+s[j]))
         for i,g1 in enumerate(G1):
             
             Xi = sp.vstack([X[j,:],Z[i,:]])
@@ -182,7 +186,7 @@ def PESgain(g0,G1,Z,X,D,s):
             #print [mi,Vi]
             v1 = Vadj(mi,Vi)
         
-            h1 = 0.5*sp.log(2*sp.pi*sp.e*(v1+s[j]))
+            h1 = 0.5*log(2*sp.pi*M_E*(v1+s[j]))
             H[j]+=h1
     
     return -H/float(len(G1))
@@ -192,7 +196,7 @@ def Vadj(m,V):
     mu = m[0,1]-m[0,0]
     alpha = -mu/sp.sqrt(s) #sign difference for minimizing
     try:
-        beta = sp.exp(sps.norm.logpdf(alpha) - sps.norm.logcdf(alpha))
+        beta = exp(sps.norm.logpdf(alpha) - sps.norm.logcdf(alpha))
     except:
         logger.warn('Vadj: complex in PESgain, using beta=0\n alpha: {}\nmu: {}\ns: {}\nm: {}\nV: {}\n'.format(alpha,mu,s,m,V))
         beta=0.
@@ -219,7 +223,7 @@ class PES:
         print "hyp std:  "+str(sp.sqrt(sp.mean(HS,axis=0)))
         self.Z = drawmins(self.G,DM_SAMPLES,lb,ub,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode)
         print "mindraws: "+str(self.Z)
-        self.Ga = [GPdc.GPcore(*addmins(self.G,X,Y,S,D,self.Z[i,:])+[self.G.kf]) for i in xrange(DM_SAMPLES)]
+        self.Ga = [GPdc.GPcore(*addmins(self.G, X, Y, S, D, self.Z[i, :]) + [self.G.kf]) for i in xrange(DM_SAMPLES)]
         #class MJMError(Exception):
             #pass
         
@@ -258,7 +262,7 @@ class PES:
             x = sp.array([Q])
             if self.noS:
                 alls = [k(x,x,dv,dv,gets=True)[1] for k in self.G.kf]
-                s = sp.exp(sp.mean(sp.log(alls)))
+                s = exp(sp.mean(log(alls)))
             else:
                 s= self.stmp
             acq = PESgain(self.G,self.Ga,self.Z,x,dv,[s])
@@ -299,7 +303,7 @@ class PES_inplane:
         print "hyp std:  "+str(sp.sqrt(sp.mean(HS,axis=0)))
         self.Z = drawmins_inplane(self.G,DM_SAMPLES,lb,ub,axis=axis,value=value,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode)
         print "mindraws:\n"+str(self.Z)
-        self.Ga = [GPdc.GPcore(*addmins_inplane(self.G,X,Y,S,D,self.Z[i,:],axis=axis,value=value,MINPOLICY=AM_POLICY)+[self.G.kf]) for i in xrange(DM_SAMPLES)]
+        self.Ga = [GPdc.GPcore(*addmins_inplane(self.G, X, Y, S, D, self.Z[i, :], axis=axis, value=value, MINPOLICY=AM_POLICY) + [self.G.kf]) for i in xrange(DM_SAMPLES)]
         return
     
     def __del__(self):
@@ -327,7 +331,7 @@ class PES_inplane:
             x = sp.array([Q])
             if self.noS:
                 alls = [k(x,x,dv,dv,gets=True)[1] for k in self.G.kf]
-                s = sp.exp(sp.mean(sp.log(alls)))
+                s = exp(sp.mean(log(alls)))
             else:
                 s = sfn(x)
             acq = PESgain(self.G,self.Ga,self.Z,x,dv,[s])
@@ -351,7 +355,7 @@ class PES_inplane:
             
             if self.noS:
                 alls = [k(xmin,xmin,dv,dv,gets=True)[1] for k in self.G.kf]
-                s = sp.exp(sp.mean(sp.log(alls)))
+                s = exp(sp.mean(log(alls)))
             else:
                 s = sfn(x)
                 

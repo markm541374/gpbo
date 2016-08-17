@@ -15,8 +15,8 @@ D=4
 
 
 
-ke = GPdc.kernel(GPdc.SQUEXP,D,sp.array([0.75,0.1,0.2,0.25,0.1]))
-km = GPdc.kernel(GPdc.MAT52,D,sp.array([0.75,0.1,0.2,0.25,0.1]))
+ke = GPdc.kernel(GPdc.SQUEXP, D, sp.array([0.75, 0.1, 0.2, 0.25, 0.1]))
+km = GPdc.kernel(GPdc.MAT52, D, sp.array([0.75, 0.1, 0.2, 0.25, 0.1]))
 #support
 ns = 1201
 xax = sp.linspace(-1,1,ns)

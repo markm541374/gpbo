@@ -8,13 +8,12 @@ import time
 import DIRECT
 import logging
 import copy
-logger = logging.getLogger(__name__)
-
 import GPdc
 import PES
 import ESutils
 #start with random
 import objectives
+logger = logging.getLogger(__name__)
 
 def randomaq(optstate,persist,**para):
     logger.info('randomaq')
@@ -75,10 +74,10 @@ def EIMAPaq(optstate,persist,ev=None, ub = None, lb=None, nrandinit=None, mprior
     y=sp.vstack(optstate.y)
     s= sp.vstack([e['s'] for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
-    MAP = GPdc.searchMAPhyp(x,y,s,dx,mprior,sprior, kindex)
+    MAP = GPdc.searchMAPhyp(x, y, s, dx, mprior, sprior, kindex)
     logger.info('MAPHYP {}'.format(MAP))
 
-    G = GPdc.GPcore(x,y,s,dx,GPdc.kernel(kindex,d,MAP))
+    G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(kindex, d, MAP))
     def directwrap(xq,y):
         xq.resize([1,d])
         a = G.infer_lEI(xq,[ev['d']])

@@ -16,7 +16,7 @@ nt=80
 d=1
 lb = sp.array([-1.]*d)
 ub = sp.array([1.]*d)
-[X,Y,S,D] = ESutils.gen_dataset(nt,d,lb,ub,GPdc.SQUEXP,sp.array([0.9,0.25]),s=0.)
+[X,Y,S,D] = ESutils.gen_dataset(nt, d, lb, ub, GPdc.SQUEXP, sp.array([0.9, 0.25]), s=0.)
 S*=0.
 for i in xrange(nt):
     x = X[i,0]
@@ -29,15 +29,15 @@ a0.plot(sp.array(X[:,0]).flatten(),Y,'g.')
 
 lb = sp.array([-2.,-2.,-9,-2.,-2.])
 ub = sp.array([2.,2.,-1,2.,2.])
-MLEH =  GPdc.searchMLEhyp(X,Y,S,D,lb,ub,GPdc.SQUEXPPS,mx=20000)
+MLEH =  GPdc.searchMLEhyp(X, Y, S, D, lb, ub, GPdc.SQUEXPPS, mx=20000)
 
 mprior = sp.array([0.,-1.,-5.,-0.5,0.5])
 sprior = sp.array([1.,1.,3.,1.,1.])
 
-MAPH = GPdc.searchMAPhyp(X,Y,S,D,mprior,sprior,GPdc.SQUEXPPS,mx=20000)
+MAPH = GPdc.searchMAPhyp(X, Y, S, D, mprior, sprior, GPdc.SQUEXPPS, mx=20000)
 print "MLEH: "+str(MLEH)
 print "MAPH: "+str(MAPH)
-G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.SQUEXPPS,1,sp.array(MAPH)))
+G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXPPS, 1, sp.array(MAPH)))
 
 
 

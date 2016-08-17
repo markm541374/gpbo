@@ -20,14 +20,14 @@ nt=60
 d=2
 lb = sp.array([-1.]*d)
 ub = sp.array([1.]*d)
-[X,Y,S,D] = ESutils.gen_dataset(nt,d,lb,ub,GPdc.SQUEXP,sp.array([1.5,0.35,0.30]))
+[X,Y,S,D] = ESutils.gen_dataset(nt, d, lb, ub, GPdc.SQUEXP, sp.array([1.5, 0.35, 0.30]))
 
-G = PES.makeG(X,Y,S,D,GPdc.SQUEXP,sp.array([0.,-1.,-1.]),sp.array([1.,1.,1.]),6)
+G = PES.makeG(X, Y, S, D, GPdc.SQUEXP, sp.array([0., -1., -1.]), sp.array([1., 1., 1.]), 6)
 nz=8
 Z=PES.drawmins_inplane(G,nz,sp.array([-1.]*d),sp.array([1.]*d),axis=0,value = 0.,SUPPORT=500,SLICELCB_PARA=1.)
 
 print Z
-Ga = [GPdc.GPcore(*PES.addmins_inplane(G,X,Y,S,D,Z[i,:],axis=0,value=0.,MINPOLICY=PES.NOMIN)+[G.kf]) for i in xrange(nz)]
+Ga = [GPdc.GPcore(*PES.addmins_inplane(G, X, Y, S, D, Z[i, :], axis=0, value=0., MINPOLICY=PES.NOMIN) + [G.kf]) for i in xrange(nz)]
 
 np=220
 sup = sp.linspace(-1,1,np)

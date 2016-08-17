@@ -10,6 +10,31 @@ def readme():
     with open('gpbo/README.rst') as f:
         return f.read()
 
+compile_flags = ['-O3']
+from numpy import get_include
+extensions = [
+    Extension(name ="gpbo/core/ESutils",
+              sources = ["gpbo/core/ESutils.c"],
+              include_dirs = ['.','core',get_include()],
+              extra_compile_args=compile_flags
+    ),
+    Extension(name ="gpbo/core/GPdc",
+              sources = ["gpbo/core/GPdc.c"],
+              include_dirs = ['.','core',get_include()],
+              extra_compile_args=compile_flags
+    ),
+    Extension(name ="gpbo/core/PES",
+              sources = ["gpbo/core/PES.c"],
+              include_dirs = ['.','core',get_include()],
+              extra_compile_args=compile_flags
+    ),
+    Extension(name ="gpbo/core/eprop",
+              sources = ["gpbo/core/eprop.c"],
+              include_dirs = ['.','core',get_include()],
+              extra_compile_args=compile_flags
+    )
+]
+
 setup(name='gpbo',
       version=version,
       description='a package',
@@ -21,4 +46,5 @@ setup(name='gpbo',
       package_dir={'gpbo':'gpbo'},
       package_data={'gpbo':['cproj/*','VERSION','README.rst']},
       install_requires=['tqdm','direct'],
+      ext_modules= extensions,
       zip_safe=False)

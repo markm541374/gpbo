@@ -32,12 +32,12 @@ a0.plot(sp.array(X[:,0]).flatten(),Y,'g.')
 
 lb = sp.array([-2.,-1.,-2.,-2.,-2.])
 ub = sp.array([2.,1.,2.,2.,2.])
-MLEH =  GPdc.searchMLEhyp(X,Y,S,D,lb,ub,GPdc.LINXSQUEXP,mx=10000)
+MLEH =  GPdc.searchMLEhyp(X, Y, S, D, lb, ub, GPdc.LINXSQUEXP, mx=10000)
 print "xxx"
-GPdc.kernel(GPdc.LINXSQUEXP,2,MLEH)
+GPdc.kernel(GPdc.LINXSQUEXP, 2, MLEH)
 print "yyyy"
 print MLEH
-G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.LINXSQUEXP,2,MLEH))
+G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.LINXSQUEXP, 2, MLEH))
 print G.llk()
 
 

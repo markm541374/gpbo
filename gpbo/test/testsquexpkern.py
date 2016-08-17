@@ -17,7 +17,7 @@ hyp = sp.array([1.5,0.15])
 kf = GPdc.gen_sqexp_k_d(hyp)
 print "X"
 print kf(sp.array([0.1]),sp.array([0.2]),[[sp.NaN]],[[sp.NaN]])
-Kxx = GPdc.buildKsym_d(kf,X,D)
+Kxx = GPdc.buildKsym_d(kf, X, D)
 print "X"
 Y = spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T+sp.matrix(sps.norm.rvs(0,1e-3,nt)).T
 S = sp.matrix([1e-6]*nt).T
@@ -27,13 +27,13 @@ a0.plot(sp.array(X[:,0]).flatten(),Y,'g.')
 
 lb = sp.array([-2.,-2.])
 ub = sp.array([2.,2.])
-MLEH =  GPdc.searchMLEhyp(X,Y,S,D,lb,ub,GPdc.SQUEXP,mx=10000)
+MLEH =  GPdc.searchMLEhyp(X, Y, S, D, lb, ub, GPdc.SQUEXP, mx=10000)
 print "X"
 print MLEH
 mp = sp.array([0.,-1.])
 sb = sp.array([1.,1.])
 #MAPH =  GPdc.searchMAPhyp(X,Y,S,D,mp,sb,GPdc.SQUEXP,mx=10000)
-G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.SQUEXP,1,MLEH))
+G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, 1, MLEH))
 print "X"
 print Y.shape
 G.printc()

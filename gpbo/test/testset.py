@@ -16,14 +16,14 @@ D = [[sp.NaN]]*(nt)
 hyp0 = sp.array([1.5,0.15])
 hyp1 = sp.array([1.5,0.05])
 hyp2 = sp.array([1.5,0.20])
-kf = GPdc.kernel(GPdc.SQUEXP,1,hyp0)
+kf = GPdc.kernel(GPdc.SQUEXP, 1, hyp0)
 
-Kxx = GPdc.buildKsym_d(kf,X,D)
+Kxx = GPdc.buildKsym_d(kf, X, D)
 
 Y = spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T+sp.matrix(sps.norm.rvs(0,1e-3,nt)).T
 S = sp.matrix([1e-6]*nt).T
 
-G = GPdc.GPcore(X,Y,S,D,[GPdc.kernel(GPdc.SQUEXP,1,hyp0),GPdc.kernel(GPdc.SQUEXP,1,hyp1),GPdc.kernel(GPdc.SQUEXP,1,hyp2),GPdc.kernel(GPdc.SQUEXP,1,hyp0)])
+G = GPdc.GPcore(X, Y, S, D, [GPdc.kernel(GPdc.SQUEXP, 1, hyp0), GPdc.kernel(GPdc.SQUEXP, 1, hyp1), GPdc.kernel(GPdc.SQUEXP, 1, hyp2), GPdc.kernel(GPdc.SQUEXP, 1, hyp0)])
 #G.printc()
 
 np=100
@@ -88,11 +88,11 @@ D = [[sp.NaN]]*(nt)
 hyp0 = sp.array([1.5,0.4])
 hyp1 = sp.array([0.7,0.025])
 hyp2 = sp.array([2.,0.075])
-kf = GPdc.kernel(GPdc.SQUEXP,1,sp.array([1.5,0.15]))
-Kxx = GPdc.buildKsym_d(kf,X,D)
+kf = GPdc.kernel(GPdc.SQUEXP, 1, sp.array([1.5, 0.15]))
+Kxx = GPdc.buildKsym_d(kf, X, D)
 Y = spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T+sp.matrix(sps.norm.rvs(0,1e-3,nt)).T
 S = sp.matrix([1e-6]*nt).T
-G = GPdc.GPcore(X,Y,S,D,[GPdc.kernel(GPdc.SQUEXP,1,hyp0),GPdc.kernel(GPdc.SQUEXP,1,hyp1),GPdc.kernel(GPdc.SQUEXP,1,hyp2)])
+G = GPdc.GPcore(X, Y, S, D, [GPdc.kernel(GPdc.SQUEXP, 1, hyp0), GPdc.kernel(GPdc.SQUEXP, 1, hyp1), GPdc.kernel(GPdc.SQUEXP, 1, hyp2)])
 m = G.infer_m(Xp,Dp)
 mp = G.infer_m_post(Xp,Dp)
 f,a = plt.subplots(m.shape[0]+1)

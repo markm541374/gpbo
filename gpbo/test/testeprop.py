@@ -39,11 +39,11 @@ nt=5
 X = sp.matrix(sp.linspace(-1,1,nt)).T
 D = [[sp.NaN]]*(nt)
 hyp = sp.array([1.5,0.15])
-kf = GPdc.kernel(GPdc.SQUEXP,1,hyp)
-Kxx = GPdc.buildKsym_d(kf,X,D)
+kf = GPdc.kernel(GPdc.SQUEXP, 1, hyp)
+Kxx = GPdc.buildKsym_d(kf, X, D)
 Y = spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T+sp.matrix(sps.norm.rvs(0,1e-3,nt)).T
 S = sp.matrix([1e-2]*nt).T
-g = GPdc.GPcore(X,Y,S,D,kf)
+g = GPdc.GPcore(X, Y, S, D, kf)
 f,a = plt.subplots(2)
 
 Xe = sp.array([-0.25,0.25])
@@ -55,7 +55,7 @@ Fe = sp.array([(1e-6)**2,(1e-6)**2])
 
 mt,vt = eprop.expectation_prop(m0,V0,Ye,Ze,Fe,20)
 print D+De
-g2 = GPdc.GPcore(sp.vstack([X,sp.array([Xe]).T]),sp.vstack([Y,sp.array([Ye]).T]),sp.vstack([S,sp.array([Fe]).T]),D+De,kf)
+g2 = GPdc.GPcore(sp.vstack([X, sp.array([Xe]).T]), sp.vstack([Y, sp.array([Ye]).T]), sp.vstack([S, sp.array([Fe]).T]), D + De, kf)
 
 ESutils.plot_gp(g,a[0],sp.linspace(-1,1,100),[[sp.NaN]]*100)
 ESutils.plot_gp(g2,a[1],sp.linspace(-1,1,100),[[sp.NaN]]*100)

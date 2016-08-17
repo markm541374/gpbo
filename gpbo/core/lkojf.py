@@ -1,6 +1,8 @@
 # Use the log likelihood of hyperperameters as an objective function.
 
+
 import ESutils
+
 import GPdc
 import scipy as sp
 import numpy.random as npr
@@ -43,7 +45,7 @@ class lkojf:
         
     def llk(self,hy):
         t0 = time.clock()
-        r = GPdc.GP_LKonly(self.X,self.Y,self.S,self.D,GPdc.kernel(self.ki,self.d,hy)).llk()
+        r = GPdc.GP_LKonly(self.X, self.Y, self.S, self.D, GPdc.kernel(self.ki, self.d, hy)).llk()
         t1 = time.clock()
         return [r,t1-t0]
     
@@ -59,7 +61,7 @@ class lkojf:
             Ys[i,:] = self.Y[x,:]
             Ds.append(self.D[x])
         t1 = time.clock()
-        r = GPdc.GP_LKonly(Xs,Ys,Ss,Ds,GPdc.kernel(self.ki,self.d,hy)).llk()
+        r = GPdc.GP_LKonly(Xs, Ys, Ss, Ds, GPdc.kernel(self.ki, self.d, hy)).llk()
         t2=time.clock()
         #print [t1-t0,t2-t1]
         return [r,t2-t0]

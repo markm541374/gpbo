@@ -16,7 +16,7 @@ D = [[sp.NaN]]*(nt)
 hyp = sp.array([1.5,0.15])
 kf = GPdc.gen_sqexp_k_d(hyp)
 
-Kxx = GPdc.buildKsym_d(kf,X,D)
+Kxx = GPdc.buildKsym_d(kf, X, D)
 
 Y = spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T+sp.matrix(sps.norm.rvs(0,1e-3,nt)).T
 S = sp.matrix([1e-6]*nt).T
@@ -28,10 +28,10 @@ a0.plot(sp.array(X[:,0]).flatten(),Y,'g.')
 
 lb = sp.array([-2.,-2.])
 ub = sp.array([2.,2.])
-MLEH =  GPdc.searchMLEhyp(X,Y,S,D,lb,ub,GPdc.SQUEXP,mx=10000)
+MLEH =  GPdc.searchMLEhyp(X, Y, S, D, lb, ub, GPdc.SQUEXP, mx=10000)
 
 print MLEH
-G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.SQUEXP,1,MLEH))
+G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, 1, MLEH))
 print G.llk()
 
 np=180
@@ -57,14 +57,14 @@ def r(x):
     m = sp.array([x])
     s = sp.array(1.)
     R = sp.empty(1)
-    GPdc.libGP.EI(m.ctypes.data_as(ctpd),s.ctypes.data_as(ctpd),ct.c_double(0.),ct.c_int(1),R.ctypes.data_as(ctpd))
+    GPdc.libGP.EI(m.ctypes.data_as(ctpd), s.ctypes.data_as(ctpd), ct.c_double(0.), ct.c_int(1), R.ctypes.data_as(ctpd))
     return R[0]
 
 def lr(x):
     m = sp.array([x])
     s = sp.array(1.)
     R = sp.empty(1)
-    GPdc.libGP.lEI(m.ctypes.data_as(ctpd),s.ctypes.data_as(ctpd),ct.c_double(0.),ct.c_int(1),R.ctypes.data_as(ctpd))
+    GPdc.libGP.lEI(m.ctypes.data_as(ctpd), s.ctypes.data_as(ctpd), ct.c_double(0.), ct.c_int(1), R.ctypes.data_as(ctpd))
     return R[0]
 
 sup = sp.linspace(-5,100,600)

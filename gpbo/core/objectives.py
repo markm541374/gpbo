@@ -1,6 +1,7 @@
 # To change this license header, choose License Headers in Project Properties.
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
+
 import scipy as sp
 import logging
 import GPdc
@@ -52,8 +53,8 @@ rosenymin=0.
 def genmat52ojf(d,lb,ub):
     from ESutils import gen_dataset
     nt=14
-    [X,Y,S,D] = gen_dataset(nt,d,lb,ub,GPdc.MAT52,sp.array([1.5]+[0.55]*d))
-    G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.MAT52,d,sp.array([1.5]+[0.55]*d)))
+    [X,Y,S,D] = gen_dataset(nt, d, lb, ub, GPdc.MAT52, sp.array([1.5] + [0.55] * d))
+    G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.MAT52, d, sp.array([1.5] + [0.55] * d)))
     def ojf(x,**ev):
         dx=ev['d']
         s=ev['s']
@@ -75,9 +76,9 @@ def genbiasedmat52ojf(d,lb,ub,sls):
     #s normalised to 0 exact, 1
     from ESutils import gen_dataset
     nt=20
-    [X,Y,S,D] = gen_dataset(nt,d+1,lb+[0],ub+[1],GPdc.MAT52,sp.array([1.5]+[0.30]*d+[sls]))
+    [X,Y,S,D] = gen_dataset(nt, d + 1, lb + [0], ub + [1], GPdc.MAT52, sp.array([1.5] + [0.30] * d + [sls]))
     
-    G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.MAT52,d+1,sp.array([1.5]+[0.30]*d+[sls])))
+    G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.MAT52, d + 1, sp.array([1.5] + [0.30] * d + [sls])))
     def ojf(x,**ev):
         #print "\nojfinput: {} : {}".format(x,ev)
         dx=ev['d']
@@ -128,6 +129,6 @@ class cfnobj():
         return self.g.infer_m(sp.array([[xa]]),[[sp.NaN]])[0,0]
 def traincfn(x,c):
     n = x.size
-    g = GPdc.GPcore(x,c,sp.array([1e-1]*n),[[sp.NaN]]*n,GPdc.kernel(GPdc.MAT52,1,[1.,0.2]))
+    g = GPdc.GPcore(x, c, sp.array([1e-1] * n), [[sp.NaN]] * n, GPdc.kernel(GPdc.MAT52, 1, [1., 0.2]))
     
     return cfnobj(g)

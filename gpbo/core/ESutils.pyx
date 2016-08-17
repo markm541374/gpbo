@@ -1,6 +1,8 @@
 # To change this license header, choose License Headers in Project Properties.
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
+#cython: profile=True
+
 import os
 import GPdc
 import slice
@@ -12,6 +14,7 @@ from scipy.optimize import minimize as spomin
 from scipy.stats import multivariate_normal as mnv
 import time
 import tqdm
+from libc.math cimport log10, log, isnan
 
 SUPPORT_UNIFORM = 0
 SUPPORT_SLICELCB = 1
@@ -26,11 +29,12 @@ def draw_support(g, lb, ub, n, method, para=1.):
         d=g
     else:
         d=g.D
-    #print 'Draw support input GP with d={} lb {} ub {}'.format(d,lb,ub) 
+    #print 'Draw support input GP with d={} lb {} ub {}'.format(d,lb,ub)
+    cdef int i,j
     if method==SUPPORT_UNIFORM:
         print "Drawing support using uniform:"
         X=sp.random.uniform(size=[n,d])
-        for i in xrange(d):
+        for i in range(d):
             X[:,i] *= ub[i]-lb[i]
             X[:,i] += lb[i]
     elif method==SUPPORT_LAPAPR:
@@ -40,19 +44,19 @@ def draw_support(g, lb, ub, n, method, para=1.):
         para = 5*int(para)
         over = 4
         Xsto=sp.random.uniform(size=[over*para,d])
-        for i in xrange(d):
+        for i in range(d):
             Xsto[:,i] *= ub[i]-lb[i]
             Xsto[:,i] += lb[i]
         #eval mean at the points
         #print 'b'
         fs = sp.empty(para*over)
-        for i in xrange(para*over):
+        for i in range(para*over):
             fs[i] = g.infer_m_post(Xsto[i,:],[[sp.NaN]])[0,0]
         #print 'mean at random draws {}'.format(fs)
         Xst = sp.empty([2*para,d])
         #keep the lowest
         #print 'c'
-        for i in xrange(para):
+        for i in range(para):
             j = fs.argmin()
             Xst[i,:] = Xsto[j,:]
             fs[j]=1e99
@@ -84,7 +88,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
         #print 'e'
         Xst
         unq = [Xst[0+para,:]]
-        for i in xrange(para):
+        for i in range(para):
             tmp=[]
             for xm in unq:
                 tmp.append(abs((xm-Xst[i+para,:])).max())
@@ -97,7 +101,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
         cls = []
         for xm in unq:
             ls = []
-            for i in xrange(d):
+            for i in range(d):
                 
                 vg = g.infer_diag_post(xm,[[i]])[1][0,0]
                 gg = g.infer_diag_post(xm,[[i,i]])[0][0,0]
@@ -109,9 +113,9 @@ def draw_support(g, lb, ub, n, method, para=1.):
         if d==1:
             X.resize([n,1])
         neach = int(n/len(unq))
-        for i in xrange(len(unq)):
+        for i in range(len(unq)):
             
-            for j in xrange(d):
+            for j in range(d):
                 X[i*neach:(i+1)*neach,j]*=min(2.,cls[i][j])
                 X[i*neach:(i+1)*neach,j]+=unq[i][j]
             
@@ -132,8 +136,8 @@ def draw_support(g, lb, ub, n, method, para=1.):
             y_ = sp.linspace(-1,1,n)
             z_ = sp.empty([n,n])
             s_ = sp.empty([n,n])
-            for i in xrange(n):
-                for j in xrange(n):
+            for i in range(n):
+                for j in range(n):
                     m_,v_ = g.infer_diag_post(sp.array([y_[j],x_[i]]),[[sp.NaN]])
                     z_[i,j] = m_[0,0]
                     s_[i,j] = sp.sqrt(v_[0,0])
@@ -143,9 +147,9 @@ def draw_support(g, lb, ub, n, method, para=1.):
             CS = ax[1].contour(x_,y_,s_,20)
             ax[0].axis([-1.,1.,-1.,1.])
             ax[1].clabel(CS, inline=1, fontsize=10)
-            for i in xrange(np):
+            for i in range(np):
                 ax[0].plot([Xst[i,0],Xst[i+np,0]],[Xst[i,1],Xst[i+np,1]],'b.-')
-            for j in xrange(len(unq)):
+            for j in range(len(unq)):
                 x = unq[j]
                 ax[0].plot(x[0],x[1],'ro')
                 xp = [x[0]+cls[j][0],x[0],x[0]-cls[j][0],x[0],x[0]+cls[j][0]]
@@ -175,7 +179,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 try:
                     ei=g.infer_EI(sp.array(x),[[sp.NaN]])[0,0]
                     #print ei
-                    return sp.log(ei)
+                    return log(ei)
                 except:
                     #ei=g.infer_EI(sp.array(x),[[sp.NaN]])[0,0]
                     g.printc()
@@ -188,13 +192,13 @@ def draw_support(g, lb, ub, n, method, para=1.):
     elif method==SUPPORT_SLICEPM:
         def f(x):
             if all(x>lb) and all(x<ub):
-                [m,v] = g.infer_diag_post(sp.vstack([sp.array(x)]*d),[[i] for i in xrange(d)])
+                [m,v] = g.infer_diag_post(sp.vstack([sp.array(x)]*d),[[i] for i in range(d)])
                 p = 0.
-                for i in xrange(d):
+                for i in range(d):
                     p+= -0.5*(m[0,i]**2)/v[0,i]
                 ym = g.infer_m_post(sp.array(x),[[sp.NaN]])[0,0]
                 if not sp.isfinite(p):
-                    print [m,V,p]
+                    print [m,p]
                     #raise ValueError
                 return -10*ym+0.01*p
             else:
@@ -202,8 +206,8 @@ def draw_support(g, lb, ub, n, method, para=1.):
         if False:
             A = sp.empty([100,100])
             sup = sp.linspace(-0.999,0.999,100)
-            for i in xrange(100):
-                for j in xrange(100):
+            for i in range(100):
+                for j in range(100):
                     print sp.array([sup[i],sup[j]])
                     A[99-j,i] = f([sup[i],sup[j]])
                     print A[99-j,i]
@@ -225,7 +229,7 @@ def draw_min(g,support,n):
     
     R = sp.empty([Z.shape[0],support.shape[1]])
     args = []
-    for i in xrange(Z.shape[0]):
+    for i in range(Z.shape[0]):
         a = sp.argmin(Z[i,:])
         args.append(a)
         R[i,:] = support[a,:]
@@ -247,16 +251,16 @@ def draw_min(g,support,n):
         y = sp.linspace(-1,1,n)
         z = sp.empty([n,n])
         s = sp.empty([n,n])
-        for i in xrange(n):
-            for j in xrange(n):
-		m_,v_ = g.infer_diag_post(sp.array([0,y[j],x[i]]),[[sp.NaN]])
+        for i in range(n):
+            for j in range(n):
+                m_,v_ = g.infer_diag_post(sp.array([0,y[j],x[i]]),[[sp.NaN]])
                 z[i,j]=m_[0,0]
                 s[i,j]=sp.sqrt(v_[0,0])
         fig, ax = plt.subplots( nrows=2, ncols=1 ,figsize=(10,20))
         ax[0].contour(x,y,z,20)
         CS = ax[1].contour(x,y,s,15)
         ax[1].clabel(CS, inline=1, fontsize=10)
-        for i in xrange(Z.shape[0]):
+        for i in range(Z.shape[0]):
             ax[0].plot(R[i,1],R[i,2],'ro')
         fig.savefig(os.path.join(debugpath,'drawmin'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
         del(fig)
@@ -313,12 +317,13 @@ def plot_gp(g,axis,x,d):
 
 #draw hyperparameters given data from posterior likelihood
 def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5):
+    ub = hm+1.8*hs
+    lb = hm-1.8*hs
     def f(loghyp):
-        ub = hm+1.8*hs
-        lb = hm-1.8*hs
+        cdef double i,r
         if all(loghyp<ub) and all(loghyp>lb):
-            r=GPdc.GP_LKonly(X,Y,S,D,GPdc.kernel(ki,X.shape[1],[10**i for i in loghyp])).plk(hm,hs)
-            if sp.isnan(r):
+            r=GPdc.GP_LKonly(X, Y, S, D, GPdc.kernel(ki, X.shape[1], [10 ** i for i in loghyp])).plk(hm, hs)
+            if isnan(r):
                 class MJMError(Exception):
                     pass
                 print 'nan from GPLKonly with input'
@@ -335,8 +340,8 @@ def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5):
 def gen_dataset(nt,d,lb,ub,kindex,hyp,s=1e-9):
     X = draw_support(d, lb,ub,nt,SUPPORT_UNIFORM)
     D = [[sp.NaN]]*(nt)
-    kf = GPdc.kernel(kindex,d,hyp)
-    Kxx = GPdc.buildKsym_d(kf,X,D)
+    kf = GPdc.kernel(kindex, d, hyp)
+    Kxx = GPdc.buildKsym_d(kf, X, D)
     Y = spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T+sp.matrix(sps.norm.rvs(0,sp.sqrt(s),nt)).T
     S = sp.matrix([s]*nt).T
     return [X,Y,S,D]

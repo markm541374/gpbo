@@ -16,7 +16,7 @@ nt=22
 d=1
 lb = sp.array([-1.]*d)
 ub = sp.array([1.]*d)
-[X,Y,S,D] = ESutils.gen_dataset(nt,d,lb,ub,GPdc.SQUEXP,sp.array([0.9,0.25]),s=1e-8)
+[X,Y,S,D] = ESutils.gen_dataset(nt, d, lb, ub, GPdc.SQUEXP, sp.array([0.9, 0.25]), s=1e-8)
 S*=0.
 f0 = plt.figure()
 a0 = plt.subplot(111)
@@ -24,15 +24,15 @@ a0.plot(sp.array(X[:,0]).flatten(),Y,'g.')
 
 lb = sp.array([-2.,-2.,-9])
 ub = sp.array([2.,2.,-1])
-MLEH =  GPdc.searchMLEhyp(X,Y,S,D,lb,ub,GPdc.SQUEXPCS,mx=10000)
+MLEH =  GPdc.searchMLEhyp(X, Y, S, D, lb, ub, GPdc.SQUEXPCS, mx=10000)
 
 mprior = sp.array([0.,-1.,-5.])
 sprior = sp.array([1.,1.,3.])
 
-MAPH = GPdc.searchMAPhyp(X,Y,S,D,mprior,sprior,GPdc.SQUEXPCS,mx=10000)
+MAPH = GPdc.searchMAPhyp(X, Y, S, D, mprior, sprior, GPdc.SQUEXPCS, mx=10000)
 print "MLEH: "+str(MLEH)
 print "MAPH: "+str(MAPH)
-G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.SQUEXPCS,1,sp.array(MLEH)))
+G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXPCS, 1, sp.array(MLEH)))
 
 
 print G.llk()

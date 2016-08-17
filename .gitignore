@@ -210,3 +210,12 @@ fabric.properties
 results/
 /gpbo/examples/results/
 /gpbo/examples/dbout/
+/gpbo/examples/Profile.prof
+/gpbo/core/ESutils.html
+/gpbo/core/ESutils.so
+/gpbo/core/GPdc.html
+/gpbo/core/GPdc.so
+/gpbo/core/PES.html
+/gpbo/core/PES.so
+/gpbo/core/eprop.so
+/gpbo/core/eprop.html

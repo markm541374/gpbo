@@ -15,10 +15,10 @@ import GPdc
 
 
 
-kp = GPdc.kernel(GPdc.MAT52,1,sp.array([0.75,0.1]))
-kq = GPdc.kernel(GPdc.MAT52PER,1,sp.array([0.75,0.1,4.5]))
-kr = GPdc.kernel(GPdc.MAT52PPT,1,sp.array([0.75,0.1,4.5,15.]))
-ks = GPdc.kernel(GPdc.DEV,1,sp.array([0.75,0.1,4.5,0.5,0.4,10.]))
+kp = GPdc.kernel(GPdc.MAT52, 1, sp.array([0.75, 0.1]))
+kq = GPdc.kernel(GPdc.MAT52PER, 1, sp.array([0.75, 0.1, 4.5]))
+kr = GPdc.kernel(GPdc.MAT52PPT, 1, sp.array([0.75, 0.1, 4.5, 15.]))
+ks = GPdc.kernel(GPdc.DEV, 1, sp.array([0.75, 0.1, 4.5, 0.5, 0.4, 10.]))
 #support
 ns = 1201
 xax = sp.array([sp.linspace(-15,15,ns)]).T

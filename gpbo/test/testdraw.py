@@ -16,10 +16,10 @@ ctpd = ct.POINTER(ct.c_double)
 import GPdc
 
 ni = 50
-kf = GPdc.kernel(GPdc.SQUEXP,1,sp.array([1.3,0.3]))
+kf = GPdc.kernel(GPdc.SQUEXP, 1, sp.array([1.3, 0.3]))
 X = sp.matrix(sp.linspace(-1,1,ni)).T
 D = [[sp.NaN]]*ni
-Kxx = GPdc.buildKsym_d(kf,X,D)
+Kxx = GPdc.buildKsym_d(kf, X, D)
 
 tmp = spl.cholesky(Kxx,lower=True)
 Ch = sp.vstack([tmp[i,:] for i in xrange(ni)]) #hack/force row major storage
@@ -49,7 +49,7 @@ D = [[sp.NaN]]*(nt)
 hyp = sp.array([1.5,0.15])
 kf = GPdc.gen_sqexp_k_d(hyp)
 
-Kxx = GPdc.buildKsym_d(kf,X,D)
+Kxx = GPdc.buildKsym_d(kf, X, D)
 
 Y = spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T+sp.matrix(sps.norm.rvs(0,1e-3,nt)).T
 S = sp.matrix([1e-6]*nt).T
@@ -60,10 +60,10 @@ a0.plot(sp.array(X[:,0]).flatten(),Y,'g.')
 
 lb = sp.array([-2.,-2.])
 ub = sp.array([2.,2.])
-MLEH =  GPdc.searchMLEhyp(X,Y,S,D,lb,ub,GPdc.SQUEXP,mx=10000)
+MLEH =  GPdc.searchMLEhyp(X, Y, S, D, lb, ub, GPdc.SQUEXP, mx=10000)
 
 print MLEH
-G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.SQUEXP,1,MLEH))
+G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, 1, MLEH))
 print G.llk()
 
 np=180

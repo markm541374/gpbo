@@ -1,7 +1,9 @@
 # To change this license header, choose License Headers in Project Properties.
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
-
+import pyximport
+from numpy import get_include
+pyximport.install(setup_args={'include_dirs': get_include()})
 import scipy as sp
 from scipy import linalg as spl
 import time
@@ -125,8 +127,8 @@ def gencamel(ignores=-1.,cfn = lambda x:1.,):
 
 def gensquexpdraw(d,lb,ub,ignores=-1):
     nt=14
-    [X,Y,S,D] = ESutils.gen_dataset(nt,d,lb,ub,GPdc.SQUEXP,sp.array([1.5]+[0.30]*d))
-    G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.SQUEXP,d,sp.array([1.5]+[0.30]*d)))
+    [X,Y,S,D] = ESutils.gen_dataset(nt, d, lb, ub, GPdc.SQUEXP, sp.array([1.5] + [0.30] * d))
+    G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, d, sp.array([1.5] + [0.30] * d)))
     def obj(x,s,d,override=False):
         #print [x,s,d]
         if ignores>0:
@@ -151,8 +153,8 @@ def gensquexpIPdraw(d,lb,ub,sl,su,sfn,sls,cfn):
     nt=25
     #print sp.hstack([sp.array([[sl]]),lb])
     #print sp.hstack([sp.array([[su]]),ub])
-    [X,Y,S,D] = ESutils.gen_dataset(nt,d+1,sp.hstack([sp.array([[sl]]),lb]).flatten(),sp.hstack([sp.array([[su]]),ub]).flatten(),GPdc.SQUEXP,sp.array([1.5]+[sls]+[0.30]*d))
-    G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.SQUEXP,d+1,sp.array([1.5]+[sls]+[0.30]*d)))
+    [X,Y,S,D] = ESutils.gen_dataset(nt, d + 1, sp.hstack([sp.array([[sl]]),lb]).flatten(), sp.hstack([sp.array([[su]]),ub]).flatten(), GPdc.SQUEXP, sp.array([1.5] + [sls] + [0.30] * d))
+    G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, d + 1, sp.array([1.5] + [sls] + [0.30] * d)))
     def obj(x,s,d,override=False):
         x = x.flatten()
         if sfn(x)==0. or override:
@@ -351,12 +353,12 @@ class LCBMLE(opt):
     
     def run_search(self):
         
-        MAP = GPdc.searchMAPhyp(self.X,self.Y,self.S,self.D,self.mprior,self.sprior, self.kindex)
+        MAP = GPdc.searchMAPhyp(self.X, self.Y, self.S, self.D, self.mprior, self.sprior, self.kindex)
         try:
             del(self.G)
         except:
             pass
-        self.G = GPdc.GPcore(self.X,self.Y,self.S,self.D,GPdc.kernel(self.kindex,self.d,MAP))
+        self.G = GPdc.GPcore(self.X, self.Y, self.S, self.D, GPdc.kernel(self.kindex, self.d, MAP))
         def directwrap(x,y):
             x.resize([1,self.d])
             
@@ -391,12 +393,12 @@ class EIMLE(opt):
     
     def run_search(self):
         
-        MAP = GPdc.searchMAPhyp(self.X,self.Y,self.S,self.D,self.mprior,self.sprior, self.kindex)
+        MAP = GPdc.searchMAPhyp(self.X, self.Y, self.S, self.D, self.mprior, self.sprior, self.kindex)
         try:
             del(self.G)
         except:
             pass
-        self.G = GPdc.GPcore(self.X,self.Y,self.S,self.D,GPdc.kernel(self.kindex,self.d,MAP))
+        self.G = GPdc.GPcore(self.X, self.Y, self.S, self.D, GPdc.kernel(self.kindex, self.d, MAP))
         
         def directwrap(x,y):
             x.resize([1,self.d])
@@ -584,9 +586,9 @@ class PESIP(opt):
         S = sp.zeros([len(self.C),1])
         lbc = sp.array([-3.,-2.,-6.])
         ubc = sp.array([3.,2.,1.])
-        MLEC =  GPdc.searchMLEhyp(X,sp.log(C),S,D,lbc,ubc,GPdc.SQUEXPCS,mx=10000)
+        MLEC =  GPdc.searchMLEhyp(X, sp.log(C), S, D, lbc, ubc, GPdc.SQUEXPCS, mx=10000)
         print "MLEC "+str(MLEC)
-        self.ce = GPdc.GPcore(X.copy(),sp.log(C),S,D,GPdc.kernel(GPdc.SQUEXPCS,1,sp.array(MLEC)))
+        self.ce = GPdc.GPcore(X.copy(), sp.log(C), S, D, GPdc.kernel(GPdc.SQUEXPCS, 1, sp.array(MLEC)))
         #self.ce = GPdc.GPcore(X,C,S,D,GPdc.kernel(GPdc.SQUEXPCS,1,sp.array([1.,0.3,1e-3])))
         #self.ce.printc()
         return
@@ -661,7 +663,7 @@ def bounds(Xs,Ys,ns=100):
     sprior = sp.array([2.,2.,2.])
     #MAPH = GPdc.searchMAPhyp(X,Y,S,D,mprior,sprior, ki,mx=500)
     MAPH = sp.array([0.5,5.,0.3])
-    g = GPdc.GPcore(X,Y,S,D,GPdc.kernel(ki,1,MAPH))
+    g = GPdc.GPcore(X, Y, S, D, GPdc.kernel(ki, 1, MAPH))
     sup = sp.linspace(min(X),max(X),ns)
     [m,V] = g.infer_diag_post(sup,[[sp.NaN]]*ns)
     std = sp.sqrt(V+MAPH[2])

@@ -14,7 +14,7 @@ kf = GPdc.gen_sqexp_k_d(hyp)
 nt=18
 x = sp.linspace(-1,1,nt)
 Dtmp = [[sp.NaN]]*nt
-Kxx = GPdc.buildKsym_d(kf,sp.matrix(x).T,Dtmp)
+Kxx = GPdc.buildKsym_d(kf, sp.matrix(x).T, Dtmp)
 
 Z = spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T
 Z = sp.vstack([Z,spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T])
@@ -42,12 +42,12 @@ a0.plot(sp.array(X[:,0]).flatten(),Y,'g.')
 
 lb = sp.array([-2.,-1.,-2.,-2.,-2.,-2.,-2.])
 ub = sp.array([2.,1.,2.,2.,2.,2.,2.])
-MLEH =  GPdc.searchMLEhyp(X,Y,S,D,lb,ub,GPdc.LINSQUEXPXSQUEXP,mx=10000)
+MLEH =  GPdc.searchMLEhyp(X, Y, S, D, lb, ub, GPdc.LINSQUEXPXSQUEXP, mx=10000)
 print "xxx"
-GPdc.kernel(GPdc.LINSQUEXPXSQUEXP,2,MLEH)
+GPdc.kernel(GPdc.LINSQUEXPXSQUEXP, 2, MLEH)
 print "yyyy"
 print MLEH
-G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.LINSQUEXPXSQUEXP,2,MLEH))
+G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.LINSQUEXPXSQUEXP, 2, MLEH))
 print G.llk()
 
 print "zzz"

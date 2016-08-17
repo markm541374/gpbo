@@ -37,9 +37,9 @@ def gpmaprecc(optstate,**para):
     y=sp.vstack(optstate.y)
     s= sp.vstack([e['s'] for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
-    MAP = GPdc.searchMAPhyp(x,y,s,dx,para['mprior'],para['sprior'], para['kindex'])
+    MAP = GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
     logger.info('MAPHYP {}'.format(MAP))
-    G = GPdc.GPcore(x,y,s,dx,GPdc.kernel(para['kindex'],d,MAP))
+    G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(para['kindex'], d, MAP))
     def directwrap(xq,y):
         xq.resize([1,d])
         a = G.infer_m(xq,[[sp.NaN]])
@@ -74,9 +74,9 @@ def gpmapasrecc(optstate,**para):
     y=sp.vstack(optstate.y)
     s= sp.vstack([e['s'] for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
-    MAP = GPdc.searchMAPhyp(x,y,s,dx,para['mprior'],para['sprior'], para['kindex'])
+    MAP = GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
     logger.info('MAPHYP {}'.format(MAP))
-    G = GPdc.GPcore(x,y,s,dx,GPdc.kernel(para['kindex'],d+1,MAP))
+    G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(para['kindex'], d + 1, MAP))
     def directwrap(xq,y):
         xq.resize([1,d])
         xe = sp.hstack([xq,sp.array([[0.]])])
@@ -146,7 +146,7 @@ def gphinasrecc(optstate,**para):
     s= sp.vstack([e['s'] for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
     
-    G = GPdc.GPcore(x,y,s,dx,[GPdc.kernel(optstate.aux['kindex'],d+1,h) for h in optstate.aux['HYPdraws']])
+    G = GPdc.GPcore(x, y, s, dx, [GPdc.kernel(optstate.aux['kindex'], d + 1, h) for h in optstate.aux['HYPdraws']])
     def directwrap(xq,y):
         xq.resize([1,d])
         xe = sp.hstack([sp.array([[0.]]),xq])

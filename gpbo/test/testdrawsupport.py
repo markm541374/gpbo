@@ -26,14 +26,14 @@ X = ESutils.draw_support(2, sp.array([-1.,-1.]),sp.array([1.,1.]),nt,ESutils.SUP
 D = [[sp.NaN]]*(nt)
 hyp = sp.array([1.5,0.25,0.25])
 kf = GPdc.gen_sqexp_k_d(hyp)
-Kxx = GPdc.buildKsym_d(kf,X,D)
+Kxx = GPdc.buildKsym_d(kf, X, D)
 Y = spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T+sp.matrix(sps.norm.rvs(0,1e-3,nt)).T
 S = sp.matrix([1e-6]*nt).T
 
 lb = sp.array([-2.,-2.,-2.])
 ub = sp.array([2.,2.,2.])
 #MLEH =  GPdc.searchMLEhyp(X,Y,S,D,lb,ub,GPdc.SQUEXP,mx=10000)
-G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.SQUEXP,2,sp.array([1.5,0.15,0.15])))
+G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, 2, sp.array([1.5, 0.15, 0.15])))
 #np=180
 #sup = sp.linspace(-1,1,np)
 #Dp = [[sp.NaN]]*np
@@ -72,7 +72,7 @@ X = sp.matrix(sp.linspace(-1,1,nt)).T
 D = [[sp.NaN]]*(nt)
 hyp = sp.array([1.5,0.15])
 kf = GPdc.gen_sqexp_k_d(hyp)
-Kxx = GPdc.buildKsym_d(kf,X,D)
+Kxx = GPdc.buildKsym_d(kf, X, D)
 Y = spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T+sp.matrix(sps.norm.rvs(0,1e-3,nt)).T
 S = sp.matrix([1e-6]*nt).T
 f0 = plt.figure()
@@ -83,7 +83,7 @@ a0.plot(sp.array(X[:,0]).flatten(),Y,'g.')
 lb = sp.array([-2.,-2.])
 ub = sp.array([2.,2.])
 #MLEH =  GPdc.searchMLEhyp(X,Y,S,D,lb,ub,GPdc.SQUEXP,mx=10000)
-G = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.SQUEXP,1,sp.array([1.5,0.15])))
+G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, 1, sp.array([1.5, 0.15])))
 np=180
 sup = sp.linspace(-1,1,np)
 Dp = [[sp.NaN]]*np

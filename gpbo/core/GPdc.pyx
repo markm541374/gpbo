@@ -1,7 +1,7 @@
 # Gaussian process with derivatives in c
 #LK_only can only be used for log likelihood or posterior log likelihood
 #GPcore takes a single hyperparameter value or a set. With a set the infer_ methods produce individual inferences while infer_post methods return the posterior
-
+#cython: profile=True
 #
 
 __author__ = "mark"
@@ -9,25 +9,32 @@ __date__ = "$22-Nov-2015 21:27:19$"
 
 #TODO draw doesn't work correclty on a GP created with no data
 import numpy as np
+cimport numpy as np
 import scipy as sp
 import ctypes as ct
 import os
 import sys
 from copy import deepcopy as dc
 from scipy.stats import norm as norms
+from libc.math cimport log10, log, isnan
 #print os.path.join(os.path.split(__file__)[0],'../../dist/Release/GNU-Linux/libGPshared.so')
-libGP = ct.cdll.LoadLibrary(os.path.join(os.path.split(__file__)[0],'../cproj/libcproj.so')) #path to c-shared library
+from . import __file__ as fl
+
+
+libGP = ct.cdll.LoadLibrary(os.path.join(os.path.split(fl)[0],'../cproj/libcproj.so')) #path to c-shared library
 #print libGP
 libGP.k.restype = ct.c_double
 
 ctpd = ct.POINTER(ct.c_double)
 cint = ct.c_int
+
+
 class GP_LKonly:
     def __init__(self, X_s, Y_s, S_s, D_s, kf):
         [n ,D] = X_s.shape
         self.hyp = kf.hyp
         R = ct.c_double()
-        Dc = [0 if sp.isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]
+        Dc = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]
         libGP.newGP_LKonly(cint(D),cint(n),X_s.ctypes.data_as(ctpd),Y_s.ctypes.data_as(ctpd),S_s.ctypes.data_as(ctpd),(cint*len(Dc))(*Dc), cint(kf.Kindex), kf.hyp.ctypes.data_as(ctpd),ct.byref(R))
         self.l = R.value
         
@@ -41,7 +48,7 @@ class GP_LKonly:
         #log likelihood given lognormal prior over hyperparameters
         tmp = 0.
         for i,h in enumerate(self.hyp):
-            tmp -= 0.5*((sp.log10(h)-lm[i])**2)/ls[i]**2
+            tmp -= 0.5*((log10(h)-lm[i])**2)/ls[i]**2
         
         return self.l+tmp
 
@@ -56,11 +63,11 @@ class GPcore:
         allhyp = sp.hstack([k.hyp for k in kf])
         self.kf=kf
         [self.n ,self.D] = X_s.shape
-        Dx = [0 if sp.isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]
+        Dx = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]
         self.s = libGP.newGP_hypset(cint(self.D),cint(self.n),cint(kf[0].Kindex),X_s.ctypes.data_as(ctpd),Y_s.ctypes.data_as(ctpd),S_s.ctypes.data_as(ctpd),(cint*len(Dx))(*Dx),allhyp.ctypes.data_as(ctpd),cint(self.size))
         self.Y_s=Y_s
         
-        D = [0 if sp.isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]
+        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]
         #print self.get_cho()
         libGP.presolv(self.s,cint(self.size))
         
@@ -82,7 +89,7 @@ class GPcore:
         return C
     def infer_m(self,X_i,D_i):
         ns=X_i.shape[0]
-        D = [0 if sp.isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
+        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.vstack([sp.empty(ns)]*self.size)
         libGP.infer_m(self.s, cint(self.size), ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
         return R
@@ -90,7 +97,7 @@ class GPcore:
     def infer_m_partial(self,X_i,D_i,ki,hyp):
         
         ns=X_i.shape[0]
-        D = [0 if sp.isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
+        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.vstack([sp.empty(ns)]*1)
         
         #libGP.infer_m_partial(self.s, cint(ki),hyp.ctypes.data_as(ctpd),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
@@ -108,11 +115,12 @@ class GPcore:
     
     def infer_full(self,X_i,D_i):
         ns=X_i.shape[0]
-        D = [0 if sp.isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
+        D = [0 if isnan(x[0]) else int(sum([8**j for j in x])) for x in D_i]
         R=sp.vstack([sp.empty([ns+1,ns])]*self.size)
         libGP.infer_full(self.s, cint(self.size), ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
-        m = sp.vstack([R[i*(ns+1),:] for i in xrange(self.size)])
-        V = sp.vstack([R[(ns+1)*i+1:(ns+1)*(i+1),:] for i in xrange(self.size)])
+        cdef int i
+        m = sp.vstack([R[i*(ns+1),:] for i in range(self.size)])
+        V = sp.vstack([R[(ns+1)*i+1:(ns+1)*(i+1),:] for i in range(self.size)])
         return [m,V]
     
     def infer_full_post(self,X_i,D_i):
@@ -121,18 +129,20 @@ class GPcore:
         [m,V] = self.infer_full(X_i,D_i)
         ns=X_i.shape[0]
         cv = sp.zeros([ns,ns])
-        for i in xrange(self.size):
+        cdef int i
+        for i in range(self.size):
             cv+=V[ns*i:ns*(i+1),:]
         cv= cv/self.size + sp.cov(m,rowvar=0,bias=1)
         return [sp.mean(m,axis=0).reshape([1,ns]),cv]
     
     def infer_diag(self,X_i,D_i):
         ns=X_i.shape[0]
-        D = [0 if sp.isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
+        D = [0 if isnan(x[0]) else int(sum([8**j for j in x])) for x in D_i]
         R=sp.vstack([sp.empty([2,ns])]*self.size)
         libGP.infer_diag(self.s,cint(self.size), ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
-        m = sp.vstack([R[i*2,:] for i in xrange(self.size)])
-        V = sp.vstack([R[i*2+1,:] for i in xrange(self.size)])
+        cdef int i
+        m = sp.vstack([R[i*2,:] for i in range(self.size)])
+        V = sp.vstack([R[i*2+1,:] for i in range(self.size)])
         return [m,V]
     
     def infer_diag_post(self,X_ii,D_i):
@@ -166,7 +176,7 @@ class GPcore:
     def draw(self,X_i,D_i,m):
         #make m draws at X_i Nd, X, D, R, m
         ns=X_i.shape[0]
-        D = [0 if sp.isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
+        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.empty([m*self.size,ns])
         libGP.draw(self.s, cint(self.size), cint(ns), X_i.ctypes.data_as(ctpd), (cint*len(D))(*D),R.ctypes.data_as(ctpd),cint(m))
         return R
@@ -186,7 +196,7 @@ class GPcore:
     
     def infer_LCB(self,X_i,D_i, p):
         ns=X_i.shape[0]
-        D = [0 if sp.isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
+        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.empty([self.size,ns])
         libGP.infer_LCB(self.s, cint(self.size), ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D), ct.c_double(p), R.ctypes.data_as(ctpd))
         
@@ -205,23 +215,24 @@ class GPcore:
     
     def infer_EI(self,X_i,D_i):
         ns=X_i.shape[0]
-        D = [0 if sp.isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
+        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.empty([self.size,ns])
         libGP.infer_EI(self.s, cint(self.size),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D), R.ctypes.data_as(ctpd))
         return R
     
     def infer_EI_post(self,X_i,D_i):
         [m,v] = self.infer_diag_post(X_i,D_i)
-        ns=X_i.shape[0]
+        cdef int ns=X_i.shape[0]
         R=sp.empty([1,ns])
-        for i in xrange(ns):
+        cdef int i
+        for i in range(ns):
             R[0,i] = EI(sp.amin(self.Y_s),m[0,i],v[0,i])
         
         return R
     
     def infer_lEI(self,X_i,D_i):
         ns=X_i.shape[0]
-        D = [0 if sp.isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
+        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.empty([self.size,ns])
         libGP.infer_lEI(self.s, cint(self.size),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D), R.ctypes.data_as(ctpd))
         return R
@@ -254,8 +265,8 @@ class kernel(object):
         return
     
     def __call__(self,x1, x2, d1=[sp.NaN], d2=[sp.NaN],gets=False):
-        D1 = 0 if sp.isnan(d1[0]) else int(sum([8**x for x in d1]))
-        D2 = 0 if sp.isnan(d2[0]) else int(sum([8**x for x in d2]))
+        D1 = 0 if isnan(d1[0]) else int(sum([8**x for x in d1]))
+        D2 = 0 if isnan(d2[0]) else int(sum([8**x for x in d2]))
         self.smodel=sp.empty(1)
         r=libGP.k(x1.ctypes.data_as(ctpd),x2.ctypes.data_as(ctpd), cint(D1),cint(D2),cint(self.dim),self.ihyp.ctypes.data_as(ctpd),cint(self.Kindex),self.smodel.ctypes.data_as(ctpd))
         if gets:
@@ -272,8 +283,8 @@ class gen_sqexp_k_d():
         self.Kindex = 0;
         return
     def __call__(self,x1, x2, d1=[sp.NaN], d2=[sp.NaN]):
-        D1 = 0 if sp.isnan(d1[0]) else int(sum([8**x for x in d1]))
-        D2 = 0 if sp.isnan(d2[0]) else int(sum([8**x for x in d2]))
+        D1 = 0 if isnan(d1[0]) else int(sum([8**x for x in d1]))
+        D2 = 0 if isnan(d2[0]) else int(sum([8**x for x in d2]))
         self.smodel=0.
         r=libGP.k(x1.ctypes.data_as(ctpd),x2.ctypes.data_as(ctpd), cint(D1),cint(D2),cint(self.dim),self.hypinv.ctypes.data_as(ctpd),cint(0),ct.byref(ct.c_double(self.smodel)))
         return r
@@ -289,8 +300,8 @@ class gen_lin1_k_d():
         return
     
     def __call__(self,x1, x2, d1=[sp.NaN], d2=[sp.NaN]):
-        D1 = 0 if sp.isnan(d1[0]) else int(sum([8**x for x in d1]))
-        D2 = 0 if sp.isnan(d2[0]) else int(sum([8**x for x in d2]))
+        D1 = 0 if isnan(d1[0]) else int(sum([8**x for x in d1]))
+        D2 = 0 if isnan(d2[0]) else int(sum([8**x for x in d2]))
         smodel = 0.
         r=libGP.k(x1.ctypes.data_as(ctpd),x2.ctypes.data_as(ctpd), cint(D1),cint(D2),cint(-42),self.hypinv.ctypes.data_as(ctpd),cint(1),ct.byref(ct.c_double(smodel)))
         return r
@@ -299,7 +310,7 @@ def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=5000,fg=-1e9):
     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
     ns=X.shape[0]
     dim = X.shape[1]
-    Dx = [0 if sp.isnan(x[0]) else int(sum([8**i for i in x])) for x in D]
+    Dx = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D]
    
     hy = sp.empty(libGP.numhyp(cint(ki),cint(dim)))
     
@@ -313,7 +324,7 @@ def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=5000,fg=-1e9):
     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
     ns=X.shape[0]
     dim = X.shape[1]
-    Dx = [0 if sp.isnan(x[0]) else int(sum([8**i for i in x])) for x in D]
+    Dx = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D]
     hy = sp.empty(libGP.numhyp(cint(ki),cint(dim)))
     
     lk = sp.empty(1)
@@ -327,6 +338,7 @@ def buildKsym_d(kf,x,d):
         #x should be  column vector
         (l,_)=x.shape
         K=sp.matrix(sp.empty([l,l]))
+        cdef int i,j
         for i in range(l):
             K[i,i]=kf(x[i,:],x[i,:],d1=d[i],d2=d[i])+10**-10
             for j in range(i+1,l):

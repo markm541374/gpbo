@@ -32,8 +32,8 @@ for i in xrange(np):
 #G = GPdc.GPcore(X.copy(),H,sp.zeros([np,1]),[[sp.NaN]]*(np),GPdc.kernel(GPdc.SQUEXPPS,1,sp.array(MLEH)))
 lb = sp.array([0.,0.,-4.,-1.,-3.])
 ub = sp.array([4.,3.,3.,0.5,3.])
-MLEH =  GPdc.searchMLEhyp(1./float(nf)*X,H,sp.zeros([np,1]),[[sp.NaN]]*(np),lb,ub,GPdc.SQUEXPBS,mx=10000)
-G = GPdc.GPcore(1./float(nf)*X.copy(),H,sp.zeros([np,1]),[[sp.NaN]]*(np),GPdc.kernel(GPdc.SQUEXPBS,1,sp.array(MLEH)))
+MLEH =  GPdc.searchMLEhyp(1. / float(nf) * X, H, sp.zeros([np, 1]), [[sp.NaN]] * (np), lb, ub, GPdc.SQUEXPBS, mx=10000)
+G = GPdc.GPcore(1. / float(nf) * X.copy(), H, sp.zeros([np, 1]), [[sp.NaN]] * (np), GPdc.kernel(GPdc.SQUEXPBS, 1, sp.array(MLEH)))
 
 [m,v] = G.infer_diag(1./float(nf)*X,[[sp.NaN]]*(np))
 
@@ -43,8 +43,8 @@ for i in xrange(np):
 
 lbc = sp.array([-4.,0.,-6.])
 ubc = sp.array([2.,3.,0.])
-MLEC =  GPdc.searchMLEhyp(X,sp.log(T),sp.zeros([np,1]),[[sp.NaN]]*(np),lbc,ubc,GPdc.SQUEXPCS,mx=10000)
-C = GPdc.GPcore(X.copy(),sp.log(T),sp.zeros([np,1]),[[sp.NaN]]*(np),GPdc.kernel(GPdc.SQUEXPCS,1,sp.array(MLEC)))
+MLEC =  GPdc.searchMLEhyp(X, sp.log(T), sp.zeros([np, 1]), [[sp.NaN]] * (np), lbc, ubc, GPdc.SQUEXPCS, mx=10000)
+C = GPdc.GPcore(X.copy(), sp.log(T), sp.zeros([np, 1]), [[sp.NaN]] * (np), GPdc.kernel(GPdc.SQUEXPCS, 1, sp.array(MLEC)))
 
 f,a = plt.subplots(2)
 a[0].plot(X.flatten(),H.flatten(),'g.')
