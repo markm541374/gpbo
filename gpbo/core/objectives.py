@@ -6,6 +6,7 @@ import scipy as sp
 import logging
 import GPdc
 import DIRECT
+from scipy.optimize import minimize as spm
 logger = logging.getLogger(__name__)
 
 
@@ -67,9 +68,16 @@ def genmat52ojf(d,lb,ub):
         z = G.infer_m(x,[[sp.NaN]])[0,0]
         #z = obj(x,0.,[sp.NaN])
         return (z,0)
-    [xmin,ymin,ierror] = DIRECT.solve(dirwrap,lb,ub,user_data=[], algmethod=1, maxf=89000, logfilename='/dev/null')
-    logger.info('generated function xmin {} ymin {} {}'.format(xmin,ymin,ierror))
-    
+    [xmin,ymin,ierror] = DIRECT.solve(dirwrap,lb,ub,user_data=[], algmethod=1, maxf=20000, logfilename='/dev/null')
+
+    def spowrap(x):
+        z = G.infer_m(x,[[sp.NaN]])[0,0]
+        #z = obj(x,0.,[sp.NaN])
+        return z
+    y = spm(spowrap, xmin,  method='nelder-mead',options={'fatol':1e-12})
+    xmin = y.x
+    ymin = spowrap(y.x)
+    logger.info('generated function xmin {} ymin {} globopt:{} locopt:{}'.format(xmin, ymin, ierror, y.status))
     return ojf,xmin,ymin
     
 def genbiasedmat52ojf(d,lb,ub,sls):
@@ -87,6 +95,7 @@ def genbiasedmat52ojf(d,lb,ub,sls):
             noise = sp.random.normal(scale=sp.sqrt(ev['s']))
         else:
             noise=0
+        #print 'noise in ojf {}'.format(noise)
         xa=ev['xa']
         x = sp.array(x)
         xfull = sp.hstack([x,xa])
@@ -95,10 +104,26 @@ def genbiasedmat52ojf(d,lb,ub,sls):
     def dirwrap(x,y):
         z = G.infer_m(sp.hstack(sp.array(x)+[0.]),[[sp.NaN]])[0,0]
         return (z,0)
-    [xmin,ymin,ierror] = DIRECT.solve(dirwrap,lb,ub,user_data=[], algmethod=1, maxf=89000, logfilename='/dev/null')
-    logger.info('generated function xmin {} ymin {}'.format(xmin,ymin))
+    [xmin,ymin,ierror] = DIRECT.solve(dirwrap,lb,ub,user_data=[], algmethod=1, maxf=20000, logfilename='/dev/null')
+    #print [xmin, ymin]
+    def spowrap(x):
+        z = G.infer_m(sp.hstack(sp.array(x) + [0.]), [[sp.NaN]])[0, 0]
+        return z
+    y = spm(spowrap, xmin, method='nelder-mead',options={'fatol':1e-12})
+    xmin = y.x
+    ymin = spowrap(y.x)
+    #print [xmin,ymin]
+    logger.info('generated function xmin {} ymin {} globopt:{} locopt:{}'.format(xmin, ymin, ierror, y.status))
     return ojf, xmin, ymin
-    
+
+def coswithbias():
+    def ojf(x,**ev):
+        xa=ev['xa']
+        cost = 0.5+xa**2
+        y = -sp.cos(x[0]*0.75/sp.pi)*sp.cos(x[1]*0.75/sp.pi)+0.05*xa**2
+        return y,cost,dict()
+    return ojf,sp.array([0,0]),-1.
+
 def costfnwrap(ojfbase,cfn):
     def ojf(x,**ev):
         y,c0,ojfaux = ojfbase(x,**ev)
@@ -132,3 +157,78 @@ def traincfn(x,c):
     g = GPdc.GPcore(x, c, sp.array([1e-1] * n), [[sp.NaN]] * n, GPdc.kernel(GPdc.MAT52, 1, [1., 0.2]))
     
     return cfnobj(g)
+
+
+def gendecayingpositiveojf(d, lb, ub):
+
+    # s normalised to 0 exact, 1
+    from ESutils import gen_dataset
+    nt = 20
+    cl=2.
+
+    [X, Y, S, D] = gen_dataset(nt, d, lb, ub , GPdc.MAT52, sp.array([1] + [0.30] * d))
+    G0 = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.MAT52, d, sp.array([1] + [0.30] * d)))
+
+    [X, Y, S, D] = gen_dataset(nt, d, lb, ub, GPdc.MAT52, sp.array([1] + [0.30] * d))
+    G1 = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.MAT52, d, sp.array([1] + [0.30] * d)))
+
+    [X, Y, S, D] = gen_dataset(nt, d, lb, ub, GPdc.MAT52, sp.array([1] + [0.30] * d))
+    G2 = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.MAT52, d, sp.array([1] + [0.30] * d)))
+
+    def p0(x):
+        v= G0.infer_m(x, [[sp.NaN]])[0,0]
+        y = v+1 if v>0 else sp.exp(v)
+        return y
+
+    def p1(x):
+        v= G1.infer_m(x, [[sp.NaN]])[0, 0]
+        y = v + 1 if v > 0 else sp.exp(v)
+        return y
+
+    def p2(x):
+        v= G2.infer_m(x, [[sp.NaN]])[0, 0]
+        y = v + 1 if v > 0 else sp.exp(v)
+        return y
+
+    def ojf(x, **ev):
+        #print "ex: {} {}".format(x,ev['xa'])
+        # print "\nojfinput: {} : {}".format(x,ev)
+        dx = ev['d']
+        s = ev['s']
+        if ev['s'] > 0:
+            noise = sp.random.normal(scale=sp.sqrt(ev['s']))
+        else:
+            noise = 0
+        # print 'noise in ojf {}'.format(noise)
+        xa = ev['xa']
+        x = sp.array(x)
+
+
+        y0=p0(x)
+        y1=10.*p1(x)+y0
+        l=p2(x)
+
+        A = (y1-y0)/(sp.exp(l)-1)
+        B=y0-A
+        y = A*sp.exp(l*xa)+B
+
+        c = sp.exp(-cl * xa)
+        return y + noise, c, dict()
+
+    def dirwrap(x, y):
+        z = ojf(x,**{'d':[sp.NaN],'s':0,'xa':0})[0]
+        return (z, 0)
+
+    [xmin, ymin, ierror] = DIRECT.solve(dirwrap, lb, ub, user_data=[], algmethod=1, maxf=20000, logfilename='/dev/null')
+
+    # print [xmin, ymin]
+    def spowrap(x):
+        z = ojf(x,**{'d':[sp.NaN],'s':0,'xa':0})[0]
+        return z
+
+    y = spm(spowrap, xmin, method='nelder-mead', options={'fatol': 1e-12})
+    xmin = y.x
+    ymin = spowrap(y.x)
+    # print [xmin,ymin]
+    logger.info('generated function xmin {} ymin {} globopt:{} locopt:{}'.format(xmin, ymin, ierror, y.status))
+    return ojf, xmin, ymin

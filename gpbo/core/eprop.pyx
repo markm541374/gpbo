@@ -38,7 +38,7 @@ def expectation_prop_inner(m0,V0,Y,Z,F,z,needed):
     m0=sp.array(m0).flatten()
     V0=sp.array(V0)
     cdef int n = V0.shape[0]
-    print "expectation prpagation running on "+str(n)+" dimensions for "+str(z)+" loops:"
+    #print "expectation prpagation running on "+str(n)+" dimensions for "+str(z)+" loops:"
     mt =sp.zeros(n)
     Vt= sp.eye(n)*float(1e10)
     m = sp.empty(n)
@@ -74,7 +74,7 @@ def expectation_prop_inner(m0,V0,Y,Z,F,z,needed):
         #TODO make this a ratio instead of absolute
         delta = max(sp.amax(mtprev-mt),sp.amax(sp.diagonal(Vtprev)-sp.diagonal(Vt)))
         conv[i]=delta
-    print "EP finished with final max deltas "+str(conv[-3:])
+    #print "EP finished with final max deltas "+str(conv[-3:])
     V = V0.dot(spl.solve(V0+Vt,Vt))
     m = V.dot((spl.solve(V0,m0)+spl.solve(Vt,mt)).T)
     return mt, Vt

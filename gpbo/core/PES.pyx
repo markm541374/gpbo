@@ -9,6 +9,7 @@ import scipy as sp
 from scipy import stats as sps
 import DIRECT
 from matplotlib import pyplot as plt
+
 import logging
 from libc.math cimport log10, log, exp, M_E
 
@@ -222,7 +223,7 @@ class PES:
         print "\nhyp mean: "+str(sp.mean(HS,axis=0))
         print "hyp std:  "+str(sp.sqrt(sp.mean(HS,axis=0)))
         self.Z = drawmins(self.G,DM_SAMPLES,lb,ub,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode)
-        print "mindraws: "+str(self.Z)
+        #print "mindraws: "+str(self.Z)
         self.Ga = [GPdc.GPcore(*addmins(self.G, X, Y, S, D, self.Z[i, :]) + [self.G.kf]) for i in xrange(DM_SAMPLES)]
         #class MJMError(Exception):
             #pass
@@ -289,20 +290,20 @@ class PES:
 #augmented space PES
 class PES_inplane:
     def __init__(self,X,Y,S,D,lb,ub,kindex,mprior,sprior,axis,value,DH_SAMPLES=8,DM_SAMPLES=8, DM_SUPPORT=400,DM_SLICELCBPARA=1.,AM_POLICY=NOMIN,mode=ESutils.SUPPORT_SLICELCB,noS=False):
-        print "PES init:"
+        #print "PES init:"
         self.lb=lb
         self.ub=ub
         self.noS=noS
         self.X=X
         if noS:
             S=sp.zeros(S.shape)
-        print [X.shape,Y.shape,mprior,sprior]
+        #print [X.shape,Y.shape,mprior,sprior]
         self.G = makeG(X,Y,S,D,kindex,mprior,sprior,DH_SAMPLES)
         HS = sp.vstack([k.hyp for k in self.G.kf])
         print "\nhyp mean: "+str(sp.mean(HS,axis=0))
         print "hyp std:  "+str(sp.sqrt(sp.mean(HS,axis=0)))
         self.Z = drawmins_inplane(self.G,DM_SAMPLES,lb,ub,axis=axis,value=value,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode)
-        print "mindraws:\n"+str(self.Z)
+        #print "mindraws:\n"+str(self.Z)
         self.Ga = [GPdc.GPcore(*addmins_inplane(self.G, X, Y, S, D, self.Z[i, :], axis=axis, value=value, MINPOLICY=AM_POLICY) + [self.G.kf]) for i in xrange(DM_SAMPLES)]
         return
     

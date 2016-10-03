@@ -38,11 +38,12 @@ def draw_support(g, lb, ub, n, method, para=1.):
             X[:,i] *= ub[i]-lb[i]
             X[:,i] += lb[i]
     elif method==SUPPORT_LAPAPR:
+        #TODO general rather than axis alignemnt
         print "Drawing support using lapapr:"
         #start with 4 times as many points as needed
         #print 'a'
-        para = 5*int(para)
-        over = 4
+        para = int(para)
+        over = 8
         Xsto=sp.random.uniform(size=[over*para,d])
         for i in range(d):
             Xsto[:,i] *= ub[i]-lb[i]
@@ -224,7 +225,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
 
 #return the min loc of draws on given support
 def draw_min(g,support,n):
-    print 'drawminin {}'.format(support)
+    #print 'drawminin {}'.format(support)
     Z = g.draw_post(support, [[sp.NaN]]*support.shape[0],n)
     
     R = sp.empty([Z.shape[0],support.shape[1]])
@@ -294,7 +295,7 @@ class gpfake():
     
 #ub and lb are still for the full space but the values in the chosen axis do not determine the outcome
 def draw_support_inplane(g,lb,ub,n,method,axis,value,para=1.):
-    print 'dsinplane axis:{} value:{}'.format(axis,value)
+    #print 'dsinplane axis:{} value:{}'.format(axis,value)
     
     if (type(g) is int):
         gf = g-1

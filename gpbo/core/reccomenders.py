@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 import GPdc
 
 def argminrecc(optstate,**para):
-    if para['onlyafter']>len(optstate.y) or not len(optstate.y)%para['everyn']==0:
-        return [sp.NaN for i in para['lb']],{'didnotrun':True}
+    #if para['onlyafter']>len(optstate.y) or not len(optstate.y)%para['everyn']==0:
+    #    return [sp.NaN for i in para['lb']],{'didnotrun':True}
     
     logger.info('argmin reccomender')
     xinc = optstate.x[0]
@@ -30,7 +30,8 @@ argmin = argminrecc, argminpara
 
 def gpmaprecc(optstate,**para):
     if para['onlyafter']>len(optstate.y) or not len(optstate.y)%para['everyn']==0:
-        return [sp.NaN for i in para['lb']],{'didnotrun':True}
+        return argminrecc(optstate,**para)
+        #return [sp.NaN for i in para['lb']],{'didnotrun':True}
     logger.info('gpmap reccomender')
     d=len(para['lb'])
     x=sp.vstack(optstate.x)
@@ -64,7 +65,8 @@ gpmap = gpmaprecc,gpmapprior
 
 def gpmapasrecc(optstate,**para):
     if para['onlyafter']>len(optstate.y) or not len(optstate.y)%para['everyn']==0:
-        return [sp.NaN for i in para['lb']],{'didnotrun':True}
+        return argminrecc(optstate, **para)
+        #return [sp.NaN for i in para['lb']],{'didnotrun':True}
     logger.info('gpmapas reccomender')
     d=len(para['lb'])
     
@@ -114,6 +116,7 @@ def gpmapasrecc(optstate,**para):
             
         ax[0].axis([-1.,1.,-1.,1.])
         fig.savefig(os.path.join(os.path.expanduser('~'),'Dropbox/debugoutput','datavis'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+        del(fig)
     return [i for i in xmin],{'MAPHYP':MAP,'ymin':ymin}
 
 gpmapasprior = {
@@ -134,7 +137,8 @@ gpasmap = gpmapasrecc,gpmapasprior
 
 def gphinasrecc(optstate,**para):
     if para['onlyafter']>len(optstate.y) or not len(optstate.y)%para['everyn']==0:
-        return [sp.NaN for i in para['lb']],{'didnotrun':True}
+        #return [sp.NaN for i in para['lb']],{'didnotrun':True}
+        return argminrecc(optstate, **para)
     logger.info('gpmapas reccomender')
     d=len(para['lb'])
 
@@ -191,7 +195,8 @@ def gphinasrecc(optstate,**para):
         ax[0].axis([-1.,1.,-1.,1.])
         ax[1].plot(xmin[0],xmin[1],'ro')
         fig.savefig(os.path.join(debugpath, 'datavis' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
-        del (fig)
+        del(fig)
+
 
     return [i for i in xmin],{'ymin':ymin}
 

@@ -18,12 +18,16 @@ def slice_sample(loglike, init, iters, sigma, step_out=True,burn=20,subsam=4):
     # dist = joint_dist()
     
     # set up empty sample holder
+    cdef int i,mn,D
+    cdef double llh0,last_llh,llh_l,llh_r
     D = len(init)
     samples = sp.empty([iters+burn,D])
     
     # initialize
     xx = init.copy()
     pt = 0
+    print 'slice sample:'
+
     for i in tqdm(xrange(iters*subsam+burn*subsam)):
         mn=i-burn+1
         #print '\r Drawn %d    ' % mn,

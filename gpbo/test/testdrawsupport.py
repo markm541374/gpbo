@@ -1,15 +1,15 @@
 # To change this license header, choose License Headers in Project Properties.
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
-
-import ESutils
+import gpbo
+from gpbo.core import ESutils as ESutils
 import scipy as sp
 from scipy import linalg as spl
 from scipy import stats as sps
 from matplotlib import pyplot as plt
 
 #uniform test
-import GPdc
+from gpbo.core import GPdc
 
 X = ESutils.draw_support(2, sp.array([-2,-1]),sp.array([0,3]),500,ESutils.SUPPORT_UNIFORM)
 for i in xrange(X.shape[0]):

@@ -94,9 +94,11 @@ class optimizer:
             t3 = time.time()
             
             if self.reccpara['check']:
-                logger.info("checkin {} : {}".format(rx,self.aqpara['ev']))
-                checky,checkc,checkojaux  = self.ojf(rx,**self.aqpara['ev'])
-                logger.info("checkout {} : {} : {}".format(checky,checkc,checkojaux))
+                #logger.info("checkin {} : {}".format(rx,self.aqpara['ev']))
+                checkpara=copy.copy(self.aqpara['ev'])
+                checkpara['s']=0
+                checky,checkc,checkojaux  = self.ojf(rx,**checkpara)
+                #logger.info("checkout {} : {} : {}".format(checky,checkc,checkojaux))
             else:
                 checky=sp.NaN
 
