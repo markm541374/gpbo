@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 from scipy.optimize import minimize as spomin
 from scipy.stats import multivariate_normal as mnv
 import time
+
 import tqdm
 from libc.math cimport log10, log, isnan
 
@@ -98,7 +99,26 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 unq.append(Xst[i+para,:])
         #get the alligned gaussian approx of pmin
         #print 'f'
-        #print unq
+        #print
+
+        #change start here
+
+        gr = sp.empty(shape=d)
+        vg = sp.empty(shape=d)
+        H = sp.empty(shape=[d,d])
+        svd=[]
+        for xm in unq:
+            for i in range(d):
+                infg = g.infer_diag_post(xm,[[i]])
+                gr[i]=infg[0][0,0]
+                vg[i]=infg[1][0,0]
+                for j in range(i,d):
+                    H[i,j]=H[j,i]=g.infer_m_post(xm,[[i,j]])[0,0]
+            q = spl.svd(H)
+            svd.append(q)
+            print 'at {} grad{} vargrad{} hess{} svd {}'.format(xm,gr,vg,H,q)
+        #change end here
+
         cls = []
         for xm in unq:
             ls = []
@@ -156,6 +176,9 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 xp = [x[0]+cls[j][0],x[0],x[0]-cls[j][0],x[0],x[0]+cls[j][0]]
                 yp = [x[1],x[1]+cls[j][1],x[1],x[1]-cls[j][1],x[1]]
                 ax[0].plot(xp,yp,'r-')
+
+                ax[0].plot([x[0],x[0]+(svd[j][2][0,0])*0.1],[x[1],x[1]+(svd[j][2][1,0])*0.1],'g')
+                ax[0].plot([x[0],x[0]+(svd[j][2][0,1])*0.1],[x[1],x[1]+(svd[j][2][1,1])*0.1],'g')
             fig.savefig(os.path.join(debugpath,'drawlapapr'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
             del(fig)
             print 'done'
@@ -239,7 +262,7 @@ def draw_min(g,support,n):
     print "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(support.shape[0],len(amins),100.*max(amins)/float(n))
 
     from gpbo.core import debugoutput
-    if debugoutput:
+    if False:
         print 'plotting draw_min...',
         from gpbo.core import debugpath
         if not os.path.exists(debugpath):

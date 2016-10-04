@@ -3,6 +3,8 @@
 # and open the template in the editor.
 import gpbo
 from gpbo.core import ESutils as ESutils
+import gpbo.core
+gpbo.core.debugoutput=True
 import scipy as sp
 from scipy import linalg as spl
 from scipy import stats as sps
@@ -20,7 +22,6 @@ plt.axis([-5,5,-5,5])
 #2d gp test
 
 
-
 nt=34
 X = ESutils.draw_support(2, sp.array([-1.,-1.]),sp.array([1.,1.]),nt,ESutils.SUPPORT_UNIFORM)
 D = [[sp.NaN]]*(nt)
@@ -32,16 +33,9 @@ S = sp.matrix([1e-6]*nt).T
 
 lb = sp.array([-2.,-2.,-2.])
 ub = sp.array([2.,2.,2.])
-#MLEH =  GPdc.searchMLEhyp(X,Y,S,D,lb,ub,GPdc.SQUEXP,mx=10000)
+
 G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, 2, sp.array([1.5, 0.15, 0.15])))
-#np=180
-#sup = sp.linspace(-1,1,np)
-#Dp = [[sp.NaN]]*np
-#Xp = sp.vstack([sp.array([i]) for i in sup])
-#[m,v] = G.infer_diag(Xp,Dp)
-#a0.plot(sup,m)
-#sq = sp.sqrt(v)
-#a0.fill_between(sup, sp.array(m-2.*sq).flatten(), sp.array(m+2.*sq).flatten(), facecolor='lightblue',edgecolor='lightblue')
+
 
 Z = ESutils.draw_support(G, sp.array([-1.,-1.]),sp.array([1.,1.]),500,ESutils.SUPPORT_SLICEEI)
 np=30
@@ -66,40 +60,6 @@ plt.figure()
 plt.imshow(A)
 
 
-#1d gp test
-nt=10
-X = sp.matrix(sp.linspace(-1,1,nt)).T
-D = [[sp.NaN]]*(nt)
-hyp = sp.array([1.5,0.15])
-kf = GPdc.gen_sqexp_k_d(hyp)
-Kxx = GPdc.buildKsym_d(kf, X, D)
-Y = spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T+sp.matrix(sps.norm.rvs(0,1e-3,nt)).T
-S = sp.matrix([1e-6]*nt).T
-f0 = plt.figure()
-a0 = plt.subplot(311)
-a1 = plt.subplot(312)
-a2 = plt.subplot(313)
-a0.plot(sp.array(X[:,0]).flatten(),Y,'g.')
-lb = sp.array([-2.,-2.])
-ub = sp.array([2.,2.])
-#MLEH =  GPdc.searchMLEhyp(X,Y,S,D,lb,ub,GPdc.SQUEXP,mx=10000)
-G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, 1, sp.array([1.5, 0.15])))
-np=180
-sup = sp.linspace(-1,1,np)
-Dp = [[sp.NaN]]*np
-Xp = sp.vstack([sp.array([i]) for i in sup])
-[m,v] = G.infer_diag(Xp,Dp)
-a0.plot(sup,m.flatten())
-sq = sp.sqrt(v)
-a0.fill_between(sup, sp.array(m-2.*sq).flatten(), sp.array(m+2.*sq).flatten(), facecolor='lightblue',edgecolor='lightblue')
 
-
-X = ESutils.draw_support(G, sp.array([-1]),sp.array([1.]),300,ESutils.SUPPORT_SLICEEI)
-a1.hist(X,bins=80)
-
-R = ESutils.draw_min(G,X,300)
-
-j = a2.hist(R,bins=60)
-a2.axis([-1,1,0,1.2*max(j[0])])
 
 plt.show()
