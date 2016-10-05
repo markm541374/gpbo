@@ -298,6 +298,7 @@ class gpfake():
         self.D = g.D-1
         self.axis=axis
         self.value=value
+        #print 'GPFAKE axis{} value{}'.format(axis,value)
         return
     
     def augx(self,x):
@@ -305,15 +306,19 @@ class gpfake():
         return ax
     
     def infer_m_post(self,x,d):
-        return self.g.infer_m_post(self.augx(x),d)
+        dstar = [[i+1 if i>=self.axis else i for i in e] for e in d]
+        return self.g.infer_m_post(self.augx(x),dstar)
     
     def infer_diag_post(self,x,d):
+        dstar = [[i+1 if i>=self.axis else i for i in e] for e in d]
         return self.g.infer_diag_post(self.augx(x),d)
     
     def infer_EI(self,x,d):
+        dstar = [[i+1 if i>=self.axis else i for i in e] for e in d]
         return self.g.infer_EI(self.augx(x),d)
     
     def infer_LCB_post(self,x,d,p):
+        dstar = [[i+1 if i>=self.axis else i for i in e] for e in d]
         return self.g.infer_LCB_post(self.augx(x),d,p)
     
 #ub and lb are still for the full space but the values in the chosen axis do not determine the outcome

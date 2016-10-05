@@ -205,7 +205,7 @@ def gendecayingpositiveojf(d, lb, ub):
 
 
         y0=p0(x)
-        y1=10.*p1(x)+y0
+        y1=0.25*p1(x)+y0
         l=p2(x)
 
         A = (y1-y0)/(sp.exp(l)-1)
