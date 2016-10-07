@@ -1,7 +1,7 @@
 # To change this license header, choose License Headers in Project Properties.
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
-
+"""
 import OPTutils
 import ESutils
 from tqdm import tqdm, tqdm_gui
@@ -235,3 +235,4 @@ def PESIPS(ojf,lb,ub,ki,b,fname):
         state = [OE.X,OE.Y,OE.S,OE.D,OE.R,OE.C,OE.T,OE.Tr,OE.Ymin,OE.Xmin,OE.Yreg, OE.Rreg]
         pickle.dump(state,open(fname,'wb'))
     return state
+"""
