@@ -175,7 +175,7 @@ def gensquexpIPdraw(d,lb,ub,sl,su,sfn,sls,cfn):
 
 
 
-
+"""
 class opt(object):
     def __init__(self,objective,lb,ub,para=None,initstate=False):
         self.initstate=initstate
@@ -334,7 +334,10 @@ class opt(object):
         #print "recc:\n"+str((self.Yreg-truey).flatten())+"\nmmmmm\n"+str((self.Rreg-truey).flatten())
         
         return
-    
+"""
+
+
+"""
 class LCBMLE(opt):
     def init_search(self,para):
         self.kindex = para[0]
@@ -372,7 +375,9 @@ class LCBMLE(opt):
             return (m,0)
         [xmin,ymin,ierror] = DIRECT.solve(dirwrap,self.lb,self.ub,user_data=[], algmethod=1, volper=self.volper, logfilename='/dev/null')
         return xmin
-    
+"""
+
+"""
 class EIMLE(opt):
     def init_search(self,para):
         self.kindex = para[0]
@@ -417,7 +422,9 @@ class EIMLE(opt):
             return (m,0)
         [xmin,ymin,ierror] = DIRECT.solve(dirwrap,self.lb,self.ub,user_data=[], algmethod=1, volper= self.volper, logfilename='/dev/null')
         return xmin
-    
+"""
+
+"""
 class PESFS(opt):
     def init_search(self,para):
         self.para=para
@@ -477,7 +484,9 @@ class PESFS(opt):
             
             plt.twinx().plot(sup,p.flatten(),'g')
         return
-    
+"""
+
+"""
 class PESIS(PESFS):
     def init_search(self,para):
         self.para=para
@@ -501,7 +510,9 @@ class PESIS(PESFS):
         [xmin,ymin,ierror] = self.pesobj.search_pes(-1,volper=self.para['volper'])
         return [xmin,0.,[sp.NaN]]
 
+"""
 
+"""
 class PESVS(opt):
     def init_search(self,para):
         self.para=para
@@ -534,7 +545,9 @@ class PESVS(opt):
         [y,c0] = self.ojf(x,s,d)
         c = self.para['cfn'](x,s)
         return [y,c]
+"""
 
+"""
 #I'm defining that the augmented dimension must be rescaled to [0,1] with 0 as the true objective
 class PESIP(opt):
     def init_search(self,para):
@@ -606,7 +619,9 @@ class PESIP(opt):
         a.plot(sup,sp.exp(mc.flatten()),'b')
         a.fill_between(sup,sp.exp(mc.flatten()-2*sc).flatten(),sp.exp(mc.flatten()+2*sc).flatten(), facecolor='lightblue',edgecolor='lightblue')
         return
-        
+"""
+
+"""
 class PESIPS(PESIP):
     def init_search(self,para):
         self.para=para
@@ -643,6 +658,10 @@ class PESIPS(PESIP):
         a[2].plot([sum(self.C[:j]) for j in xrange(len(self.C))],sp.log10(self.Rreg.flatten()-truey))
         a[2].set_ylabel("regret/c")
         return
+
+"""
+
+
 def bounds(Xs,Ys,ns=100):
     #use a gp to infer mean and bounds on sets of x/y data that have diffent x
     #f,a = plt.subplots(2)
