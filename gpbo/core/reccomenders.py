@@ -29,7 +29,7 @@ argminpara = dict()
 argmin = argminrecc, argminpara
 
 def gpmaprecc(optstate,**para):
-    if para['onlyafter']>len(optstate.y) or not len(optstate.y)%para['everyn']==0:
+    if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
         return argminrecc(optstate,**para)
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
     logger.info('gpmap reccomender')
@@ -64,7 +64,7 @@ gpmapprior = {
 gpmap = gpmaprecc,gpmapprior
 
 def gpmapasrecc(optstate,**para):
-    if para['onlyafter']>len(optstate.y) or not len(optstate.y)%para['everyn']==0:
+    if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
         return argminrecc(optstate, **para)
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
     logger.info('gpmapas reccomender')
@@ -136,7 +136,7 @@ gpmapasprior = {
 gpasmap = gpmapasrecc,gpmapasprior
 
 def gphinasrecc(optstate,**para):
-    if para['onlyafter']>len(optstate.y) or not len(optstate.y)%para['everyn']==0:
+    if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
         return argminrecc(optstate, **para)
     logger.info('gpmapas reccomender')
@@ -215,3 +215,49 @@ gphinasprior = {
                 }
 
 gpashin = gphinasrecc,gphinasprior
+
+
+def gphinrecc(optstate,**para):
+    print [para['onlyafter'],len(optstate.y)]
+    if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
+        #return [sp.NaN for i in para['lb']],{'didnotrun':True}
+        return argminrecc(optstate, **para)
+    logger.info('gphin reccomender')
+    d=len(para['lb'])
+
+
+    x=sp.vstack(optstate.x)
+
+    
+    y=sp.vstack(optstate.y)
+    s= sp.vstack([e['s'] for e in optstate.ev])
+    dx=[e['d'] for e in optstate.ev]
+    
+    G = GPdc.GPcore(x, y, s, dx, [GPdc.kernel(optstate.aux['kindex'], d, h) for h in optstate.aux['HYPdraws']])
+    def directwrap(xq,y):
+        xq.resize([1,d])
+        xe = xq
+        #print xe
+        a = G.infer_m_post(xe,[[sp.NaN]])
+        return (a[0,0],0)
+    [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
+    logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
+
+    
+    return [i for i in xmin],{'ymin':ymin}
+
+gphinprior = {
+                'ev':{'s':1e-9,'d':[sp.NaN],'xa':0.},
+                #'ev':[1e-9,[sp.NaN]],
+                'lb':[-1.-1.],
+                'ub':[1.,1.],
+                #'mprior':sp.array([1.,0.,0.,0.]),
+                #'sprior':sp.array([1.,1.,1.,1.]),
+                #'kindex':GPdc.MAT52,
+                'volper':1e-6,
+                'onlyafter':10,
+                'check':False,
+                'everyn':1,
+                }
+
+gphin = gphinrecc,gphinprior
