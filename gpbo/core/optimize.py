@@ -24,7 +24,6 @@ class optstate:
         return
     
     def update(self,x,ev,y,c):
-        #print 'updata {}'.format(self.ev)
         self.x.append(x)
         self.ev.append(copy.copy(ev))
         self.y.append(y)
@@ -74,7 +73,7 @@ class optimizer:
         logger.info('startopt:')
         
         lf = open(os.path.join(self.dirpath,self.name),'wb',0)
-        lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime'])+'\n')
+        lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, aqauxdata'])+'\n')
         self.state = optstate()
         stepn=0
         while not self.stopfn(self.state,**self.stoppara):
@@ -106,14 +105,10 @@ class optimizer:
 
             
             logger.info("{}     recctime: {}\n".format(rx,t3-t2))
-            
-            logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+'\n'
+            logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+','+str(aqaux).replace(',',' ').replace('\n',';').replace('\r',';')+'\n'
             lf.write(logstr)
             
-            pobj = [x,ev,self.aqpersist,aqaux,y,c,ojaux,rx,reaux,t1-t0,t2-t1,t3-t2,time.strftime('%H:%M:%S  %d-%m-%y')]
-            
-            pickle.dump(pobj,open(os.path.join(self.dirpath,'step{}.p'.format(stepn)),'wb'))
-        pickle.dump(self.state,open(os.path.join(self.dirpath,'state.p'),'wb'))
+
         logger.info('endopt')
 
         return rx,reaux
