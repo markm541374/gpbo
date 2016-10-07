@@ -1,6 +1,6 @@
 # Use the log likelihood of hyperperameters as an objective function.
 
-
+"""
 import ESutils
 
 import GPdc
@@ -65,3 +65,4 @@ class lkojf:
         t2=time.clock()
         #print [t1-t0,t2-t1]
         return [r,t2-t0]
+"""
