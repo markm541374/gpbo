@@ -35,10 +35,11 @@ class optstate:
 
 
 class optimizer:
-    def __init__(self,dirpath,aqpara,aqfn,stoppara,stopfn,reccpara,reccfn,ojf,ojfchar):
+    def __init__(self,dirpath,name,aqpara,aqfn,stoppara,stopfn,reccpara,reccfn,ojf,ojfchar):
         print aqpara
 
         self.dirpath = dirpath
+        self.name = name
         self.setaq(aqpara,aqfn)
         self.setstopcon(stoppara,stopfn)
         self.setojf(ojf)
@@ -72,7 +73,7 @@ class optimizer:
     def run(self):
         logger.info('startopt:')
         
-        lf = open(os.path.join(self.dirpath,'trace.csv'),'wb',0)
+        lf = open(os.path.join(self.dirpath,self.name),'wb',0)
         lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime'])+'\n')
         self.state = optstate()
         stepn=0
@@ -96,7 +97,8 @@ class optimizer:
             if self.reccpara['check']:
                 #logger.info("checkin {} : {}".format(rx,self.aqpara['ev']))
                 checkpara=copy.copy(self.aqpara['ev'])
-                checkpara['s']=0
+                checkpara['s']=1e-99
+                checkpara['cheattrue']=True
                 checky,checkc,checkojaux  = self.ojf(rx,**checkpara)
                 #logger.info("checkout {} : {} : {}".format(checky,checkc,checkojaux))
             else:
@@ -126,7 +128,9 @@ def cstopfn(optstate,cmax = 1):
 
 
 def search(optconfig):
-    O = optimizer(optconfig.path, optconfig.aqpara, optconfig.aqfn, optconfig.stoppara,
+    if not hasattr(optconfig,'fname'):
+        optconfig.fname='traces.csv'
+    O = optimizer(optconfig.path, optconfig.fname, optconfig.aqpara, optconfig.aqfn, optconfig.stoppara,
                                      optconfig.stopfn, optconfig.reccpara, optconfig.reccfn, optconfig.ojf,
                                      optconfig.ojfchar)
 

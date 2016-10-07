@@ -27,8 +27,8 @@ kindex = gpbo.core.GPdc.MAT52
 prior = sp.array([0.]+[-1.]*d)
 sprior = sp.array([1.]*(d+1))
 kernel = [kindex,prior,sprior]
-nreps = 4
-bd = 15.
+nreps = 2
+bd = 3.
 slist = [1e3,1e-3]
 print 'start'
 f,a_ = plt.subplots(2)

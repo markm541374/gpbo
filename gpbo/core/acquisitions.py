@@ -58,7 +58,7 @@ bruteprior = {'ev':{'s':0.,'d':[sp.NaN]},'lb':[-1.-1.],'ub':[1.,1.]}
 brute = bruteaq, bruteprior
 
 #EIMAP
-def EIMAPaq(optstate,persist,ev=None, ub = None, lb=None, nrandinit=None, mprior=None,sprior=None,kindex = None,directmaxiter=None):
+def EIMAPaq(optstate,persist,ev=None, ub = None, lb=None, nrandinit=None, mprior=None,sprior=None,kindex = None,volper=None):
     #para = copy.deepcopy(para)
     if persist==None:
         persist = {'n':0,'d':len(ub)}
@@ -83,7 +83,7 @@ def EIMAPaq(optstate,persist,ev=None, ub = None, lb=None, nrandinit=None, mprior
         a = G.infer_lEI(xq,[ev['d']])
         return (-a[0,0],0)
     
-    [xmin,ymin,ierror] = DIRECT.solve(directwrap,lb,ub,user_data=[], algmethod=0, maxf = directmaxiter, logfilename='/dev/null')
+    [xmin,ymin,ierror] = DIRECT.solve(directwrap,lb,ub,user_data=[], algmethod=1, volper = volper, logfilename='/dev/null')
     #logger.debug([xmin,ymin,ierror])
     persist['n']+=1
     return [i for i in xmin],ev,persist,{'MAPHYP':MAP,'logEImin':ymin,'DIRECTmessage':ierror}
@@ -96,7 +96,7 @@ EIMAPprior = {
                 'mprior':sp.array([1.,0.,0.]),
                 'sprior':sp.array([1.,1.,1.]),
                 'kindex':GPdc.MAT52,
-                'directmaxiter':10000
+                'volper':1e-5
                 }
 
 EIMAP = EIMAPaq, EIMAPprior
@@ -125,7 +125,7 @@ def PESfsaq(optstate,persist,**para):
     
     [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],volper=para['volper'])
     #logger.debug([xmin,ymin,ierror])
-    return [i for i in xmin],para['ev'],persist,{'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
+    return [i for i in xmin],para['ev'],persist,{'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],}
 
 PESfsprior = {
             'ev':{'s':1e-9,'d':[sp.NaN]},
@@ -158,8 +158,9 @@ def PESvsaq(optstate,persist,**para):
     d = persist['d']
     if n<para['nrandinit']:
         persist['n']+=1
-        
-        return randomaq(optstate,persist,**para)
+        para2=copy.deepcopy(para)
+        para2['ev']['s']=10**(para['logsu'])
+        return randomaq(optstate,persist,**para2)
     logger.info('PESvsaq')
     #logger.debug(sp.vstack([e[0] for e in optstate.ev]))
     #raise
@@ -177,7 +178,7 @@ def PESvsaq(optstate,persist,**para):
     logger.debug([xmin,ymin,ierror])
     para['ev']['s']=10**xmin[-1]
     xout = [i for i in xmin[:-1]]
-    return xout,para['ev'],persist,{'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
+    return xout,para['ev'],persist,{'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
 
     return
 
