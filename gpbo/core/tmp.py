@@ -1,3 +1,5 @@
+"""
+
 import optimize
 import acquisitions
 import reccomenders
@@ -70,3 +72,5 @@ aqpara['ub']=[1.,1.]
 aqpara['ev']['s']=1e-12
 
 print aqfn(O,{'n':nq,'d':len(aqpara['ub'])},**aqpara)
+
+"""
