@@ -240,7 +240,7 @@ def PESbsaq(optstate,persist,**para):
         raise
     else:
         pass
-    logger.info('PESssaq')
+    logger.info('PESbsaq')
     
     x=sp.hstack([sp.vstack([e['xa'] for e in optstate.ev]),sp.vstack(optstate.x)])
     
