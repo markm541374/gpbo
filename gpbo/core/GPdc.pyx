@@ -31,7 +31,8 @@ cint = ct.c_int
 
 class GP_LKonly:
     def __init__(self, X_s, Y_s, S_s, D_s, kf):
-        [n ,D] = X_s.shape
+        cdef int n, D, i
+        n ,D = X_s.shape
         self.hyp = kf.hyp
         R = ct.c_double()
         Dc = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]
@@ -114,11 +115,11 @@ class GPcore:
     
     
     def infer_full(self,X_i,D_i):
+        cdef int ns,j,i
         ns=X_i.shape[0]
         D = [0 if isnan(x[0]) else int(sum([8**j for j in x])) for x in D_i]
         R=sp.vstack([sp.empty([ns+1,ns])]*self.size)
         libGP.infer_full(self.s, cint(self.size), ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
-        cdef int i
         m = sp.vstack([R[i*(ns+1),:] for i in range(self.size)])
         V = sp.vstack([R[(ns+1)*i+1:(ns+1)*(i+1),:] for i in range(self.size)])
         return [m,V]
@@ -127,26 +128,28 @@ class GPcore:
         class MJMError(Exception):
             pass
         [m,V] = self.infer_full(X_i,D_i)
+        cdef int i,ns
         ns=X_i.shape[0]
         cv = sp.zeros([ns,ns])
-        cdef int i
+
         for i in range(self.size):
             cv+=V[ns*i:ns*(i+1),:]
         cv= cv/self.size + sp.cov(m,rowvar=0,bias=1)
         return [sp.mean(m,axis=0).reshape([1,ns]),cv]
     
     def infer_diag(self,X_i,D_i):
+        cdef int i,j,ns
         ns=X_i.shape[0]
         D = [0 if isnan(x[0]) else int(sum([8**j for j in x])) for x in D_i]
         R=sp.vstack([sp.empty([2,ns])]*self.size)
         libGP.infer_diag(self.s,cint(self.size), ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
-        cdef int i
+
         m = sp.vstack([R[i*2,:] for i in range(self.size)])
         V = sp.vstack([R[i*2+1,:] for i in range(self.size)])
         return [m,V]
     
     def infer_diag_post(self,X_ii,D_i):
-        
+        cdef int ns
         X_i = dc(X_ii)
         ns = len(D_i)
         
@@ -175,6 +178,7 @@ class GPcore:
     
     def draw(self,X_i,D_i,m):
         #make m draws at X_i Nd, X, D, R, m
+        cdef int i,ns
         ns=X_i.shape[0]
         D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.empty([m*self.size,ns])
@@ -182,6 +186,7 @@ class GPcore:
         return R
     
     def draw_post(self,X_i,D_i,z):
+        cdef int ns
         ns = X_i.shape[0]
         [m,V] = self.infer_full_post(X_i,D_i)
         R = sp.empty([ns,z])
@@ -195,6 +200,7 @@ class GPcore:
         return R
     
     def infer_LCB(self,X_i,D_i, p):
+        cdef int ns,i
         ns=X_i.shape[0]
         D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.empty([self.size,ns])

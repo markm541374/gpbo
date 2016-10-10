@@ -2,7 +2,7 @@ import os
 from . import core
 from . import test
 from . import examples
-from . import configs
+from . import _configs
 from core import search
 
 

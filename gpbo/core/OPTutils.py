@@ -1,9 +1,9 @@
 # To change this license header, choose License Headers in Project Properties.
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
-import pyximport
-from numpy import get_include
-pyximport.install(setup_args={'include_dirs': get_include()})
+#import pyximport
+#from numpy import get_include
+#pyximport.install(setup_args={'include_dirs': get_include()})
 import scipy as sp
 from scipy import linalg as spl
 import time
