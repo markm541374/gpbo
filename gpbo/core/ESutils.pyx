@@ -16,7 +16,7 @@ import time
 
 import tqdm
 from libc.math cimport log10, log, isnan
-
+import copy
 SUPPORT_UNIFORM = 0
 SUPPORT_SLICELCB = 1
 SUPPORT_SLICEEI = 2
@@ -374,3 +374,29 @@ def gen_dataset(nt,d,lb,ub,kindex,hyp,s=1e-9):
     Y = spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T+sp.matrix(sps.norm.rvs(0,sp.sqrt(s),nt)).T
     S = sp.matrix([s]*nt).T
     return [X,Y,S,D]
+
+def plot2dFtofile(f,fname,xmin=False,atxa=0.):
+    n = 100
+    x_ = sp.linspace(-1, 1, n)
+    y_ = sp.linspace(-1, 1, n)
+    z_ = sp.empty([n, n])
+    s_ = sp.empty([n, n])
+    for i in xrange(n):
+        for j in xrange(n):
+            m_ = f(sp.array([y_[j], x_[i]]), **{'s': 0, 'xa': atxa, 'd': [sp.NaN]})
+            z_[i, j] = m_[0]
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
+    CS = ax.contour(x_, y_, z_, 30)
+    ax.clabel(CS, inline=1, fontsize=8)
+    if any(xmin):
+        ax.plot(xmin[0], xmin[1], 'ro')
+    fig.savefig(fname)
+    del (fig)
+    return
+
+def accumulate(x):
+    y = copy.deepcopy(x)
+    cdef int i
+    for i in xrange(len(x)-1):
+        y[i+1]+=y[i]
+    return y
