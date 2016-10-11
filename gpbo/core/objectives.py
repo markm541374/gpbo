@@ -231,4 +231,7 @@ def gendecayingpositiveojf(d, lb, ub):
     ymin = spowrap(y.x)
     # print [xmin,ymin]
     logger.info('generated function xmin {} ymin {} globopt:{} locopt:{}'.format(xmin, ymin, ierror, y.status))
+    if sp.isnan(ymin):
+        logger.warning('generator got nan optimizing objective. retrying...')
+        return gendecayingpositiveojf(d, lb, ub)
     return ojf, xmin, ymin
