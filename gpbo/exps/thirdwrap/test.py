@@ -7,7 +7,7 @@ def testsimple():
     sworst=1.
     sbest=0.
     def f(x, s):
-        y = -sp.cos(x[0]*0.5) -sp.cos(0.5*x[1])+0.1*s**2
+        y = -sp.cos(x[0]*0.5) -sp.cos(0.5*x[1])+0.1*s**2+2.
         c = 1-0.5*s
         return y, c
 

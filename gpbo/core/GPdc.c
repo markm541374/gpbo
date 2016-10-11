@@ -2103,7 +2103,7 @@ static PyObject *__pyx_int_11;
 static PyObject *__pyx_int_12;
 static PyObject *__pyx_int_13;
 static PyObject *__pyx_int_14;
-static PyObject *__pyx_int_5000;
+static PyObject *__pyx_int_20000;
 static PyObject *__pyx_int_neg_42;
 static PyObject *__pyx_codeobj_;
 static PyObject *__pyx_slice__12;
@@ -15827,7 +15827,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_12gen_lin1_k_d_2__call__(CYTHON_UNUS
  *         r=libGP.k(x1.ctypes.data_as(ctpd),x2.ctypes.data_as(ctpd), cint(D1),cint(D2),cint(-42),self.hypinv.ctypes.data_as(ctpd),cint(1),ct.byref(ct.c_double(smodel)))
  *         return r             # <<<<<<<<<<<<<<
  * 
- * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=5000,fg=-1e9):
+ * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=20000,fg=-1e9):
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_r);
@@ -15876,7 +15876,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_12gen_lin1_k_d_2__call__(CYTHON_UNUS
 /* "gpbo/core/GPdc.pyx":315
  *         return r
  * 
- * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=5000,fg=-1e9):             # <<<<<<<<<<<<<<
+ * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=20000,fg=-1e9):             # <<<<<<<<<<<<<<
  *     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
  *     ns=X.shape[0]
  */
@@ -15900,7 +15900,7 @@ static PyObject *__pyx_pw_4gpbo_4core_4GPdc_1searchMLEhyp(PyObject *__pyx_self, 
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_Y,&__pyx_n_s_S,&__pyx_n_s_D,&__pyx_n_s_lb,&__pyx_n_s_ub,&__pyx_n_s_ki,&__pyx_n_s_mx,&__pyx_n_s_fg,0};
     PyObject* values[9] = {0,0,0,0,0,0,0,0,0};
-    values[7] = ((PyObject *)__pyx_int_5000);
+    values[7] = ((PyObject *)__pyx_int_20000);
     values[8] = ((PyObject *)__pyx_float_neg_1e9);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -16047,7 +16047,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_searchMLEhyp(CYTHON_UNUSED PyObject 
 
   /* "gpbo/core/GPdc.pyx":316
  * 
- * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=5000,fg=-1e9):
+ * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=20000,fg=-1e9):
  *     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))             # <<<<<<<<<<<<<<
  *     ns=X.shape[0]
  *     dim = X.shape[1]
@@ -16144,7 +16144,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_searchMLEhyp(CYTHON_UNUSED PyObject 
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "gpbo/core/GPdc.pyx":317
- * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=5000,fg=-1e9):
+ * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=20000,fg=-1e9):
  *     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
  *     ns=X.shape[0]             # <<<<<<<<<<<<<<
  *     dim = X.shape[1]
@@ -16861,7 +16861,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_searchMLEhyp(CYTHON_UNUSED PyObject 
   /* "gpbo/core/GPdc.pyx":315
  *         return r
  * 
- * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=5000,fg=-1e9):             # <<<<<<<<<<<<<<
+ * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=20000,fg=-1e9):             # <<<<<<<<<<<<<<
  *     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
  *     ns=X.shape[0]
  */
@@ -16905,7 +16905,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_searchMLEhyp(CYTHON_UNUSED PyObject 
 /* "gpbo/core/GPdc.pyx":329
  * 
  * 
- * def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=5000,fg=-1e9):             # <<<<<<<<<<<<<<
+ * def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=20000,fg=-1e9):             # <<<<<<<<<<<<<<
  *     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
  *     ns=X.shape[0]
  */
@@ -16931,7 +16931,7 @@ static PyObject *__pyx_pw_4gpbo_4core_4GPdc_3searchMAPhyp(PyObject *__pyx_self, 
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_Y,&__pyx_n_s_S,&__pyx_n_s_D,&__pyx_n_s_m,&__pyx_n_s_s,&__pyx_n_s_ki,&__pyx_n_s_MAPmargin,&__pyx_n_s_mx,&__pyx_n_s_fg,0};
     PyObject* values[10] = {0,0,0,0,0,0,0,0,0,0};
     values[7] = ((PyObject *)__pyx_float_1_8);
-    values[8] = ((PyObject *)__pyx_int_5000);
+    values[8] = ((PyObject *)__pyx_int_20000);
     values[9] = ((PyObject *)__pyx_float_neg_1e9);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -17087,7 +17087,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_2searchMAPhyp(CYTHON_UNUSED PyObject
 
   /* "gpbo/core/GPdc.pyx":330
  * 
- * def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=5000,fg=-1e9):
+ * def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=20000,fg=-1e9):
  *     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))             # <<<<<<<<<<<<<<
  *     ns=X.shape[0]
  *     dim = X.shape[1]
@@ -17184,7 +17184,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_2searchMAPhyp(CYTHON_UNUSED PyObject
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "gpbo/core/GPdc.pyx":331
- * def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=5000,fg=-1e9):
+ * def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=20000,fg=-1e9):
  *     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
  *     ns=X.shape[0]             # <<<<<<<<<<<<<<
  *     dim = X.shape[1]
@@ -17955,7 +17955,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_2searchMAPhyp(CYTHON_UNUSED PyObject
   /* "gpbo/core/GPdc.pyx":329
  * 
  * 
- * def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=5000,fg=-1e9):             # <<<<<<<<<<<<<<
+ * def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=20000,fg=-1e9):             # <<<<<<<<<<<<<<
  *     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
  *     ns=X.shape[0]
  */
@@ -21917,7 +21917,7 @@ static int __Pyx_InitCachedConstants(void) {
   /* "gpbo/core/GPdc.pyx":315
  *         return r
  * 
- * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=5000,fg=-1e9):             # <<<<<<<<<<<<<<
+ * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=20000,fg=-1e9):             # <<<<<<<<<<<<<<
  *     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
  *     ns=X.shape[0]
  */
@@ -21929,7 +21929,7 @@ static int __Pyx_InitCachedConstants(void) {
   /* "gpbo/core/GPdc.pyx":329
  * 
  * 
- * def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=5000,fg=-1e9):             # <<<<<<<<<<<<<<
+ * def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=20000,fg=-1e9):             # <<<<<<<<<<<<<<
  *     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
  *     ns=X.shape[0]
  */
@@ -21992,7 +21992,7 @@ static int __Pyx_InitGlobals(void) {
   __pyx_int_12 = PyInt_FromLong(12); if (unlikely(!__pyx_int_12)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_13 = PyInt_FromLong(13); if (unlikely(!__pyx_int_13)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_14 = PyInt_FromLong(14); if (unlikely(!__pyx_int_14)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_int_5000 = PyInt_FromLong(5000); if (unlikely(!__pyx_int_5000)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_20000 = PyInt_FromLong(20000L); if (unlikely(!__pyx_int_20000)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_neg_42 = PyInt_FromLong(-42); if (unlikely(!__pyx_int_neg_42)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -23137,7 +23137,7 @@ PyMODINIT_FUNC PyInit_GPdc(void)
   /* "gpbo/core/GPdc.pyx":315
  *         return r
  * 
- * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=5000,fg=-1e9):             # <<<<<<<<<<<<<<
+ * def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=20000,fg=-1e9):             # <<<<<<<<<<<<<<
  *     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
  *     ns=X.shape[0]
  */
@@ -23149,7 +23149,7 @@ PyMODINIT_FUNC PyInit_GPdc(void)
   /* "gpbo/core/GPdc.pyx":329
  * 
  * 
- * def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=5000,fg=-1e9):             # <<<<<<<<<<<<<<
+ * def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=20000,fg=-1e9):             # <<<<<<<<<<<<<<
  *     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
  *     ns=X.shape[0]
  */

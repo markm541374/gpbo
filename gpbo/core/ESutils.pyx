@@ -9,7 +9,13 @@ import slice
 import scipy as sp
 from scipy import linalg as spl
 from scipy import stats as sps
-from matplotlib import pyplot as plt
+try:
+    from matplotlib import pyplot as plt
+    plots=True
+except ImportError:
+    plots=False
+    plt=None
+
 from scipy.optimize import minimize as spomin
 from scipy.stats import multivariate_normal as mnv
 import time
@@ -143,7 +149,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
         sp.clip(X,-1,1,out=X)
         from gpbo.core import debugoutput
 
-        if debugoutput:
+        if debugoutput and plots:
             print "plotting draw_support...",
             from gpbo.core import debugpath
             if not os.path.exists(debugpath):
@@ -227,7 +233,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 return -10*ym+0.01*p
             else:
                 return -1e99
-        if False:
+        if False and plots:
             A = sp.empty([100,100])
             sup = sp.linspace(-0.999,0.999,100)
             for i in range(100):
@@ -262,12 +268,12 @@ def draw_min(g,support,n):
     print "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(support.shape[0],len(amins),100.*max(amins)/float(n))
 
     from gpbo.core import debugoutput
-    if False:
+    if False and plots:
         print 'plotting draw_min...',
         from gpbo.core import debugpath
         if not os.path.exists(debugpath):
             os.mkdir(debugpath)
-        from matplotlib import pyplot as plt
+
         import time
         #2d plot assuming [-1,1]^2 support
         n = 200
@@ -376,14 +382,19 @@ def gen_dataset(nt,d,lb,ub,kindex,hyp,s=1e-9):
     return [X,Y,S,D]
 
 def plot2dFtofile(f,fname,xmin=False,atxa=0.):
+    if not plots:
+        print 'XXXplots disabled'
+        return
+    cdef int i,j
     n = 100
     x_ = sp.linspace(-1, 1, n)
     y_ = sp.linspace(-1, 1, n)
     z_ = sp.empty([n, n])
     s_ = sp.empty([n, n])
+    ev={'s': 0, 'xa': atxa, 'd': [sp.NaN],'cheattrue':True}
     for i in xrange(n):
         for j in xrange(n):
-            m_ = f(sp.array([y_[j], x_[i]]), **{'s': 0, 'xa': atxa, 'd': [sp.NaN]})
+            m_ = f(sp.array([y_[j], x_[i]]), **ev)
             z_[i, j] = m_[0]
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
     CS = ax.contour(x_, y_, z_, 30)
@@ -400,3 +411,10 @@ def accumulate(x):
     for i in xrange(len(x)-1):
         y[i+1]+=y[i]
     return y
+
+def medianirregular(xdata,ydata,xtarget):
+    n = len(xdata)
+    inters=sp.empty(shape=[n,len(xtarget)])
+    for i in xrange(n):
+        inters[i,:] = sp.interp(xtarget,xdata,ydata,left=sp.NaN,right=sp.NaN)
+    return sp.median(inters,axis=0)

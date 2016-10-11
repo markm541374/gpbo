@@ -8,15 +8,15 @@ from scipy import stats as sps
 from scipy import linalg as spl
 import scipy as sp
 from matplotlib import pyplot as plt
-import ESutils
+from gpbo.core import ESutils as ESutils
 
-import GPdc
+from gpbo.core import GPdc as GPdc
 
 nt=22
-d=1
+d=2
 lb = sp.array([-1.]*d)
 ub = sp.array([1.]*d)
-[X,Y,S,D] = ESutils.gen_dataset(nt, d, lb, ub, GPdc.SQUEXP, sp.array([0.9, 0.25]), s=1e-8)
+[X,Y,S,D] = ESutils.gen_dataset(nt, d, lb, ub, GPdc.SQUEXP, sp.array([0.9, 0.25,0.25]), s=1e-6)
 S*=0.
 f0 = plt.figure()
 a0 = plt.subplot(111)
@@ -27,14 +27,14 @@ ub = sp.array([2.,2.,-1])
 MLEH =  GPdc.searchMLEhyp(X, Y, S, D, lb, ub, GPdc.SQUEXPCS, mx=10000)
 
 mprior = sp.array([0.,-1.,-5.])
-sprior = sp.array([1.,1.,3.])
+sprior = sp.array([1.,1.,39.])
 
 MAPH = GPdc.searchMAPhyp(X, Y, S, D, mprior, sprior, GPdc.SQUEXPCS, mx=10000)
 print "MLEH: "+str(MLEH)
 print "MAPH: "+str(MAPH)
 G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXPCS, 1, sp.array(MLEH)))
 
-
+"""
 print G.llk()
 
 np=180
@@ -49,3 +49,5 @@ sq = sp.sqrt(v)
 a0.fill_between(sup, sp.array(m-1.*sq).flatten(), sp.array(m+1.*sq).flatten(), facecolor='lightblue',edgecolor='lightblue')
 
 plt.show()
+
+"""

@@ -4,7 +4,7 @@ import scipy as sp
 
 D=2
 n=30
-s=1e-6
+s=1e-3
 
 def f(x, **ev):
     y = -sp.cos(x[0]) - sp.cos(x[1]) + 2
@@ -17,6 +17,6 @@ def f(x, **ev):
     return y + n, c, dict()
 
 
-C=gpbo.core.config.eimledefault(f,D,n,s,'results','eimle.csv')
+C=gpbo.core.config.eimlesearch(f,D,n,s,'results','eimle.csv')
 out = gpbo.search(C)
 print out

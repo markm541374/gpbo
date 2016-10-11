@@ -124,10 +124,18 @@ def PESfsaq(optstate,persist,**para):
     dx=[e['d'] for e in optstate.ev]
     
     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'])
-    
+
+
     [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],volper=para['volper'])
-    #logger.debug([xmin,ymin,ierror])
-    return [i for i in xmin],para['ev'],persist,{'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],}
+
+    lhyp = sp.log10([k.hyp for k in pesobj.G.kf])
+    lhmean = sp.mean(lhyp, axis=0)
+    lhstd = sp.sqrt(sp.var(lhyp, axis=0))
+    lhmin = lhyp.min(axis=0)
+    lhmax = lhyp.max(axis=0)
+    logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean,lhstd,lhmin,lhmax))
+
+    return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],}
 """
 PESfsprior = {
             'ev':{'s':1e-9,'d':[sp.NaN]},
@@ -177,9 +185,17 @@ def PESvsaq(optstate,persist,**para):
     logger.debug([xmin,ymin,ierror])
     para['ev']['s']=10**xmin[-1]
     xout = [i for i in xmin[:-1]]
-    return xout,para['ev'],persist,{'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
 
-    return
+    lhyp = sp.log10([k.hyp for k in pesobj.G.kf])
+    lhmean = sp.mean(lhyp, axis=0)
+    lhstd = sp.sqrt(sp.var(lhyp, axis=0))
+    lhmin = lhyp.min(axis=0)
+    lhmax = lhyp.max(axis=0)
+    logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean, lhstd, lhmin, lhmax))
+
+    return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
+
+
 """
 PESvsprior = {
             'ev':{'s':1e-7,'d':[sp.NaN]},
@@ -260,7 +276,15 @@ def PESbsaq(optstate,persist,**para):
     logger.debug([xmin,ymin,ierror])
     para['ev']['xa']=xmin[0]
     xout = [i for i in xmin[1:]]
-    return xout,para['ev'],persist,{'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
+
+    lhyp = sp.log10([k.hyp for k in pesobj.G.kf])
+    lhmean = sp.mean(lhyp, axis=0)
+    lhstd = sp.sqrt(sp.var(lhyp, axis=0))
+    lhmin = lhyp.min(axis=0)
+    lhmax = lhyp.max(axis=0)
+    logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean, lhstd, lhmin, lhmax))
+
+    return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
 
 """
 PESbsprior = {

@@ -312,7 +312,7 @@ class gen_lin1_k_d():
         r=libGP.k(x1.ctypes.data_as(ctpd),x2.ctypes.data_as(ctpd), cint(D1),cint(D2),cint(-42),self.hypinv.ctypes.data_as(ctpd),cint(1),ct.byref(ct.c_double(smodel)))
         return r
 
-def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=5000,fg=-1e9):
+def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=20000,fg=-1e9):
     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
     ns=X.shape[0]
     dim = X.shape[1]
@@ -326,7 +326,7 @@ def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=5000,fg=-1e9):
     return hy
 
 
-def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=5000,fg=-1e9):
+def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=20000,fg=-1e9):
     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
     ns=X.shape[0]
     dim = X.shape[1]

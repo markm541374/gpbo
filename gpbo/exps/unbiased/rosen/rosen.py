@@ -26,26 +26,26 @@ def f(x, **ev):
 
 
 
-if not os.path.exists('rosen'):
+if not os.path.exists('results'):
     os.mkdir('rosen')
 
 nruns = 2
 if run:
     for i in range(nruns):
-        C=gpbo.core.config.eimledefault(f,D,n,s,'rosen','eimle{}.csv'.format(i))
+        C=gpbo.core.config.eimledefault(f,D,n,s,'results','eimle{}.csv'.format(i))
         out = gpbo.search(C)
     for i in range(nruns):
-        C = gpbo.core.config.pesfsdefault(f, D, n, s, 'rosen', 'pesfs{}.csv'.format(i))
+        C = gpbo.core.config.pesfsdefault(f, D, n, s, 'results', 'pesfs{}.csv'.format(i))
         out = gpbo.search(C)
 
 if plot:
     f,a = plt.subplots(1)
     for i in range(nruns):
-        data = pd.read_csv('rosen/eimle{}.csv'.format(i))
+        data = pd.read_csv('results/eimle{}.csv'.format(i))
         a.plot( data[' truey at xrecc'],'b')
 
     for i in range(nruns):
-        data = pd.read_csv('rosen/pesfs{}.csv'.format(i))
+        data = pd.read_csv('results/pesfs{}.csv'.format(i))
         a.plot( data[' truey at xrecc'],'r')
 
     a.set_yscale('log')

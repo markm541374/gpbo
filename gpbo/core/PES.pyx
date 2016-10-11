@@ -8,7 +8,12 @@ import eprop
 import scipy as sp
 from scipy import stats as sps
 import DIRECT
-from matplotlib import pyplot as plt
+try:
+    from matplotlib import pyplot as plt
+    plots=True
+except ImportError:
+    plots=False
+    plt=None
 
 import logging
 from libc.math cimport log10, log, exp, M_E
@@ -28,7 +33,7 @@ def drawmins(G,n,lb,ub,SUPPORT=300,mode = [ESutils.SUPPORT_SLICELCB],SLICELCB_PA
     #draw support points
     
     W = sp.vstack([ESutils.draw_support(G, lb,ub,SUPPORT/len(mode),m, para = SLICELCB_PARA) for m in mode])
-    if False:
+    if False and plots:
         print 'how did I get here'
         plt.figure()
         plt.plot(W[:,0],W[:,1],'g.')
@@ -36,7 +41,7 @@ def drawmins(G,n,lb,ub,SUPPORT=300,mode = [ESutils.SUPPORT_SLICELCB],SLICELCB_PA
     #draw in samples on the support
     print "drawing mins from support"
     R = ESutils.draw_min(G,W,n)
-    if False:
+    if False and plots:
         
         plt.figure()
         plt.plot(R[:,0],R[:,1],'r.')
@@ -220,8 +225,6 @@ class PES:
             S=sp.zeros(S.shape)
         self.G = makeG(X,Y,S,D,kindex,mprior,sprior,DH_SAMPLES)
         HS = sp.vstack([k.hyp for k in self.G.kf])
-        print "\nhyp mean: "+str(sp.mean(HS,axis=0))
-        print "hyp std:  "+str(sp.sqrt(sp.mean(HS,axis=0)))
         self.Z = drawmins(self.G,DM_SAMPLES,lb,ub,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode)
         #print "mindraws: "+str(self.Z)
         self.Ga = [GPdc.GPcore(*addmins(self.G, X, Y, S, D, self.Z[i, :]) + [self.G.kf]) for i in xrange(DM_SAMPLES)]
@@ -300,8 +303,7 @@ class PES_inplane:
         #print [X.shape,Y.shape,mprior,sprior]
         self.G = makeG(X,Y,S,D,kindex,mprior,sprior,DH_SAMPLES)
         HS = sp.vstack([k.hyp for k in self.G.kf])
-        print "\nhyp mean: "+str(sp.mean(HS,axis=0))
-        print "hyp std:  "+str(sp.sqrt(sp.mean(HS,axis=0)))
+
         self.Z = drawmins_inplane(self.G,DM_SAMPLES,lb,ub,axis=axis,value=value,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode)
         #print "mindraws:\n"+str(self.Z)
         self.Ga = [GPdc.GPcore(*addmins_inplane(self.G, X, Y, S, D, self.Z[i, :], axis=axis, value=value, MINPOLICY=AM_POLICY) + [self.G.kf]) for i in xrange(DM_SAMPLES)]
@@ -347,8 +349,8 @@ class PES_inplane:
         [xmin, ymin, ierror] = DIRECT.solve(directwrap,self.lb,self.ub,user_data=[], algmethod=1, volper=volper, logfilename='/dev/null')
         
         
-        if False:
-            from matplotlib import pyplot as plt
+        if False and plots:
+
             import time
             D = self.lb.size
             ns=200

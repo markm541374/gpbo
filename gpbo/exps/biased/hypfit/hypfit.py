@@ -10,7 +10,7 @@ from gpbo.core.ESutils import accumulate as accumulate
 import os
 import copy
 
-run=True
+run=False
 plot = True
 
 days = 148
@@ -80,9 +80,12 @@ def f_inplane(x,**ev):
 #gpbo.core.ESutils.plot2dFtofile(f,os.path.join('dbout', 'worst.png'),atxa=1.)2
 D=2
 N=40
-s=1e-3
+s=1e-6
 
 if run:
+    C = gpbo.core.config.eimledefault(f, D, N, s, 'results', 'hypfitbs.csv')
+    out = gpbo.search(C)
+
     C=gpbo.core.config.pesbsdefault(f,D,60,s,'results','hypfitbs.csv')
     out = gpbo.search(C)
 

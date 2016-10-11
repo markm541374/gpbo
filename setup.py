@@ -37,6 +37,11 @@ extensions = [
               sources = ["gpbo/core/slice.c"],
               include_dirs = ['.','core',get_include()],
               extra_compile_args=compile_flags
+    ),
+    Extension(name ="gpbo/core/acquisitions",
+              sources = ["gpbo/core/acquisitions.c"],
+              include_dirs = ['.','core',get_include()],
+              extra_compile_args=compile_flags
     )
 ]
 

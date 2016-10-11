@@ -8,7 +8,7 @@ import os
 import time
 import logging
 import copy
-
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +105,7 @@ class optimizer:
 
             
             logger.info("{}     recctime: {}\n".format(rx,t3-t2))
-            logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+','+str(aqaux).replace(',',' ').replace('\n',';').replace('\r',';')+'\n'
+            logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+','+''.join([str(k)+' '+str(aqaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in aqaux.keys()])[:-1]+'\n'
             lf.write(logstr)
             
 
@@ -118,6 +118,7 @@ def nstopfn(optstate,nmax = 1):
     return optstate.n >= nmax
 
 def cstopfn(optstate,cmax = 1):
+    logger.info('Used {} of {} evaluation budget.'.format(optstate.C,cmax))
     return optstate.C >= cmax
 
 
@@ -133,4 +134,33 @@ def search(optconfig):
 
 
 
-    
+def readoptdata(fname):
+    df = pd.DataFrame()
+
+    with open(fname, 'r') as f:
+        for line in f:
+            df = pd.concat([df, pd.DataFrame([tuple(line.strip().split(','))])], ignore_index=True)
+
+    j = 0
+    for i in xrange(df.shape[1]):
+        if not isinstance(df[i][0], str):
+            df[i][0] = 'augdata{}'.format(j)
+            j += 1
+        else:
+           df[i][0] = df[i][0].replace(' ', '')
+    df.columns = df.iloc[0]
+    df.drop(df.index[[0]], inplace=True)
+    df.reset_index(inplace=True)
+    l = len(df['c'])
+    df['cacc'] = pd.Series(sp.empty(l), index=df.index)
+
+    for c in df.columns:
+        try:
+            df[c] = df[c].astype(float)  #
+        except ValueError:
+            pass
+    df['cacc'][0] = df.loc[0, ('c')]
+    for i in xrange(1, l):
+        df['cacc'][i] = df.loc[i - 1, 'cacc'] + df.loc[i, 'c']
+
+    return df

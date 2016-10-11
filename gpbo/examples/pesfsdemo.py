@@ -3,7 +3,7 @@ import scipy as sp
 
 
 D=2
-n=30
+n=20
 s=1e-6
 def f(x,**ev):
 
@@ -17,7 +17,7 @@ def f(x,**ev):
     return y+n,c,dict()
 
 
-C=gpbo.core.config.pesfsdefault(f,D,n,s,'results','pesfs.csv')
+C=gpbo.core.config.pesfslearns(f,D,n,s,'results','pesfs.csv')
 
 out = gpbo.search(C)
 print out
