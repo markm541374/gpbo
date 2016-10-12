@@ -120,13 +120,16 @@ def draw_support(g, lb, ub, n, method, para=1.):
         X=mnv.rvs(size=n,mean=[0.]*d)
         if d==1:
             X.resize([n,1])
-        neach = int(n/len(unq))
+        neach = int(n/(len(unq)+1))
         for i in range(len(unq)):
             
             for j in range(d):
                 X[i*neach:(i+1)*neach,j]*=min(2.,cls[i][j])
                 X[i*neach:(i+1)*neach,j]+=unq[i][j]
-            
+        X[len(unq)*neach:,:]=sp.random.uniform(size=[n-len(unq)*neach,d])
+        for i in range(d):
+            X[len(unq)*neach:,i] *= ub[i]-lb[i]
+            X[len(unq)*neach:,i] += lb[i]
         sp.clip(X,-1,1,out=X)
         from gpbo.core import debugoutput
 
@@ -260,7 +263,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
 
 
         #print 'g'
-        X=mnv.rvs(size=n,mean=[0.]*d)
+
         X = sp.empty(shape=[n,d])
         if d==1:
             X.resize([n,1])
