@@ -24,5 +24,6 @@ def f(x,**ev):
 
 
 C=gpbo.core.config.pesbsdefault(f,D,n,s,'results','pesbs.csv')
+C.aqpara['SUPPORT_MODE']=[gpbo.core.ESutils.SUPPORT_LAPAPROT]
 out = gpbo.search(C)
 print out

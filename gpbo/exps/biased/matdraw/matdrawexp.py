@@ -12,14 +12,14 @@ import re
 import pandas as pd
 
 
-run=False
+run=True
 plot=True
 D=2
 lb = [-1., -1.]
 ub = [1., 1.]
 s=1e-9
 
-nopts=3
+nopts=1
 if run:
     for k in xrange(nopts):
         ojfw, xmin, ymin = objectives.genbiasedmat52ojf(D,lb,ub,0.5)
@@ -45,20 +45,15 @@ if run:
 
         gpbo.core.ESutils.plot2dFtofile(f,os.path.join('dbout', 'worst.png'),xmin=xmin,atxa=1.)
 
-        C=gpbo.core.config.pesbsdefault(f,D,80,s,'results','matdrawbs{}.csv'.format(k))
+        C=gpbo.core.config.pesbsdefault(f,D,50,s,'results','matdrawbs{}.csv'.format(k))
         C.stopfn = gpbo.core.optimize.cstopfn
         C.stoppara = {'cmax': 20}
         out = gpbo.search(C)
 
-        C=gpbo.core.config.pesfsdefault(f_inplane,D,40,s,'results','matdrawfs{}.csv'.format(k))
+
+        C=gpbo.core.config.pesfsdefault(f_inplane,D,20,s,'results','matdrawfs{}.csv'.format(k))
         out = gpbo.search(C)
 
-def medianirregular(xdata,ydata,xtarget):
-    n = len(xdata)
-    inters=sp.empty(shape=[n,len(xtarget)])
-    for i in xrange(n):
-        inters[i,:]= sp.interp(xtarget,xdata[i].values.flatten(),ydata[i].values.flatten(),left=sp.NaN,right=sp.NaN)
-    return sp.median(inters,axis=0)
 
 if plot:
     f,a = plt.subplots(1)
@@ -79,10 +74,10 @@ if plot:
         a.semilogy(d0[k]['cacc'], d0[k]['trueyatxrecc'], 'r')
 
     xaxis = sp.linspace(0,20,100)
-    med0 = medianirregular([d0[k]['cacc'] for k in xrange(nopts)],[d0[k]['trueyatxrecc'] for k in xrange(nopts)],xaxis)
+    med0 = gpbo.core.ESutils.medianirregular([d0[k]['cacc'] for k in xrange(nopts)],[d0[k]['trueyatxrecc'] for k in xrange(nopts)],xaxis)
     a.plot(xaxis,med0,'r.')
 
-    med1 = medianirregular([d1[k]['cacc'] for k in xrange(nopts)], [d1[k]['trueyatxrecc'] for k in xrange(nopts)],
+    med1 = gpbo.core.ESutils.medianirregular([d1[k]['cacc'] for k in xrange(nopts)], [d1[k]['trueyatxrecc'] for k in xrange(nopts)],
                            xaxis)
     a.plot(xaxis, med1, 'b.')
     plt.show()

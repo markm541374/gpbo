@@ -172,7 +172,6 @@ def draw_support(g, lb, ub, n, method, para=1.):
             del(fig)
             print 'done'
     elif method==SUPPORT_LAPAPROT:
-
         print "Drawing support using lapaprot:"
         #start with 4 times as many points as needed
         #print 'a'
@@ -242,7 +241,6 @@ def draw_support(g, lb, ub, n, method, para=1.):
                     divs[k]=[i,j]
                     k+=1
             vecH,cvecH = g.infer_full_post(sp.vstack([xm]*(d*(d+1)/2)),divs)
-            print vecH
             #build hesian matrix
             H = sp.empty(shape=[d,d])
             k=0
@@ -278,6 +276,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
             X[len(unq)*neach:,i] += lb[i]
 
         sp.clip(X,-1,1,out=X)
+
         from gpbo.core import debugoutput
 
         if debugoutput and plots:
@@ -307,15 +306,19 @@ def draw_support(g, lb, ub, n, method, para=1.):
             ax[1].clabel(CS, inline=1, fontsize=10)
             for i in range(np):
                 ax[0].plot([Xst[i,0],Xst[i+np,0]],[Xst[i,1],Xst[i+np,1]],'b.-')
+
+            circ=sp.empty([2,100])
             for j in range(len(unq)):
                 x = unq[j]
                 ax[0].plot(x[0],x[1],'ro')
 
-                u0 = U[j][:,0]*sp.sqrt(E[j][0])
-                u1 = U[j][:,1]*sp.sqrt(E[j][1])
-                xp = [x[0]+u0[0],x[0]+u1[0],x[0]-u0[0],x[0]-u1[0],x[0]+u0[0]]
-                yp = [x[1]+u0[1],x[1]+u1[1],x[1]-u0[1],x[1]-u1[1],x[1]+u0[1]]
-                ax[0].plot(xp,yp,'g-')
+                for i in xrange(100):
+                    theta = 2.*sp.pi*i/99.
+                    circ[:,i]=U[j].dot(sp.array([sp.sin(theta)*sp.sqrt(E[j][0]),sp.cos(theta)*sp.sqrt(E[j][1])]))+unq[j].T
+                ax[0].plot(circ[0,:],circ[1,:],'r')
+
+
+
                 #ax[0].plot([x[0],x[0]+(svd[j][2][0,0])*0.1],[x[1],x[1]+(svd[j][2][1,0])*0.1],'g')
                 #ax[0].plot([x[0],x[0]+(svd[j][2][0,1])*0.1],[x[1],x[1]+(svd[j][2][1,1])*0.1],'g')
             fig.savefig(os.path.join(debugpath,'drawlapaprot'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
