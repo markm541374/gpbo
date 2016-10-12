@@ -28,6 +28,7 @@ SUPPORT_SLICELCB = 1
 SUPPORT_SLICEEI = 2
 SUPPORT_SLICEPM = 3
 SUPPORT_LAPAPR = 4
+SUPPORT_LAPAPROT = 5
 #drawing points between lb and ub using specified method
 def draw_support(g, lb, ub, n, method, para=1.):
     
@@ -103,27 +104,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
             
             if min(tmp)>0.0002:
                 unq.append(Xst[i+para,:])
-        #get the alligned gaussian approx of pmin
-        #print 'f'
-        #print
 
-        #change start here
-
-        gr = sp.empty(shape=d)
-        vg = sp.empty(shape=d)
-        H = sp.empty(shape=[d,d])
-        svd=[]
-        for xm in unq:
-            for i in range(d):
-                infg = g.infer_diag_post(xm,[[i]])
-                gr[i]=infg[0][0,0]
-                vg[i]=infg[1][0,0]
-                for j in range(i,d):
-                    H[i,j]=H[j,i]=g.infer_m_post(xm,[[i,j]])[0,0]
-            q = spl.svd(H)
-            svd.append(q)
-            print 'at {} grad{} vargrad{} hess{} svd {}'.format(xm,gr,vg,H,q)
-        #change end here
 
         cls = []
         for xm in unq:
@@ -183,11 +164,161 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 yp = [x[1],x[1]+cls[j][1],x[1],x[1]-cls[j][1],x[1]]
                 ax[0].plot(xp,yp,'r-')
 
-                ax[0].plot([x[0],x[0]+(svd[j][2][0,0])*0.1],[x[1],x[1]+(svd[j][2][1,0])*0.1],'g')
-                ax[0].plot([x[0],x[0]+(svd[j][2][0,1])*0.1],[x[1],x[1]+(svd[j][2][1,1])*0.1],'g')
+
             fig.savefig(os.path.join(debugpath,'drawlapapr'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
             del(fig)
             print 'done'
+    elif method==SUPPORT_LAPAPROT:
+        #TODO general rather than axis alignemnt
+        print "Drawing support using lapapr:"
+        #start with 4 times as many points as needed
+        #print 'a'
+        para = int(para)
+        over = 8
+        Xsto=sp.random.uniform(size=[over*para,d])
+        for i in range(d):
+            Xsto[:,i] *= ub[i]-lb[i]
+            Xsto[:,i] += lb[i]
+        #eval mean at the points
+        #print 'b'
+        fs = sp.empty(para*over)
+        for i in range(para*over):
+            fs[i] = g.infer_m_post(Xsto[i,:],[[sp.NaN]])[0,0]
+        #print 'mean at random draws {}'.format(fs)
+        Xst = sp.empty([2*para,d])
+        #keep the lowest
+        #print 'c'
+        for i in range(para):
+            j = fs.argmin()
+            Xst[i,:] = Xsto[j,:]
+            fs[j]=1e99
+        #minimize the posterior mean from each start
+        #print 'd'
+        def f(x):
+            y= g.infer_m_post(sp.array(x),[[sp.NaN]])[0,0]
+            bound=0
+            r = max(abs(x))
+            if r>1:
+                #print 'offedge {}'.format(x)
+                bound=(1e3*(r-1))**6
+            return y+bound
+        for i in range(para):
+            res = spomin(f,Xst[i,:],method='Nelder-Mead',options={'xtol':0.0001,'maxfev':2000})
+            if not res.success:
+                class MJMError(Exception):
+                    pass
+                print res
+                if not res.status==2:
+                    raise MJMError('failed in opt in support lapapr')
+                else:
+                    print "warn, lapapr opt did not fully vconverge "
+            Xst[i+int(para),:] = res.x
+
+        #find endpoints that are unique
+        #print 'e'
+
+        unq = [Xst[0+para,:]]
+        for i in range(para):
+            tmp=[]
+            for xm in unq:
+                tmp.append(abs((xm-Xst[i+para,:])).max())
+
+            if min(tmp)>0.0002:
+                unq.append(Xst[i+para,:])
+
+        U = []
+        E = []
+        for xm in unq:
+            #gradient inference
+            G,cG = g.infer_full_post(sp.vstack([xm]*d),[[i] for i in xrange(d)])
+            divs = [[]]*(d*(d+1)/2)
+            #hessian inference
+            k=0
+            for i in xrange(d):
+                for j in xrange(i+1):
+                    divs[k]=[i,j]
+                    k+=1
+            vecH,cvecH = g.infer_full_post(sp.vstack([xm]*(d*(d+1)/2)),divs)
+            print vecH
+            #build hesian matrix
+            H = sp.empty(shape=[d,d])
+            k=0
+            for i in xrange(d):
+                for j in xrange(i+1):
+                    H[i,j]=H[j,i]=vecH[0,k]
+                    k+=1
+            #svd on cov of grad
+            Ucg,Ecg,Vcg = spl.svd(cG)
+            #new rotated covariance
+            C0 = spl.solve(H,Ucg)
+            varP = C0.dot(sp.diag(Ecg).dot(C0.T))
+            #svd of new cov
+            Uvp,Evp,Vvp=spl.svd(varP)
+            U.append(Uvp)
+            E.append(Evp)
+            #print '\nat {}\ngrad\n{} \nvargrad\n{} \nhess\n{} \nsvdvargrad\n {}\n{}\nnewcov\n{}\newsvd\n{}\n{}'.format(xm,G,cG,H,Ucg,Ecg,varP,Uvp,Evp)
+
+
+        #print 'g'
+        X=mnv.rvs(size=n,mean=[0.]*d)
+        X = sp.empty(shape=[n,d])
+        if d==1:
+            X.resize([n,1])
+        neach = int(n/(len(unq)+1))
+        for i in range(len(unq)):
+            X[i*neach:(i+1)*neach,:]= U[i].dot(sp.diag(sp.sqrt(E[i])).dot(sp.random.normal(size=[d,neach]))).T
+            for j in range(d):
+                X[i*neach:(i+1)*neach,j]+=unq[i][j]
+        X[len(unq)*neach:,:]=sp.random.uniform(size=[n-len(unq)*neach,d])
+        for i in range(d):
+            X[len(unq)*neach:,i] *= ub[i]-lb[i]
+            X[len(unq)*neach:,i] += lb[i]
+
+        sp.clip(X,-1,1,out=X)
+        from gpbo.core import debugoutput
+
+        if debugoutput and plots:
+            print "plotting draw_support...",
+            from gpbo.core import debugpath
+            if not os.path.exists(debugpath):
+                os.mkdir(debugpath)
+
+            np = para
+            #print 'para{}'.format(para)
+            #print Xst.shape
+            n = 200
+            x_ = sp.linspace(-1,1,n)
+            y_ = sp.linspace(-1,1,n)
+            z_ = sp.empty([n,n])
+            s_ = sp.empty([n,n])
+            for i in range(n):
+                for j in range(n):
+                    m_,v_ = g.infer_diag_post(sp.array([y_[j],x_[i]]),[[sp.NaN]])
+                    z_[i,j] = m_[0,0]
+                    s_[i,j] = sp.sqrt(v_[0,0])
+            fig, ax = plt.subplots( nrows=2, ncols=1 ,figsize=(10,20))
+            CS = ax[0].contour(x_,y_,z_,20)
+            ax[0].clabel(CS, inline=1, fontsize=10)
+            CS = ax[1].contour(x_,y_,s_,20)
+            ax[0].axis([-1.,1.,-1.,1.])
+            ax[1].clabel(CS, inline=1, fontsize=10)
+            for i in range(np):
+                ax[0].plot([Xst[i,0],Xst[i+np,0]],[Xst[i,1],Xst[i+np,1]],'b.-')
+            for j in range(len(unq)):
+                x = unq[j]
+                ax[0].plot(x[0],x[1],'ro')
+
+                u0 = U[j][:,0]*sp.sqrt(E[j][0])
+                u1 = U[j][:,1]*sp.sqrt(E[j][1])
+                xp = [x[0]+u0[0],x[0]+u1[0],x[0]-u0[0],x[0]-u1[0],x[0]+u0[0]]
+                yp = [x[1]+u0[1],x[1]+u1[1],x[1]-u0[1],x[1]-u1[1],x[1]+u0[1]]
+                ax[0].plot(xp,yp,'g-')
+                #ax[0].plot([x[0],x[0]+(svd[j][2][0,0])*0.1],[x[1],x[1]+(svd[j][2][1,0])*0.1],'g')
+                #ax[0].plot([x[0],x[0]+(svd[j][2][0,1])*0.1],[x[1],x[1]+(svd[j][2][1,1])*0.1],'g')
+            fig.savefig(os.path.join(debugpath,'drawlapaprot'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+            del(fig)
+            print 'done'
+
 
     elif method==SUPPORT_SLICELCB:
         def f(x):
