@@ -46,7 +46,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
             X[:,i] *= ub[i]-lb[i]
             X[:,i] += lb[i]
     elif method==SUPPORT_LAPAPR:
-        #TODO general rather than axis alignemnt
+
         print "Drawing support using lapapr:"
         #start with 4 times as many points as needed
         #print 'a'
@@ -95,7 +95,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
         
         #find endpoints that are unique
         #print 'e'
-        Xst
+
         unq = [Xst[0+para,:]]
         for i in range(para):
             tmp=[]
@@ -172,7 +172,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
             del(fig)
             print 'done'
     elif method==SUPPORT_LAPAPROT:
-        #TODO general rather than axis alignemnt
+
         print "Drawing support using lapapr:"
         #start with 4 times as many points as needed
         #print 'a'
