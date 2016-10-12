@@ -173,7 +173,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
             print 'done'
     elif method==SUPPORT_LAPAPROT:
 
-        print "Drawing support using lapapr:"
+        print "Drawing support using lapaprot:"
         #start with 4 times as many points as needed
         #print 'a'
         para = int(para)
@@ -442,7 +442,10 @@ class gpfake():
         return
     
     def augx(self,x):
-        ax = sp.hstack([x[:self.axis],sp.array([self.value]*(x.size/self.D)).T,x[self.axis:]])
+        if x.ndim==1:
+            ax = sp.hstack([x[:self.axis],sp.array([self.value]*(x.size/self.D)).T,x[self.axis:]])
+        else:
+            ax = sp.hstack([x[:self.axis].reshape(x.shape[0],self.axis),sp.array([[self.value]*(x.size/self.D)]).T,x[self.axis:].reshape(x.shape[0],self.D-self.axis)])
         return ax
     
     def infer_m_post(self,x,d):
@@ -452,7 +455,12 @@ class gpfake():
     def infer_diag_post(self,x,d):
         dstar = [[i+1 if i>=self.axis else i for i in e] for e in d]
         return self.g.infer_diag_post(self.augx(x),d)
-    
+
+    def infer_full_post(self,x,d):
+        print [x,d]
+        dstar = [[i+1 if i>=self.axis else i for i in e] for e in d]
+        return self.g.infer_full_post(self.augx(x),d)
+
     def infer_EI(self,x,d):
         dstar = [[i+1 if i>=self.axis else i for i in e] for e in d]
         return self.g.infer_EI(self.augx(x),d)
@@ -550,5 +558,5 @@ def medianirregular(xdata,ydata,xtarget):
     n = len(xdata)
     inters=sp.empty(shape=[n,len(xtarget)])
     for i in xrange(n):
-        inters[i,:] = sp.interp(xtarget,xdata,ydata,left=sp.NaN,right=sp.NaN)
+        inters[i,:]= sp.interp(xtarget,xdata[i].values.flatten(),ydata[i].values.flatten(),left=sp.NaN,right=sp.NaN)
     return sp.median(inters,axis=0)
