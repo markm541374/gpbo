@@ -12,7 +12,7 @@ import re
 import pandas as pd
 
 
-run=True
+run=False
 plot=True
 D=2
 lb = [-1., -1.]
@@ -69,16 +69,16 @@ if plot:
         y[k] = float(r.findall(txt)[0])
         d0[k]['trueyatxrecc'] -=y[k]
         d1[k]['trueyatxrecc'] -=y[k]
-
+        print d0[k]['trueyatxrecc']
+        print d1[k]['trueyatxrecc']
         a.semilogy(d1[k]['cacc'], d1[k]['trueyatxrecc'], 'b')
         a.semilogy(d0[k]['cacc'], d0[k]['trueyatxrecc'], 'r')
 
     xaxis = sp.linspace(0,20,100)
-    med0 = gpbo.core.ESutils.medianirregular([d0[k]['cacc'] for k in xrange(nopts)],[d0[k]['trueyatxrecc'] for k in xrange(nopts)],xaxis)
-    a.plot(xaxis,med0,'r.')
+    #med0 = gpbo.core.ESutils.medianirregular([d0[k]['cacc'] for k in xrange(nopts)],[d0[k]['trueyatxrecc'] for k in xrange(nopts)],xaxis)
+    #a.plot(xaxis,med0,'r.')
 
-    med1 = gpbo.core.ESutils.medianirregular([d1[k]['cacc'] for k in xrange(nopts)], [d1[k]['trueyatxrecc'] for k in xrange(nopts)],
-                           xaxis)
-    a.plot(xaxis, med1, 'b.')
+    #med1 = gpbo.core.ESutils.medianirregular([d1[k]['cacc'] for k in xrange(nopts)], [d1[k]['trueyatxrecc'] for k in xrange(nopts)],xaxis)
+    #a.plot(xaxis, med1, 'b.')
     plt.show()
 

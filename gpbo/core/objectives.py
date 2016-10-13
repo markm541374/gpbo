@@ -113,6 +113,10 @@ def genbiasedmat52ojf(d,lb,ub,sls):
     xmin = y.x
     ymin = spowrap(y.x)
     #print [xmin,ymin]
+
+    if sp.isnan(ymin):
+        logger.warning('generator got nan optimizing objective. retrying...')
+        return genbiasedmat52ojf(d,lb,ub,sls)
     logger.info('generated function xmin {} ymin {} globopt:{} locopt:{}'.format(xmin, ymin, ierror, y.status))
     return ojf, xmin, ymin
 
@@ -230,7 +234,7 @@ def gendecayingpositiveojf(d, lb, ub):
     xmin = y.x
     ymin = spowrap(y.x)
     # print [xmin,ymin]
-    logger.info('generated function xmin {} ymin {} globopt:{} locopt:{}'.format(xmin, ymin, ierror, y.status))
+    logger.info('generated function xmin {} ymin {} yminisnan{} globopt:{} locopt:{}'.format(xmin, ymin, sp.isnan(ymin),ierror, y.status))
     if sp.isnan(ymin):
         logger.warning('generator got nan optimizing objective. retrying...')
         return gendecayingpositiveojf(d, lb, ub)
