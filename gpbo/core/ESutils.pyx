@@ -9,6 +9,8 @@ import slice
 import scipy as sp
 from scipy import linalg as spl
 from scipy import stats as sps
+import logging
+logger = logging.getLogger(__name__)
 try:
     from matplotlib import pyplot as plt
     plots=True
@@ -205,7 +207,13 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 bound=(1e3*(r-1))**6
             return y+bound
         for i in range(para):
-            res = spomin(f,Xst[i,:],method='Nelder-Mead',options={'xtol':0.0001,'maxfev':2000})
+            retries=5
+            for j in xrange(retries):
+                res = spomin(f,Xst[i,:]+sp.random.uniform(-0.01,0.01),method='Nelder-Mead',options={'xtol':0.0002,'maxfev':4000})
+                if not res.success:
+                    logger.warning('failed to find local mean {}'.format(res))
+                else:
+                    break
             if not res.success:
                 class MJMError(Exception):
                     pass
@@ -460,7 +468,6 @@ class gpfake():
         return self.g.infer_diag_post(self.augx(x),d)
 
     def infer_full_post(self,x,d):
-        print [x,d]
         dstar = [[i+1 if i>=self.axis else i for i in e] for e in d]
         return self.g.infer_full_post(self.augx(x),d)
 
