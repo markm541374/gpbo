@@ -2,7 +2,7 @@
 
 import gpbo
 import gpbo.core.objectives as objectives
-gpbo.core.debugoutput=False
+gpbo.core.debugoutput=True
 import scipy as sp
 import copy
 import os
@@ -19,10 +19,10 @@ lb = [-1., -1.]
 ub = [1., 1.]
 s=1e-9
 
-nopts=1
+nopts=18
 if run:
     for k in xrange(nopts):
-        ojfw, xmin, ymin = objectives.genbiasedmat52ojf(D,lb,ub,0.5)
+        ojfw, xmin, ymin = objectives.genbiasedmat52ojf(D,lb,ub,0.15)
 
         with open('results/matdrawopt{}.txt'.format(k),'w') as o:
             o.write('reported truemin x {} ; y {}'.format(xmin,ymin))
@@ -31,7 +31,7 @@ if run:
 
         def f(x,**ev):
             y,c_,aux=ojfw(x,**ev)
-            c = sp.exp(-3.*ev['xa'])
+            c = sp.exp(-1.*ev['xa'])
             return y,c,aux
 
         def f_inplane(x,**ev):
@@ -47,15 +47,16 @@ if run:
 
         C=gpbo.core.config.pesbsdefault(f,D,50,s,'results','matdrawbs{}.csv'.format(k))
         C.stopfn = gpbo.core.optimize.cstopfn
-        C.stoppara = {'cmax': 20}
+        C.stoppara = {'cmax': 30}
         out = gpbo.search(C)
 
 
-        C=gpbo.core.config.pesfsdefault(f_inplane,D,20,s,'results','matdrawfs{}.csv'.format(k))
+        C=gpbo.core.config.pesfsdefault(f_inplane,D,30,s,'results','matdrawfs{}.csv'.format(k))
         out = gpbo.search(C)
 
 
 if plot:
+    import seaborn as sns
     f,a = plt.subplots(1)
     y=sp.empty(nopts)
     r = re.compile('y (-?\d.\d+)')
@@ -65,20 +66,44 @@ if plot:
 
     for k in xrange(nopts):
         txt = open('results/matdrawopt{}.txt'.format(k)).read()
-        print txt
         y[k] = float(r.findall(txt)[0])
+
         d0[k]['trueyatxrecc'] -=y[k]
         d1[k]['trueyatxrecc'] -=y[k]
-        print d0[k]['trueyatxrecc']
-        print d1[k]['trueyatxrecc']
-        a.semilogy(d1[k]['cacc'], d1[k]['trueyatxrecc'], 'b')
-        a.semilogy(d0[k]['cacc'], d0[k]['trueyatxrecc'], 'r')
 
-    xaxis = sp.linspace(0,20,100)
-    #med0 = gpbo.core.ESutils.medianirregular([d0[k]['cacc'] for k in xrange(nopts)],[d0[k]['trueyatxrecc'] for k in xrange(nopts)],xaxis)
-    #a.plot(xaxis,med0,'r.')
+        a.semilogy(d0[k]['cacc'], d0[k]['trueyatxrecc'], 'b')
+        a.semilogy(d1[k]['cacc'], d1[k]['trueyatxrecc'], 'r')
 
-    #med1 = gpbo.core.ESutils.medianirregular([d1[k]['cacc'] for k in xrange(nopts)], [d1[k]['trueyatxrecc'] for k in xrange(nopts)],xaxis)
-    #a.plot(xaxis, med1, 'b.')
+    f, a = plt.subplots(1)
+
+    xaxis = sp.linspace(0,30,100)
+    low0, med0, upp0 = gpbo.core.ESutils.quartsirregular([d0[k]['cacc'] for k in xrange(nopts)],
+                                                         [d0[k]['trueyatxrecc'] for k in xrange(nopts)], xaxis)
+
+    a.fill_between(xaxis, low0, upp0, facecolor='lightblue', edgecolor='lightblue', alpha=0.5)
+    a.plot(xaxis, med0, 'b')
+
+    low1, med1, upp1 = gpbo.core.ESutils.quartsirregular([d1[k]['cacc'] for k in xrange(nopts)],
+                                                         [d1[k]['trueyatxrecc'] for k in xrange(nopts)], xaxis)
+    a.fill_between(xaxis, low1, upp1, facecolor='lightpink', edgecolor='lightpink', alpha=0.5)
+    a.plot(xaxis, med1, 'r')
+
+    a.set_yscale('log')
+    a.set_xlabel('accumulated cost')
+    a.set_ylabel('regret')
+    f.savefig('plots/out0.pdf')
+    f,a = plt.subplots(1)
+    low0, med0, upp0 = gpbo.core.ESutils.quartsirregular([d0[k]['cacc'] for k in xrange(nopts)],
+                                                         [d0[k]['c'] for k in xrange(nopts)], xaxis)
+    a.fill_between(xaxis, low0, upp0, facecolor='lightblue', edgecolor='lightblue', alpha=0.5)
+    a.plot(xaxis, med0, 'b')
+
+    low1, med1, upp1 = gpbo.core.ESutils.quartsirregular([d1[k]['cacc'] for k in xrange(nopts)],
+                                                         [d1[k]['c'] for k in xrange(nopts)], xaxis)
+    a.fill_between(xaxis, low1, upp1, facecolor='lightpink', edgecolor='lightpink', alpha=0.5)
+    a.plot(xaxis, med1, 'r')
+    a.set_xlabel('accumulated cost')
+    a.set_ylabel('per-step cost')
+    f.savefig('plots/out1.pdf')
     plt.show()
 
