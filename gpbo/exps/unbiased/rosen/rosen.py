@@ -3,7 +3,7 @@ import scipy as sp
 import os
 import pandas as pd
 from matplotlib import pyplot as plt
-run = True
+run = False
 plot = True
 
 D=2
@@ -27,7 +27,7 @@ def f(x, **ev):
 
 
 if not os.path.exists('results'):
-    os.mkdir('rosen')
+    os.mkdir('resuts')
 
 nruns = 2
 if run:

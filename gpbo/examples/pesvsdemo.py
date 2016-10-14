@@ -2,6 +2,8 @@ import gpbo
 import scipy as sp
 from gpbo.core import GPdc as GPdc
 
+braninymin = 0.39788735772973816
+
 def cfn(x,s):
     return s**-0.5
 
