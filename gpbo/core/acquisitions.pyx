@@ -20,11 +20,7 @@ def randomaq(optstate,persist,**para):
     q = sp.random.uniform(size=len(para['lb']))
     return [l+x*(u-l) for l,u,x in zip(para['lb'],para['ub'],q)],para['ev'],persist,dict()
 
-"""
-randomprior = {'ev':{'s':0.,'d':[sp.NaN]},'lb':[-1.-1.],'ub':[1.,1.]}
 
-random = randomaq,randomprior
-"""
 # and grid
 
 def bruteaq(optstate,persist,**para):
@@ -52,11 +48,8 @@ def bruteaq(optstate,persist,**para):
     else:
         persist['idx']+=1
     return [l+x*(u-l) for l,u,x in zip(para['lb'],para['ub'],q)],para['ev'],persist,dict()
-"""
-bruteprior = {'ev':{'s':0.,'d':[sp.NaN]},'lb':[-1.-1.],'ub':[1.,1.]}
 
-brute = bruteaq, bruteprior
-"""
+
 #EIMAP
 def EIMAPaq(optstate,persist,ev=None, ub = None, lb=None, nrandinit=None, mprior=None,sprior=None,kindex = None,volper=None):
     #para = copy.deepcopy(para)
@@ -88,21 +81,6 @@ def EIMAPaq(optstate,persist,ev=None, ub = None, lb=None, nrandinit=None, mprior
     persist['n']+=1
     return [i for i in xmin],ev,persist,{'MAPHYP':MAP,'logEImin':ymin,'DIRECTmessage':ierror}
 
-
-"""
-EIMAPprior = {
-             'ev':{'s':1e-9,'d':[sp.NaN]},
-             'lb':[-1.-1.],
-             'ub':[1.,1.],
-             'nrandinit':10,
-             'mprior':sp.array([1.,0.,0.]),
-             'sprior':sp.array([1.,1.,1.]),
-             'kindex':GPdc.MAT52,
-             'volper':1e-5
-             }
-
-EIMAP = EIMAPaq, EIMAPprior
-"""
 
 #PES with fixed s ev
 def PESfsaq(optstate,persist,**para):
@@ -136,27 +114,7 @@ def PESfsaq(optstate,persist,**para):
     logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean,lhstd,lhmin,lhmax))
 
     return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],}
-"""
-PESfsprior = {
-            'ev':{'s':1e-9,'d':[sp.NaN]},
-            'lb':[-1.-1.],
-            'ub':[1.,1.],
-            'volper':1e-5,
-            'mprior':sp.array([1.,0.,0.]),
-            'sprior':sp.array([1.,1.,1.]),
-            'kindex':GPdc.MAT52,
-            'directmaxiter':10000,
-            'DH_SAMPLES':8,
-            'DM_SAMPLES':8,
-            'DM_SUPPORT':800,
-            'SUPPORT_MODE':[ESutils.SUPPORT_LAPAPR],
-            'DM_SLICELCBPARA':1.,
-            'noS':False,
-            'nrandinit':10
-            }
 
-PESfs = PESfsaq,PESfsprior
-"""
 
 
 #PES with variable s ev give costfunction
@@ -196,31 +154,7 @@ def PESvsaq(optstate,persist,**para):
     return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
 
 
-"""
-PESvsprior = {
-            'ev':{'s':1e-7,'d':[sp.NaN]},
-            'lb':[-1.-1.],
-            'ub':[1.,1.],
-            'volper':1e-5,
-            'mprior':sp.array([1.,0.,0.]),
-            'sprior':sp.array([1.,1.,1.]),
-            'kindex':GPdc.MAT52,
-            'directmaxiter':10000,
-            'DH_SAMPLES':8,
-            'DM_SAMPLES':8,
-            'DM_SUPPORT':800,
-            'SUPPORT_MODE':[ESutils.SUPPORT_LAPAPR],
-            'DM_SLICELCBPARA':1.,
-            'noS':False,
-            'nrandinit':10,
-            'cfn':lambda x,ev:42.,
-            'traincfn':False,
-            'logsu':-3,
-            'logsl':-10
-            }
-            
-PESvs = PESvsaq,PESvsprior
-"""
+
 def PESbsaq(optstate,persist,**para):
     para = copy.deepcopy(para)
     if persist==None:
@@ -285,31 +219,3 @@ def PESbsaq(optstate,persist,**para):
     logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean, lhstd, lhmin, lhmax))
 
     return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
-
-"""
-PESbsprior = {
-            'ev':{'s':1e-9,'d':[sp.NaN],'xa':0.},
-            'lb':[-1.-1.],
-            'ub':[1.,1.],
-            'volper':1e-5,
-            'mprior':sp.array([1.,0.,0.,0.]),
-            'sprior':sp.array([1.,1.,1.,1.]),
-            'kindex':GPdc.MAT52,
-            'directmaxiter':10000,
-            'DH_SAMPLES':16,
-            'DM_SAMPLES':16,
-            'DM_SUPPORT':1000,
-            'SUPPORT_MODE':[ESutils.SUPPORT_LAPAPR],
-            'DM_SLICELCBPARA':16.,
-            'noS':False,
-            'nrandinit':10,
-            'cfn':lambda x,ev:42.,
-            'traincfn':False,
-            'xau':1.,
-            'xal':0.,
-            'startmode':'inline',
-            'initpoints':[0.5,0.75,0.875]
-            }
-            
-PESbs = PESbsaq,PESbsprior
-"""
