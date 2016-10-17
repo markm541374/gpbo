@@ -9,6 +9,7 @@ import slice
 import scipy as sp
 from scipy import linalg as spl
 from scipy import stats as sps
+import gpbo
 import logging
 logger = logging.getLogger(__name__)
 try:
@@ -135,7 +136,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
         sp.clip(X,-1,1,out=X)
         from gpbo.core import debugoutput
 
-        if debugoutput and plots:
+        if debugoutput and  gpbo.core.debugoptions['drawlap'] and plots:
             print "plotting draw_support...",
             from gpbo.core import debugpath
             if not os.path.exists(debugpath):
@@ -287,7 +288,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
 
         from gpbo.core import debugoutput
 
-        if debugoutput and plots:
+        if debugoutput and gpbo.core.debugoptions['drawlap'] and plots:
             print "plotting draw_support...",
             from gpbo.core import debugpath
             if not os.path.exists(debugpath):

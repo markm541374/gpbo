@@ -202,7 +202,7 @@ def PESbsaq(optstate,persist,**para):
         #print "XXXXXXXXXXXXXXx"
         cx=sp.vstack([e['xa'] for e in optstate.ev])
         cc=sp.vstack([e for e in optstate.c])
-        cfn = objectives.traincfn(cx,cc)
+        cfn = objectives.traincfn1d(cx,cc)
     else:
         cfn = para['cfn']
         

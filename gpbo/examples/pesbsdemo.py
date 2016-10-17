@@ -1,10 +1,10 @@
 import gpbo
 import scipy as sp
 from gpbo.core import GPdc as GPdc
-
-
+gpbo.core.debugoutput=True
+gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':True}
 D=2
-n=50
+n=30
 s=1e-9
 
 def f(x,**ev):

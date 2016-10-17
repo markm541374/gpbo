@@ -87,8 +87,8 @@ def gpmapasrecc(optstate,**para):
         return (a[0,0],0)
     [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
     logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
-    from gpbo.core import debugoutput
-    if debugoutput:
+    from gpbo.core import debugoutput, debugoptions
+    if debugoutput and debugoptions['datavis']:
         A2 = MAP[0]
         l = MAP[3]
         from matplotlib import pyplot as plt
@@ -160,8 +160,8 @@ def gphinasrecc(optstate,**para):
     [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
     logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
 
-    from gpbo.core import debugoutput
-    if debugoutput:
+    from gpbo.core import debugoutput, debugoptions
+    if debugoutput and debugoptions['datavis']:
         from gpbo.core import debugpath
         if not os.path.exists(debugpath):
             os.mkdir(debugpath)

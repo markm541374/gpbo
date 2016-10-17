@@ -7,6 +7,7 @@ import logging
 import GPdc
 import DIRECT
 from scipy.optimize import minimize as spm
+import gpbo
 logger = logging.getLogger(__name__)
 
 
@@ -156,10 +157,38 @@ class cfnobj():
     def __call__(self,x,**ev):
         xa =  ev['xa']
         return self.g.infer_m(sp.array([[xa]]),[[sp.NaN]])[0,0]
-def traincfn(x,c):
+
+def traincfn1d(x,c):
     n = x.size
     g = GPdc.GPcore(x, c, sp.array([1e-1] * n), [[sp.NaN]] * n, GPdc.kernel(GPdc.MAT52, 1, [1., 0.2]))
-    
+
+    if gpbo.core.debugoutput and gpbo.core.debugoptions['cost1d']:
+        print 'plotting cost1d...'
+        from gpbo.core import debugpath
+        import os
+        if not os.path.exists(debugpath):
+            os.mkdir(debugpath)
+        import time
+        from matplotlib import pyplot as plt
+        f,a=plt.subplots(1)
+        low = min(0,min(x))
+        high = max(1,max(x))
+        xaxis = sp.linspace(low,high,100)
+        y,cy = g.infer_diag_post(xaxis,[[sp.NaN]]*100)
+
+        a.plot(xaxis,y[0,:],'b')
+        s = 2.*sp.sqrt(cy)
+        u=sp.empty(100)
+        l=sp.empty(100)
+        for i in xrange(100):
+            s = sp.sqrt(cy[0,i])
+            u[i]=y[0,i]+2.*s
+            l[i]=y[0,i]-2.*s
+        a.fill_between(xaxis,l,u,facecolor='lightblue',edgecolor='lightblue',alpha=0.5)
+        for i in xrange(n):
+            a.plot(x[i],c[i],'r.')
+        f.savefig(os.path.join(debugpath, 'cost1d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+        del(f)
     return cfnobj(g)
 
 
