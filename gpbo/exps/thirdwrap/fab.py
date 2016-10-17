@@ -33,7 +33,7 @@ def augres(outfile,xl,xu,sbest,f):
     for i,line in enumerate(lines):
 
         if i==0:
-            out.write(line.strip('\r\n')+',xtrue,strue,ctrue,incumbenttrue,yatincumbent\n')
+            out.write(line.strip('\r\n')+',xtrue,strue,c,incumbenttrue,trueyatxrecc\n')
         else:
             vals = line.split(',')
             con = [float(j) for j in vals[1].strip('[]').split()]

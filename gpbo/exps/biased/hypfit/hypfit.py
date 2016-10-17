@@ -1,7 +1,7 @@
 import scipy as sp
 import numpy.random as npr
 import pandas as pd
-from matplotlib import pyplot as plt
+
 import time
 import gpbo
 gpbo.core.debugoutput=False
@@ -10,10 +10,12 @@ from gpbo.core.ESutils import accumulate as accumulate
 import os
 import copy
 
-run=False
-plot = True
+#run=[True,True,True]
+run=[False,False,False]
+plot = False
+extras=True
 
-days = 148
+days = 120
 t0 = time.clock()
 df = pd.read_csv('data/DemandData_Historic-2015.csv')
 t1 = time.clock()
@@ -28,12 +30,7 @@ X = sp.array([df.index.values[:n]]).T / 48.
 Y = sp.array([df.indo.values[:n]]).T / 1000.
 offs = sp.mean(Y)
 Y -= offs
-f, a = plt.subplots(3)
 
-f2, a2 = plt.subplots(1)
-a = sp.hstack([a, a2])
-
-a[0].plot(X, Y, 'g.')
 #plt.show()
 S = sp.ones([n, 1]) * 1e-6
 D = [[sp.NaN]] * n
@@ -80,23 +77,86 @@ def f_inplane(x,**ev):
 #gpbo.core.ESutils.plot2dFtofile(f,os.path.join('dbout', 'worst.png'),atxa=1.)2
 D=2
 N=40
-s=1e-6
+s=1e-3
+nopts=9
 
-if run:
-    C = gpbo.core.config.eimledefault(f, D, N, s, 'results', 'hypfitbs.csv')
-    out = gpbo.search(C)
 
-    C=gpbo.core.config.pesbsdefault(f,D,60,s,'results','hypfitbs.csv')
-    out = gpbo.search(C)
 
-    s=1e-6
-    C=gpbo.core.config.pesfsdefault(f_inplane,D,N,s,'results','hypfitfs.csv')
-    out = gpbo.search(C)
+if run[0]:
+    for k in xrange(nopts):
+        C = gpbo.core.config.eimledefault(f_inplane, D, N, 1e-9, 'results', 'hypfitei{}.csv'.format(k))
+        C.stopfn = gpbo.core.optimize.cstopfn
+        C.stoppara = {'cmax': 100}
+        out = gpbo.search(C)
+
+if run[1]:
+    for k in xrange(nopts):
+        C = gpbo.core.config.pesbsdefault(f, D, N, s, 'results', 'hypfitbs{}.csv'.format(k))
+        C.stopfn = gpbo.core.optimize.cstopfn
+        C.stoppara = {'cmax': 100}
+        out = gpbo.search(C)
+
+if run[2]:
+    for k in xrange(nopts):
+        C = gpbo.core.config.pesfsdefault(f_inplane, D, N, 1e-9, 'results', 'hypfitfs{}.csv'.format(k))
+        C.stopfn = gpbo.core.optimize.cstopfn
+        C.stoppara = {'cmax': 100}
+        out = gpbo.search(C)
+
+
+
 
 if plot:
-    d0 = pd.read_csv('results/hypfitbs.csv')
-    plt.plot(accumulate(d0[' c']),d0[' truey at xrecc'],'r')
+    from matplotlib import pyplot as plt
+    f,a = plt.subplots(1)
 
-    d1 = pd.read_csv('results/hypfitfs.csv')
-    plt.plot(accumulate(d1[' c']), d1[' truey at xrecc'], 'b')
+    d0 = [gpbo.optimize.readoptdata('results/hypfitbs{}.csv'.format(k)) for k in xrange(nopts)]
+    d1 = [gpbo.optimize.readoptdata('results/hypfitfs{}.csv'.format(k)) for k in xrange(nopts)]
+    d2 = [gpbo.optimize.readoptdata('results/hypfitei{}.csv'.format(k)) for k in xrange(nopts)]
+
+    for k in xrange(nopts):
+
+        a.semilogy(d0[k]['cacc'], d0[k]['trueyatxrecc'], 'b')
+        a.semilogy(d1[k]['cacc'], d1[k]['trueyatxrecc'], 'r')
+        a.semilogy(d2[k]['cacc'], d2[k]['trueyatxrecc'], 'g')
+
+    f, a = plt.subplots(1)
+
+    xaxis = sp.linspace(0,100,100)
+    low0, med0, upp0 = gpbo.core.ESutils.quartsirregular([d0[k]['cacc'] for k in xrange(nopts)],
+                                                         [d0[k]['trueyatxrecc'] for k in xrange(nopts)], xaxis)
+
+    a.fill_between(xaxis, low0, upp0, facecolor='lightblue', edgecolor='lightblue', alpha=0.5)
+    a.plot(xaxis, med0, 'b')
+
+    low1, med1, upp1 = gpbo.core.ESutils.quartsirregular([d1[k]['cacc'] for k in xrange(nopts)],
+                                                         [d1[k]['trueyatxrecc'] for k in xrange(nopts)], xaxis)
+    a.fill_between(xaxis, low1, upp1, facecolor='lightpink', edgecolor='lightpink', alpha=0.5)
+    a.plot(xaxis, med1, 'r')
+
+    low2, med2, upp2 = gpbo.core.ESutils.quartsirregular([d2[k]['cacc'] for k in xrange(nopts)],
+                                                         [d2[k]['trueyatxrecc'] for k in xrange(nopts)], xaxis)
+
+    a.fill_between(xaxis, low2, upp2, facecolor='lightgreen', edgecolor='lightgreen', alpha=0.5)
+    a.plot(xaxis, med2, 'g')
+
+    plt.show()
+
+if extras:
+    clist=[]
+    ylist=[]
+    x0list=[]
+    x1list=[]
+    from matplotlib import pyplot as plt
+    for i in xrange(120):
+        x = sp.random.uniform(-1,1,2)
+        y,c,null = f(x,**{'s':s,'d':[sp.NaN],'xa':0.})
+        clist.append(c)
+        ylist.append(y)
+        x0list.append(x[0])
+        x1list.append(x[1])
+    f,a = plt.subplots(3)
+    a[0].plot(ylist,clist,'b.')
+    a[1].plot(x0list, clist, 'b.')
+    a[2].plot(x1list, clist, 'b.')
     plt.show()
