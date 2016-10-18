@@ -24,7 +24,7 @@ nopts=10
 
 
 if run:
-    testsimple(40,nopts)
+    testsimple(42,nopts)
 if plot:
     from matplotlib import pyplot as plt
 
@@ -35,6 +35,7 @@ if plot:
         a[0].plot(d[i]['cacc'],d[i]['trueyatxrecc'],'b')
         a[1].plot(d[i]['cacc'],d[i]['c'])
     a[0].set_yscale('log')
+    f.savefig('plots/out0.pdf')
     f,a=plt.subplots(1)
     xaxis = sp.linspace(0, 100, 100)
 
@@ -44,4 +45,5 @@ if plot:
     a.fill_between(xaxis, low0, upp0, facecolor='lightblue', edgecolor='lightblue', alpha=0.5)
     a.plot(xaxis, med0, 'b')
     a.set_yscale('log')
+    f.savefig('plots/out1.pdf')
     plt.show()

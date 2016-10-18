@@ -202,7 +202,12 @@ def PESbsaq(optstate,persist,**para):
         #print "XXXXXXXXXXXXXXx"
         cx=sp.vstack([e['xa'] for e in optstate.ev])
         cc=sp.vstack([e for e in optstate.c])
-        cfn = objectives.traincfn1d(cx,cc)
+        if para['traincfn']=='llog1d':
+            #a latent log model
+            cfn = objectives.traincfn1dll(cx,cc)
+        else:
+            #default is 1d nieve gp
+            cfn = objectives.traincfn1d(cx,cc)
     else:
         cfn = para['cfn']
         

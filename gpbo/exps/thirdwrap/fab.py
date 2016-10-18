@@ -25,13 +25,16 @@ def runfab(Xl,Xu,Sworst,Sbest,f,n,D,ofpath='fabresults.csv'):
     return
 
 def augres(outfile,xl,xu,sbest,f):
+
     out = open(outfile,'w')
     text = open('results.csv').read()
-
-    lines = re.findall('(?:"[^"]*"|.)+', text)
+    pattern = re.compile(r'".*?"', re.DOTALL)
+    textnonl=pattern.sub(lambda x: x.group().replace('\n', ''), text)
+    print textnonl
+    lines = re.findall('(?:"[^"]*"|.)+', textnonl)
 
     for i,line in enumerate(lines):
-
+        print line
         if i==0:
             out.write(line.strip('\r\n')+',xtrue,strue,c,incumbenttrue,trueyatxrecc\n')
         else:

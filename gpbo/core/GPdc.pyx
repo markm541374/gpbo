@@ -48,6 +48,7 @@ class GP_LKonly:
     def plk(self,lm,ls):
         #log likelihood given lognormal prior over hyperparameters
         tmp = 0.
+
         for i,h in enumerate(self.hyp):
             tmp -= 0.5*((log10(h)-lm[i])**2)/ls[i]**2
         

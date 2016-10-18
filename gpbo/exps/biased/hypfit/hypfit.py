@@ -5,15 +5,17 @@ import pandas as pd
 import time
 import gpbo
 gpbo.core.debugoutput=False
+gpbo.core.debugoptions={'datavis':False,'drawlap':True,'cost1d':True}
+
 import gpbo.core.GPdc as GPdc
-from gpbo.core.ESutils import accumulate as accumulate
+
 import os
 import copy
 
-#run=[True,True,True]
-run=[False,False,False]
-plot = False
-extras=True
+run=[True,True,True]
+#run=[False,False,False]
+plot = True
+
 
 days = 120
 t0 = time.clock()
@@ -30,7 +32,7 @@ X = sp.array([df.index.values[:n]]).T / 48.
 Y = sp.array([df.indo.values[:n]]).T / 1000.
 offs = sp.mean(Y)
 Y -= offs
-
+submode='rand'
 #plt.show()
 S = sp.ones([n, 1]) * 1e-6
 D = [[sp.NaN]] * n
@@ -47,15 +49,24 @@ def f(x, **ev):
     t0 = time.clock()
 
     npts = max(1,int( (1-0.98*ev['xa'])*n ))
+    if submode=='rand':
+        print "subsampling {} of {} at x={} aug={}".format(npts, n, x,ev['xa'])
+        pts = npr.choice(range(n), size=npts, replace=False)
+        Xd = sp.vstack([X[i] for i in pts])
+        Yd = sp.vstack([Y[i] for i in pts])
+        Sd = sp.vstack([S[i] for i in pts])
+        Dd = [[sp.NaN]] * npts
+    elif submode=='first':
+        print "first {} of {} at x={} aug={}".format(npts, n, x, ev['xa'])
+        pts = npr.choice(range(n), size=npts, replace=False)
+        print pts
+        pts = range(npts)
+        Xd = sp.vstack([X[i] for i in ps])
+        Yd = sp.vstack([Y[i] for i in ps])
+        Sd = sp.vstack([S[i] for i in ps])
+        Dd = [[sp.NaN]] * npts
 
-    print "subsampling {} of {} at x={} aug={}".format(npts, n, x,ev['xa'])
-    ps = npr.choice(range(n), size=npts, replace=False)
-    Xd = sp.vstack([X[i] for i in ps])
-    Yd = sp.vstack([Y[i] for i in ps])
-    Sd = sp.vstack([S[i] for i in ps])
-    Dd = [[sp.NaN]] * npts
-
-    llk = GPdc.GP_LKonly(Xd, Yd, Sd, Dd, GPdc.kernel(GPdc.MAT52, 1, sp.array(hyp))).plk(pm, ps)
+    llk = GPdc.GP_LKonly(Xd, Yd, Sd, Dd, GPdc.kernel(GPdc.MAT52, 2, sp.array(hyp))).plk(pm, ps)
     t1 = time.clock()
     if llk < -1.:
         out = sp.log(-llk) + 1.
@@ -78,7 +89,7 @@ def f_inplane(x,**ev):
 D=2
 N=40
 s=1e-3
-nopts=9
+nopts=3
 
 
 
@@ -86,21 +97,22 @@ if run[0]:
     for k in xrange(nopts):
         C = gpbo.core.config.eimledefault(f_inplane, D, N, 1e-9, 'results', 'hypfitei{}.csv'.format(k))
         C.stopfn = gpbo.core.optimize.cstopfn
-        C.stoppara = {'cmax': 100}
+        C.stoppara = {'cmax': 400}
         out = gpbo.search(C)
 
 if run[1]:
     for k in xrange(nopts):
         C = gpbo.core.config.pesbsdefault(f, D, N, s, 'results', 'hypfitbs{}.csv'.format(k))
         C.stopfn = gpbo.core.optimize.cstopfn
-        C.stoppara = {'cmax': 100}
+        C.stoppara = {'cmax': 160}
+        C.aqpara['traincfn'] = 'llog1d'
         out = gpbo.search(C)
 
 if run[2]:
     for k in xrange(nopts):
         C = gpbo.core.config.pesfsdefault(f_inplane, D, N, 1e-9, 'results', 'hypfitfs{}.csv'.format(k))
         C.stopfn = gpbo.core.optimize.cstopfn
-        C.stoppara = {'cmax': 100}
+        C.stoppara = {'cmax': 400}
         out = gpbo.search(C)
 
 
@@ -117,6 +129,7 @@ if plot:
     for k in xrange(nopts):
 
         a.semilogy(d0[k]['cacc'], d0[k]['trueyatxrecc'], 'b')
+        print [d1[k]['cacc'][0],d1[k]['cacc'][len(d1[k]['cacc'])-1]]
         a.semilogy(d1[k]['cacc'], d1[k]['trueyatxrecc'], 'r')
         a.semilogy(d2[k]['cacc'], d2[k]['trueyatxrecc'], 'g')
 
@@ -142,21 +155,3 @@ if plot:
 
     plt.show()
 
-if extras:
-    clist=[]
-    ylist=[]
-    x0list=[]
-    x1list=[]
-    from matplotlib import pyplot as plt
-    for i in xrange(120):
-        x = sp.random.uniform(-1,1,2)
-        y,c,null = f(x,**{'s':s,'d':[sp.NaN],'xa':0.})
-        clist.append(c)
-        ylist.append(y)
-        x0list.append(x[0])
-        x1list.append(x[1])
-    f,a = plt.subplots(3)
-    a[0].plot(ylist,clist,'b.')
-    a[1].plot(x0list, clist, 'b.')
-    a[2].plot(x1list, clist, 'b.')
-    plt.show()
