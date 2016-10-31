@@ -534,12 +534,12 @@ def gen_dataset(nt,d,lb,ub,kindex,hyp,s=1e-9):
     S = sp.matrix([s]*nt).T
     return [X,Y,S,D]
 
-def plot2dFtofile(f,fname,xmin=False,atxa=0.):
+def plot2dFtofile(f,fname,xmin=[False],atxa=0.):
     if not plots:
         print 'XXXplots disabled'
         return
     cdef int i,j
-    n = 100
+    n = 50
     x_ = sp.linspace(-1, 1, n)
     y_ = sp.linspace(-1, 1, n)
     z_ = sp.empty([n, n])

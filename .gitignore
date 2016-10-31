@@ -223,3 +223,13 @@ results/
 /gpbo/core/slice.so
 /gpbo/core/acquisitions.so
 /gpbo/exps/biased/matdraw/dbout/
+/gpbo/exps/thirdwrap/null.txt
+/gpbo/exps/thirdwrap/outcmaesxrecentbest.dat
+/gpbo/exps/thirdwrap/outcmaesxmean.dat
+/gpbo/exps/thirdwrap/resultsnonl.csv
+/gpbo/exps/thirdwrap/results.csv
+/gpbo/exps/thirdwrap/outcmaesstddev.dat
+/gpbo/exps/thirdwrap/results.json
+/gpbo/exps/thirdwrap/outcmaesfit.dat
+/gpbo/exps/thirdwrap/outcmaesaxlencorr.dat
+/gpbo/exps/thirdwrap/outcmaesaxlen.dat

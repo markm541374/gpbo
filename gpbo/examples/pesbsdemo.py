@@ -3,7 +3,7 @@
 import gpbo
 import gpbo.core.objectives as objectives
 gpbo.core.debugoutput=True
-gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':True}
+gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':True,'taq':True}
 import scipy as sp
 import copy
 import os
@@ -32,7 +32,7 @@ if run:
 
         def f(x, **ev):
             #c = 1 - 0.5* ev['xa']
-            c=sp.exp(-2.*ev['xa'])
+            c=5*sp.exp(-10.*ev['xa'])
             y = -sp.cos(x[0]) - sp.cos(x[1]) + 2. +0.1*s**2.
             b = ev['xa'] ** 2
             n = sp.random.normal() * sp.sqrt(s)
@@ -54,8 +54,9 @@ if run:
 
         C=gpbo.core.config.pesbsdefault(f,D,50,s,'results','pesbsdemo{}.csv'.format(k))
         C.stopfn = gpbo.core.optimize.cstopfn
-        C.stoppara = {'cmax': 35}
-        C.aqpara['traincfn']='llog1d'
+        C.stoppara = {'cmax': 500}
+        C.aqpara['traincfn']='predictive1d'
+        C.aqpara['cmax']=C.stoppara['cmax']
         out = gpbo.search(C)
 
 

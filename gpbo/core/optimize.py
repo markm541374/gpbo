@@ -20,16 +20,21 @@ class optstate:
         self.c = []
         self.C = 0
         self.n = 0
+        self.Cfull=0.
+        self.aqtime=[]
         self.aux=None
+
         return
     
-    def update(self,x,ev,y,c):
+    def update(self,x,ev,y,c,taq):
         self.x.append(x)
         self.ev.append(copy.copy(ev))
         self.y.append(y)
         self.c.append(c)
         self.C +=c
+        self.Cfull+=c+taq
         self.n+=1
+        self.aqtime.append(taq)
         return 
 
 
@@ -88,7 +93,7 @@ class optimizer:
             
             y,c,ojaux  = self.ojf(x,**ev)
             t2 = time.time()
-            self.state.update(x,ev,y,c)
+            self.state.update(x,ev,y,c,t1-t0)
             logger.info("{} : {}     evaltime: {}\nreccomend:".format(y,c,t2-t1))
             rx,reaux = self.reccfn(self.state,**self.reccpara)
             t3 = time.time()
@@ -117,9 +122,13 @@ class optimizer:
 def nstopfn(optstate,nmax = 1):
     return optstate.n >= nmax
 
-def cstopfn(optstate,cmax = 1):
-    logger.info('Used {} of {} evaluation budget.'.format(optstate.C,cmax))
-    return optstate.C >= cmax
+def cstopfn(optstate,cmax = 1,includeaq=False):
+    if not includeaq:
+        logger.info('Used {} of {} evaluation budget.'.format(optstate.C,cmax))
+        return optstate.C >= cmax
+    else:
+        logger.info('Used {} of {} evaluation budget.'.format(optstate.Cfull, cmax))
+        return optstate.Cfull >= cmax
 
 
 
@@ -134,7 +143,7 @@ def search(optconfig):
 
 
 
-def readoptdata(fname):
+def readoptdata(fname,includetaq=False):
     df = pd.DataFrame()
 
     with open(fname, 'r') as f:
@@ -159,8 +168,12 @@ def readoptdata(fname):
             df[c] = df[c].astype(float)  #
         except ValueError:
             pass
-    df['cacc'][0] = df.loc[0, ('c')]
-    for i in xrange(1, l):
-        df['cacc'][i] = df.loc[i - 1, 'cacc'] + df.loc[i, 'c']
-
+    if includetaq:
+        df['cacc'][0] = df.loc[0, ('c')]+df.loc[0, ('taq')]
+        for i in xrange(1, l):
+            df['cacc'][i] = df.loc[i - 1, 'cacc'] + df.loc[i, 'c']+df.loc[i, ('taq')]
+    else:
+        df['cacc'][0] = df.loc[0, ('c')]
+        for i in xrange(1, l):
+            df['cacc'][i] = df.loc[i - 1, 'cacc'] + df.loc[i, 'c']
     return df

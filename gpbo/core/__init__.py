@@ -6,4 +6,4 @@ from .GPdc import *
 from .ESutils import *
 debugoutput=False
 debugpath='dbout'
-debugoptions={'datavis':True,'drawlap':True,'cost1d':True}
+debugoptions={'datavis':True,'drawlap':True,'cost1d':True,'ctaq':True}

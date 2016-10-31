@@ -13,29 +13,29 @@ def testsimple(ns,no):
         c = 1-0.5*s
         return y, c
     for i in xrange(no):
-        fab.runfab(xl,xu,sworst,sbest,f,ns,2,ofpath='results/fabout{}.csv'.format(i))
+        fab.runfab(xl,xu,sworst,sbest,f,ns,2,ofpath='results2/fabout{}.csv'.format(i))
     return
 
 
-run=False
+run=True
 plot=True
 
-nopts=10
+nopts=1
 
 
 if run:
-    testsimple(42,nopts)
+    testsimple(55,nopts)
 if plot:
     from matplotlib import pyplot as plt
 
-    d = [gpbo.optimize.readoptdata('results/fabout{}.csv'.format(k)) for k in xrange(nopts)]
+    d = [gpbo.optimize.readoptdata('results2/fabout{}.csv'.format(k)) for k in xrange(nopts)]
 
     f,a=plt.subplots(2)
     for i in xrange(nopts):
         a[0].plot(d[i]['cacc'],d[i]['trueyatxrecc'],'b')
         a[1].plot(d[i]['cacc'],d[i]['c'])
     a[0].set_yscale('log')
-    f.savefig('plots/out0.pdf')
+    f.savefig('plots/2out0.pdf')
     f,a=plt.subplots(1)
     xaxis = sp.linspace(0, 100, 100)
 
@@ -45,5 +45,5 @@ if plot:
     a.fill_between(xaxis, low0, upp0, facecolor='lightblue', edgecolor='lightblue', alpha=0.5)
     a.plot(xaxis, med0, 'b')
     a.set_yscale('log')
-    f.savefig('plots/out1.pdf')
+    f.savefig('plots/2out1.pdf')
     plt.show()

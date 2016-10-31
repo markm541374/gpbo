@@ -13,6 +13,7 @@ import PES
 import ESutils
 #start with random
 import objectives
+import costs
 logger = logging.getLogger(__name__)
 
 def randomaq(optstate,persist,**para):
@@ -203,11 +204,14 @@ def PESbsaq(optstate,persist,**para):
         cx=sp.vstack([e['xa'] for e in optstate.ev])
         cc=sp.vstack([e for e in optstate.c])
         if para['traincfn']=='llog1d':
-            #a latent log model
-            cfn = objectives.traincfn1dll(cx,cc)
+            cfn = costs.traincfn1dll(cx,cc)
+        elif para['traincfn']=='llogfull':
+            cfn = costs.traincfnfull(x,cc)
+        elif para['traincfn']=='predictive1d':
+            cfn = costs.predictive1d(cx,cc,sp.array(optstate.aqtime),para['nrandinit'],para['cmax']-optstate.C)
         else:
             #default is 1d nieve gp
-            cfn = objectives.traincfn1d(cx,cc)
+            cfn = costs.traincfn1d(cx,cc)
     else:
         cfn = para['cfn']
         
