@@ -106,7 +106,7 @@ def genbiasedmat52ojf(d,lb,ub,sls):
     def dirwrap(x,y):
         z = G.infer_m(sp.hstack(sp.array(x)+[0.]),[[sp.NaN]])[0,0]
         return (z,0)
-    [xmin,ymin,ierror] = DIRECT.solve(dirwrap,lb,ub,user_data=[], algmethod=1, maxf=20000, logfilename='/dev/null')
+    [xmin,ymin,ierror] = DIRECT.solve(dirwrap,lb,ub,user_data=[], algmethod=1, maxf=40000, logfilename='/dev/null')
     #print [xmin, ymin]
     def spowrap(x):
         z = G.infer_m(sp.hstack(sp.array(x) + [0.]), [[sp.NaN]])[0, 0]
