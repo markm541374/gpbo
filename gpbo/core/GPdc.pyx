@@ -19,7 +19,7 @@ from scipy.stats import norm as norms
 from libc.math cimport log10, log, isnan
 #print os.path.join(os.path.split(__file__)[0],'../../dist/Release/GNU-Linux/libGPshared.so')
 from . import __file__ as fl
-
+from scipy import linalg as spl
 
 libGP = ct.cdll.LoadLibrary(os.path.join(os.path.split(fl)[0],'../cproj/libcproj.so')) #path to c-shared library
 #print libGP
@@ -135,7 +135,14 @@ class GPcore:
 
         for i in range(self.size):
             cv+=V[ns*i:ns*(i+1),:]
-        cv= cv/self.size + sp.cov(m,rowvar=0,bias=1)
+        cv= cv/self.size
+        if self.size>1:
+            cv+=sp.cov(m,rowvar=0,bias=1)
+        #print "_________________"
+        #print self.size
+        #print sp.cov(m,rowvar=0,bias=1)
+        #print V
+        #print cv
         return [sp.mean(m,axis=0).reshape([1,ns]),cv]
     
     def infer_diag(self,X_i,D_i):
@@ -193,6 +200,7 @@ class GPcore:
         R = sp.empty([ns,z])
         libGP.drawk(V.ctypes.data_as(ctpd),cint(ns),R.ctypes.data_as(ctpd),cint(z))
         R+=sp.hstack([m.T]*z)
+     #R=sp.random.multivariate_normal(m.flatten(),V,z)
         return R.T
     
     def llk(self):
