@@ -36,17 +36,26 @@ def main():
     g = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, 1, sp.array([0.5, 0.2])))
     #g.printc()
     C= g.get_cho()
-    print C
+    #print C
 
-    print spl.cho_solve((C,True),sp.eye(4)).dot(K)
+    #print spl.cho_solve((C,True),sp.eye(4)).dot(K)
     for i,d in enumerate([[sp.NaN],[0],[0,0]]):
         m,v = g.infer_diag(sup,[d]*ns)
+
+        null,V = g.infer_full_post(sup,[d]*ns)
+        Vu = (m+sp.sqrt(sp.diag(V))).flatten()
+        a[i].plot(sup, Vu.flatten(),'g')
+
         vl = (m-sp.sqrt(v)).flatten()
         vu = (m+sp.sqrt(v)).flatten()
         a[i].plot(sup,m.flatten())
         a[i].fill_between(sup,vl,vu,facecolor='LightBlue',edgecolor='LightBlue')
         a[i].set_ylabel(''.join(['d/dx ']*i)+'f')
 
+        dr = g.draw_post(sup,[d]*ns,5)
+
+        for j in range(5):
+            a[i].plot(sup,dr[j,:],'lightpink')
     plt.show()
     return
 
