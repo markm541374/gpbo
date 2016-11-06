@@ -413,35 +413,27 @@ def draw_min(g,support,n):
     amins = [len(list(group)) for key, group in groupby(sorted(args))]
     print "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(support.shape[0],len(amins),100.*max(amins)/float(n))
 
-    from gpbo.core import debugoutput
-    if False and plots:
-        print 'plotting draw_min...',
-        from gpbo.core import debugpath
-        if not os.path.exists(debugpath):
-            os.mkdir(debugpath)
 
-        import time
-        #2d plot assuming [-1,1]^2 support
-        n = 200
-        x = sp.linspace(-1,1,n)
-        y = sp.linspace(-1,1,n)
-        z = sp.empty([n,n])
-        s = sp.empty([n,n])
-        for i in range(n):
-            for j in range(n):
-                m_,v_ = g.infer_diag_post(sp.array([0,y[j],x[i]]),[[sp.NaN]])
-                z[i,j]=m_[0,0]
-                s[i,j]=sp.sqrt(v_[0,0])
-        fig, ax = plt.subplots( nrows=2, ncols=1 ,figsize=(10,20))
-        ax[0].contour(x,y,z,20)
-        CS = ax[1].contour(x,y,s,15)
-        ax[1].clabel(CS, inline=1, fontsize=10)
-        for i in range(Z.shape[0]):
-            ax[0].plot(R[i,1],R[i,2],'ro')
-        fig.savefig(os.path.join(debugpath,'drawmin'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
-        del(fig)
-        print 'done'
     return R
+
+def draw_min_xypair(g,support,n,x):
+    support = sp.vstack([x,support])
+    Z = g.draw_post(support, [[sp.NaN]]*support.shape[0],n)
+
+    R = sp.empty([n,support.shape[1]])
+    Y = sp.empty([n,2])
+    args = []
+    for i in range(n):
+        a = sp.argmin(Z[i,:])
+        args.append(a)
+        R[i,:] = support[a,:]
+        Y[i,0] = Z[i,a]
+        Y[i,1] = Z[i,0]
+    from itertools import groupby
+    amins = [len(list(group)) for key, group in groupby(sorted(args))]
+    print "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(support.shape[0],len(amins),100.*max(amins)/float(n))
+    #print R,Y
+    return R,Y
 
 #fake gp class that 9looks like a d-1 gp becuase an extra vaue is added before callind
 class gpfake():
