@@ -53,11 +53,11 @@ def rosenojf(x,**ev):
 rosenxmin=[0.2,0.2]
 rosenymin=0.
 
-def genmat52ojf(d,lb,ub):
+def genmat52ojf(d,lb,ub,ls=0.3):
     from ESutils import gen_dataset
     nt=18
-    [X,Y,S,D] = gen_dataset(nt, d, lb, ub, GPdc.MAT52, sp.array([1.5] + [0.3] * d))
-    G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.MAT52, d, sp.array([1.5] + [0.3] * d)))
+    [X,Y,S,D] = gen_dataset(nt, d, lb, ub, GPdc.MAT52, sp.array([1.5] + [ls] * d))
+    G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.MAT52, d, sp.array([1.5] + [ls] * d)))
     def ojf(x,**ev):
         dx=ev['d']
         s=ev['s']
@@ -140,7 +140,7 @@ def costfnwrap(ojfbase,cfn):
 
 
 
-def gendecayingpositiveojf(d, lb, ub):
+def gendecayingpositiveojf(d, lb, ub,sim):
 
     # s normalised to 0 exact, 1
     from ESutils import gen_dataset
@@ -186,7 +186,7 @@ def gendecayingpositiveojf(d, lb, ub):
 
 
         y0=p0(x)
-        y1=0.25*p1(x)+y0
+        y1=sim*p1(x)+y0
         l=p2(x)
 
         A = (y1-y0)/(sp.exp(l)-1)

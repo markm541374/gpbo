@@ -6,10 +6,10 @@ from scipy import stats as sps
 from scipy import linalg as spl
 import scipy as sp
 from matplotlib import pyplot as plt
-import ESutils
-import GPdc
+from gpbo.core import ESutils
+from gpbo.core import GPdc
 
-nt=82
+nt=22
 X = sp.matrix(sp.linspace(-1,1,nt)).T
 D = [[sp.NaN]]*(nt)
 

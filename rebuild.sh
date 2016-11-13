@@ -16,3 +16,4 @@ for FILE in *.pyx; do
     done
 
 )
+echo "done"

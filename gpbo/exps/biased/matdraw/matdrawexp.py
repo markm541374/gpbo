@@ -11,15 +11,15 @@ from matplotlib import pyplot as plt
 import re
 import pandas as pd
 
-#run=[True,True,True,True]
-run=[False]*4
+run=[True,True,True,True]
+#run=[False]*4
 plot=True
 D=2
 lb = [-1., -1.]
 ub = [1., 1.]
 s=1e-9
 
-nopts=10
+nopts=1
 if any(run):
     for k in xrange(nopts):
         ojfw, xmin, ymin = objectives.genbiasedmat52ojf(D,lb,ub,0.5)

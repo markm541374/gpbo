@@ -9,7 +9,7 @@ from scipy import stats as sps
 from scipy import linalg as spl
 from matplotlib import pyplot as plt
 import os
-libGP = ct.cdll.LoadLibrary(os.path.join(os.path.dirname(os.path.realpath(__file__)),'../../../dist/Release/GNU-Linux/libGPshared.so'))
+#libGP = ct.cdll.LoadLibrary(os.path.join(os.path.dirname(os.path.realpath(__file__)),'../../../dist/Release/GNU-Linux/libGPshared.so'))
 
 ctpd = ct.POINTER(ct.c_double)
 

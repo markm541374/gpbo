@@ -20,7 +20,7 @@ def runfab(Xl,Xu,Sworst,Sbest,f,n,D,ofpath='fabresults.csv'):
         return sp.array([[y]]), sp.array([[c]])
 
     if True:
-        O1 = fabolas_fmin(fw, X_lower, X_upper, num_iterations=max(0,(n-40)),rec='change')
+        O1 = fabolas_fmin(fw, X_lower, X_upper, num_iterations=max(0,(n-40)),rec='change2')
     augres(ofpath,Xl,Xu,Sbest,f)
     return
 

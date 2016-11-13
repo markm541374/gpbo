@@ -416,22 +416,23 @@ def draw_min(g,support,n):
 
     return R
 
-def draw_min_xypair(g,support,n,x):
-    support = sp.vstack([x,support])
-    Z = g.draw_post(support, [[sp.NaN]]*support.shape[0],n)
+def draw_min_xypairgrad(g,support,n,x):
+    m,d=support.shape
+    support = sp.vstack([support,[x]*(d+1)])
+    Z = g.draw_post(support, [[sp.NaN]]*(m+1)+[[i] for i in range(d)],n)
 
-    R = sp.empty([n,support.shape[1]])
-    Y = sp.empty([n,2])
+    R = sp.empty([n,d])
+    Y = sp.empty([n,2+d])
     args = []
     for i in range(n):
-        a = sp.argmin(Z[i,:])
+        a = sp.argmin(Z[i,:(m+1)])
         args.append(a)
         R[i,:] = support[a,:]
         Y[i,0] = Z[i,a]
-        Y[i,1] = Z[i,0]
+        Y[i,1:] = Z[i,m:]
     from itertools import groupby
     amins = [len(list(group)) for key, group in groupby(sorted(args))]
-    print "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(support.shape[0],len(amins),100.*max(amins)/float(n))
+    print "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(m,len(amins),100.*max(amins)/float(n))
     #print R,Y
     return R,Y
 

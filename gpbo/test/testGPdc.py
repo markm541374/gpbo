@@ -11,7 +11,7 @@ def main():
 
     f,a = plt.subplots(3)
     ns = 200
-    sup = sp.linspace(-1,1,200)
+    sup = sp.linspace(-1,1,ns)
 
     #points are a high noise obs, a low noise obs, a derivative obs and a second derivative obs
     X = sp.array([[-0.8],[-0.25],[0.25],[0.8]])
