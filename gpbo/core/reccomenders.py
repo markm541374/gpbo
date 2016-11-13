@@ -345,7 +345,7 @@ def adaptiverecc(optstate,**para):
         ax[0,1].plot(W[:, 0], W[:, 1], 'bx')
         ax[0,1].plot(R[:, 0], R[:, 1], 'r.')
 
-
+        """
         axA = ax[1, 1].twinx()
         lowD = 1e2
         for i in xrange(nd):
@@ -404,7 +404,7 @@ def adaptiverecc(optstate,**para):
               'TrueR       : {}'.format(ERegret,IRegret,ORegret,prob,CRegret)
         l_,u_=ax[1, 1].get_xlim()
         axA.text(l_+0.02*(u_-l_),-0.98,msg)
-
+        """
         #---------------------------------------------------
         """
         from sklearn.cluster import MeanShift, estimate_bandwidth
@@ -450,13 +450,13 @@ def adaptiverecc(optstate,**para):
 
         clf = best_gmm
 
-        D = sp.inf
+        D_ = sp.inf
         local = -1
         for i,m in enumerate(clf.means_):
             dist=spl.norm(m-xmin)
-            if dist<D:
+            if dist<D_:
                 local=i
-                D=dist
+                D_=dist
 
         splot=ax[0,2]
 
@@ -480,6 +480,64 @@ def adaptiverecc(optstate,**para):
             v = 2. * sp.sqrt(2.) * sp.sqrt(v)
             ell = patches.Ellipse(mean, v[0], v[1], 180. + angle, color=None, edgecolor=color,facecolor='none')
             splot.add_artist(ell)
+
+        ERegret = 0. #full expected
+        IRegret = 0. #within the local cluster
+        ORegret = 0. #outside the cluster
+        NRegret = 0. #within the cluster and not converging
+        r = [0, 0, 0]
+        for i in xrange(nd):
+            if Y_[i]==local:
+                if A[i,0]>0:
+                    ax[1, 2].plot(D[i, 0], Y[i, 1]-Y[i, 0], 'r.')
+                else:
+                    ax[1, 2].plot(D[i, 0], Y[i, 1] - Y[i, 0], 'rx')
+                    NRegret += Y[i, 1] - Y[i, 0]
+                    r[2]+=1
+                IRegret+=Y[i, 1]-Y[i, 0]
+                r[0]+=1
+            else:
+                if A[i,0]>0:
+                    ax[1, 2].plot(D[i, 0], Y[i, 1]-Y[i, 0], 'b.')
+                else:
+                    ax[1, 2].plot(D[i, 0], Y[i, 1] - Y[i, 0], 'bx')
+                ORegret += Y[i, 1] - Y[i, 0]
+                r[1]+=1
+            ERegret += Y[i, 1] - Y[i, 0]
+
+        ERegret /= float(nd)
+        try:
+            IRegret /= float(r[0])
+        except ZeroDivisionError:
+            IRegret = 0
+        try:
+            ORegret /= float(r[1])
+        except ZeroDivisionError:
+            ORegret = 0
+
+        try:
+            NRegret /= float(r[2])
+        except ZeroDivisionError:
+            NRegret = 0
+        Iprob = r[0] / float(nd)
+        Nprob = r[2] / float(r[0])
+        try:
+            CRegret = para['cheatf'](xmin, **{'s': 0., 'd': [sp.NaN]})[0] - para['cheatymin']
+        except KeyError:
+            CRegret = sp.nan
+
+
+        msg = 'TrueR        : {}\n' \
+              'ExpR full    : {}\n\n' \
+              'Prob in C    : {}\n' \
+              'ExpR in C    : {}\n' \
+              'ExpR notin C : {}\n\n' \
+              'Prob noCV inC: {}\n' \
+              'ExpR noCV inC: {}\n' \
+              ''.format(CRegret, ERegret, Iprob, IRegret, ORegret, Nprob, NRegret)
+        l_x, u_x = ax[1, 1].get_xlim()
+        l_y, u_y = ax[1, 1].get_ylim()
+        ax[1,1].text(l_x + 0.02 * (u_x - l_x), l_y + 0.02 * (u_y - l_y), msg,fontdict={'size':18})
 
         from gpbo.core import debugpath
         fig.savefig(os.path.join(debugpath, 'support' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
