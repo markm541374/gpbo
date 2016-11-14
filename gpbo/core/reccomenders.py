@@ -4,12 +4,13 @@
 
 import scipy as sp
 from scipy import linalg as spl
+from scipy import stats as sps
 import os
 import time
 import DIRECT
 import itertools
 import logging
-
+from scipy.optimize import minimize as spm
 logger = logging.getLogger(__name__)
 try:
     from matplotlib import pyplot as plt
@@ -21,7 +22,7 @@ except ImportError:
 
 import GPdc
 
-def argminrecc(optstate,**para):
+def argminrecc(optstate,persist,**para):
     #if para['onlyafter']>len(optstate.y) or not len(optstate.y)%para['everyn']==0:
     #    return [sp.NaN for i in para['lb']],{'didnotrun':True}
     
@@ -32,14 +33,14 @@ def argminrecc(optstate,**para):
         if y<yinc:
             xinc = x
             yinc=y
-    return xinc,{'yinc':yinc}
+    return xinc,persist,{'yinc':yinc}
 
 argminpara = dict()
 argmin = argminrecc, argminpara
 
-def gpmaprecc(optstate,**para):
+def gpmaprecc(optstate,persist,**para):
     if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
-        return argminrecc(optstate,**para)
+        return argminrecc(optstate,persist,**para)
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
     logger.info('gpmap reccomender')
     d=len(para['lb'])
@@ -55,7 +56,7 @@ def gpmaprecc(optstate,**para):
         a = G.infer_m(xq,[[sp.NaN]])
         return (a[0,0],0)
     [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
-    return [i for i in xmin],{'MAPHYP':MAP,'ymin':ymin}
+    return [i for i in xmin],persist,{'MAPHYP':MAP,'ymin':ymin}
 
 gpmapprior = {
                 'ev':{'s':1e-9,'d':[sp.NaN]},
@@ -72,9 +73,9 @@ gpmapprior = {
 
 gpmap = gpmaprecc,gpmapprior
 
-def gpmapasrecc(optstate,**para):
+def gpmapasrecc(optstate,persist,**para):
     if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
-        return argminrecc(optstate, **para)
+        return argminrecc(optstate,persist, **para)
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
     logger.info('gpmapas reccomender')
     d=len(para['lb'])
@@ -126,7 +127,7 @@ def gpmapasrecc(optstate,**para):
         ax[0].axis([-1.,1.,-1.,1.])
         fig.savefig(os.path.join(os.path.expanduser('~'),'Dropbox/debugoutput','datavis'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
         del(fig)
-    return [i for i in xmin],{'MAPHYP':MAP,'ymin':ymin}
+    return [i for i in xmin],persist,{'MAPHYP':MAP,'ymin':ymin}
 
 gpmapasprior = {
                 'ev':{'s':1e-9,'d':[sp.NaN],'xa':0.},
@@ -144,10 +145,10 @@ gpmapasprior = {
 
 gpasmap = gpmapasrecc,gpmapasprior
 
-def gphinasrecc(optstate,**para):
+def gphinasrecc(optstate,persist,**para):
     if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
-        return argminrecc(optstate, **para)
+        return argminrecc(optstate,persist, **para)
     logger.info('gpmapas reccomender')
     d=len(para['lb'])
 
@@ -207,7 +208,7 @@ def gphinasrecc(optstate,**para):
         del(fig)
 
 
-    return [i for i in xmin],{'ymin':ymin}
+    return [i for i in xmin],persist,{'ymin':ymin}
 
 gphinasprior = {
                 'ev':{'s':1e-9,'d':[sp.NaN],'xa':0.},
@@ -226,11 +227,11 @@ gphinasprior = {
 gpashin = gphinasrecc,gphinasprior
 
 
-def gphinrecc(optstate,**para):
+def gphinrecc(optstate,persist,**para):
     print [para['onlyafter'],len(optstate.y)]
     if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
-        return argminrecc(optstate, **para)
+        return argminrecc(optstate, persist,**para)
     logger.info('gphin reccomender')
     d=len(para['lb'])
 
@@ -253,7 +254,7 @@ def gphinrecc(optstate,**para):
     logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
 
     
-    return [i for i in xmin],{'ymin':ymin}
+    return [i for i in xmin],persist,{'ymin':ymin}
 
 gphinprior = {
                 'ev':{'s':1e-9,'d':[sp.NaN],'xa':0.},
@@ -273,9 +274,11 @@ gphin = gphinrecc,gphinprior
 
 
 
-def adaptiverecc(optstate,**para):
+def adaptiverecc(optstate,persist,**para):
+    if persist==None:
+        persist={'ERCom':[],'probcluster':[],'Rtrue':[],'RCtrue':[],'ER':[],'ERlocal':[],'globRbound':[],'globCbound':[]}
     if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
-        return argminrecc(optstate,**para)
+        return argminrecc(optstate,persist,**para)
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
     logger.info('gpmap reccomender')
     d=len(para['lb'])
@@ -295,6 +298,28 @@ def adaptiverecc(optstate,**para):
         return (a[0,0],0)
     [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
 
+    def spowrap(x):
+        a = G.infer_m(x,[[sp.NaN]])[0,0]
+        #z = obj(x,0.,[sp.NaN])
+        return a
+    res = spm(spowrap, xmin,  method='l-bfgs-b',bounds=[(-1,1),(-1,1)],options={'ftol':1e-10})
+    xmin = res['x']
+    ymin = res['fun']
+
+    def directwrap(xq,y):
+        xq.resize([1,d])
+        m,v = G.infer_diag(xq,[[sp.NaN]])
+        return (-v[0,0],0)
+    [xcmax,cmax,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
+
+    def spowrap(x):
+        m,v = G.infer_diag(x,[[sp.NaN]])
+        #z = obj(x,0.,[sp.NaN])
+        return -v[0,0]
+    res = spm(spowrap, xcmax,  method='l-bfgs-b',bounds=[(-1,1),(-1,1)],options={'ftol':1e-10})
+    xcmax = res['x']
+    cmax = -res['fun']
+    yatcmax = G.infer_m(xcmax,[[sp.NaN]])[0,0]
 
     import ESutils
     W = sp.vstack(ESutils.draw_support(G, para['lb'], para['ub'], para['support'], ESutils.SUPPORT_LAPAPROT, para=para['starts']))
@@ -305,12 +330,6 @@ def adaptiverecc(optstate,**para):
     A = sp.empty([nd,1])
     for i in xrange(nd):
         A[i,0] = -Y[i,2:].dot(R[i,:]-xmin)/(spl.norm(Y[i,2:])*spl.norm(R[i,:]-xmin))
-        #print '__________________\n'
-        #print xmin
-        #print Y[i,2:]
-        #print Y[i,2:].dot(xmin)
-        #print [spl.norm(Y[i,2:]),spl.norm(xmin)]
-        #print A[i,0]
 
     D = sp.zeros([nd,1])
     for i in xrange(nd):
@@ -321,7 +340,7 @@ def adaptiverecc(optstate,**para):
     from gpbo.core import debugoptions
     if debugoutput and debugoptions['support'] and plots:
         print 'plotting support...'
-        fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(30, 20))
+        fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(30, 30))
 
         n = 100
         x_ = sp.linspace(-1, 1, n)
@@ -340,96 +359,12 @@ def adaptiverecc(optstate,**para):
         ax[0,0].axis([-1., 1., -1., 1.])
         ax[1,0].clabel(CS, inline=1, fontsize=10)
 
+        ax[1,0].plot(xcmax[0],xcmax[1],'bo')
         ax[0,0].plot(xmin[0],xmin[1],'ro')
 
         ax[0,1].plot(W[:, 0], W[:, 1], 'bx')
         ax[0,1].plot(R[:, 0], R[:, 1], 'r.')
 
-        """
-        axA = ax[1, 1].twinx()
-        lowD = 1e2
-        for i in xrange(nd):
-            if 0.<D[i,0]<lowD and A[i,0]<0:
-                lowD=D[i,0]
-            axA.plot(D[i,0],A[i,0],'g.')
-        axA.plot([lowD,lowD],[-1,1],'g')
-
-        zerocount = 0
-        ERegret = 0.
-        IRegret = 0.
-        ORegret = 0.
-        r = [0, 0]
-
-        for i in xrange(nd):
-            if D[i,0]==0.:
-                zerocount+=1
-            ax[1,1].plot(D[i,0],Y[i,0],'b.')
-            ax[1, 1].plot(D[i, 0], Y[i, 1], 'r.')
-
-            ERegret+=Y[i,1]-Y[i,0]
-            if D[i,0]<lowD:
-                IRegret+=Y[i,1]-Y[i,0]
-                r[0]+=1
-            else:
-                ORegret+=Y[i,1]-Y[i,0]
-                r[1]+=1
-
-        ERegret/=float(nd)
-        try:
-            IRegret/=float(r[0])
-        except ZeroDivisionError:
-            IRegret=-1
-        try:
-            ORegret /= float(r[1])
-        except ZeroDivisionError:
-            Oregret=-1
-        prob = r[0]/float(nd)
-        ax[1,1].plot([0,D.max()],[ymin,ymin],'r')
-
-
-
-        ax[1,1].set_xscale('log')
-        ax[1, 1].text(ax[1,1].get_xlim()[0], ymin, str(zerocount))
-        #ax[1, 1].text(ax[1, 1].get_xlim()[0]*2., ymin, str(ERegret))
-
-        try:
-            CRegret = para['cheatf'](xmin,**{'s': 0., 'd': [sp.NaN]})[0]-para['cheatymin']
-        except KeyError:
-            CRegret=sp.nan
-
-        msg = 'ExpR full   : {}\n' \
-              'ExpR in loc : {}\n' \
-              'ExpR out loc: {}\n' \
-              'Pmin in loc : {}\n' \
-              'TrueR       : {}'.format(ERegret,IRegret,ORegret,prob,CRegret)
-        l_,u_=ax[1, 1].get_xlim()
-        axA.text(l_+0.02*(u_-l_),-0.98,msg)
-        """
-        #---------------------------------------------------
-        """
-        from sklearn.cluster import MeanShift, estimate_bandwidth
-        bandwidth = estimate_bandwidth(R, quantile=0.2, n_samples=0.25*R.shape[0])
-        ms = MeanShift(bandwidth=bandwidth, bin_seeding=True, cluster_all=False)
-        ms.fit(R)
-        labels = ms.labels_
-        cluster_centers = ms.cluster_centers_
-
-        labels_unique = sp.unique(labels)
-        n_clusters_ = len(labels_unique)
-        if labels_unique[0] == -1:
-            n_clusters_ -= 1
-
-        print("number of estimated clusters : %d" % n_clusters_)
-
-        from itertools import cycle
-        colors = cycle('bgrcmykbgrcmykbgrcmykbgrcmyk')
-        for k, col in zip(range(-1, n_clusters_), colors):
-            my_members = labels == k
-            if k >= 0:
-                ax[0,2].plot(R[my_members, 0], R[my_members, 1], col + '.')
-            else:
-                ax[0,2].plot(R[my_members, 0], R[my_members, 1], '.', color='grey')
-        """
         #---------------------------------------------------
         from sklearn import mixture
         lowest_bic = sp.inf
@@ -523,9 +458,50 @@ def adaptiverecc(optstate,**para):
         Nprob = r[2] / float(r[0])
         try:
             CRegret = para['cheatf'](xmin, **{'s': 0., 'd': [sp.NaN]})[0] - para['cheatymin']
+            def f(x):
+                return para['cheatf'](x, **{'s': 0., 'd': [sp.NaN]})[0]
+            from scipy.optimize import minimize
+            resob = minimize(f,xmin,method='l-bfgs-b',bounds=[(-1,1),(-1,1)])
+            RCtrue = (resob['fun']-para['cheatymin'],resob['nfev'])
+            print 'optstart {} {}\n' \
+                  'optend   {} {}'.format(xmin,ymin,resob['x'],resob['fun'])
         except KeyError:
             CRegret = sp.nan
+            RCtrue = (sp.nan,0,)
+        CommitRegret=(1-Iprob)*ORegret
 
+        S_ = (ymin-yatcmax) / sp.sqrt(cmax)
+        c_ = sps.norm.cdf(S_)
+        p_ = sps.norm.pdf(S_)
+        Rbound = (ymin-yatcmax)*c_ + sp.sqrt(cmax) * p_
+        #print "{} {} {} {} {}".format(S_,c_,p_,cmax,yatcmax)
+        persist['RCtrue'].append(RCtrue)
+        persist['ER'].append(ERegret)
+        persist['ERCom'].append(CommitRegret)
+        persist['probcluster'].append(Iprob)
+        persist['Rtrue'].append(CRegret)
+        persist['ERlocal'].append(IRegret)
+        persist['globRbound'].append(Rbound)
+        persist['globCbound'].append(1.-c_)
+
+        ax[2,0].semilogy(persist['ER'],'b')
+        ax[2, 1].semilogy(persist['Rtrue'],'r')
+        for i in xrange(len(persist['Rtrue'])):
+            ax[2,1].plot([i,i+persist['RCtrue'][i][1]],[persist['Rtrue'][i],persist['RCtrue'][i][0]],'g')
+
+        ax[2, 0].semilogy(persist['ERCom'], 'k')
+        ax[2,0].semilogy(persist['ERlocal'],'pink')
+        #print 'XXXXXXXXX{}'.format(persist['globRbound'])
+        ax[2,0].semilogy(persist['globRbound'],'m')
+
+        ax[2,2].semilogy([1-i for i in persist['globCbound']],'m')
+        ax[2,2].semilogy([1-i for i in persist['probcluster']])
+
+        ax[2,2].set_ylabel('probcluster')
+
+        l=len(persist['Rtrue'])
+        ax[2,0].plot([l-1,l+4*(xmin.size+1)-1],[ERegret,ERegret*(0.01/(xmin.size+1))**4],'grey')
+        ax[2, 0].plot([l-1, l-1 + persist['RCtrue'][l-1][1]], [persist['Rtrue'][l-1], persist['RCtrue'][l-1][0]], 'g')
 
         msg = 'TrueR        : {}\n' \
               'ExpR full    : {}\n\n' \
@@ -533,14 +509,16 @@ def adaptiverecc(optstate,**para):
               'ExpR in C    : {}\n' \
               'ExpR notin C : {}\n\n' \
               'Prob noCV inC: {}\n' \
-              'ExpR noCV inC: {}\n' \
-              ''.format(CRegret, ERegret, Iprob, IRegret, ORegret, Nprob, NRegret)
+              'ExpR noCV inC: {}\n\n' \
+              'ComR         : {}\n' \
+              ''.format(CRegret, ERegret, Iprob, IRegret, ORegret, Nprob, NRegret,CommitRegret)
         l_x, u_x = ax[1, 1].get_xlim()
         l_y, u_y = ax[1, 1].get_ylim()
         ax[1,1].text(l_x + 0.02 * (u_x - l_x), l_y + 0.02 * (u_y - l_y), msg,fontdict={'size':18})
+        # ---------------------------------------------------
 
         from gpbo.core import debugpath
-        fig.savefig(os.path.join(debugpath, 'support' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+        fig.savefig(os.path.join(debugpath, 'lotsofplots' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
 
         del (fig)
-    return [i for i in xmin],{'MAPHYP':MAP,'ymin':ymin}
+    return [i for i in xmin],persist,{'MAPHYP':MAP,'ymin':ymin}

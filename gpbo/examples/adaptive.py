@@ -28,16 +28,32 @@ class conf():
         """
 
     def __init__(self, f, D, n, s, path, fname):
-        self.aqfn = gpbo.core.acquisitions.EIMAPaq
+        self.aqfn = gpbo.core.acquisitions.PESfsaq
+        #self.aqpara = {
+        #    'ev': {'s': s, 'd': [sp.NaN]},
+        #    'lb': [-1.] * D,
+        #    'ub': [1.] * D,
+        #    'nrandinit': 12,
+        #    'mprior': sp.array([1.] + [0.] * D),
+        #    'sprior': sp.array([1.] * (D + 1)),
+        #    'kindex': GPdc.MAT52,
+        #    'volper': 1e-6
+        #}
         self.aqpara = {
             'ev': {'s': s, 'd': [sp.NaN]},
             'lb': [-1.] * D,
             'ub': [1.] * D,
             'nrandinit': 12,
+            'volper': 1e-6,
             'mprior': sp.array([1.] + [0.] * D),
             'sprior': sp.array([1.] * (D + 1)),
             'kindex': GPdc.MAT52,
-            'volper': 1e-6
+            'DH_SAMPLES': 16,
+            'DM_SAMPLES': 16,
+            'DM_SUPPORT': 1000,
+            'SUPPORT_MODE': [gpbo.core.ESutils.SUPPORT_LAPAPROT],
+            'DM_SLICELCBPARA': 1.,
+            'noS': False,
         }
 
         self.stoppara = {'nmax': n}
@@ -55,8 +71,8 @@ class conf():
             'onlyafter': self.aqpara['nrandinit'],
             'check': True,
             'everyn': 1,
-            'support':1000,
-            'draws':150,
+            'support':5000,
+            'draws':400,
             'starts':15,
             'cheatymin':ymin,
             'cheatf':f
@@ -68,7 +84,7 @@ class conf():
         self.fname = fname
         return
 
-C = conf(f,D,40,s,'results','adaptive.csv')
+C = conf(f,D,80,s,'results','adaptive.csv')
 
 out = gpbo.search(C)
 

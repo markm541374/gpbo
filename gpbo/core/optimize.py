@@ -23,7 +23,6 @@ class optstate:
         self.Cfull=0.
         self.aqtime=[]
         self.aux=None
-
         return
     
     def update(self,x,ev,y,c,taq):
@@ -63,6 +62,7 @@ class optimizer:
     def setrecc(self,reccpara,reccfn):
         self.reccpara = reccpara
         self.reccfn = reccfn
+        self.reccpersist = None
         return
     
     def setstopcon(self,stoppara,stopfn):
@@ -95,7 +95,7 @@ class optimizer:
             t2 = time.time()
             self.state.update(x,ev,y,c,t1-t0)
             logger.info("{} : {}     evaltime: {}\nreccomend:".format(y,c,t2-t1))
-            rx,reaux = self.reccfn(self.state,**self.reccpara)
+            rx,self.reccpersist,reaux = self.reccfn(self.state,self.reccpersist,**self.reccpara)
             t3 = time.time()
             
             if self.reccpara['check']:

@@ -76,7 +76,7 @@ def genmat52ojf(d,lb,ub,ls=0.3):
         z = G.infer_m(x,[[sp.NaN]])[0,0]
         #z = obj(x,0.,[sp.NaN])
         return z
-    y = spm(spowrap, xmin,  method='nelder-mead',options={'fatol':1e-12})
+    y = spm(spowrap, xmin,  method='l-bfgs-b',bounds=[(-1,1),(-1,1)],options={'ftol':1e-15})
     xmin = y.x
     ymin = spowrap(y.x)
     logger.info('generated function xmin {} ymin {} globopt:{} locopt:{}'.format(xmin, ymin, ierror, y.status))
@@ -111,7 +111,7 @@ def genbiasedmat52ojf(d,lb,ub,sls):
     def spowrap(x):
         z = G.infer_m(sp.hstack(sp.array(x) + [0.]), [[sp.NaN]])[0, 0]
         return z
-    y = spm(spowrap, xmin, method='nelder-mead',options={'fatol':1e-12})
+    y = spm(spowrap, xmin, method='l-bfgs-b',bounds=[(-1,1),(-1,1)],options={'ftol':1e-15})
     xmin = y.x
     ymin = spowrap(y.x)
     #print [xmin,ymin]
