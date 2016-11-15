@@ -276,7 +276,7 @@ gphin = gphinrecc,gphinprior
 
 def adaptiverecc(optstate,persist,**para):
     if persist==None:
-        persist={'ERCom':[],'probcluster':[],'Rtrue':[],'RCtrue':[],'ER':[],'ERlocal':[],'globRbound':[],'globCbound':[]}
+        persist={'ERCom':[],'probcluster':[],'Rtrue':[],'RCtrue':[],'ER':[],'ERlocal':[],'globRbound':[],'globCbound':[],'LT':[],'globRupper':[]}
     if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
         return argminrecc(optstate,persist,**para)
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
@@ -327,9 +327,9 @@ def adaptiverecc(optstate,persist,**para):
 
     R,Y = ESutils.draw_min_xypairgrad(G, W, nd, xmin)
 
-    A = sp.empty([nd,1])
-    for i in xrange(nd):
-        A[i,0] = -Y[i,2:].dot(R[i,:]-xmin)/(spl.norm(Y[i,2:])*spl.norm(R[i,:]-xmin))
+    #A = sp.empty([nd,1])
+    #for i in xrange(nd):
+    #    A[i,0] = -Y[i,2:].dot(R[i,:]-xmin)/(spl.norm(Y[i,2:])*spl.norm(R[i,:]-xmin))
 
     D = sp.zeros([nd,1])
     for i in xrange(nd):
@@ -340,7 +340,7 @@ def adaptiverecc(optstate,persist,**para):
     from gpbo.core import debugoptions
     if debugoutput and debugoptions['support'] and plots:
         print 'plotting support...'
-        fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(30, 30))
+        fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(40, 40))
 
         n = 100
         x_ = sp.linspace(-1, 1, n)
@@ -419,23 +419,28 @@ def adaptiverecc(optstate,persist,**para):
         ERegret = 0. #full expected
         IRegret = 0. #within the local cluster
         ORegret = 0. #outside the cluster
-        NRegret = 0. #within the cluster and not converging
+
+        StoConv=[]
+        #NRegret = 0. #within the cluster and not converging
         r = [0, 0, 0]
         for i in xrange(nd):
             if Y_[i]==local:
-                if A[i,0]>0:
-                    ax[1, 2].plot(D[i, 0], Y[i, 1]-Y[i, 0], 'r.')
-                else:
-                    ax[1, 2].plot(D[i, 0], Y[i, 1] - Y[i, 0], 'rx')
-                    NRegret += Y[i, 1] - Y[i, 0]
-                    r[2]+=1
+                #if A[i,0]>0:
+                #    ax[1, 2].plot(D[i, 0], Y[i, 1]-Y[i, 0], 'r.')
+                #else:
+                #    ax[1, 2].plot(D[i, 0], Y[i, 1] - Y[i, 0], 'rx')
+                #    NRegret += Y[i, 1] - Y[i, 0]
+                #    r[2]+=1
+                ax[1, 2].plot(D[i, 0], Y[i, 1] - Y[i, 0], 'r.')
                 IRegret+=Y[i, 1]-Y[i, 0]
                 r[0]+=1
+
             else:
-                if A[i,0]>0:
-                    ax[1, 2].plot(D[i, 0], Y[i, 1]-Y[i, 0], 'b.')
-                else:
-                    ax[1, 2].plot(D[i, 0], Y[i, 1] - Y[i, 0], 'bx')
+                #if A[i,0]>0:
+                #    ax[1, 2].plot(D[i, 0], Y[i, 1]-Y[i, 0], 'b.')
+                #else:
+                #    ax[1, 2].plot(D[i, 0], Y[i, 1] - Y[i, 0], 'bx')
+                ax[1, 2].plot(D[i, 0], Y[i, 1] - Y[i, 0], 'b.')
                 ORegret += Y[i, 1] - Y[i, 0]
                 r[1]+=1
             ERegret += Y[i, 1] - Y[i, 0]
@@ -450,19 +455,23 @@ def adaptiverecc(optstate,persist,**para):
         except ZeroDivisionError:
             ORegret = 0
 
-        try:
-            NRegret /= float(r[2])
-        except ZeroDivisionError:
-            NRegret = 0
+        #try:
+        #    NRegret /= float(r[2])
+        #except ZeroDivisionError:
+        #    NRegret = 0
         Iprob = r[0] / float(nd)
-        Nprob = r[2] / float(r[0])
+        #Nprob = r[2] / float(r[0])
         try:
             CRegret = para['cheatf'](xmin, **{'s': 0., 'd': [sp.NaN]})[0] - para['cheatymin']
+            LocalTrace=[CRegret]
             def f(x):
-                return para['cheatf'](x, **{'s': 0., 'd': [sp.NaN]})[0]
+                y=para['cheatf'](x, **{'s': 0., 'd': [sp.NaN]})[0]
+                LocalTrace.append(y-para['cheatymin'])
+                return y
             from scipy.optimize import minimize
-            resob = minimize(f,xmin,method='l-bfgs-b',bounds=[(-1,1),(-1,1)])
+            resob = minimize(f,xmin,method='l-bfgs-b',bounds=[(-1,1),(-1,1)],options={'ftol':1e-10})
             RCtrue = (resob['fun']-para['cheatymin'],resob['nfev'])
+
             print 'optstart {} {}\n' \
                   'optend   {} {}'.format(xmin,ymin,resob['x'],resob['fun'])
         except KeyError:
@@ -474,6 +483,18 @@ def adaptiverecc(optstate,persist,**para):
         c_ = sps.norm.cdf(S_)
         p_ = sps.norm.pdf(S_)
         Rbound = (ymin-yatcmax)*c_ + sp.sqrt(cmax) * p_
+        approxcommitregret = max(CommitRegret, Rbound)
+
+        print 'XXXXXXXX\n' \
+              'cdf upto ymin      : {}\n' \
+              'nsupp points       : {}\n' \
+              'ER                 : {}\n' \
+              'ER | lessthan      : {}\n' \
+              'p allgreaterthan   : {}\n' \
+              'p anylessthan      : {}\n' \
+              'ER after           : {}\n' \
+              ''.format(c_,para['support'],Rbound,Rbound/(c_),(1-c_)**float(para['support']),1-(1-c_)**float(para['support']),(1.-(1-c_)**float(para['support']))*(Rbound/(c_)))
+        Rupper = (1.-(1-c_)**float(para['support']))*(Rbound/(c_))
         #print "{} {} {} {} {}".format(S_,c_,p_,cmax,yatcmax)
         persist['RCtrue'].append(RCtrue)
         persist['ER'].append(ERegret)
@@ -482,36 +503,48 @@ def adaptiverecc(optstate,persist,**para):
         persist['Rtrue'].append(CRegret)
         persist['ERlocal'].append(IRegret)
         persist['globRbound'].append(Rbound)
+        persist['globRupper'].append(Rupper)
         persist['globCbound'].append(1.-c_)
-
-        ax[2,0].semilogy(persist['ER'],'b')
-        ax[2, 1].semilogy(persist['Rtrue'],'r')
+        persist['LT'].append(LocalTrace)
+        ax[2,0].semilogy(persist['ER'],'k')
+        ax[2, 1].semilogy(persist['ER'], 'k')
+        ax[2, 1].semilogy(persist['Rtrue'],'g')
         for i in xrange(len(persist['Rtrue'])):
-            ax[2,1].plot([i,i+persist['RCtrue'][i][1]],[persist['Rtrue'][i],persist['RCtrue'][i][0]],'g')
-
-        ax[2, 0].semilogy(persist['ERCom'], 'k')
-        ax[2,0].semilogy(persist['ERlocal'],'pink')
+            #ax[2,1].plot([i,i+persist['RCtrue'][i][1]],[persist['Rtrue'][i],persist['RCtrue'][i][0]],'g')
+            ax[2, 1].plot([i,len(persist['LT'][i])+i], [persist['LT'][i][0],persist['LT'][i][-1]], 'r')
+        ax[2, 0].semilogy(persist['globRupper'], 'orange')
+        ax[2, 0].semilogy(persist['ERCom'], 'pink')
+        ax[2,0].semilogy(persist['ERlocal'],'b')
         #print 'XXXXXXXXX{}'.format(persist['globRbound'])
-        ax[2,0].semilogy(persist['globRbound'],'m')
-
+        ax[2,0].semilogy(persist['globRbound'],'pink')
+        ax[2, 0].semilogy([max(i, j) for i, j in zip(persist['ERCom'], persist['globRbound'])], 'm')
         ax[2,2].semilogy([1-i for i in persist['globCbound']],'m')
         ax[2,2].semilogy([1-i for i in persist['probcluster']])
 
         ax[2,2].set_ylabel('probcluster')
 
         l=len(persist['Rtrue'])
-        ax[2,0].plot([l-1,l+4*(xmin.size+1)-1],[ERegret,ERegret*(0.01/(xmin.size+1))**4],'grey')
-        ax[2, 0].plot([l-1, l-1 + persist['RCtrue'][l-1][1]], [persist['Rtrue'][l-1], persist['RCtrue'][l-1][0]], 'g')
+        mguess = 0.01 / (xmin.size + 1)
+        mx=0
+        for i in xrange(nd):
+            if Y_[i] == local:
+                stepsahead=(-sp.log(Y[i, 1] - Y[i, 0]) - 10 * sp.log(10)) / sp.log(mguess)
+                if mx<stepsahead:
+                    mx=stepsahead
 
+
+                ax[2,0].plot([l-1,l+stepsahead-1],[ERegret,approxcommitregret],'grey')
+        ax[2, 0].plot([l - 1, l + mx - 1], [approxcommitregret, approxcommitregret], 'grey')
+                #ax[2, 0].plot([l + stepsahead - 1], [approxcommitregret], 'ko')
+        #ax[2, 0].plot([l-1, l-1 + persist['RCtrue'][l-1][1]], [persist['Rtrue'][l-1], persist['RCtrue'][l-1][0]], 'g')
+        ax[2, 0].plot(range(l-1, len(LocalTrace)+l-1), LocalTrace, 'g')
         msg = 'TrueR        : {}\n' \
               'ExpR full    : {}\n\n' \
               'Prob in C    : {}\n' \
               'ExpR in C    : {}\n' \
               'ExpR notin C : {}\n\n' \
-              'Prob noCV inC: {}\n' \
-              'ExpR noCV inC: {}\n\n' \
               'ComR         : {}\n' \
-              ''.format(CRegret, ERegret, Iprob, IRegret, ORegret, Nprob, NRegret,CommitRegret)
+              ''.format(CRegret, ERegret, Iprob, IRegret, ORegret, CommitRegret)
         l_x, u_x = ax[1, 1].get_xlim()
         l_y, u_y = ax[1, 1].get_ylim()
         ax[1,1].text(l_x + 0.02 * (u_x - l_x), l_y + 0.02 * (u_y - l_y), msg,fontdict={'size':18})
