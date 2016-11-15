@@ -85,7 +85,7 @@ class conf():
         self.fname = fname
         return
 
-C = conf(f,D,80,s,'results','adaptive.csv')
+C = conf(f,D,100,s,'results','adaptive.csv')
 
 out = gpbo.search(C)
 
