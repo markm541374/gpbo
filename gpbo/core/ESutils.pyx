@@ -172,6 +172,8 @@ def draw_support(g, lb, ub, n, method, para=1.):
 
 
             fig.savefig(os.path.join(debugpath,'drawlapapr'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+            fig.clf()
+            plt.close(fig)
             del(fig)
             print 'done'
     elif method==SUPPORT_LAPAPROT:
@@ -331,6 +333,8 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 #ax[0].plot([x[0],x[0]+(svd[j][2][0,0])*0.1],[x[1],x[1]+(svd[j][2][1,0])*0.1],'g')
                 #ax[0].plot([x[0],x[0]+(svd[j][2][0,1])*0.1],[x[1],x[1]+(svd[j][2][1,1])*0.1],'g')
             fig.savefig(os.path.join(debugpath,'drawlapaprot'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+            fig.clf()
+            plt.close(fig)
             del(fig)
             print 'done'
 
@@ -548,6 +552,8 @@ def plot2dFtofile(f,fname,xmin=[False],atxa=0.):
     if any(xmin):
         ax.plot(xmin[0], xmin[1], 'ro')
     fig.savefig(fname)
+    fig.clf()
+    plt.close(fig)
     del (fig)
     return
 

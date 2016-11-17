@@ -52,6 +52,8 @@ def drawmins(G,n,lb,ub,SUPPORT=300,mode = [ESutils.SUPPORT_SLICELCB],SLICELCB_PA
         ax.plot(R[:,0],R[:,1],'r.')
         from gpbo.core import debugpath
         fig.savefig(os.path.join(debugpath,'support'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+        fig.clf()
+        plt.close(fig)
         del(fig)
     #plt.show()
     return R
@@ -414,5 +416,8 @@ class PES_inplane:
             print xmin
             
             f.savefig('../figcache/{0}.png'.format(time.time()))
+            f.clf()
+            plt.close(f)
+            del(f)
             #plt.show()
         return [xmin,ymin,ierror]

@@ -1,3 +1,6 @@
+#import matplotlib
+#matplotlib.use('Agg')
+
 import gpbo
 from gpbo.core import objectives as objectives
 from gpbo.core import GPdc as GPdc
@@ -6,7 +9,7 @@ import scipy as sp
 import time
 
 gpbo.core.debugoutput=True
-gpbo.core.debugoptions={'datavis':True,'drawlap':False,'cost1d':False,'ctaq':False,'support':True}
+gpbo.core.debugoptions={'datavis':True,'drawlap':False,'cost1d':False,'ctaq':False,'support':False,'adaptive':True}
 
 D=2
 n=50
@@ -39,24 +42,25 @@ class conf():
             'kindex': GPdc.MAT52,
             'volper': 1e-6
         }
-        #self.aqfn = gpbo.core.acquisitions.PESfsaq
-        #self.aqpara = {
-        #    'ev': {'s': s, 'd': [sp.NaN]},
-        #    'lb': [-1.] * D,
-        #    'ub': [1.] * D,
-        #    'nrandinit': 12,
-        #    'volper': 1e-6,
-        #    'mprior': sp.array([1.] + [0.] * D),
-        #    'sprior': sp.array([1.] * (D + 1)),
-         #   'kindex': GPdc.MAT52,
-         #   'DH_SAMPLES': 16,
-         #   'DM_SAMPLES': 16,
-         ##   'DM_SUPPORT': 1000,
-         #   'SUPPORT_MODE': [gpbo.core.ESutils.SUPPORT_LAPAPROT],
-         #   'DM_SLICELCBPARA': 1.,
-         #   'noS': False,
-        #}
-
+        """
+        self.aqfn = gpbo.core.acquisitions.PESfsaq
+        self.aqpara = {
+            'ev': {'s': s, 'd': [sp.NaN]},
+            'lb': [-1.] * D,
+            'ub': [1.] * D,
+            'nrandinit': 12,
+            'volper': 1e-6,
+            'mprior': sp.array([1.] + [0.] * D),
+            'sprior': sp.array([1.] * (D + 1)),
+            'kindex': GPdc.MAT52,
+            'DH_SAMPLES': 16,
+            'DM_SAMPLES': 16,
+            'DM_SUPPORT': 2000,
+            'SUPPORT_MODE': [gpbo.core.ESutils.SUPPORT_LAPAPROT],
+            'DM_SLICELCBPARA': 16.,
+            'noS': False,
+        }
+        """
         self.stoppara = {'nmax': n}
         self.stopfn = gpbo.core.optimize.nstopfn
 
@@ -72,9 +76,9 @@ class conf():
             'onlyafter': self.aqpara['nrandinit'],
             'check': True,
             'everyn': 1,
-            'support':5000,
-            'draws':400,
-            'starts':15,
+            'support':6000,
+            'draws':2000,
+            'starts':20,
             'cheatymin':ymin,
             'cheatf':f
         }

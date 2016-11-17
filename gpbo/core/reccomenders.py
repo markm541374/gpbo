@@ -126,6 +126,8 @@ def gpmapasrecc(optstate,persist,**para):
             
         ax[0].axis([-1.,1.,-1.,1.])
         fig.savefig(os.path.join(os.path.expanduser('~'),'Dropbox/debugoutput','datavis'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+        fig.clf()
+        plt.close(fig)
         del(fig)
     return [i for i in xmin],persist,{'MAPHYP':MAP,'ymin':ymin}
 
@@ -205,6 +207,8 @@ def gphinasrecc(optstate,persist,**para):
         ax[0].axis([-1.,1.,-1.,1.])
         ax[1].plot(xmin[0],xmin[1],'ro')
         fig.savefig(os.path.join(debugpath, 'datavis' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+        fig.clf()
+        plt.close(fig)
         del(fig)
 
 
@@ -338,11 +342,11 @@ def adaptiverecc(optstate,persist,**para):
         D[i,0]=sp.sqrt(D[i,0])
     from gpbo.core import debugoutput
     from gpbo.core import debugoptions
-    if debugoutput and debugoptions['support'] and plots:
+    if debugoutput and debugoptions['adaptive'] and plots:
         print 'plotting support...'
         fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(40, 40))
 
-        n = 100
+        n = 60
         x_ = sp.linspace(-1, 1, n)
         y_ = sp.linspace(-1, 1, n)
         z_ = sp.empty([n, n])
@@ -485,15 +489,15 @@ def adaptiverecc(optstate,persist,**para):
         Rbound = (ymin-yatcmax)*c_ + sp.sqrt(cmax) * p_
         approxcommitregret = max(CommitRegret, Rbound)
 
-        print 'XXXXXXXX\n' \
-              'cdf upto ymin      : {}\n' \
-              'nsupp points       : {}\n' \
-              'ER                 : {}\n' \
-              'ER | lessthan      : {}\n' \
-              'p allgreaterthan   : {}\n' \
-              'p anylessthan      : {}\n' \
-              'ER after           : {}\n' \
-              ''.format(c_,para['support'],Rbound,Rbound/(c_),(1-c_)**float(para['support']),1-(1-c_)**float(para['support']),(1.-(1-c_)**float(para['support']))*(Rbound/(c_)))
+        uppermsg = 'XXXXXXXX\n' \
+                   'cdf upto ymin      : {}\n' \
+                   'nsupp points       : {}\n' \
+                   'ER                 : {}\n' \
+                   'ER | lessthan      : {}\n' \
+                   'p allgreaterthan   : {}\n' \
+                   'p anylessthan      : {}\n' \
+                   'ER after           : {}\n' \
+                   ''.format(c_,para['support'],Rbound,Rbound/(c_),(1-c_)**float(para['support']),1-(1-c_)**float(para['support']),(1.-(1-c_)**float(para['support']))*(Rbound/(c_)))
         Rupper = (1.-(1-c_)**float(para['support']))*(Rbound/(c_))
         #print "{} {} {} {} {}".format(S_,c_,p_,cmax,yatcmax)
         persist['RCtrue'].append(RCtrue)
@@ -547,11 +551,16 @@ def adaptiverecc(optstate,persist,**para):
               ''.format(CRegret, ERegret, Iprob, IRegret, ORegret, CommitRegret)
         l_x, u_x = ax[1, 1].get_xlim()
         l_y, u_y = ax[1, 1].get_ylim()
-        ax[1,1].text(l_x + 0.02 * (u_x - l_x), l_y + 0.02 * (u_y - l_y), msg,fontdict={'size':18})
+        ax[1,1].text(l_x + 0.02 * (u_x - l_x), l_y + 0.02 * (u_y - l_y), uppermsg+'\n----\n'+msg,fontdict={'size':18})
         # ---------------------------------------------------
 
         from gpbo.core import debugpath
         fig.savefig(os.path.join(debugpath, 'lotsofplots' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
-
+        fig.clf()
+        plt.close(fig)
         del (fig)
+
+        print 'endstep'
+
+
     return [i for i in xmin],persist,{'MAPHYP':MAP,'ymin':ymin}
