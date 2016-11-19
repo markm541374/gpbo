@@ -232,16 +232,20 @@ class GPcore:
         ns=X_i.shape[0]
         D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.empty([self.size,ns])
+
         libGP.infer_EI(self.s, cint(self.size),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D), R.ctypes.data_as(ctpd))
         return R
     
-    def infer_EI_post(self,X_i,D_i):
+    def infer_EI_post(self,X_i,D_i,wrt=False):
         [m,v] = self.infer_diag_post(X_i,D_i)
-        cdef int ns=X_i.shape[0]
+        #print m,v
+        cdef int ns=len(D_i)
         R=sp.empty([1,ns])
         cdef int i
+        if wrt:
+            wrt=sp.amin(self.Y_s)
         for i in range(ns):
-            R[0,i] = EI(sp.amin(self.Y_s),m[0,i],v[0,i])
+            R[0,i] = EI(wrt,m[0,i],v[0,i])
         
         return R
     

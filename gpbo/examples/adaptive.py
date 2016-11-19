@@ -1,5 +1,5 @@
-#import matplotlib
-#matplotlib.use('Agg')
+import matplotlib
+matplotlib.use('Agg')
 
 import gpbo
 from gpbo.core import objectives as objectives
@@ -76,8 +76,8 @@ class conf():
             'onlyafter': self.aqpara['nrandinit'],
             'check': True,
             'everyn': 1,
-            'support':6000,
-            'draws':2000,
+            'support':5000,
+            'draws':40000,
             'starts':20,
             'cheatymin':ymin,
             'cheatf':f
