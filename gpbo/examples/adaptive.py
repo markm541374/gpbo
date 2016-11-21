@@ -76,8 +76,8 @@ class conf():
             'onlyafter': self.aqpara['nrandinit'],
             'check': True,
             'everyn': 1,
-            'support':5000,
-            'draws':40000,
+            'support':2000,
+            'draws':4000,
             'starts':20,
             'cheatymin':ymin,
             'cheatf':f

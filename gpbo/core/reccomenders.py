@@ -312,14 +312,14 @@ def adaptiverecc(optstate,persist,**para):
 
     def directwrap(xq,y):
         xq.resize([1,d])
-        m,v = G.infer_diag(xq,[[sp.NaN]])
-        return (-v[0,0],0)
+        e = G.infer_EI_post(xq,[[sp.NaN]],wrt=ymin)
+        return (-e[0,0],0)
     [xcmax,cmax,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
 
     def spowrap(x):
-        m,v = G.infer_diag(x,[[sp.NaN]])
+        e = G.infer_EI_post(x,[[sp.NaN]])
         #z = obj(x,0.,[sp.NaN])
-        return -v[0,0]
+        return -e[0,0]
     res = spm(spowrap, xcmax,  method='l-bfgs-b',bounds=[(-1,1),(-1,1)],options={'ftol':1e-10})
     xcmax = res['x']
     cmax = -res['fun']
@@ -331,9 +331,7 @@ def adaptiverecc(optstate,persist,**para):
 
     R,Y = ESutils.draw_min_xypairgrad(G, W, nd, xmin)
 
-    import pickle
-    obj=[R,xmin]
-    pickle.dump(obj,open('dbout/{}.p'.format(optstate.n),'wb'))
+
     ER = G.infer_EI_post(W,[[sp.NaN]]*W.shape[0],wrt=ymin)
     #A = sp.empty([nd,1])
     #for i in xrange(nd):
@@ -407,7 +405,12 @@ def adaptiverecc(optstate,persist,**para):
                 D_=dist
 
         locals = [local]
-        closestcov = clf.covariances_[local]
+        try:
+            closestcov = clf.covariances_[local]
+        except:
+            print clf.means_
+            print clf.covariances_
+            print local
         closestmean = clf.means_[local]
         for i, (mean, cov) in enumerate(zip(clf.means_, clf.covariances_)):
             if typ == 'spherical':
@@ -416,7 +419,6 @@ def adaptiverecc(optstate,persist,**para):
                 cov = sp.diag(cov)
             else:
                 pass
-            print cov
             if (mean - closestmean).max() < sp.sqrt(cov.max()) and (mean - closestmean).max()<sp.sqrt(closestcov.max()):
                 if closestcov.max() < 1.5 * cov.max() and closestcov.max() > 0.5 * cov.max():
                         locals.append(i)
