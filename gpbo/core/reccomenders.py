@@ -381,7 +381,7 @@ def adaptiverecc(optstate,persist,**para):
         lowest_bic = sp.inf
         bic = []
         n_components_range = range(1, 7)
-        cv_types = ['spherical', 'tied', 'diag', 'full']
+        cv_types = ['spherical', 'diag', 'full']
         for cv_type in cv_types:
             for n_components in n_components_range:
                 # Fit a Gaussian mixture with EM
@@ -405,17 +405,13 @@ def adaptiverecc(optstate,persist,**para):
                 D_=dist
 
         locals = [local]
-        try:
-            closestcov = clf.covariances_[local]
-        except:
-            print clf.means_
-            print clf.covariances_
-            print local
+        closestcov = clf.covariances_[local]
+
         closestmean = clf.means_[local]
         for i, (mean, cov) in enumerate(zip(clf.means_, clf.covariances_)):
             if typ == 'spherical':
                 cov = sp.diag([cov] * R.shape[1])
-            elif typ == 'tied' or typ == 'diag':
+            elif typ == 'diag':
                 cov = sp.diag(cov)
             else:
                 pass
