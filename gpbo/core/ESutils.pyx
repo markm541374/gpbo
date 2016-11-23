@@ -438,7 +438,7 @@ def draw_min_xypairgrad(g,support,n,x):
     amins = [len(list(group)) for key, group in groupby(sorted(args))]
     print "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(m,len(amins),100.*max(amins)/float(n))
     #print R,Y
-    return R,Y
+    return R,Y,args
 
 #fake gp class that 9looks like a d-1 gp becuase an extra vaue is added before callind
 class gpfake():

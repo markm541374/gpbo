@@ -31,58 +31,71 @@ class conf():
         """
 
     def __init__(self, f, D, n, s, path, fname):
-        self.aqfn = gpbo.core.acquisitions.EIMAPaq
-        self.aqpara = {
+        aq0 = gpbo.core.acquisitions.EIMAPaq
+        aq0para = {
             'ev': {'s': s, 'd': [sp.NaN]},
             'lb': [-1.] * D,
             'ub': [1.] * D,
-            'nrandinit': 12,
+            'nrandinit': 10,
             'mprior': sp.array([1.] + [0.] * D),
             'sprior': sp.array([1.] * (D + 1)),
             'kindex': GPdc.MAT52,
             'volper': 1e-6
         }
-        """
-        self.aqfn = gpbo.core.acquisitions.PESfsaq
-        self.aqpara = {
+
+        aq1 = gpbo.core.acquisitions.bruteaq
+        aq1para = {
             'ev': {'s': s, 'd': [sp.NaN]},
             'lb': [-1.] * D,
             'ub': [1.] * D,
-            'nrandinit': 12,
-            'volper': 1e-6,
-            'mprior': sp.array([1.] + [0.] * D),
-            'sprior': sp.array([1.] * (D + 1)),
-            'kindex': GPdc.MAT52,
-            'DH_SAMPLES': 16,
-            'DM_SAMPLES': 16,
-            'DM_SUPPORT': 2000,
-            'SUPPORT_MODE': [gpbo.core.ESutils.SUPPORT_LAPAPROT],
-            'DM_SLICELCBPARA': 16.,
-            'noS': False,
         }
-        """
+
+        choosepara = {
+            'ev': aq0para['ev'],
+            'lb': aq0para['lb'],
+            'ub': aq0para['ub'],
+            'mprior': aq0para['mprior'],
+            'sprior': aq0para['sprior'],
+            'kindex': aq0para['kindex'],
+            'nhyp' : 12,
+            'maxf': 20000,
+            'onlyafter': aq0para['nrandinit'],
+            'check': True,
+            'everyn': 1,
+            'support': 1500,
+            'draws': 8000,
+            'starts': 20,
+            'cheatymin': ymin,
+            'cheatf': f
+        }
+        self.aqfn = gpbo.core.acquisitions.choiceaq
+        self.aqpara = {
+            'aqoptions': [[aq0, aq0para], [aq1, aq1para]],
+            'chooser': gpbo.core.choosers.gpcommitment,
+            'choosepara': choosepara,
+            'ev': aq0para['ev'],
+
+        }
+
+
         self.stoppara = {'nmax': n}
         self.stopfn = gpbo.core.optimize.nstopfn
 
-        self.reccfn = gpbo.core.reccomenders.adaptiverecc
+
+        self.reccfn = gpbo.core.reccomenders.gpmaprecc
         self.reccpara = {
-            'ev': self.aqpara['ev'],
-            'lb': self.aqpara['lb'],
-            'ub': self.aqpara['ub'],
-            'mprior': self.aqpara['mprior'],
-            'sprior': self.aqpara['sprior'],
-            'kindex': self.aqpara['kindex'],
+            'ev': aq0para['ev'],
+            'lb': aq0para['lb'],
+            'ub': aq0para['ub'],
+            'mprior': aq0para['mprior'],
+            'sprior': aq0para['sprior'],
+            'kindex': aq0para['kindex'],
             'volper': 1e-6,
-            'onlyafter': self.aqpara['nrandinit'],
+            'onlyafter': aq0para['nrandinit'],
             'check': True,
-            'everyn': 1,
-            'support':2000,
-            'draws':4000,
-            'starts':20,
-            'cheatymin':ymin,
-            'cheatf':f
+            'everyn': 1
         }
-        self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
+        self.ojfchar = {'dx': len(aq0para['lb']), 'dev': len(aq0para['ev'])}
         self.ojf = f
 
         self.path = path

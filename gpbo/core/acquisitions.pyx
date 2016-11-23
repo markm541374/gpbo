@@ -227,3 +227,14 @@ def PESbsaq(optstate,persist,**para):
     logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean, lhstd, lhmin, lhmax))
 
     return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
+
+def choiceaq(optstate,persist,**para):
+    para = copy.deepcopy(para)
+    if persist==None:
+        persist = [None,[None]*len(para['aqoptions'])]
+    aqn,choosepersist = para['chooser'](optstate,persist[0],**para['choosepara'])
+    persist[0]=choosepersist
+    logger.debug('choose to use aquisition {}'.format(para['aqoptions'][aqn][0].__name__))
+    x,ev,pers,aux = para['aqoptions'][aqn][0](optstate,persist[1][aqn],**para['aqoptions'][aqn][1])
+    persist[1][aqn]=pers
+    return x,ev,persist,aux

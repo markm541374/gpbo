@@ -835,6 +835,16 @@ static CYTHON_INLINE void __Pyx_ReraiseException(void) {
     }
 }
 
+/* SetItemInt.proto */
+#define __Pyx_SetItemInt(o, i, v, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_SetItemInt_Fast(o, (Py_ssize_t)i, v, is_list, wraparound, boundscheck) :\
+    (is_list ? (PyErr_SetString(PyExc_IndexError, "list assignment index out of range"), -1) :\
+               __Pyx_SetItemInt_Generic(o, to_py_func(i), v)))
+static CYTHON_INLINE int __Pyx_SetItemInt_Generic(PyObject *o, PyObject *j, PyObject *v);
+static CYTHON_INLINE int __Pyx_SetItemInt_Fast(PyObject *o, Py_ssize_t i, PyObject *v,
+                                               int is_list, int wraparound, int boundscheck);
+
 /* Import.proto */
 static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level);
 
@@ -914,6 +924,8 @@ static const char __pyx_k_xa[] = "xa";
 static const char __pyx_k_xq[] = "xq";
 static const char __pyx_k_MAP[] = "MAP";
 static const char __pyx_k_PES[] = "PES";
+static const char __pyx_k_aqn[] = "aqn";
+static const char __pyx_k_aux[] = "aux";
 static const char __pyx_k_cfn[] = "cfn";
 static const char __pyx_k_d_2[] = "_d";
 static const char __pyx_k_hyp[] = "hyp";
@@ -942,6 +954,7 @@ static const char __pyx_k_mean[] = "mean";
 static const char __pyx_k_mode[] = "mode";
 static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_para[] = "para";
+static const char __pyx_k_pers[] = "pers";
 static const char __pyx_k_size[] = "size";
 static const char __pyx_k_sqrt[] = "sqrt";
 static const char __pyx_k_test[] = "__test__";
@@ -991,11 +1004,13 @@ static const char __pyx_k_PESbsaq[] = "PESbsaq";
 static const char __pyx_k_PESfsaq[] = "PESfsaq";
 static const char __pyx_k_PESvsaq[] = "PESvsaq";
 static const char __pyx_k_bruteaq[] = "bruteaq";
+static const char __pyx_k_chooser[] = "chooser";
 static const char __pyx_k_logging[] = "logging";
 static const char __pyx_k_persist[] = "persist";
 static const char __pyx_k_uniform[] = "uniform";
 static const char __pyx_k_HYPdraws[] = "HYPdraws";
 static const char __pyx_k_MAPHYP_2[] = "MAPHYP";
+static const char __pyx_k_choiceaq[] = "choiceaq";
 static const char __pyx_k_deepcopy[] = "deepcopy";
 static const char __pyx_k_dev_null[] = "/dev/null";
 static const char __pyx_k_llogfull[] = "llogfull";
@@ -1005,6 +1020,7 @@ static const char __pyx_k_optstate[] = "optstate";
 static const char __pyx_k_randomaq[] = "randomaq";
 static const char __pyx_k_traincfn[] = "traincfn";
 static const char __pyx_k_algmethod[] = "algmethod";
+static const char __pyx_k_aqoptions[] = "aqoptions";
 static const char __pyx_k_getLogger[] = "getLogger";
 static const char __pyx_k_infer_lEI[] = "infer_lEI";
 static const char __pyx_k_nrandinit[] = "nrandinit";
@@ -1013,6 +1029,7 @@ static const char __pyx_k_user_data[] = "user_data";
 static const char __pyx_k_DH_SAMPLES[] = "DH_SAMPLES";
 static const char __pyx_k_DM_SAMPLES[] = "DM_SAMPLES";
 static const char __pyx_k_DM_SUPPORT[] = "DM_SUPPORT";
+static const char __pyx_k_choosepara[] = "choosepara";
 static const char __pyx_k_directwrap[] = "directwrap";
 static const char __pyx_k_initpoints[] = "initpoints";
 static const char __pyx_k_objectives[] = "objectives";
@@ -1028,10 +1045,12 @@ static const char __pyx_k_searchMAPhyp[] = "searchMAPhyp";
 static const char __pyx_k_traincfn1dll[] = "traincfn1dll";
 static const char __pyx_k_traincfnfull[] = "traincfnfull";
 static const char __pyx_k_DIRECTmessage[] = "DIRECTmessage";
+static const char __pyx_k_choosepersist[] = "choosepersist";
 static const char __pyx_k_DM_SLICELCBPARA[] = "DM_SLICELCBPARA";
 static const char __pyx_k_bruteaq_griddiv[] = "bruteaq griddiv={}";
 static const char __pyx_k_PESbsaq_locals_lambda[] = "PESbsaq.<locals>.<lambda>";
 static const char __pyx_k_gpbo_core_acquisitions[] = "gpbo.core.acquisitions";
+static const char __pyx_k_choose_to_use_aquisition[] = "choose to use aquisition {}";
 static const char __pyx_k_EIMAPaq_locals_directwrap[] = "EIMAPaq.<locals>.directwrap";
 static const char __pyx_k_home_mark_Dropbox_workspace_gpb[] = "/home/mark/Dropbox/workspace/gpbo/gpbo/core/acquisitions.pyx";
 static const char __pyx_k_loghyperparameters_mean_std_min[] = "loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}";
@@ -1063,8 +1082,11 @@ static PyObject *__pyx_n_s_SUPPORT_MODE;
 static PyObject *__pyx_n_s_Z;
 static PyObject *__pyx_n_s_a;
 static PyObject *__pyx_n_s_algmethod;
+static PyObject *__pyx_n_s_aqn;
+static PyObject *__pyx_n_s_aqoptions;
 static PyObject *__pyx_n_s_aqtime;
 static PyObject *__pyx_n_s_array;
+static PyObject *__pyx_n_s_aux;
 static PyObject *__pyx_n_s_axis;
 static PyObject *__pyx_n_s_b;
 static PyObject *__pyx_n_s_bruteaq;
@@ -1072,6 +1094,11 @@ static PyObject *__pyx_kp_s_bruteaq_griddiv;
 static PyObject *__pyx_n_s_c;
 static PyObject *__pyx_n_s_cc;
 static PyObject *__pyx_n_s_cfn;
+static PyObject *__pyx_n_s_choiceaq;
+static PyObject *__pyx_kp_s_choose_to_use_aquisition;
+static PyObject *__pyx_n_s_choosepara;
+static PyObject *__pyx_n_s_choosepersist;
+static PyObject *__pyx_n_s_chooser;
 static PyObject *__pyx_n_s_cmax;
 static PyObject *__pyx_n_s_copy;
 static PyObject *__pyx_n_s_costs;
@@ -1141,6 +1168,7 @@ static PyObject *__pyx_n_s_par;
 static PyObject *__pyx_n_s_para;
 static PyObject *__pyx_n_s_para2;
 static PyObject *__pyx_n_s_per;
+static PyObject *__pyx_n_s_pers;
 static PyObject *__pyx_n_s_persist;
 static PyObject *__pyx_n_s_pesobj;
 static PyObject *__pyx_n_s_predictive1d;
@@ -1196,6 +1224,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_6PESfsaq(CYTHON_UNUSED PyOb
 static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_8PESvsaq(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_optstate, PyObject *__pyx_v_persist, PyObject *__pyx_v_para); /* proto */
 static PyObject *__pyx_lambda_funcdef_lambda(PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_s); /* proto */
 static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_10PESbsaq(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_optstate, PyObject *__pyx_v_persist, PyObject *__pyx_v_para); /* proto */
+static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_12choiceaq(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_optstate, PyObject *__pyx_v_persist, PyObject *__pyx_v_para); /* proto */
 static PyObject *__pyx_tp_new_4gpbo_4core_12acquisitions___pyx_scope_struct__EIMAPaq(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_4gpbo_4core_12acquisitions___pyx_scope_struct_1_PESbsaq(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_int_0;
@@ -1218,6 +1247,7 @@ static PyObject *__pyx_tuple__15;
 static PyObject *__pyx_tuple__17;
 static PyObject *__pyx_tuple__19;
 static PyObject *__pyx_tuple__21;
+static PyObject *__pyx_tuple__23;
 static PyObject *__pyx_codeobj__5;
 static PyObject *__pyx_codeobj__12;
 static PyObject *__pyx_codeobj__14;
@@ -1225,6 +1255,7 @@ static PyObject *__pyx_codeobj__16;
 static PyObject *__pyx_codeobj__18;
 static PyObject *__pyx_codeobj__20;
 static PyObject *__pyx_codeobj__22;
+static PyObject *__pyx_codeobj__24;
 
 /* "gpbo/core/acquisitions.pyx":18
  * logger = logging.getLogger(__name__)
@@ -8550,6 +8581,8 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_10PESbsaq(CYTHON_UNUSED PyO
  *     logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean, lhstd, lhmin, lhmax))
  * 
  *     return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}             # <<<<<<<<<<<<<<
+ * 
+ * def choiceaq(optstate,persist,**para):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_4 = PyObject_GetItem(__pyx_cur_scope->__pyx_v_para, __pyx_n_s_ev); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 229, __pyx_L1_error)
@@ -8700,6 +8733,569 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_10PESbsaq(CYTHON_UNUSED PyO
   __Pyx_XDECREF(__pyx_v_k);
   __Pyx_XDECREF(__pyx_v_persist);
   __Pyx_DECREF(((PyObject *)__pyx_cur_scope));
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "gpbo/core/acquisitions.pyx":231
+ *     return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
+ * 
+ * def choiceaq(optstate,persist,**para):             # <<<<<<<<<<<<<<
+ *     para = copy.deepcopy(para)
+ *     if persist==None:
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_4gpbo_4core_12acquisitions_13choiceaq(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_4gpbo_4core_12acquisitions_13choiceaq = {"choiceaq", (PyCFunction)__pyx_pw_4gpbo_4core_12acquisitions_13choiceaq, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_4gpbo_4core_12acquisitions_13choiceaq(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_optstate = 0;
+  PyObject *__pyx_v_persist = 0;
+  PyObject *__pyx_v_para = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("choiceaq (wrapper)", 0);
+  __pyx_v_para = PyDict_New(); if (unlikely(!__pyx_v_para)) return NULL;
+  __Pyx_GOTREF(__pyx_v_para);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_optstate,&__pyx_n_s_persist,0};
+    PyObject* values[2] = {0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_optstate)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        case  1:
+        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_persist)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("choiceaq", 1, 2, 2, 1); __PYX_ERR(0, 231, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, __pyx_v_para, values, pos_args, "choiceaq") < 0)) __PYX_ERR(0, 231, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+    }
+    __pyx_v_optstate = values[0];
+    __pyx_v_persist = values[1];
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("choiceaq", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 231, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_DECREF(__pyx_v_para); __pyx_v_para = 0;
+  __Pyx_AddTraceback("gpbo.core.acquisitions.choiceaq", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_4gpbo_4core_12acquisitions_12choiceaq(__pyx_self, __pyx_v_optstate, __pyx_v_persist, __pyx_v_para);
+
+  /* function exit code */
+  __Pyx_XDECREF(__pyx_v_para);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_12choiceaq(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_optstate, PyObject *__pyx_v_persist, PyObject *__pyx_v_para) {
+  PyObject *__pyx_v_aqn = NULL;
+  PyObject *__pyx_v_choosepersist = NULL;
+  PyObject *__pyx_v_x = NULL;
+  PyObject *__pyx_v_ev = NULL;
+  PyObject *__pyx_v_pers = NULL;
+  PyObject *__pyx_v_aux = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_t_5;
+  Py_ssize_t __pyx_t_6;
+  PyObject *(*__pyx_t_7)(PyObject *);
+  PyObject *__pyx_t_8 = NULL;
+  PyObject *__pyx_t_9 = NULL;
+  PyObject *__pyx_t_10 = NULL;
+  __Pyx_RefNannySetupContext("choiceaq", 0);
+  __Pyx_INCREF(__pyx_v_persist);
+  __Pyx_INCREF(__pyx_v_para);
+
+  /* "gpbo/core/acquisitions.pyx":232
+ * 
+ * def choiceaq(optstate,persist,**para):
+ *     para = copy.deepcopy(para)             # <<<<<<<<<<<<<<
+ *     if persist==None:
+ *         persist = [None,[None]*len(para['aqoptions'])]
+ */
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_copy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 232, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 232, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  if (!__pyx_t_2) {
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_para); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 232, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  } else {
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 232, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2); __pyx_t_2 = NULL;
+    __Pyx_INCREF(__pyx_v_para);
+    __Pyx_GIVEREF(__pyx_v_para);
+    PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_para);
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 232, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF_SET(__pyx_v_para, __pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "gpbo/core/acquisitions.pyx":233
+ * def choiceaq(optstate,persist,**para):
+ *     para = copy.deepcopy(para)
+ *     if persist==None:             # <<<<<<<<<<<<<<
+ *         persist = [None,[None]*len(para['aqoptions'])]
+ *     aqn,choosepersist = para['chooser'](optstate,persist[0],**para['choosepara'])
+ */
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_persist, Py_None, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 233, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__pyx_t_5) {
+
+    /* "gpbo/core/acquisitions.pyx":234
+ *     para = copy.deepcopy(para)
+ *     if persist==None:
+ *         persist = [None,[None]*len(para['aqoptions'])]             # <<<<<<<<<<<<<<
+ *     aqn,choosepersist = para['chooser'](optstate,persist[0],**para['choosepara'])
+ *     persist[0]=choosepersist
+ */
+    __pyx_t_1 = PyObject_GetItem(__pyx_v_para, __pyx_n_s_aqoptions); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_6 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 234, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = PyList_New(1 * ((__pyx_t_6<0) ? 0:__pyx_t_6)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    { Py_ssize_t __pyx_temp;
+      for (__pyx_temp=0; __pyx_temp < __pyx_t_6; __pyx_temp++) {
+        __Pyx_INCREF(Py_None);
+        __Pyx_GIVEREF(Py_None);
+        PyList_SET_ITEM(__pyx_t_1, __pyx_temp, Py_None);
+      }
+    }
+    __pyx_t_3 = PyList_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 234, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_INCREF(Py_None);
+    __Pyx_GIVEREF(Py_None);
+    PyList_SET_ITEM(__pyx_t_3, 0, Py_None);
+    __Pyx_GIVEREF(__pyx_t_1);
+    PyList_SET_ITEM(__pyx_t_3, 1, __pyx_t_1);
+    __pyx_t_1 = 0;
+    __Pyx_DECREF_SET(__pyx_v_persist, __pyx_t_3);
+    __pyx_t_3 = 0;
+
+    /* "gpbo/core/acquisitions.pyx":233
+ * def choiceaq(optstate,persist,**para):
+ *     para = copy.deepcopy(para)
+ *     if persist==None:             # <<<<<<<<<<<<<<
+ *         persist = [None,[None]*len(para['aqoptions'])]
+ *     aqn,choosepersist = para['chooser'](optstate,persist[0],**para['choosepara'])
+ */
+  }
+
+  /* "gpbo/core/acquisitions.pyx":235
+ *     if persist==None:
+ *         persist = [None,[None]*len(para['aqoptions'])]
+ *     aqn,choosepersist = para['chooser'](optstate,persist[0],**para['choosepara'])             # <<<<<<<<<<<<<<
+ *     persist[0]=choosepersist
+ *     logger.debug('choose to use aquisition {}'.format(para['aqoptions'][aqn][0].__name__))
+ */
+  __pyx_t_3 = PyObject_GetItem(__pyx_v_para, __pyx_n_s_chooser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 235, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_persist, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 235, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_INCREF(__pyx_v_optstate);
+  __Pyx_GIVEREF(__pyx_v_optstate);
+  PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_optstate);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_1);
+  __pyx_t_1 = 0;
+  __pyx_t_2 = PyObject_GetItem(__pyx_v_para, __pyx_n_s_choosepara); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 235, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (unlikely(__pyx_t_2 == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "argument after ** must be a mapping, not NoneType");
+    __PYX_ERR(0, 235, __pyx_L1_error)
+  }
+  if (likely(PyDict_CheckExact(__pyx_t_2))) {
+    __pyx_t_1 = PyDict_Copy(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  } else {
+    __pyx_t_1 = PyObject_CallFunctionObjArgs((PyObject*)&PyDict_Type, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  }
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 235, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
+    PyObject* sequence = __pyx_t_2;
+    #if CYTHON_COMPILING_IN_CPYTHON
+    Py_ssize_t size = Py_SIZE(sequence);
+    #else
+    Py_ssize_t size = PySequence_Size(sequence);
+    #endif
+    if (unlikely(size != 2)) {
+      if (size > 2) __Pyx_RaiseTooManyValuesError(2);
+      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+      __PYX_ERR(0, 235, __pyx_L1_error)
+    }
+    #if CYTHON_COMPILING_IN_CPYTHON
+    if (likely(PyTuple_CheckExact(sequence))) {
+      __pyx_t_1 = PyTuple_GET_ITEM(sequence, 0); 
+      __pyx_t_4 = PyTuple_GET_ITEM(sequence, 1); 
+    } else {
+      __pyx_t_1 = PyList_GET_ITEM(sequence, 0); 
+      __pyx_t_4 = PyList_GET_ITEM(sequence, 1); 
+    }
+    __Pyx_INCREF(__pyx_t_1);
+    __Pyx_INCREF(__pyx_t_4);
+    #else
+    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 235, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    #endif
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  } else {
+    Py_ssize_t index = -1;
+    __pyx_t_3 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 235, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_7 = Py_TYPE(__pyx_t_3)->tp_iternext;
+    index = 0; __pyx_t_1 = __pyx_t_7(__pyx_t_3); if (unlikely(!__pyx_t_1)) goto __pyx_L4_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_1);
+    index = 1; __pyx_t_4 = __pyx_t_7(__pyx_t_3); if (unlikely(!__pyx_t_4)) goto __pyx_L4_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_4);
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_3), 2) < 0) __PYX_ERR(0, 235, __pyx_L1_error)
+    __pyx_t_7 = NULL;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    goto __pyx_L5_unpacking_done;
+    __pyx_L4_unpacking_failed:;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_7 = NULL;
+    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
+    __PYX_ERR(0, 235, __pyx_L1_error)
+    __pyx_L5_unpacking_done:;
+  }
+  __pyx_v_aqn = __pyx_t_1;
+  __pyx_t_1 = 0;
+  __pyx_v_choosepersist = __pyx_t_4;
+  __pyx_t_4 = 0;
+
+  /* "gpbo/core/acquisitions.pyx":236
+ *         persist = [None,[None]*len(para['aqoptions'])]
+ *     aqn,choosepersist = para['chooser'](optstate,persist[0],**para['choosepara'])
+ *     persist[0]=choosepersist             # <<<<<<<<<<<<<<
+ *     logger.debug('choose to use aquisition {}'.format(para['aqoptions'][aqn][0].__name__))
+ *     x,ev,pers,aux = para['aqoptions'][aqn][0](optstate,persist[1][aqn],**para['aqoptions'][aqn][1])
+ */
+  if (unlikely(__Pyx_SetItemInt(__pyx_v_persist, 0, __pyx_v_choosepersist, long, 1, __Pyx_PyInt_From_long, 0, 0, 1) < 0)) __PYX_ERR(0, 236, __pyx_L1_error)
+
+  /* "gpbo/core/acquisitions.pyx":237
+ *     aqn,choosepersist = para['chooser'](optstate,persist[0],**para['choosepara'])
+ *     persist[0]=choosepersist
+ *     logger.debug('choose to use aquisition {}'.format(para['aqoptions'][aqn][0].__name__))             # <<<<<<<<<<<<<<
+ *     x,ev,pers,aux = para['aqoptions'][aqn][0](optstate,persist[1][aqn],**para['aqoptions'][aqn][1])
+ *     persist[1][aqn]=pers
+ */
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 237, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_debug); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 237, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_choose_to_use_aquisition, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 237, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_8 = PyObject_GetItem(__pyx_v_para, __pyx_n_s_aqoptions); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 237, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
+  __pyx_t_9 = PyObject_GetItem(__pyx_t_8, __pyx_v_aqn); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 237, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_9, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 237, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_name); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 237, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  __pyx_t_8 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_8)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_8);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  if (!__pyx_t_8) {
+    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_9); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 237, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __Pyx_GOTREF(__pyx_t_4);
+  } else {
+    __pyx_t_10 = PyTuple_New(1+1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 237, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
+    __Pyx_GIVEREF(__pyx_t_9);
+    PyTuple_SET_ITEM(__pyx_t_10, 0+1, __pyx_t_9);
+    __pyx_t_9 = 0;
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_10, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 237, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_1))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_1);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_1, function);
+    }
+  }
+  if (!__pyx_t_3) {
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 237, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_GOTREF(__pyx_t_2);
+  } else {
+    __pyx_t_10 = PyTuple_New(1+1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 237, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_3); __pyx_t_3 = NULL;
+    __Pyx_GIVEREF(__pyx_t_4);
+    PyTuple_SET_ITEM(__pyx_t_10, 0+1, __pyx_t_4);
+    __pyx_t_4 = 0;
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 237, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "gpbo/core/acquisitions.pyx":238
+ *     persist[0]=choosepersist
+ *     logger.debug('choose to use aquisition {}'.format(para['aqoptions'][aqn][0].__name__))
+ *     x,ev,pers,aux = para['aqoptions'][aqn][0](optstate,persist[1][aqn],**para['aqoptions'][aqn][1])             # <<<<<<<<<<<<<<
+ *     persist[1][aqn]=pers
+ *     return x,ev,persist,aux
+ */
+  __pyx_t_2 = PyObject_GetItem(__pyx_v_para, __pyx_n_s_aqoptions); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = PyObject_GetItem(__pyx_t_2, __pyx_v_aqn); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_persist, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_10 = PyObject_GetItem(__pyx_t_1, __pyx_v_aqn); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_v_optstate);
+  __Pyx_GIVEREF(__pyx_v_optstate);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_optstate);
+  __Pyx_GIVEREF(__pyx_t_10);
+  PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_10);
+  __pyx_t_10 = 0;
+  __pyx_t_4 = PyObject_GetItem(__pyx_v_para, __pyx_n_s_aqoptions); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = PyObject_GetItem(__pyx_t_4, __pyx_v_aqn); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_3, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(__pyx_t_4 == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "argument after ** must be a mapping, not NoneType");
+    __PYX_ERR(0, 238, __pyx_L1_error)
+  }
+  if (likely(PyDict_CheckExact(__pyx_t_4))) {
+    __pyx_t_10 = PyDict_Copy(__pyx_t_4); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 238, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  } else {
+    __pyx_t_10 = PyObject_CallFunctionObjArgs((PyObject*)&PyDict_Type, __pyx_t_4, NULL); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 238, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  }
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  if ((likely(PyTuple_CheckExact(__pyx_t_4))) || (PyList_CheckExact(__pyx_t_4))) {
+    PyObject* sequence = __pyx_t_4;
+    #if CYTHON_COMPILING_IN_CPYTHON
+    Py_ssize_t size = Py_SIZE(sequence);
+    #else
+    Py_ssize_t size = PySequence_Size(sequence);
+    #endif
+    if (unlikely(size != 4)) {
+      if (size > 4) __Pyx_RaiseTooManyValuesError(4);
+      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+      __PYX_ERR(0, 238, __pyx_L1_error)
+    }
+    #if CYTHON_COMPILING_IN_CPYTHON
+    if (likely(PyTuple_CheckExact(sequence))) {
+      __pyx_t_10 = PyTuple_GET_ITEM(sequence, 0); 
+      __pyx_t_1 = PyTuple_GET_ITEM(sequence, 1); 
+      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 2); 
+      __pyx_t_3 = PyTuple_GET_ITEM(sequence, 3); 
+    } else {
+      __pyx_t_10 = PyList_GET_ITEM(sequence, 0); 
+      __pyx_t_1 = PyList_GET_ITEM(sequence, 1); 
+      __pyx_t_2 = PyList_GET_ITEM(sequence, 2); 
+      __pyx_t_3 = PyList_GET_ITEM(sequence, 3); 
+    }
+    __Pyx_INCREF(__pyx_t_10);
+    __Pyx_INCREF(__pyx_t_1);
+    __Pyx_INCREF(__pyx_t_2);
+    __Pyx_INCREF(__pyx_t_3);
+    #else
+    {
+      Py_ssize_t i;
+      PyObject** temps[4] = {&__pyx_t_10,&__pyx_t_1,&__pyx_t_2,&__pyx_t_3};
+      for (i=0; i < 4; i++) {
+        PyObject* item = PySequence_ITEM(sequence, i); if (unlikely(!item)) __PYX_ERR(0, 238, __pyx_L1_error)
+        __Pyx_GOTREF(item);
+        *(temps[i]) = item;
+      }
+    }
+    #endif
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  } else {
+    Py_ssize_t index = -1;
+    PyObject** temps[4] = {&__pyx_t_10,&__pyx_t_1,&__pyx_t_2,&__pyx_t_3};
+    __pyx_t_9 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 238, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_t_7 = Py_TYPE(__pyx_t_9)->tp_iternext;
+    for (index=0; index < 4; index++) {
+      PyObject* item = __pyx_t_7(__pyx_t_9); if (unlikely(!item)) goto __pyx_L6_unpacking_failed;
+      __Pyx_GOTREF(item);
+      *(temps[index]) = item;
+    }
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_9), 4) < 0) __PYX_ERR(0, 238, __pyx_L1_error)
+    __pyx_t_7 = NULL;
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    goto __pyx_L7_unpacking_done;
+    __pyx_L6_unpacking_failed:;
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __pyx_t_7 = NULL;
+    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
+    __PYX_ERR(0, 238, __pyx_L1_error)
+    __pyx_L7_unpacking_done:;
+  }
+  __pyx_v_x = __pyx_t_10;
+  __pyx_t_10 = 0;
+  __pyx_v_ev = __pyx_t_1;
+  __pyx_t_1 = 0;
+  __pyx_v_pers = __pyx_t_2;
+  __pyx_t_2 = 0;
+  __pyx_v_aux = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "gpbo/core/acquisitions.pyx":239
+ *     logger.debug('choose to use aquisition {}'.format(para['aqoptions'][aqn][0].__name__))
+ *     x,ev,pers,aux = para['aqoptions'][aqn][0](optstate,persist[1][aqn],**para['aqoptions'][aqn][1])
+ *     persist[1][aqn]=pers             # <<<<<<<<<<<<<<
+ *     return x,ev,persist,aux
+ */
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_persist, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 239, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  if (unlikely(PyObject_SetItem(__pyx_t_4, __pyx_v_aqn, __pyx_v_pers) < 0)) __PYX_ERR(0, 239, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+  /* "gpbo/core/acquisitions.pyx":240
+ *     x,ev,pers,aux = para['aqoptions'][aqn][0](optstate,persist[1][aqn],**para['aqoptions'][aqn][1])
+ *     persist[1][aqn]=pers
+ *     return x,ev,persist,aux             # <<<<<<<<<<<<<<
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_4 = PyTuple_New(4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 240, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_INCREF(__pyx_v_x);
+  __Pyx_GIVEREF(__pyx_v_x);
+  PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_x);
+  __Pyx_INCREF(__pyx_v_ev);
+  __Pyx_GIVEREF(__pyx_v_ev);
+  PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_ev);
+  __Pyx_INCREF(__pyx_v_persist);
+  __Pyx_GIVEREF(__pyx_v_persist);
+  PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_v_persist);
+  __Pyx_INCREF(__pyx_v_aux);
+  __Pyx_GIVEREF(__pyx_v_aux);
+  PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_v_aux);
+  __pyx_r = __pyx_t_4;
+  __pyx_t_4 = 0;
+  goto __pyx_L0;
+
+  /* "gpbo/core/acquisitions.pyx":231
+ *     return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
+ * 
+ * def choiceaq(optstate,persist,**para):             # <<<<<<<<<<<<<<
+ *     para = copy.deepcopy(para)
+ *     if persist==None:
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_AddTraceback("gpbo.core.acquisitions.choiceaq", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_para);
+  __Pyx_XDECREF(__pyx_v_aqn);
+  __Pyx_XDECREF(__pyx_v_choosepersist);
+  __Pyx_XDECREF(__pyx_v_x);
+  __Pyx_XDECREF(__pyx_v_ev);
+  __Pyx_XDECREF(__pyx_v_pers);
+  __Pyx_XDECREF(__pyx_v_aux);
+  __Pyx_XDECREF(__pyx_v_persist);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -8978,8 +9574,11 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_Z, __pyx_k_Z, sizeof(__pyx_k_Z), 0, 0, 1, 1},
   {&__pyx_n_s_a, __pyx_k_a, sizeof(__pyx_k_a), 0, 0, 1, 1},
   {&__pyx_n_s_algmethod, __pyx_k_algmethod, sizeof(__pyx_k_algmethod), 0, 0, 1, 1},
+  {&__pyx_n_s_aqn, __pyx_k_aqn, sizeof(__pyx_k_aqn), 0, 0, 1, 1},
+  {&__pyx_n_s_aqoptions, __pyx_k_aqoptions, sizeof(__pyx_k_aqoptions), 0, 0, 1, 1},
   {&__pyx_n_s_aqtime, __pyx_k_aqtime, sizeof(__pyx_k_aqtime), 0, 0, 1, 1},
   {&__pyx_n_s_array, __pyx_k_array, sizeof(__pyx_k_array), 0, 0, 1, 1},
+  {&__pyx_n_s_aux, __pyx_k_aux, sizeof(__pyx_k_aux), 0, 0, 1, 1},
   {&__pyx_n_s_axis, __pyx_k_axis, sizeof(__pyx_k_axis), 0, 0, 1, 1},
   {&__pyx_n_s_b, __pyx_k_b, sizeof(__pyx_k_b), 0, 0, 1, 1},
   {&__pyx_n_s_bruteaq, __pyx_k_bruteaq, sizeof(__pyx_k_bruteaq), 0, 0, 1, 1},
@@ -8987,6 +9586,11 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
   {&__pyx_n_s_cc, __pyx_k_cc, sizeof(__pyx_k_cc), 0, 0, 1, 1},
   {&__pyx_n_s_cfn, __pyx_k_cfn, sizeof(__pyx_k_cfn), 0, 0, 1, 1},
+  {&__pyx_n_s_choiceaq, __pyx_k_choiceaq, sizeof(__pyx_k_choiceaq), 0, 0, 1, 1},
+  {&__pyx_kp_s_choose_to_use_aquisition, __pyx_k_choose_to_use_aquisition, sizeof(__pyx_k_choose_to_use_aquisition), 0, 0, 1, 0},
+  {&__pyx_n_s_choosepara, __pyx_k_choosepara, sizeof(__pyx_k_choosepara), 0, 0, 1, 1},
+  {&__pyx_n_s_choosepersist, __pyx_k_choosepersist, sizeof(__pyx_k_choosepersist), 0, 0, 1, 1},
+  {&__pyx_n_s_chooser, __pyx_k_chooser, sizeof(__pyx_k_chooser), 0, 0, 1, 1},
   {&__pyx_n_s_cmax, __pyx_k_cmax, sizeof(__pyx_k_cmax), 0, 0, 1, 1},
   {&__pyx_n_s_copy, __pyx_k_copy, sizeof(__pyx_k_copy), 0, 0, 1, 1},
   {&__pyx_n_s_costs, __pyx_k_costs, sizeof(__pyx_k_costs), 0, 0, 1, 1},
@@ -9056,6 +9660,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_para, __pyx_k_para, sizeof(__pyx_k_para), 0, 0, 1, 1},
   {&__pyx_n_s_para2, __pyx_k_para2, sizeof(__pyx_k_para2), 0, 0, 1, 1},
   {&__pyx_n_s_per, __pyx_k_per, sizeof(__pyx_k_per), 0, 0, 1, 1},
+  {&__pyx_n_s_pers, __pyx_k_pers, sizeof(__pyx_k_pers), 0, 0, 1, 1},
   {&__pyx_n_s_persist, __pyx_k_persist, sizeof(__pyx_k_persist), 0, 0, 1, 1},
   {&__pyx_n_s_pesobj, __pyx_k_pesobj, sizeof(__pyx_k_pesobj), 0, 0, 1, 1},
   {&__pyx_n_s_predictive1d, __pyx_k_predictive1d, sizeof(__pyx_k_predictive1d), 0, 0, 1, 1},
@@ -9292,6 +9897,18 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__21);
   __Pyx_GIVEREF(__pyx_tuple__21);
   __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(2, 0, 30, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_PESbsaq, 158, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 158, __pyx_L1_error)
+
+  /* "gpbo/core/acquisitions.pyx":231
+ *     return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
+ * 
+ * def choiceaq(optstate,persist,**para):             # <<<<<<<<<<<<<<
+ *     para = copy.deepcopy(para)
+ *     if persist==None:
+ */
+  __pyx_tuple__23 = PyTuple_Pack(9, __pyx_n_s_optstate, __pyx_n_s_persist, __pyx_n_s_para, __pyx_n_s_aqn, __pyx_n_s_choosepersist, __pyx_n_s_x, __pyx_n_s_ev, __pyx_n_s_pers, __pyx_n_s_aux); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 231, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__23);
+  __Pyx_GIVEREF(__pyx_tuple__23);
+  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(2, 0, 9, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_choiceaq, 231, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 231, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -9658,6 +10275,18 @@ PyMODINIT_FUNC PyInit_acquisitions(void)
   __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_4gpbo_4core_12acquisitions_11PESbsaq, NULL, __pyx_n_s_gpbo_core_acquisitions); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 158, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_PESbsaq, __pyx_t_1) < 0) __PYX_ERR(0, 158, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "gpbo/core/acquisitions.pyx":231
+ *     return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
+ * 
+ * def choiceaq(optstate,persist,**para):             # <<<<<<<<<<<<<<
+ *     para = copy.deepcopy(para)
+ *     if persist==None:
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_4gpbo_4core_12acquisitions_13choiceaq, NULL, __pyx_n_s_gpbo_core_acquisitions); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 231, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_choiceaq, __pyx_t_1) < 0) __PYX_ERR(0, 231, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "gpbo/core/acquisitions.pyx":1
@@ -11262,8 +11891,56 @@ static PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, CYTHON_UNUSED 
 }
 #endif
 
+/* SetItemInt */
+        static CYTHON_INLINE int __Pyx_SetItemInt_Generic(PyObject *o, PyObject *j, PyObject *v) {
+    int r;
+    if (!j) return -1;
+    r = PyObject_SetItem(o, j, v);
+    Py_DECREF(j);
+    return r;
+}
+static CYTHON_INLINE int __Pyx_SetItemInt_Fast(PyObject *o, Py_ssize_t i, PyObject *v, int is_list,
+                                               CYTHON_NCP_UNUSED int wraparound, CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_COMPILING_IN_CPYTHON
+    if (is_list || PyList_CheckExact(o)) {
+        Py_ssize_t n = (!wraparound) ? i : ((likely(i >= 0)) ? i : i + PyList_GET_SIZE(o));
+        if ((!boundscheck) || likely((n >= 0) & (n < PyList_GET_SIZE(o)))) {
+            PyObject* old = PyList_GET_ITEM(o, n);
+            Py_INCREF(v);
+            PyList_SET_ITEM(o, n, v);
+            Py_DECREF(old);
+            return 1;
+        }
+    } else {
+        PySequenceMethods *m = Py_TYPE(o)->tp_as_sequence;
+        if (likely(m && m->sq_ass_item)) {
+            if (wraparound && unlikely(i < 0) && likely(m->sq_length)) {
+                Py_ssize_t l = m->sq_length(o);
+                if (likely(l >= 0)) {
+                    i += l;
+                } else {
+                    if (!PyErr_ExceptionMatches(PyExc_OverflowError))
+                        return -1;
+                    PyErr_Clear();
+                }
+            }
+            return m->sq_ass_item(o, i, v);
+        }
+    }
+#else
+#if CYTHON_COMPILING_IN_PYPY
+    if (is_list || (PySequence_Check(o) && !PyDict_Check(o))) {
+#else
+    if (is_list || PySequence_Check(o)) {
+#endif
+        return PySequence_SetItem(o, i, v);
+    }
+#endif
+    return __Pyx_SetItemInt_Generic(o, PyInt_FromSsize_t(i), v);
+}
+
 /* Import */
-        static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level) {
+          static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level) {
     PyObject *empty_list = 0;
     PyObject *module = 0;
     PyObject *global_dict = 0;
@@ -11337,7 +12014,7 @@ bad:
 }
 
 /* CodeObjectCache */
-        static int __pyx_bisect_code_objects(__Pyx_CodeObjectCacheEntry* entries, int count, int code_line) {
+          static int __pyx_bisect_code_objects(__Pyx_CodeObjectCacheEntry* entries, int count, int code_line) {
     int start = 0, mid = 0, end = count - 1;
     if (end >= 0 && code_line > entries[end].code_line) {
         return count;
@@ -11417,7 +12094,7 @@ static void __pyx_insert_code_object(int code_line, PyCodeObject* code_object) {
 }
 
 /* AddTraceback */
-        #include "compile.h"
+          #include "compile.h"
 #include "frameobject.h"
 #include "traceback.h"
 static PyCodeObject* __Pyx_CreateCodeObjectForTraceback(
@@ -11498,7 +12175,7 @@ bad:
 }
 
 /* CIntToPy */
-        static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
+          static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
     const long neg_one = (long) -1, const_zero = (long) 0;
     const int is_unsigned = neg_one > const_zero;
     if (is_unsigned) {
@@ -11525,7 +12202,7 @@ bad:
 }
 
 /* CIntFromPyVerify */
-        #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
+          #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
     __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
 #define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
     __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
@@ -11547,7 +12224,7 @@ bad:
     }
 
 /* CIntFromPy */
-        static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *x) {
+          static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *x) {
     const long neg_one = (long) -1, const_zero = (long) 0;
     const int is_unsigned = neg_one > const_zero;
 #if PY_MAJOR_VERSION < 3
@@ -11732,7 +12409,7 @@ raise_neg_overflow:
 }
 
 /* CIntFromPy */
-        static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
+          static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
     const int neg_one = (int) -1, const_zero = (int) 0;
     const int is_unsigned = neg_one > const_zero;
 #if PY_MAJOR_VERSION < 3
@@ -11917,7 +12594,7 @@ raise_neg_overflow:
 }
 
 /* CheckBinaryVersion */
-        static int __Pyx_check_binary_version(void) {
+          static int __Pyx_check_binary_version(void) {
     char ctversion[4], rtversion[4];
     PyOS_snprintf(ctversion, 4, "%d.%d", PY_MAJOR_VERSION, PY_MINOR_VERSION);
     PyOS_snprintf(rtversion, 4, "%s", Py_GetVersion());
@@ -11933,7 +12610,7 @@ raise_neg_overflow:
 }
 
 /* InitStrings */
-        static int __Pyx_InitStrings(__Pyx_StringTabEntry *t) {
+          static int __Pyx_InitStrings(__Pyx_StringTabEntry *t) {
     while (t->p) {
         #if PY_MAJOR_VERSION < 3
         if (t->is_unicode) {

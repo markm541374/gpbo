@@ -329,10 +329,11 @@ def adaptiverecc(optstate,persist,**para):
     W = sp.vstack(ESutils.draw_support(G, para['lb'], para['ub'], para['support'], ESutils.SUPPORT_LAPAPROT, para=para['starts']))
     nd = para['draws']
 
-    R,Y = ESutils.draw_min_xypairgrad(G, W, nd, xmin)
+    R,Y,A = ESutils.draw_min_xypairgrad(G, W, nd, xmin)
 
-
+    M,V=G.infer_diag_post(W,[[sp.NaN]]*W.shape[0])
     ER = G.infer_EI_post(W,[[sp.NaN]]*W.shape[0],wrt=ymin)
+    ERc = G.infer_EI_post(W,[[sp.NaN]]*W.shape[0],wrt=ymin)
     #A = sp.empty([nd,1])
     #for i in xrange(nd):
     #    A[i,0] = -Y[i,2:].dot(R[i,:]-xmin)/(spl.norm(Y[i,2:])*spl.norm(R[i,:]-xmin))
@@ -346,18 +347,16 @@ def adaptiverecc(optstate,persist,**para):
     from gpbo.core import debugoptions
     if debugoutput and debugoptions['adaptive'] and plots:
         print 'plotting support...'
-        fig, ax = plt.subplots(nrows=3, ncols=4, figsize=(56, 40))
+        fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(40, 40))
 
         n = 60
         x_ = sp.linspace(-1, 1, n)
         y_ = sp.linspace(-1, 1, n)
         z_ = sp.empty([n, n])
         s_ = sp.empty([n, n])
-        e_ = sp.empty([n, n])
         for i in range(n):
             for j in range(n):
                 m_, v_ = G.infer_diag_post(sp.array([y_[j], x_[i]]), [[sp.NaN]])
-                e_[i,j] = G.infer_EI_post(sp.array([y_[j], x_[i]]), [[sp.NaN]],wrt=ymin)
                 z_[i, j] = m_[0, 0]
                 s_[i, j] = sp.sqrt(v_[0, 0])
 
@@ -367,8 +366,6 @@ def adaptiverecc(optstate,persist,**para):
         ax[0,0].axis([-1., 1., -1., 1.])
         ax[1,0].clabel(CS, inline=1, fontsize=10)
 
-        CS = ax[0, 3].contour(x_, y_, e_, 20)
-        ax[0, 3].clabel(CS, inline=1, fontsize=10)
 
         ax[1,0].plot(xcmax[0],xcmax[1],'bo')
         ax[0,0].plot(xmin[0],xmin[1],'ro')
@@ -381,7 +378,7 @@ def adaptiverecc(optstate,persist,**para):
         lowest_bic = sp.inf
         bic = []
         n_components_range = range(1, 7)
-        cv_types = ['spherical', 'diag', 'full']
+        cv_types = ['full']
         for cv_type in cv_types:
             for n_components in n_components_range:
                 # Fit a Gaussian mixture with EM
@@ -404,32 +401,22 @@ def adaptiverecc(optstate,persist,**para):
                 local=i
                 D_=dist
 
-        locals = [local]
+        localset = [local]
         closestcov = clf.covariances_[local]
 
         closestmean = clf.means_[local]
         for i, (mean, cov) in enumerate(zip(clf.means_, clf.covariances_)):
-            if typ == 'spherical':
-                cov = sp.diag([cov] * R.shape[1])
-            elif typ == 'diag':
-                cov = sp.diag(cov)
-            else:
-                pass
-            if (mean - closestmean).max() < sp.sqrt(cov.max()) and (mean - closestmean).max()<sp.sqrt(closestcov.max()):
-                if closestcov.max() < 1.5 * cov.max() and closestcov.max() > 0.5 * cov.max():
-                        locals.append(i)
+            if i not in localset:
+                if (mean - closestmean).max() < sp.sqrt(cov.max()) and (mean - closestmean).max()<sp.sqrt(closestcov.max()):
+                    if closestcov.max() < 1.5 * cov.max() and closestcov.max() > 0.5 * cov.max():
+                            localset.append(i)
 
         splot=ax[0,2]
 
         Y_ = clf.predict(R)
+        W_ = clf.predict(W)
         for i, (mean, cov) in enumerate(zip(clf.means_, clf.covariances_)):
-            color='blue' if i not in locals else 'red'
-            if typ == 'spherical':
-                cov = sp.diag([cov] * R.shape[1])
-            elif typ == 'tied' or typ == 'diag':
-                cov = sp.diag(cov)
-            else:
-                pass
+            color='blue' if i not in localset else 'red'
             v, w = spl.eigh(cov)
             if not sp.any(Y_ == i):
                 continue
@@ -452,7 +439,7 @@ def adaptiverecc(optstate,persist,**para):
         #NRegret = 0. #within the cluster and not converging
         r = [0, 0, 0]
         for i in xrange(nd):
-            if Y_[i] in locals:
+            if Y_[i] in localset:
 
                 ax[1, 2].plot(D[i, 0], Y[i, 1] - Y[i, 0], 'r.')
                 IRegret+=Y[i, 1]-Y[i, 0]
@@ -504,31 +491,29 @@ def adaptiverecc(optstate,persist,**para):
             RCtrue = (sp.nan,0,)
         CommitRegret=(1-Iprob)*ORegret
 
-        S_ = (ymin-yatcmax) / sp.sqrt(cmax)
-        c_ = sps.norm.cdf(S_)
-        p_ = sps.norm.pdf(S_)
-        Rbound = (ymin-yatcmax)*c_ + sp.sqrt(cmax) * p_
 
-        panyless = 1.- (1 - c_) ** float(para['support'])
-        panyless_2terms = para['support'] * c_ - 0.5 * para['support'] * (para['support'] - 1) * c_ ** 2
-        if panyless == 0.:
-            Rupper = panyless_2terms * (Rbound / (c_))
-        else:
-            Rupper = panyless * (Rbound / (c_))
+        Rbound = ER.sum()
 
-        approxcommitregret = max(CommitRegret, Rupper)
+        #panyless = 1.- (1 - c_) ** float(para['support'])
+        #panyless_2terms = para['support'] * c_ - 0.5 * para['support'] * (para['support'] - 1) * c_ ** 2
+        #if panyless == 0.:
+        #    Rupper = panyless_2terms * (Rbound / (c_))
+        #else:
+        #    Rupper = panyless * (Rbound / (c_))
+
+        approxcommitregret = max(CommitRegret, Rbound)
 
 
-        uppermsg = 'XXXXXXXX\n' \
-                   'cdf upto ymin      : {}\n' \
-                   'nsupp points       : {}\n' \
-                   'ER                 : {}\n' \
-                   'ER | lessthan      : {}\n' \
-                   'p allgreaterthan   : {}\n' \
-                   'p2termless         : {}\n' \
-                   'p anylessthan      : {}\n' \
-                   'ER after           : {}\n' \
-                   ''.format(c_,para['support'],Rbound,Rbound/(c_),(1-c_)**float(para['support']),panyless_2terms,panyless,Rupper)
+        #uppermsg = 'XXXXXXXX\n' \
+        #           'cdf upto ymin      : {}\n' \
+        #           'nsupp points       : {}\n' \
+        #           'ER                 : {}\n' \
+        #           'ER | lessthan      : {}\n' \
+        #           'p allgreaterthan   : {}\n' \
+        #           'p2termless         : {}\n' \
+        #           'p anylessthan      : {}\n' \
+        #           'ER after           : {}\n' \
+        #           ''.format(c_,para['support'],Rbound,Rbound/(c_),(1-c_)**float(para['support']),panyless_2terms,panyless,Rupper)
 
         #print "{} {} {} {} {}".format(S_,c_,p_,cmax,yatcmax)
         persist['RCtrue'].append(RCtrue)
@@ -538,9 +523,9 @@ def adaptiverecc(optstate,persist,**para):
         persist['Rtrue'].append(CRegret)
         persist['ERlocal'].append(IRegret)
         persist['globRbound'].append(Rbound)
-        persist['globRupper'].append(Rupper)
-        persist['globCbound'].append(1.-c_)
-        persist['globCupper'].append(panyless if panyless>0. else panyless_2terms)
+        #persist['globRupper'].append(Rupper)
+        #persist['globCbound'].append(1.-c_)
+        #persist['globCupper'].append(panyless if panyless>0. else panyless_2terms)
         persist['LT'].append(LocalTrace)
         persist['sumER'].append(ER.sum())
         ax[2,0].semilogy(persist['ER'],'k')
@@ -549,12 +534,13 @@ def adaptiverecc(optstate,persist,**para):
         for i in xrange(len(persist['Rtrue'])):
             #ax[2,1].plot([i,i+persist['RCtrue'][i][1]],[persist['Rtrue'][i],persist['RCtrue'][i][0]],'g')
             ax[2, 1].plot([i,len(persist['LT'][i])+i], [persist['LT'][i][0],persist['LT'][i][-1]], 'r')
-        ax[2, 0].semilogy(persist['globRupper'], 'orange')
-        ax[2, 0].semilogy(persist['ERCom'], 'pink')
+        #ax[2, 0].semilogy(persist['globRupper'], 'orange')
+
         ax[2,0].semilogy(persist['ERlocal'],'b')
         #print 'XXXXXXXXX{}'.format(persist['globRbound'])
         ax[2,0].semilogy(persist['globRbound'],'pink')
-        ax[2, 0].semilogy(persist['ERCom'], 'm.')
+        ax[2, 0].semilogy(persist['ERCom'], 'm.-')
+
         #ax[2, 0].semilogy(persist['sumER'], 'cyan')
         ax[2,2].semilogy([1-i for i in persist['globCbound']],'m')
         ax[2,2].semilogy([1-i for i in persist['probcluster']])
@@ -586,7 +572,7 @@ def adaptiverecc(optstate,persist,**para):
               ''.format(CRegret, ERegret, Iprob, IRegret, ORegret, CommitRegret)
         l_x, u_x = ax[1, 1].get_xlim()
         l_y, u_y = ax[1, 1].get_ylim()
-        ax[1,1].text(l_x + 0.02 * (u_x - l_x), l_y + 0.02 * (u_y - l_y), uppermsg+'\n----\n'+msg,fontdict={'size':18})
+        ax[1,1].text(l_x + 0.02 * (u_x - l_x), l_y + 0.02 * (u_y - l_y), '\n----\n'+msg,fontdict={'size':18})
         # ---------------------------------------------------
 
         from gpbo.core import debugpath
@@ -595,6 +581,10 @@ def adaptiverecc(optstate,persist,**para):
         plt.close(fig)
         del (fig)
 
+        import pickle
+        obj = [W,R,Y,ERc,Y_,localset,CommitRegret,IRegret,ORegret,ERegret,optstate.n,persist,clf.means_, clf.covariances_,M,V,xmin,ymin,W_,A]
+        pickle.dump(obj, open('dbout/{}.p'.format(optstate.n), 'wb'))
+        logger.info('endopt')
         print 'endstep'
 
 
