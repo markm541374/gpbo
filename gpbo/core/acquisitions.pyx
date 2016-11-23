@@ -2,6 +2,7 @@
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
 import scipy as sp
+from scipy.optimize import minimize
 import os
 import time
 import DIRECT
@@ -238,3 +239,36 @@ def choiceaq(optstate,persist,**para):
     x,ev,pers,aux = para['aqoptions'][aqn][0](optstate,persist[1][aqn],**para['aqoptions'][aqn][1])
     persist[1][aqn]=pers
     return x,ev,persist,aux
+
+def splocalaq(optstate,persist,**para):
+    logger.info('splocalaq {}'.format(persist))
+    if persist==None:
+        persist={'n':0,'y':[],'x':[],'done':False}
+    else:
+        persist['y'].append(optstate.y[-1])
+
+    global count
+    count=0
+
+
+    def fwrap(x):
+        global count
+
+        if count>=persist['n']:
+            raise KeyError([i for i in x])
+        else:
+            assert sp.all(x==persist['x'][count])
+            #print 'fwrap {} count {} y {}'.format(x,count,persist['y'][count])
+            count+=1
+            return persist['y'][count-1]
+    try:
+        minimize(fwrap,para['start'])
+        persist['done']=True
+        optstate.localdone=True
+        return persist['x'][-1],para['ev'],persist,{'msg':'localopt is complete'}
+    except KeyError as k:
+        x=k.args[0]
+    persist['x'].append(x)
+    persist['n']+=1
+    #print 'xtoev {}'.format(x)
+    return x,para['ev'],persist,{'msg':'localopt is complete'}

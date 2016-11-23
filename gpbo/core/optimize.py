@@ -23,6 +23,7 @@ class optstate:
         self.Cfull=0.
         self.aqtime=[]
         self.aux=None
+        self.localdone=False
         return
     
     def update(self,x,ev,y,c,taq):
@@ -123,6 +124,9 @@ class optimizer:
 
 def nstopfn(optstate,nmax = 1):
     return optstate.n >= nmax
+
+def localstopfn(optstate,**para):
+    return optstate.localdone
 
 def cstopfn(optstate,cmax = 1,includeaq=False):
     if not includeaq:
