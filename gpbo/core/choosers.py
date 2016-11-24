@@ -7,6 +7,7 @@ import ESutils
 import DIRECT
 from sklearn import mixture
 import logging
+import gpbo
 logger = logging.getLogger(__name__)
 try:
     from matplotlib import pyplot as plt
@@ -105,8 +106,11 @@ def gpcommitment(optstate,persist,**para):
     EBound = ER.sum()
 
     splitbound = [0.,0.,0.]
+    splitzeros = [0,0,0]
     for i in xrange(Z_.shape[0]):
         splitbound[Z_[i]]+=ER[0,i]
+        if ER[0,i]==0.:
+            splitzeros[Z_[i]]+=1
     GBound=splitbound[1]+splitbound[2]
     LBound=splitbound[0]
 
@@ -114,6 +118,32 @@ def gpcommitment(optstate,persist,**para):
     persist['GBound'].append(GBound)
     persist['LBound'].append(LBound)
 
+
+    #more conservative? bounds
+    ns = Z_.shape[0]
+    Mf, Vf = G.infer_diag(sp.vstack([W, xmin]), [[sp.NaN]] * (W.shape[0] + 1))
+    V2 = Vf.max(axis=0) + sp.var(Mf, axis=0).reshape([1, ns])
+    M2 = Mf.min(axis=0)
+    ER2 = sp.empty([1, ns])
+    for i in xrange(ns):
+        ER2[0, i] = gpbo.core.GPdc.EI(ymin, M2[i], V2[0, i])
+
+    EBound2 = ER2.sum()
+
+    splitbound2 = [0., 0., 0.]
+    splitzeros2 = [0, 0, 0]
+    closetoV = [0,0,0]
+    for i in xrange(Z_.shape[0]):
+        splitbound2[Z_[i]] += ER2[0, i]
+        if ER2[0, i] == 0.:
+            splitzeros2[Z_[i]] += 1
+   
+    GBound2 = splitbound2[1] + splitbound2[2]
+    LBound2 = splitbound2[0]
+
+    persist['EBound2'].append(EBound2)
+    persist['GBound2'].append(GBound2)
+    persist['LBound2'].append(LBound2)
 
     from gpbo.core import debugoutput, debugoptions, debugpath
     if debugoutput and debugoptions['adaptive'] and plots:
@@ -173,14 +203,38 @@ def gpcommitment(optstate,persist,**para):
 
 
         #plot support based regret bounds
-        ax[2, 0].semilogy(persist['EBound'], 'k:')  # full regret
-        ax[2, 0].semilogy(persist['LBound'], 'b:')  # local regret
-        ax[2, 0].semilogy(persist['GBound'], 'm:')  # nonlocal regret
+        ax[2, 0].semilogy(persist['EBound'], 'k:x')  # full regret
+        ax[2, 0].semilogy(persist['LBound'], 'b:x')  # local regret
+        ax[2, 0].semilogy(persist['GBound'], 'm:x')  # nonlocal regret
+
+        #display zeroER count for regret bounds
+
+        ax[2,0].text(0.5,min(persist['GBound']),'out of total  {}\ntotal zeros {}\ninlocal {}\ndrawnnotlocal {}\nnotdrawn {}'.format(Z_.shape[0],sum(splitzeros),splitzeros[0],splitzeros[1],splitzeros[2]))
+
+        #repeat for more conservative
+        # plot support based regret bounds
+        ax[2, 0].semilogy(persist['EBound2'], 'k:o')  # full regret
+        ax[2, 0].semilogy(persist['LBound2'], 'b:o')  # local regret
+        ax[2, 0].semilogy(persist['GBound2'], 'm:o')  # nonlocal regret
+
+        # display zeroER count for regret bounds
+
+        ax[2, 0].text(0.5*len(persist['GBound2'])+0.5, min(persist['GBound']),'out of total  {}\ntotal zeros {}\ninlocal {}\ndrawnnotlocal {}\nnotdrawn {}'.format(Z_.shape[0],sum(splitzeros2),splitzeros2[0],splitzeros2[1],splitzeros2[2]))
+
 
         fig.savefig(os.path.join(debugpath, 'lotsofplots' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
         fig.clf()
         plt.close(fig)
         del (fig)
+
+        ER = G.infer_EI_post(sp.vstack([W, xmin]), [[sp.NaN]] * (W.shape[0] + 1), wrt=ymin)
+        M,V = G.infer_diag_post(sp.vstack([W, xmin]), [[sp.NaN]] * (W.shape[0] + 1))
+
+        obj = [ER,M,V,Z_,Y_,R,Y,ymin,persist,Mf,Vf]
+        import pickle
+        pickle.dump(obj, open('dbout/{}.p'.format(optstate.n), 'wb'))
+        logger.info('endopt')
+
     return 0,persist
 
 def gmmclassifier(R,xmin):
