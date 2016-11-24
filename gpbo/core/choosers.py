@@ -130,14 +130,18 @@ def gpcommitment(optstate,persist,**para):
 
     EBound2 = ER2.sum()
 
+    splits=[0,0,0]
     splitbound2 = [0., 0., 0.]
     splitzeros2 = [0, 0, 0]
     closetoV = [0,0,0]
     for i in xrange(Z_.shape[0]):
         splitbound2[Z_[i]] += ER2[0, i]
+        splits[Z_[i]] += 1
         if ER2[0, i] == 0.:
             splitzeros2[Z_[i]] += 1
-   
+        if abs(ymin-M2[i])<3.*sp.sqrt(V2[0,-1]):
+            closetoV[Z_[i]] += 1
+
     GBound2 = splitbound2[1] + splitbound2[2]
     LBound2 = splitbound2[0]
 
@@ -208,9 +212,13 @@ def gpcommitment(optstate,persist,**para):
         ax[2, 0].semilogy(persist['GBound'], 'm:x')  # nonlocal regret
 
         #display zeroER count for regret bounds
-
-        ax[2,0].text(0.5,min(persist['GBound']),'out of total  {}\ntotal zeros {}\ninlocal {}\ndrawnnotlocal {}\nnotdrawn {}'.format(Z_.shape[0],sum(splitzeros),splitzeros[0],splitzeros[1],splitzeros[2]))
-
+        msg = 'out of total   {}\n' \
+              'total closetoV {}\n' \
+              'inlocal        {}  ({})\n' \
+              'drawnotlocal   {}  ({})\n' \
+              'nodraw         {}  ({})' \
+              ''.format(ns, sum(closetoV), closetoV[0], splits[0], closetoV[1], splits[1], closetoV[2],splits[2])
+        ax[2,0].text(0.5,min(persist['GBound']),msg)
         #repeat for more conservative
         # plot support based regret bounds
         ax[2, 0].semilogy(persist['EBound2'], 'k:o')  # full regret
@@ -218,11 +226,18 @@ def gpcommitment(optstate,persist,**para):
         ax[2, 0].semilogy(persist['GBound2'], 'm:o')  # nonlocal regret
 
         # display zeroER count for regret bounds
+        msg = 'out of total   {}\n' \
+              'total zeros    {}\n' \
+              'inlocal        {}  ({})\n' \
+              'drawnotlocal   {}  ({})\n' \
+              'nodraw         {}  ({})' \
+              ''.format(ns,sum(splitzeros2),splitzeros2[0],splits[0],splitzeros2[1],splits[1],splitzeros2[2],splits[2])
+        ax[2, 0].text(0.5*len(persist['GBound2'])+0.5, min(persist['GBound']),msg)
 
-        ax[2, 0].text(0.5*len(persist['GBound2'])+0.5, min(persist['GBound']),'out of total  {}\ntotal zeros {}\ninlocal {}\ndrawnnotlocal {}\nnotdrawn {}'.format(Z_.shape[0],sum(splitzeros2),splitzeros2[0],splitzeros2[1],splitzeros2[2]))
-
-
-        fig.savefig(os.path.join(debugpath, 'lotsofplots' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+        try:
+            fig.savefig(os.path.join(debugpath, 'lotsofplots' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+        except BaseException as e:
+            logger.error(str(e))
         fig.clf()
         plt.close(fig)
         del (fig)
