@@ -8,6 +8,8 @@ import DIRECT
 from sklearn import mixture
 import logging
 import gpbo
+from scipy.stats import norm as norms
+from gpbo.core import GPdc as GP
 logger = logging.getLogger(__name__)
 try:
     from matplotlib import pyplot as plt
@@ -68,6 +70,7 @@ def gpcommitment(optstate,persist,**para):
 
 
     Y_,classaux = gmmclassifier(R,xmin)
+    Y_r,classauxr = radgmmclassifier(R,xmin)
     #classify all the points in W as 0:localdrawn, 1:drawn, 2:notdrawn
     Z_ = sp.ones(para['support']+1,dtype='i')*2
     for i in xrange(nd):
@@ -102,12 +105,19 @@ def gpcommitment(optstate,persist,**para):
 
     #ER bounds on regret based on support
 
-    ER = G.infer_EI_post(sp.vstack([W,xmin]), [[sp.NaN]] * (W.shape[0]+1), wrt=ymin)
+    ns = Z_.shape[0]
+    Mf, Vf = G.infer_diag(sp.vstack([W, xmin]), [[sp.NaN]] * (W.shape[0] + 1))
+    V = Vf.max(axis=0) + sp.var(Mf, axis=0).reshape([1, ns])
+    M = Mf.min(axis=0)
+    ER = sp.empty([1, ns])
+    for i in xrange(ns):
+        ER[0, i] = ERdouble(M[-1],sp.sqrt(V[0,-1]), M[i], sp.sqrt(V[0, i]))
     EBound = ER.sum()
-
+    splits=[0,0,0]
     splitbound = [0.,0.,0.]
     splitzeros = [0,0,0]
     for i in xrange(Z_.shape[0]):
+        splits[Z_[i]]+=1
         splitbound[Z_[i]]+=ER[0,i]
         if ER[0,i]==0.:
             splitzeros[Z_[i]]+=1
@@ -118,36 +128,10 @@ def gpcommitment(optstate,persist,**para):
     persist['GBound'].append(GBound)
     persist['LBound'].append(LBound)
 
-
-    #more conservative? bounds
-    ns = Z_.shape[0]
-    Mf, Vf = G.infer_diag(sp.vstack([W, xmin]), [[sp.NaN]] * (W.shape[0] + 1))
-    V2 = Vf.max(axis=0) + sp.var(Mf, axis=0).reshape([1, ns])
-    M2 = Mf.min(axis=0)
-    ER2 = sp.empty([1, ns])
-    for i in xrange(ns):
-        ER2[0, i] = gpbo.core.GPdc.EI(ymin, M2[i], V2[0, i])
-
-    EBound2 = ER2.sum()
-
-    splits=[0,0,0]
-    splitbound2 = [0., 0., 0.]
-    splitzeros2 = [0, 0, 0]
-    closetoV = [0,0,0]
-    for i in xrange(Z_.shape[0]):
-        splitbound2[Z_[i]] += ER2[0, i]
-        splits[Z_[i]] += 1
-        if ER2[0, i] == 0.:
-            splitzeros2[Z_[i]] += 1
-        if abs(ymin-M2[i])<3.*sp.sqrt(V2[0,-1]):
-            closetoV[Z_[i]] += 1
-
-    GBound2 = splitbound2[1] + splitbound2[2]
-    LBound2 = splitbound2[0]
-
-    persist['EBound2'].append(EBound2)
-    persist['GBound2'].append(GBound2)
-    persist['LBound2'].append(LBound2)
+    #predictors for the bounds
+    Epred = predictforward(persist['EBound'])
+    Gpred = predictforward(persist['GBound'])
+    Lpred = predictforward(persist['LBound'])
 
     from gpbo.core import debugoutput, debugoptions, debugpath
     if debugoutput and debugoptions['adaptive'] and plots:
@@ -178,11 +162,18 @@ def gpcommitment(optstate,persist,**para):
         for i in xrange(para['support']):
             symbol = ['r.','g.','bx'][Z_[i]]
             ax[0,1].plot(W[i,0],W[i,1],symbol)
+            if ER[0,i]>0.:
+                ax[2,2].plot(W[i,0],W[i,1],'b.')
+            else:
+                ax[2,2].plot(W[i,0],W[i,1],'r.')
         ax[0, 1].axis([-1, 1, -1, 1])
 
         for i in xrange(nd):
             symbol = ['r.', 'g.'][Y_[i]]
             ax[1, 1].plot(R[i, 0], R[i, 1], symbol)
+        for i in xrange(nd):
+            symbol = ['r.', 'g.'][Y_r[i]]
+            ax[1, 2].plot(R[i, 0], R[i, 1], symbol)
 
         Nselected = sorted([len(list(group)) for key, group in groupby(sorted(A))])
         ax[0,2].plot(Nselected,'b')
@@ -207,23 +198,10 @@ def gpcommitment(optstate,persist,**para):
 
 
         #plot support based regret bounds
-        ax[2, 0].semilogy(persist['EBound'], 'k:x')  # full regret
-        ax[2, 0].semilogy(persist['LBound'], 'b:x')  # local regret
-        ax[2, 0].semilogy(persist['GBound'], 'm:x')  # nonlocal regret
+        ax[2, 0].semilogy(persist['EBound'], 'k--.')  # full regret
+        ax[2, 0].semilogy(persist['LBound'], 'b--.')  # local regret
+        ax[2, 0].semilogy(persist['GBound'], 'm--.')  # nonlocal regret
 
-        #display zeroER count for regret bounds
-        msg = 'out of total   {}\n' \
-              'total closetoV {}\n' \
-              'inlocal        {}  ({})\n' \
-              'drawnotlocal   {}  ({})\n' \
-              'nodraw         {}  ({})' \
-              ''.format(ns, sum(closetoV), closetoV[0], splits[0], closetoV[1], splits[1], closetoV[2],splits[2])
-        ax[2,0].text(0.5,min(persist['GBound']),msg)
-        #repeat for more conservative
-        # plot support based regret bounds
-        ax[2, 0].semilogy(persist['EBound2'], 'k:o')  # full regret
-        ax[2, 0].semilogy(persist['LBound2'], 'b:o')  # local regret
-        ax[2, 0].semilogy(persist['GBound2'], 'm:o')  # nonlocal regret
 
         # display zeroER count for regret bounds
         msg = 'out of total   {}\n' \
@@ -231,8 +209,20 @@ def gpcommitment(optstate,persist,**para):
               'inlocal        {}  ({})\n' \
               'drawnotlocal   {}  ({})\n' \
               'nodraw         {}  ({})' \
-              ''.format(ns,sum(splitzeros2),splitzeros2[0],splits[0],splitzeros2[1],splits[1],splitzeros2[2],splits[2])
-        ax[2, 0].text(0.5*len(persist['GBound2'])+0.5, min(persist['GBound']),msg)
+              ''.format(ns,sum(splitzeros),splitzeros[0],splits[0],splitzeros[1],splits[1],splitzeros[2],splits[2])
+        ax[2, 0].text(0.5, min(persist['GBound']),msg)
+
+        #show forward predictions
+        nq=200
+        xaxis = sp.linspace(0,min(len(persist['EBound'])+20,2*len(persist['EBound'])),nq)
+        Ep = map(Epred.predict,xaxis)
+        Lp = map(Lpred.predict, xaxis)
+        Gp = map(Gpred.predict, xaxis)
+        ax[2, 0].semilogy(xaxis,Ep, 'k:')  # full regret
+        ax[2, 0].semilogy(xaxis,Lp, 'b:')  # local regret
+        ax[2, 0].semilogy(xaxis,Gp, 'm:')
+
+
 
         try:
             fig.savefig(os.path.join(debugpath, 'lotsofplots' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
@@ -242,10 +232,7 @@ def gpcommitment(optstate,persist,**para):
         plt.close(fig)
         del (fig)
 
-        ER = G.infer_EI_post(sp.vstack([W, xmin]), [[sp.NaN]] * (W.shape[0] + 1), wrt=ymin)
-        M,V = G.infer_diag_post(sp.vstack([W, xmin]), [[sp.NaN]] * (W.shape[0] + 1))
-
-        obj = [ER,M,V,Z_,Y_,R,Y,ymin,persist,Mf,Vf]
+        obj = [ER,M,V,Z_,Y_,R,Y,xmin,ymin,persist]
         import pickle
         pickle.dump(obj, open('dbout/{}.p'.format(optstate.n), 'wb'))
         logger.info('endopt')
@@ -300,3 +287,67 @@ def gmmclassifier(R,xmin):
         else:
             Z_[i]=1
     return Z_,{'localset':localset,'covs':clf.covariances_,'means':clf.means_}
+
+def radgmmclassifier(Ri,xmin):
+    R=sp.empty([Ri.shape[0],1])
+    for i in xrange(Ri.shape[0]):
+        z=Ri[i,:]-xmin
+        R[i,0] = sp.log10(sp.sqrt(z[0]**2+z[1]**2)) if z[0]!=0 and z[1]!=0 else -3.
+    # fit gmm to the drawn mins
+    lowest_bic = sp.inf
+    bic = []
+    n_components_range = range(1, 3)
+    for n_components in n_components_range:
+        # Fit a Gaussian mixture with EM
+        gmm = mixture.GaussianMixture(n_components=n_components, covariance_type='full')
+        gmm.fit(R)
+        bic.append(gmm.bic(R))
+        if bic[-1] < lowest_bic:
+            lowest_bic = bic[-1]
+            best_gmm = gmm
+
+    clf = best_gmm
+    local = int(sp.argmin(clf.means_))
+    localset = [local]
+    closestcov = clf.covariances_[local]
+    closestmean = clf.means_[local]
+    # add any that are similar size and overlappind
+
+    # predict classes
+    Y_ = clf.predict(R)
+    #map classes to in out
+    Z_ = sp.empty(Y_.size,dtype='i')
+    for i in xrange(Y_.size):
+        if Y_[i] in localset:
+            Z_[i]=0
+        else:
+            Z_[i]=1
+
+    print "XXXXXXXXXXXXXXXX_\n{}\n{}".format(clf.means_.flatten(),clf.covariances_.flatten())
+    return Z_,{'localset':localset,'covs':clf.covariances_,'means':clf.means_}
+
+def ERdouble(m0,s0,m1,s1):
+    sz = sp.sqrt(s0**2+s1**2)
+    mz = m0-m1
+    return sz*norms.pdf(-mz/sz)-mz*norms.cdf(-mz/sz)+mz
+
+
+class predictforward:
+    def __init__(self, data):
+        self.n = len(data)
+        self.Y = sp.array([sp.log10(i) for i in data]).reshape([self.n, 1])
+        self.X = sp.array([float(i) for i in range(self.n)]).reshape([self.n, 1])
+        self.D = [[sp.NaN]] * self.n
+        self.S = sp.zeros([1, self.n])
+        self.ki = GP.SQUEXPCS
+
+        self.MAPHYP = GP.searchMAPhyp(self.X, self.Y, self.S, self.D, sp.array([1., 2., 2.]), sp.array([2., 2., 2.]),
+                                      self.ki)
+
+        self.kf = GP.kernel(self.ki, 1, sp.array(self.MAPHYP))
+
+        self.G = GP.GPcore(self.X, self.Y, self.S, self.D, self.kf)
+
+    def predict(self, x):
+        m = self.G.infer_m(sp.array([[x]]), [[sp.NaN]])
+        return 10**(m[0, 0])

@@ -9,3 +9,4 @@ from .config import *
 from .GPdc import *
 from .ESutils import *
 from .choosers import *
+from .GP1dg import *

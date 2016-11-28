@@ -1,41 +1,58 @@
 import pickle
 import scipy as sp
+import numpy as np
 from scipy import linalg as spl
 from scipy import stats as sps
 from matplotlib import pyplot as plt
 from matplotlib import patches
 import gpbo
-n=39
+from gpbo.core import GPdc as GP
+from gpbo.core.choosers import gmmclassifier
+from sklearn.neighbors import kneighbors_graph
+from sklearn import cluster
+from sklearn.preprocessing import StandardScaler
+n=37
+
+def topolar(x,o):
+    z = x-o
+    r = sp.log10(sp.sqrt(z[0]**2+z[1]**2)) if z[0]!=0 and z[1]!=0 else -4.
+    th = sp.arctan(z[1]/z[0]) if z[0] != 0. else sp.pi/2.
+    return [r,1.]
+
+ER,M,V,Z_,Y_,Ro,Y,xmin,ymin,persist = pickle.load(open("dbout/{}.p".format(n), "rb"))
 
 
-ER,M,V,Z_,Y_,R,Y,ymin,persist,Mf,Vf = pickle.load(open("dbout/{}.p".format(n), "rb"))
-ns = Z_.shape[0]
-
-P = sp.mean(Vf,axis=0)+sp.var(Mf,axis=0).reshape([1,ns])
-V2 = Vf.max(axis=0)+sp.var(Mf,axis=0).reshape([1,ns])
-M2 = Mf.min(axis=0)
-
-ER2 = sp.empty([1,ns])
+ns = Ro.shape[0]
+R = sp.empty(Ro.shape)
 for i in xrange(ns):
-    ER2[0,i] = gpbo.core.GPdc.EI(ymin,M2[i],V2[0,i])
+    R[i,:] = topolar(Ro[i,:],xmin)
+#    print Ro[i,:],R[i,:]
+aug = sp.empty([R.shape[0],1])
+for i in xrange(ns):
+    aug[i,0] = (R[i,0]-xmin[0])**2 + (R[i,1]-xmin[1])**2
 
 
+Y_,classaux = gmmclassifier(R,xmin)
 
-count=[0,0,0]
-zcount=[0,0,0]
-for i in xrange(Z_.size):
-    count[Z_[i]]+=1
-    if ER[0,i]==0.:
-        zcount[Z_[i]] += 1
-        print '> >           {} | {} {} | {} {}'.format(ER2[0,i], Z_[i],Y[i, 1]-Y[i,0],(M[0,i]-ymin),(M[0,i]-ymin)/sp.sqrt(V[0,i]))
-    elif Z_[i]==2:
-        print '{} | {} {} | {} {}'.format(ER2[0,i], Z_[i],Y[i, 1]-Y[i,0],(M[0,i]-ymin),(M[0,i]-ymin)/sp.sqrt(V[0,i]))
+F = StandardScaler().fit_transform(R)
+bandwidth = cluster.estimate_bandwidth(F, quantile=0.3)
+ms = cluster.MeanShift(bandwidth=bandwidth, bin_seeding=True)
+ms.fit(R)
+Ys_ = ms.predict(R)
 
-print count
-print zcount
-print sp.sqrt(V[0,-1])
+f,a=plt.subplots(4)
 
-#print sp.hstack([Vf[:,:4].T,V[0,:4].reshape([4,1])])
+for i in xrange(ns):
+    sym = ['r.','b.', 'g.','c.','k.','bx','rx','gx','cx','kx']+['grey']*20
+    col = sym[Ys_[i]]
+    a[0].plot(R[i,0],R[i,1],col)
+    col = sym[Ys_[i]]
+    a[1].plot(Ro[i, 0], Ro[i, 1], col)
 
-
-
+for i in xrange(ns):
+    sym = ['r.','b.', 'g.','c.','k.','bx','rx','gx','cx','kx']+['grey']*20
+    col = sym[Y_[i]]
+    a[2].plot(R[i,0],R[i,1],col)
+    col = sym[Y_[i]]
+    a[3].plot(Ro[i, 0], Ro[i, 1], col)
+plt.show()

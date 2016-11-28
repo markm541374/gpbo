@@ -13,8 +13,13 @@ def readme():
 compile_flags = ['-O3']
 from numpy import get_include
 extensions = [
-    Extension(name ="gpbo/core/ESutils",
+     Extension(name ="gpbo/core/ESutils",
               sources = ["gpbo/core/ESutils.c"],
+              include_dirs = ['.','core',get_include()],
+              extra_compile_args=compile_flags
+    ),
+    Extension(name ="gpbo/core/GP1dg",
+              sources = ["gpbo/core/GP1dg.c"],
               include_dirs = ['.','core',get_include()],
               extra_compile_args=compile_flags
     ),
