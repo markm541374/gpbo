@@ -129,9 +129,9 @@ def gpcommitment(optstate,persist,**para):
     persist['LBound'].append(LBound)
 
     #predictors for the bounds
-    Epred = predictforward(persist['EBound'])
+    Epred = predictforward(persist['ERegret'])
     Gpred = predictforward(persist['GBound'])
-    Lpred = predictforward(persist['LBound'])
+    Lpred = predictforward(persist['LRegret'])
 
     from gpbo.core import debugoutput, debugoptions, debugpath
     if debugoutput and debugoptions['adaptive'] and plots:
@@ -338,11 +338,12 @@ class predictforward:
         self.Y = sp.array([sp.log10(i) for i in data]).reshape([self.n, 1])
         self.X = sp.array([float(i) for i in range(self.n)]).reshape([self.n, 1])
         self.D = [[sp.NaN]] * self.n
-        self.S = sp.zeros([1, self.n])
-        self.ki = GP.SQUEXPCS
-
-        self.MAPHYP = GP.searchMAPhyp(self.X, self.Y, self.S, self.D, sp.array([1., 2., 2.]), sp.array([2., 2., 2.]),
-                                      self.ki)
+        self.S = sp.array([[1e-2]]*self.n).T
+#        self.S = sp.zeros([1e-2, self.n])
+#        self.ki = GP.SQUEXPCS
+#        self.MAPHYP = GP.searchMAPhyp(self.X, self.Y, self.S, self.D, sp.array([1., 2., 2.]), sp.array([2., 2., 2.]),self.ki)
+        self.ki = GP.CPDEC1
+        self.MAPHYP = GP.searchMAPhyp(self.X, self.Y, self.S, self.D, sp.array([1., 1., 0.]), sp.array([1., 1., 0.5]),self.ki)
 
         self.kf = GP.kernel(self.ki, 1, sp.array(self.MAPHYP))
 

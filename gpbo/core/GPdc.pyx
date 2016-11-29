@@ -57,7 +57,7 @@ class GP_LKonly:
 class GPcore:
     def __init__(self, X_s, Y_s, S_s, D_s, kf):
         #print [X_s, Y_s, S_s, D_s, kf]
-        if type(kf) is kernel:
+        if isinstance(kf,kernel):
             self.size = 1
             kf = [kf]
         else:
@@ -273,6 +273,9 @@ MAT52PER = 11
 MAT52PPT = 12
 DEV=13
 MATPP=14
+DEC1=15
+DEC1CS=16
+CPDEC1=17
 class kernel(object):
     def __init__(self,K,D,H):
         self.dim = D

@@ -11,7 +11,9 @@ from gpbo.core.choosers import gmmclassifier
 from sklearn.neighbors import kneighbors_graph
 from sklearn import cluster
 from sklearn.preprocessing import StandardScaler
-n=37
+from gpbo.core import GPdc
+from gpbo.core.GPdc import kernel
+n=10
 
 def topolar(x,o):
     z = x-o
@@ -21,7 +23,27 @@ def topolar(x,o):
 
 ER,M,V,Z_,Y_,Ro,Y,xmin,ymin,persist = pickle.load(open("dbout/{}.p".format(n), "rb"))
 
+f,a=plt.subplots(2,2)
+xaxis = sp.linspace(0,min(2*n,n+20),200)
+dplot = [[sp.NaN]]*200
+print persist['GBound']
+for ax,data in zip([a[0,0],a[1,0],a[1,1]],[persist['ERegret'],persist['GBound'],persist['LRegret']]):
 
+    n=len(data)
+    Y = sp.array([sp.log10(i) for i in data]).reshape([n,1])
+    X = sp.array([[float(i) for i in range(n)]]).T
+    D = [[sp.NaN]]*n
+    S = sp.array([[1e-2]]*n).T
+    MAPHYP = GPdc.searchMAPhyp(X, Y, S, D, sp.array([1., 1.,0.]), sp.array([1., 1.,0.5]), GPdc.CPDEC1)
+    k = kernel(GPdc.CPDEC1,1,MAPHYP)
+    g = GPdc.GPcore(X, Y, S, D,k)
+    m,v = g.infer_diag(xaxis,dplot)
+    s = sp.sqrt(v)
+    ax.fill_between(xaxis,(m-2.*s).flatten(),(m+2.*s).flatten(),facecolor='lightblue',edgecolor='lightblue')
+    ax.plot(xaxis,m.flatten(),'b')
+    ax.plot(X,Y,'r.')
+    #ax.set_yscale('log')
+"""
 ns = Ro.shape[0]
 R = sp.empty(Ro.shape)
 for i in xrange(ns):
@@ -55,4 +77,5 @@ for i in xrange(ns):
     a[2].plot(R[i,0],R[i,1],col)
     col = sym[Y_[i]]
     a[3].plot(Ro[i, 0], Ro[i, 1], col)
+"""
 plt.show()

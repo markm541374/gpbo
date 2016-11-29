@@ -4,6 +4,76 @@
 #include <stdio.h>
 #include "matern.h"
 #include "simplekernels.h"
+int cpdec1conv(double *h, int D, double* ih){
+    ih[0] = h[0];
+    ih[1] = h[1];
+    ih[2] = h[2];
+    return 0;
+}
+//origin var and grad var are logspace, offset in unchanged
+int cpdec1searchconv(double *h, int D, double* ih){
+    ih[0] = pow(10.,h[0]);
+    ih[1] = pow(10.,h[1]);
+    ih[2] = pow(10.,h[2]);
+    return 0;
+}
+double cpdec1(double *x1, double *x2, int d1, int d2, int D, double* ih, double* smodel){
+    //linear kernel in the first axis. ih are v^2 c b^2. Kernel is v^2 *(x1-c)(x2-c)+b^2
+    //D is not to be used, only present for consistency in function definition
+
+    if (d1==0 and d2 == 0){
+        //no derivatives
+
+        return ih[2]+pow(ih[1],ih[0])/pow(x1[0]+x2[0]+ih[1],ih[0]);
+    }
+   else{
+        return 0.;
+    }
+}
+int dec1conv(double *h, int D, double* ih){
+    ih[0] = h[0];
+    ih[1] = h[1];
+    return 0;
+}
+//origin var and grad var are logspace, offset in unchanged
+int dec1searchconv(double *h, int D, double* ih){
+    ih[0] = pow(10.,h[0]);
+    ih[1] = pow(10.,h[1]);
+    return 0;
+}
+double dec1(double *x1, double *x2, int d1, int d2, int D, double* ih, double* smodel){
+    //linear kernel in the first axis. ih are v^2 c b^2. Kernel is v^2 *(x1-c)(x2-c)+b^2
+    //D is not to be used, only present for consistency in function definition
+
+    if (d1==0 and d2 == 0){
+        //no derivatives
+
+        return pow(ih[1],ih[0])/pow(x1[0]+x2[0]+ih[1],ih[0]);
+    }
+   else{
+        return 0.;
+    }
+}
+
+double dec1cs(double *x1, double *x2, int d1, int d2, int D, double* ih, double* smodel){
+
+    smodel[0] = ih[2];
+    return dec1(x1,x2,d1,d2,D,ih,smodel);
+}
+
+int dec1csconv(double *h, int D, double* ih){
+    ih[0] = pow(10.,h[0]);
+    ih[1] = pow(10.,h[1]);
+    ih[2] = pow(10.,h[2]);
+    return 0;
+}
+//all are searched in log space
+int dec1cssearchconv(double *h, int D, double* ih){
+    ih[0] = pow(10.,h[0]);
+    ih[1] = pow(10.,h[1]);
+    ih[2] = pow(10.,h[2]);
+    return 0;
+}
 
 int lin1conv(double *h, int D, double* ih){
     ih[0] = pow(h[0],2);
@@ -435,7 +505,7 @@ double squexpsquexpPsquexp(double *x1, double *x2, int d1, int d2, int D, double
 
 typedef double (*KP)(double*, double*, int, int, int, double*,double*);
 
-extern "C" const KP kern[15] = {&squexp,&lin1,&linXPsquexp,&linsquexpXPsquexp,squexp1Ssquexp,&squexpsquexpPsquexp,&squexpcs,&squexpps,&squexpbs,&mat52,&mat52cs,&mat52per,&mat52ppt,&dev,&matpp};
+extern "C" const KP kern[18] = {&squexp,&lin1,&linXPsquexp,&linsquexpXPsquexp,squexp1Ssquexp,&squexpsquexpPsquexp,&squexpcs,&squexpps,&squexpbs,&mat52,&mat52cs,&mat52per,&mat52ppt,&dev,&matpp,&dec1,&dec1cs,&cpdec1};
 
 extern "C" double k(double *x1, double *x2, int d1, int d2, int D, double* ih, int kindex, double* smodel){
     smodel[0] = 0.;
@@ -447,7 +517,7 @@ return kern[kindex](&x1[0], &x2[0], d1, d2, D, &ih[0],smodel);
 
 typedef int (*HP)(double *h, int D, double* ih);
 
-extern "C" const HP hypcons[15] = {&squexpconv,&lin1conv,&linXPsquexpconv,&linsquexpXPsquexpconv,&squexp1Ssquexpconv,&squexpsquexpPsquexpconv,&squexpcsconv,&squexppsconv,&squexpbsconv,&mat52conv,&mat52csconv,&mat52perconv,&mat52pptconv,&devconv,&matppconv};
+extern "C" const HP hypcons[18] = {&squexpconv,&lin1conv,&linXPsquexpconv,&linsquexpXPsquexpconv,&squexp1Ssquexpconv,&squexpsquexpPsquexpconv,&squexpcsconv,&squexppsconv,&squexpbsconv,&mat52conv,&mat52csconv,&mat52perconv,&mat52pptconv,&devconv,&matppconv,&dec1conv,&dec1csconv,&cpdec1conv};
 
 extern "C" int hypconvert(double *h, int kindex, int D, double* ih){
     return hypcons[kindex](h,D,ih);
@@ -455,7 +525,7 @@ extern "C" int hypconvert(double *h, int kindex, int D, double* ih){
 
 typedef int (*SP)(double *h, int D, double* ih);
 
-extern "C" const SP hypsearchcons[15] = {&squexpsearchconv,&lin1searchconv,&linXPsquexpsearchconv,&linsquexpXPsquexpsearchconv,&squexp1Ssquexpsearchconv,&squexpsquexpPsquexpsearchconv,&squexpcssearchconv,&squexppssearchconv,&squexpbssearchconv,&mat52searchconv,&mat52cssearchconv,&mat52persearchconv,&mat52pptsearchconv,&devsearchconv,&matppsearchconv};
+extern "C" const SP hypsearchcons[18] = {&squexpsearchconv,&lin1searchconv,&linXPsquexpsearchconv,&linsquexpXPsquexpsearchconv,&squexp1Ssquexpsearchconv,&squexpsquexpPsquexpsearchconv,&squexpcssearchconv,&squexppssearchconv,&squexpbssearchconv,&mat52searchconv,&mat52cssearchconv,&mat52persearchconv,&mat52pptsearchconv,&devsearchconv,&matppsearchconv,&dec1searchconv,&dec1cssearchconv,&cpdec1searchconv};
 
 extern "C" int hypsearchconvert(double *h, int kindex, int D, double* ih){
     return hypsearchcons[kindex](h,D,ih);
@@ -507,6 +577,15 @@ extern "C" int numhyp(int kindex, int D){
     else if (kindex==14){
         //dev
         return 5;
+    }
+    else if (kindex==15){
+        return 2;
+    }
+    else if (kindex==16){
+        return 3;
+    }
+    else if (kindex==17){
+        return 3;
     }
     else{
         printf("%d %d a bad thing happened :(",kindex,D);
