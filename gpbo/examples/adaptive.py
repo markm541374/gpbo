@@ -50,8 +50,8 @@ class conf():
             'ub': [1.] * D,
             'start':[0.]*D
         }
-
-        choosepara = {
+        self.chooser = gpbo.core.choosers.gpcommitment
+        self.choosepara = {
             'ev': aq0para['ev'],
             'lb': aq0para['lb'],
             'ub': aq0para['ub'],
@@ -70,22 +70,19 @@ class conf():
             'cheatf': f,
             'budget': n
         }
-        self.aqfn = gpbo.core.acquisitions.choiceaq
-        self.aqpara = {
-            'aqoptions': [[aq0, aq0para], [aq1, aq1para]],
-            'chooser': gpbo.core.choosers.gpcommitment,
-            'choosepara': choosepara,
-            'ev': aq0para['ev'],
+        self.aqfn = [aq0,aq1]
+        self.aqpara = [aq0para,aq1para]
+        self.multimode = True
 
-        }
+
 
 
         self.stoppara = {'nmax': n}
-        self.stopfn = gpbo.core.optimize.nstopfn
+        self.stopfn = gpbo.core.optimize.norlocalstopfn
 
 
-        self.reccfn = gpbo.core.reccomenders.gpmaprecc
-        self.reccpara = {
+        reccfn0 = gpbo.core.reccomenders.gpmaprecc
+        reccpara0 = {
             'ev': aq0para['ev'],
             'lb': aq0para['lb'],
             'ub': aq0para['ub'],
@@ -97,6 +94,12 @@ class conf():
             'check': True,
             'everyn': 1
         }
+        reccfn1 = gpbo.core.reccomenders.argminrecc
+        reccpara1 = {'check':True}
+
+        self.reccfn = [reccfn0,reccfn1]
+        self.reccpara = [reccpara0,reccpara1]
+
         self.ojfchar = {'dx': len(aq0para['lb']), 'dev': len(aq0para['ev'])}
         self.ojf = f
 

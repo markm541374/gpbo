@@ -23,18 +23,18 @@ import time
 
 
 def always0(optstate,persist,**para):
-    return 0
+    return 0,None,dict()
 
 
 def alternate(optstate,persist,**para):
-    return optstate.n%2
+    return optstate.n%2,None,dict()
 
 
 def aftern(optstate,persist,**para):
     if optstate.n>para['n']:
-        return 1
+        return 1,None,dict()
     else:
-        return 0
+        return 0,None,dict()
 
 
 def gpcommitment(optstate,persist,**para):
@@ -149,8 +149,6 @@ def gpcommitment(optstate,persist,**para):
         'brm':para['budget']-optstate.n
         }
     now,when = choice(chpara)
-    if optstate.n>30:
-        now=1
     persist['flip']=now
     from gpbo.core import debugoutput, debugoptions, debugpath
     if debugoutput and debugoptions['adaptive'] and plots:

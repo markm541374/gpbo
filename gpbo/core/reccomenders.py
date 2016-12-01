@@ -28,7 +28,7 @@ def argminrecc(optstate,persist,**para):
     
     logger.info('argmin reccomender')
     xinc = optstate.x[0]
-    yinc = 1e99
+    yinc =sp.Inf
     for x,y in zip(optstate.x,optstate.y):
         if y<yinc:
             xinc = x

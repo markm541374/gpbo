@@ -9,6 +9,7 @@ import time
 import logging
 import copy
 import pandas as pd
+import gpbo
 
 logger = logging.getLogger(__name__)
 
@@ -39,16 +40,14 @@ class optstate:
 
 
 class optimizer:
-    def __init__(self,dirpath,name,aqpara,aqfn,stoppara,stopfn,reccpara,reccfn,ojf,ojfchar):
-        print aqpara
-
+    def __init__(self,dirpath,name,aqpara,aqfn,stoppara,stopfn,reccpara,reccfn,ojf,ojfchar,choosefn,choosepara):
         self.dirpath = dirpath
         self.name = name
         self.setaq(aqpara,aqfn)
         self.setstopcon(stoppara,stopfn)
         self.setojf(ojf)
         self.setrecc(reccpara,reccfn)
-        
+        self.setchoose(choosepara,choosefn)
         self.ojfchar = ojfchar
         self.dx = ojfchar['dx']
         self.dev = ojfchar['dev']
@@ -57,15 +56,20 @@ class optimizer:
     def setaq(self,aqpara,aqfn):
         self.aqfn = aqfn
         self.aqpara = aqpara
-        self.aqpersist = None
+        self.aqpersist = [None]*len(aqfn)
         return
     
     def setrecc(self,reccpara,reccfn):
         self.reccpara = reccpara
         self.reccfn = reccfn
-        self.reccpersist = None
+        self.reccpersist = [None]*len(reccfn)
         return
-    
+
+    def setchoose(self,choosepara,choosefn):
+        self.choosepara = choosepara
+        self.choosefn =choosefn
+        self.choosepersist = None
+        return
     def setstopcon(self,stoppara,stopfn):
         self.stoppara = stoppara
         self.stopfn=stopfn
@@ -79,15 +83,19 @@ class optimizer:
         logger.info('startopt:')
         
         lf = open(os.path.join(self.dirpath,self.name),'wb',0)
-        lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, aqauxdata'])+'\n')
+        lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara[0]['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, aqauxdata'])+'\n')
         self.state = optstate()
         stepn=0
         while not self.stopfn(self.state,**self.stoppara):
             stepn+=1
+            print self.choosepara
+            print self.choosefn
+            mode,self.choosepersist,chooseaux = self.choosefn(self.state,self.choosepersist,**self.choosepara)
+
             logger.info("---------------------\nstep {}\naquisition:".format(stepn))
             
             t0 = time.time()
-            x,ev,self.aqpersist,aqaux = self.aqfn(self.state,self.aqpersist,**self.aqpara)
+            x,ev,self.aqpersist[mode],aqaux = self.aqfn[mode](self.state,self.aqpersist[mode],**self.aqpara[mode])
             t1 = time.time()
             self.state.aux = aqaux
             logger.info("{} : {}    aqtime: {}\nevaluate:".format(x,ev,t1-t0))
@@ -96,12 +104,12 @@ class optimizer:
             t2 = time.time()
             self.state.update(x,ev,y,c,t1-t0)
             logger.info("{} : {}     evaltime: {}\nreccomend:".format(y,c,t2-t1))
-            rx,self.reccpersist,reaux = self.reccfn(self.state,self.reccpersist,**self.reccpara)
+            rx,self.reccpersist[mode],reaux = self.reccfn[mode](self.state,self.reccpersist[mode],**self.reccpara[mode])
             t3 = time.time()
             
-            if self.reccpara['check']:
+            if self.reccpara[mode]['check']:
                 #logger.info("checkin {} : {}".format(rx,self.aqpara['ev']))
-                checkpara=copy.copy(self.aqpara['ev'])
+                checkpara=copy.copy(self.aqpara[mode]['ev'])
                 checkpara['s']=1e-99
                 checkpara['cheattrue']=True
                 checky,checkc,checkojaux  = self.ojf(rx,**checkpara)
@@ -121,6 +129,8 @@ class optimizer:
 
         return rx,reaux
     
+def norlocalstopfn(optstate,**para):
+    return nstopfn(optstate,**para) or localstopfn(optstate,**para)
 
 def nstopfn(optstate,nmax = 1):
     return optstate.n >= nmax
@@ -141,9 +151,18 @@ def cstopfn(optstate,cmax = 1,includeaq=False):
 def search(optconfig):
     if not hasattr(optconfig,'fname'):
         optconfig.fname='traces.csv'
-    O = optimizer(optconfig.path, optconfig.fname, optconfig.aqpara, optconfig.aqfn, optconfig.stoppara,
+    multi=False
+    if hasattr(optconfig,'multimode'):
+        if optconfig.multimode:
+            multi=True
+    if not multi:
+        O = optimizer(optconfig.path, optconfig.fname, [optconfig.aqpara], [optconfig.aqfn], optconfig.stoppara,
+                                     optconfig.stopfn, [optconfig.reccpara], [optconfig.reccfn], optconfig.ojf,
+                                     optconfig.ojfchar,gpbo.core.choosers.always0,dict())
+    else:
+        O = optimizer(optconfig.path, optconfig.fname, optconfig.aqpara, optconfig.aqfn, optconfig.stoppara,
                                      optconfig.stopfn, optconfig.reccpara, optconfig.reccfn, optconfig.ojf,
-                                     optconfig.ojfchar)
+                                     optconfig.ojfchar,optconfig.chooser,optconfig.choosepara)
 
     return O.run()
 
