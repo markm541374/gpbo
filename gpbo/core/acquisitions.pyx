@@ -52,7 +52,16 @@ def bruteaq(optstate,persist,**para):
 
 
 #EIMAP
-def EIMAPaq(optstate,persist,ev=None, ub = None, lb=None, nrandinit=None, mprior=None,sprior=None,kindex = None,volper=None):
+def EIMAPaq(optstate,persist,**para):
+    ev=para['ev']
+    ub = para['ub']
+    lb = para['lb']
+    nrandinit = para['nrandinit']
+    mprior = para['mprior']
+    sprior = para['sprior']
+    kindex = para['kindex']
+    volper = para['volper']
+
     #para = copy.deepcopy(para)
     if persist==None:
         persist = {'n':0,'d':len(ub)}
@@ -233,15 +242,16 @@ def choiceaq(optstate,persist,**para):
     para = copy.deepcopy(para)
     if persist==None:
         persist = [None,[None]*len(para['aqoptions'])]
-    aqn,choosepersist = para['chooser'](optstate,persist[0],**para['choosepara'])
+    aqn,choosepersist,transfer = para['chooser'](optstate,persist[0],**para['choosepara'])
     persist[0]=choosepersist
+    para['aqoptions'][aqn][1]['transfer']=transfer
     logger.debug('choose to use aquisition {}'.format(para['aqoptions'][aqn][0].__name__))
     x,ev,pers,aux = para['aqoptions'][aqn][0](optstate,persist[1][aqn],**para['aqoptions'][aqn][1])
     persist[1][aqn]=pers
     return x,ev,persist,aux
 
 def splocalaq(optstate,persist,**para):
-    logger.info('splocalaq {}'.format(persist))
+
     if persist==None:
         persist={'n':0,'y':[],'x':[],'done':False}
     else:
@@ -250,7 +260,12 @@ def splocalaq(optstate,persist,**para):
     global count
     count=0
 
-
+    if not 'start' in persist.keys():
+        try:
+            persist['start']=para['transfer']['localstart']
+        except:
+            persist['start']=para['start']
+    logger.info('splocalaq from {} step {}'.format(persist['start'],persist['n']))
     def fwrap(x):
         global count
 
@@ -262,7 +277,7 @@ def splocalaq(optstate,persist,**para):
             count+=1
             return persist['y'][count-1]
     try:
-        minimize(fwrap,para['start'])
+        minimize(fwrap,persist['start'],method='l-bfgs-b',bounds=[(para['lb'][i],para['ub'][i])for i in range(len(para['ub']))])
         persist['done']=True
         optstate.localdone=True
         return persist['x'][-1],para['ev'],persist,{'msg':'localopt is complete'}
@@ -271,4 +286,4 @@ def splocalaq(optstate,persist,**para):
     persist['x'].append(x)
     persist['n']+=1
     #print 'xtoev {}'.format(x)
-    return x,para['ev'],persist,{'msg':'localopt is complete'}
+    return x,para['ev'],persist,{'msg':'localopt' }

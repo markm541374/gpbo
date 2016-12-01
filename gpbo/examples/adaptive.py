@@ -13,7 +13,7 @@ gpbo.core.debugoptions={'datavis':True,'drawlap':False,'cost1d':False,'ctaq':Fal
 
 D=2
 n=50
-s=1e-6
+s=0.
 
 lb=[-1.,-1.]
 ub = [1.,1.]
@@ -43,11 +43,12 @@ class conf():
             'volper': 1e-6
         }
 
-        aq1 = gpbo.core.acquisitions.bruteaq
+        aq1 = gpbo.core.acquisitions.splocalaq
         aq1para = {
             'ev': {'s': s, 'd': [sp.NaN]},
             'lb': [-1.] * D,
             'ub': [1.] * D,
+            'start':[0.]*D
         }
 
         choosepara = {
@@ -66,7 +67,8 @@ class conf():
             'draws': 8000,
             'starts': 20,
             'cheatymin': ymin,
-            'cheatf': f
+            'cheatf': f,
+            'budget': n
         }
         self.aqfn = gpbo.core.acquisitions.choiceaq
         self.aqpara = {
@@ -102,7 +104,7 @@ class conf():
         self.fname = fname
         return
 
-C = conf(f,D,100,s,'results','adaptive.csv')
+C = conf(f,D,80,s,'results','adaptive.csv')
 
 out = gpbo.search(C)
 

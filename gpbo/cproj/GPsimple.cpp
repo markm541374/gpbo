@@ -49,9 +49,9 @@ GP_LKonly::GP_LKonly(int d, int n, double* Xin, double* Yin, double* Sin, int* D
 		//cho factor
 		int c = LAPACKE_dpotrf(LAPACK_ROW_MAJOR,'L',N,&Kxx[0],N);
                 if (c!=0){
-                    printf("failed to cho fac Kxx %d with hyp [",c);
-                    for (int i=0; i<numhyp(kindex,d);i++){printf("%f ",hyp[i]);}
-                    printf("]");
+                    //printf("failed to cho fac Kxx %d with hyp [",c);
+                    //for (int i=0; i<numhyp(kindex,d);i++){printf("%f ",hyp[i]);}
+                    //printf("]");
                     R[0]=-1e22; return;
                 }
                 

@@ -42,7 +42,9 @@ def gpcommitment(optstate,persist,**para):
     if persist == None:
         persist = defaultdict(list)
     if optstate.n<para['onlyafter']:
-        return 0,persist
+        return 0,persist,dict()
+    if persist['flip']:
+        return 1,persist,dict()
     d = len(para['lb'])
 
 
@@ -70,7 +72,7 @@ def gpcommitment(optstate,persist,**para):
 
 
     Y_,classaux = gmmclassifier(R,xmin)
-    Y_r,classauxr = radgmmclassifier(R,xmin)
+    #Y_r,classauxr = radgmmclassifier(R,xmin)
     #classify all the points in W as 0:localdrawn, 1:drawn, 2:notdrawn
     Z_ = sp.ones(para['support']+1,dtype='i')*2
     for i in xrange(nd):
@@ -129,51 +131,68 @@ def gpcommitment(optstate,persist,**para):
     persist['LBound'].append(LBound)
 
     #predictors for the bounds
-    Epred = predictforward(persist['ERegret'])
+
     Gpred = predictforward(persist['GBound'])
     Lpred = predictforward(persist['LRegret'])
+    linit = Lpred.predict(optstate.n-1)
+    ginit = Gpred.predict(optstate.n-1)
 
+    #check the switch to lacl asecision
+    chpara = {
+        'lrf':lambda x:min(linit,Lpred.predict(x+optstate.n-1)),
+        'grf':lambda x:min(ginit,Gpred.predict(x+optstate.n-1)),
+        'bcf':lambda x:0.,
+        'evc':1.,
+        'lsc':0.,
+        'lsn':20,
+        'lsr':1e-7,
+        'brm':para['budget']-optstate.n
+        }
+    now,when = choice(chpara)
+    if optstate.n>30:
+        now=1
+    persist['flip']=now
     from gpbo.core import debugoutput, debugoptions, debugpath
     if debugoutput and debugoptions['adaptive'] and plots:
         print 'plotting choice...'
         fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(40, 40))
+        if optstate.n%2==0:
+            #plot the current GP
+            n = 60
+            x_ = sp.linspace(-1, 1, n)
+            y_ = sp.linspace(-1, 1, n)
+            z_ = sp.empty([n, n])
+            s_ = sp.empty([n, n])
+            for i in range(n):
+                for j in range(n):
+                    m_, v_ = G.infer_diag_post(sp.array([y_[j], x_[i]]), [[sp.NaN]])
+                    z_[i, j] = m_[0, 0]
+                    s_[i, j] = sp.sqrt(v_[0, 0])
 
-        #plot the current GP
-        n = 60
-        x_ = sp.linspace(-1, 1, n)
-        y_ = sp.linspace(-1, 1, n)
-        z_ = sp.empty([n, n])
-        s_ = sp.empty([n, n])
-        for i in range(n):
-            for j in range(n):
-                m_, v_ = G.infer_diag_post(sp.array([y_[j], x_[i]]), [[sp.NaN]])
-                z_[i, j] = m_[0, 0]
-                s_[i, j] = sp.sqrt(v_[0, 0])
-
-        CS = ax[0, 0].contour(x_, y_, z_, 20)
-        ax[0, 0].clabel(CS, inline=1, fontsize=10)
-        CS = ax[1, 0].contour(x_, y_, s_, 20)
-        ax[0, 0].axis([-1., 1., -1., 1.])
-        ax[1, 0].clabel(CS, inline=1, fontsize=10)
-        ax[0, 0].plot(xmin[0], xmin[1], 'ro')
+            CS = ax[0, 0].contour(x_, y_, z_, 20)
+            ax[0, 0].clabel(CS, inline=1, fontsize=10)
+            CS = ax[1, 0].contour(x_, y_, s_, 20)
+            ax[0, 0].axis([-1., 1., -1., 1.])
+            ax[1, 0].clabel(CS, inline=1, fontsize=10)
+            ax[0, 0].plot(xmin[0], xmin[1], 'ro')
 
 
         #plot support points and draws
         for i in xrange(para['support']):
             symbol = ['r.','g.','bx'][Z_[i]]
             ax[0,1].plot(W[i,0],W[i,1],symbol)
-            if ER[0,i]>0.:
-                ax[2,2].plot(W[i,0],W[i,1],'b.')
-            else:
-                ax[2,2].plot(W[i,0],W[i,1],'r.')
+            #if ER[0,i]>0.:
+            #    ax[2,2].plot(W[i,0],W[i,1],'b.')
+            #else:
+            #    ax[2,2].plot(W[i,0],W[i,1],'r.')
         ax[0, 1].axis([-1, 1, -1, 1])
 
         for i in xrange(nd):
             symbol = ['r.', 'g.'][Y_[i]]
             ax[1, 1].plot(R[i, 0], R[i, 1], symbol)
-        for i in xrange(nd):
-            symbol = ['r.', 'g.'][Y_r[i]]
-            ax[1, 2].plot(R[i, 0], R[i, 1], symbol)
+        #for i in xrange(nd):
+        #    symbol = ['r.', 'g.'][Y_r[i]]
+        #    ax[1, 2].plot(R[i, 0], R[i, 1], symbol)
 
         Nselected = sorted([len(list(group)) for key, group in groupby(sorted(A))])
         ax[0,2].plot(Nselected,'b')
@@ -208,17 +227,17 @@ def gpcommitment(optstate,persist,**para):
               'total zeros    {}\n' \
               'inlocal        {}  ({})\n' \
               'drawnotlocal   {}  ({})\n' \
-              'nodraw         {}  ({})' \
-              ''.format(ns,sum(splitzeros),splitzeros[0],splits[0],splitzeros[1],splits[1],splitzeros[2],splits[2])
+              'nodraw         {}  ({})\n\n' \
+              'golocalnow     {}\n' \
+              'switch in      {}' \
+              ''.format(ns,sum(splitzeros),splitzeros[0],splits[0],splitzeros[1],splits[1],splitzeros[2],splits[2],now,when)
         ax[2, 0].text(0.5, min(persist['GBound']),msg)
 
         #show forward predictions
-        nq=200
-        xaxis = sp.linspace(0,min(len(persist['EBound'])+20,2*len(persist['EBound'])),nq)
-        Ep = map(Epred.predict,xaxis)
+        nq=300
+        xaxis = sp.linspace(0,para['budget'],nq)
         Lp = map(Lpred.predict, xaxis)
         Gp = map(Gpred.predict, xaxis)
-        ax[2, 0].semilogy(xaxis,Ep, 'k:')  # full regret
         ax[2, 0].semilogy(xaxis,Lp, 'b:')  # local regret
         ax[2, 0].semilogy(xaxis,Gp, 'm:')
 
@@ -237,7 +256,7 @@ def gpcommitment(optstate,persist,**para):
         pickle.dump(obj, open('dbout/{}.p'.format(optstate.n), 'wb'))
         logger.info('endopt')
 
-    return 0,persist
+    return int(now),persist,{'localstart':xmin}
 
 def gmmclassifier(R,xmin):
 
@@ -323,7 +342,7 @@ def radgmmclassifier(Ri,xmin):
         else:
             Z_[i]=1
 
-    print "XXXXXXXXXXXXXXXX_\n{}\n{}".format(clf.means_.flatten(),clf.covariances_.flatten())
+    #print "XXXXXXXXXXXXXXXX_\n{}\n{}".format(clf.means_.flatten(),clf.covariances_.flatten())
     return Z_,{'localset':localset,'covs':clf.covariances_,'means':clf.means_}
 
 def ERdouble(m0,s0,m1,s1):
@@ -350,5 +369,47 @@ class predictforward:
         self.G = GP.GPcore(self.X, self.Y, self.S, self.D, self.kf)
 
     def predict(self, x):
-        m = self.G.infer_m(sp.array([[x]]), [[sp.NaN]])
+        m = self.G.infer_m(sp.array([[float(x)]]), [[sp.NaN]])
         return 10**(m[0, 0])
+
+def choice(para):
+    lrf = para['lrf'] #local regret function, in steps ahead
+    grf = para['grf'] #global regret function, in steps ahead
+    bcf = para['bcf'] #BayesOpt cost function, overhead cost to run BO from i to i+1 ahead
+    evc = para['evc'] #Evaluation cost
+    lsc = para['lsc'] #Local seach cost, overhead cost to run a local search
+    lsn = para['lsn'] #Local search number, number of evaluations needed for a local search
+    lsr = para['lsr'] #Local search regrert, regret (tolerance) of a local search
+    brm = para['brm'] #Budget ReMaining, cost allowed to be inured
+
+    M=0 #number of bo states available (including current)
+    acc=0.
+    while acc<brm:
+        acc+=bcf(M)+evc
+        M+=1
+
+    Sc = sp.zeros([2,M])
+    Sv = sp.zeros([2,M])
+    Ac = sp.zeros(M)
+    #forward pass to costs of state
+    for i in xrange(1,M):
+        Sc[0,i]=Sc[0,i-1]+bcf(i-1)+evc
+        Sc[1,i]=Sc[0,i-1]+lsc+lsn*evc
+
+    #backward pass for value and action
+    Sv[0,M-1]=lrf(M-1)+grf(M-1)
+    Sv[1,M-1]=grf(M-1)+lsr if Sc[1,M-1]<brm else sp.Inf
+    switchat=-1
+    for i in reversed(range(M-1)):
+        Sv[1,i]=grf(i-1)+lsr if Sc[1,i]<brm else sp.Inf
+        if Sv[1,i+1]>=Sv[0,i+1]:
+            Sv[0,i]=Sv[0,i+1]
+            Ac[i]=0
+        else:
+            Sv[0,i]=Sv[1,i+1]
+            Ac[i]=1
+            switchat=i
+    #print sp.vstack([Sv,Ac]).T
+    return Ac[0],switchat
+
+

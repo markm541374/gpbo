@@ -13,16 +13,48 @@ from sklearn import cluster
 from sklearn.preprocessing import StandardScaler
 from gpbo.core import GPdc
 from gpbo.core.GPdc import kernel
-n=10
+from gpbo.core import choosers
+"""
+para = {
+    'lrf':lambda x:sp.exp(-2*x)+0.001*sp.exp(-0.01*x),
+    'grf':lambda x:4*sp.exp(-0.4*x)+2.,
+    'bcf':lambda x:0.*(7e-8)*(x+192.)**3,
+    'evc':10.,
+    'lsc':0.1,
+    'lsn':20,
+    'lsr':1e-7,
+    'brm':700
+}
+print choosers.choice(para)
+
+n=80
 
 def topolar(x,o):
     z = x-o
     r = sp.log10(sp.sqrt(z[0]**2+z[1]**2)) if z[0]!=0 and z[1]!=0 else -4.
     th = sp.arctan(z[1]/z[0]) if z[0] != 0. else sp.pi/2.
     return [r,1.]
-
+"""
+n=20
 ER,M,V,Z_,Y_,Ro,Y,xmin,ymin,persist = pickle.load(open("dbout/{}.p".format(n), "rb"))
+Gpred = choosers.predictforward(persist['GBound'])
+Lpred = choosers.predictforward(persist['LRegret'])
+linit = Lpred.predict(20)
+ginit = Gpred.predict(20)
 
+    #check the switch to lacl asecision
+chpara = {
+    'lrf':lambda x:min(linit,Lpred.predict(x+20)),
+    'grf':lambda x:min(ginit,Gpred.predict(x+20)),
+    'bcf':lambda x:0.,
+    'evc':1.,
+    'lsc':0.,
+    'lsn':20,
+    'lsr':1e-7,
+    'brm':100-20
+    }
+print choosers.choice(chpara)
+"""
 f,a=plt.subplots(2,2)
 xaxis = sp.linspace(0,min(2*n,n+20),200)
 dplot = [[sp.NaN]]*200
@@ -42,8 +74,8 @@ for ax,data in zip([a[0,0],a[1,0],a[1,1]],[persist['ERegret'],persist['GBound'],
     ax.fill_between(xaxis,(m-2.*s).flatten(),(m+2.*s).flatten(),facecolor='lightblue',edgecolor='lightblue')
     ax.plot(xaxis,m.flatten(),'b')
     ax.plot(X,Y,'r.')
+
     #ax.set_yscale('log')
-"""
 ns = Ro.shape[0]
 R = sp.empty(Ro.shape)
 for i in xrange(ns):
