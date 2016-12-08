@@ -262,7 +262,7 @@ def splocalaq(optstate,persist,**para):
 
     if not 'start' in persist.keys():
         try:
-            persist['start']=para['transfer']['localstart']
+            persist['start']=optstate.startlocal
         except:
             persist['start']=para['start']
     logger.info('splocalaq from {} step {}'.format(persist['start'],persist['n']))

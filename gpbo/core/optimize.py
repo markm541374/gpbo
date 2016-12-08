@@ -25,6 +25,7 @@ class optstate:
         self.aqtime=[]
         self.aux=None
         self.localdone=False
+        self.startlocal= None
         return
     
     def update(self,x,ev,y,c,taq):
@@ -88,8 +89,8 @@ class optimizer:
         stepn=0
         while not self.stopfn(self.state,**self.stoppara):
             stepn+=1
-            print self.choosepara
-            print self.choosefn
+            #print self.choosepara
+            #print self.choosefn
             mode,self.choosepersist,chooseaux = self.choosefn(self.state,self.choosepersist,**self.choosepara)
 
             logger.info("---------------------\nstep {}\naquisition:".format(stepn))

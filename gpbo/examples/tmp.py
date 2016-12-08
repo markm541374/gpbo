@@ -35,25 +35,26 @@ def topolar(x,o):
     th = sp.arctan(z[1]/z[0]) if z[0] != 0. else sp.pi/2.
     return [r,1.]
 """
-n=20
+n=57
 ER,M,V,Z_,Y_,Ro,Y,xmin,ymin,persist = pickle.load(open("dbout/{}.p".format(n), "rb"))
 Gpred = choosers.predictforward(persist['GBound'])
 Lpred = choosers.predictforward(persist['LRegret'])
-linit = Lpred.predict(20)
-ginit = Gpred.predict(20)
+linit = Lpred.predict(57)
+ginit = Gpred.predict(57)
 
     #check the switch to lacl asecision
 chpara = {
-    'lrf':lambda x:min(linit,Lpred.predict(x+20)),
-    'grf':lambda x:min(ginit,Gpred.predict(x+20)),
+    'lrf':lambda x:min(linit,Lpred.predict(x+57)),
+    'grf':lambda x:min(ginit,Gpred.predict(x+57)),
     'bcf':lambda x:0.,
     'evc':1.,
     'lsc':0.,
     'lsn':20,
     'lsr':1e-7,
-    'brm':100-20
+    'brm':90-57,
+    'tol':1e-5
     }
-print choosers.choice(chpara)
+print choosers.choice2(chpara)
 """
 f,a=plt.subplots(2,2)
 xaxis = sp.linspace(0,min(2*n,n+20),200)

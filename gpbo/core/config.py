@@ -98,7 +98,7 @@ class pesfsdefault():
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
             'DH_SAMPLES': 16,
-            'DM_SAMPLES': 16,
+            'DM_SAMPLES': 64,
             'DM_SUPPORT': 800,
             'SUPPORT_MODE': [gpbo.core.ESutils.SUPPORT_LAPAPROT],
             'DM_SLICELCBPARA': 1.,

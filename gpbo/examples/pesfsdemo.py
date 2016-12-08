@@ -17,7 +17,7 @@ def f(x,**ev):
     return y+n,c,dict()
 
 
-C=gpbo.core.config.pesfslearns(f,D,n,s,'results','pesfs.csv')
+C=gpbo.core.config.pesfsdefault(f,D,n,s,'results','pesfs.csv')
 
 out = gpbo.search(C)
 print out

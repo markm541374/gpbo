@@ -17,9 +17,9 @@ s=0.
 
 lb=[-1.,-1.]
 ub = [1.,1.]
-f, xmin, ymin = objectives.genmat52ojf(D,lb,ub,ls=0.2)
+f, xmin, ymin = objectives.genmat52ojf(D,lb,ub,ls=0.4)
 
-with open('results/matdrawopt.txt','w') as o:
+with open('results/adaptive.txt','w') as o:
     o.write('reported truemin x {} ; y {}'.format(xmin,ymin))
 
 gpbo.core.ESutils.plot2dFtofile(f,os.path.join('dbout', 'truegeneratedobjective' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'),xmin=xmin)
@@ -42,7 +42,25 @@ class conf():
             'kindex': GPdc.MAT52,
             'volper': 1e-6
         }
-
+        """
+        aq0 = gpbo.core.acquisitions.PESfsaq
+        aq0para = {
+            'ev': {'s': s, 'd': [sp.NaN]},
+            'lb': [-1.]*D,
+            'ub': [1.]*D,
+            'nrandinit': 10,
+            'volper': 1e-6,
+            'mprior': sp.array([1.]+[0.]*D),
+            'sprior': sp.array([1.]*(D+1)),
+            'kindex': GPdc.MAT52,
+            'DH_SAMPLES': 16,
+            'DM_SAMPLES': 64,
+            'DM_SUPPORT': 800,
+            'SUPPORT_MODE': [gpbo.core.ESutils.SUPPORT_LAPAPROT],
+            'DM_SLICELCBPARA': 1.,
+            'noS': False,
+        }
+"""
         aq1 = gpbo.core.acquisitions.splocalaq
         aq1para = {
             'ev': {'s': s, 'd': [sp.NaN]},
@@ -107,7 +125,7 @@ class conf():
         self.fname = fname
         return
 
-C = conf(f,D,80,s,'results','adaptive.csv')
+C = conf(f,D,150,s,'results','adaptive.csv')
 
 out = gpbo.search(C)
 

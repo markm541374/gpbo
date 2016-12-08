@@ -62,6 +62,7 @@ def gpcommitment(optstate,persist,**para):
         a = G.infer_m_post(xq,[[sp.NaN]])
         return (a[0,0],0)
     [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
+    optstate.startlocal = xmin
 
 
     #draw support points
@@ -146,33 +147,34 @@ def gpcommitment(optstate,persist,**para):
         'lsc':0.,
         'lsn':20,
         'lsr':1e-7,
-        'brm':para['budget']-optstate.n
+        'brm':para['budget']-optstate.n,
+        'tol':1e-5
         }
-    now,when = choice(chpara)
+    now,when = choice2(chpara)
     persist['flip']=now
+
     from gpbo.core import debugoutput, debugoptions, debugpath
     if debugoutput and debugoptions['adaptive'] and plots:
         print 'plotting choice...'
         fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(40, 40))
-        if optstate.n%2==0:
-            #plot the current GP
-            n = 60
-            x_ = sp.linspace(-1, 1, n)
-            y_ = sp.linspace(-1, 1, n)
-            z_ = sp.empty([n, n])
-            s_ = sp.empty([n, n])
-            for i in range(n):
-                for j in range(n):
-                    m_, v_ = G.infer_diag_post(sp.array([y_[j], x_[i]]), [[sp.NaN]])
-                    z_[i, j] = m_[0, 0]
-                    s_[i, j] = sp.sqrt(v_[0, 0])
+        #plot the current GP
+        n = 60
+        x_ = sp.linspace(-1, 1, n)
+        y_ = sp.linspace(-1, 1, n)
+        z_ = sp.empty([n, n])
+        s_ = sp.empty([n, n])
+        for i in range(n):
+            for j in range(n):
+                m_, v_ = G.infer_diag_post(sp.array([y_[j], x_[i]]), [[sp.NaN]])
+                z_[i, j] = m_[0, 0]
+                s_[i, j] = sp.sqrt(v_[0, 0])
 
-            CS = ax[0, 0].contour(x_, y_, z_, 20)
-            ax[0, 0].clabel(CS, inline=1, fontsize=10)
-            CS = ax[1, 0].contour(x_, y_, s_, 20)
-            ax[0, 0].axis([-1., 1., -1., 1.])
-            ax[1, 0].clabel(CS, inline=1, fontsize=10)
-            ax[0, 0].plot(xmin[0], xmin[1], 'ro')
+        CS = ax[0, 0].contour(x_, y_, z_, 20)
+        ax[0, 0].clabel(CS, inline=1, fontsize=10)
+        CS = ax[1, 0].contour(x_, y_, s_, 20)
+        ax[0, 0].axis([-1., 1., -1., 1.])
+        ax[1, 0].clabel(CS, inline=1, fontsize=10)
+        ax[0, 0].plot(xmin[0], xmin[1], 'ro')
 
 
         #plot support points and draws
@@ -193,6 +195,7 @@ def gpcommitment(optstate,persist,**para):
         #    ax[1, 2].plot(R[i, 0], R[i, 1], symbol)
 
         Nselected = sorted([len(list(group)) for key, group in groupby(sorted(A))])
+        Nselected.reverse()
         ax[0,2].plot(Nselected,'b')
         ax[0,2].text(1,max(Nselected)*0.5,'no draws from {} bins ({}%)'.format(para['support']-len(Nselected),100*(para['support']-len(Nselected))/float(para['support'])))
 
@@ -211,7 +214,6 @@ def gpcommitment(optstate,persist,**para):
         ax[2,0].semilogy(persist['ERegret'],'k') #full regret
         ax[2, 0].semilogy(persist['LRegret'], 'b') #local regret
         ax[2, 0].semilogy(persist['GRegret'], 'm') #nonlocal regret
-        ax[2,1].semilogy(persist['probnotlocal'],'k') #prob not in local
 
 
         #plot support based regret bounds
@@ -240,7 +242,15 @@ def gpcommitment(optstate,persist,**para):
         ax[2, 0].semilogy(xaxis,Gp, 'm:')
 
 
+        #true regret if available:
+        #try:
+        Rtrue = para['cheatf'](xmin,**{'s':0.,'d':[sp.NaN]})[0]-para['cheatymin']
+        persist['RTrue'].append(Rtrue)
+        ax[2,1].semilogy(persist['RTrue'],'g')
+        ax[2,1].semilogy(persist['ERegret'],'k') #prob not in local
 
+        #except:
+        #    pass
         try:
             fig.savefig(os.path.join(debugpath, 'lotsofplots' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
         except BaseException as e:
@@ -411,3 +421,43 @@ def choice(para):
     return Ac[0],switchat
 
 
+def choice2(para):
+    lrf = para['lrf'] #local regret function, in steps ahead
+    grf = para['grf'] #global regret function, in steps ahead
+    bcf = para['bcf'] #BayesOpt cost function, overhead cost to run BO from i to i+1 ahead
+    evc = para['evc'] #Evaluation cost
+    lsc = para['lsc'] #Local seach cost, overhead cost to run a local search
+    lsn = para['lsn'] #Local search number, number of evaluations needed for a local search
+    lsr = para['lsr'] #Local search regrert, regret (tolerance) of a local search
+    brm = para['brm'] #Budget ReMaining, cost allowed to be inured
+    tol = para['tol'] #regret tolerance
+    M=0 #number of bo states available (including current)
+    acc=0.
+    while acc<brm:
+        acc+=bcf(M)+evc
+        M+=1
+
+    Sc = sp.zeros([2,M])
+    Sv = sp.zeros([2,M])
+    Ac = sp.zeros(M)
+    #forward pass to costs of state
+    for i in xrange(1,M):
+        Sc[0,i]=Sc[0,i-1]+bcf(i-1)+evc
+        Sc[1,i]=Sc[0,i-1]+lsc+lsn*evc
+
+    #backward pass for value and action
+    Sv[0,M-1]=lrf(M-1)+grf(M-1)+Sc[0,M-1]
+    Sv[1,M-1]=grf(M-1)+lsr +Sc[1,M-1] if Sc[1,M-1]<brm and grf(M-1)+lsr<tol else sp.Inf
+    switchat=-1
+    for i in reversed(range(M-1)):
+        print grf(i-1)+lsr,grf(i-1)+lsr<tol,tol,Sc[1,i],Sc[1,i]<brm
+        Sv[1,i]=grf(i-1)+lsr+Sc[1,i] if Sc[1,i]<brm and grf(i-1)+lsr<tol else sp.Inf
+        if Sv[1,i+1]>=Sv[0,i+1]:
+            Sv[0,i]=Sv[0,i+1]
+            Ac[i]=0
+        else:
+            Sv[0,i]=Sv[1,i+1]
+            Ac[i]=1
+            switchat=i
+    print sp.vstack([Sc,Sv,Ac]).T
+    return Ac[0],switchat
