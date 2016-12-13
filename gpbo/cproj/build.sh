@@ -20,4 +20,4 @@ g++ -std=c++11   -c -O3 -fPIC  newmain.cpp
 
 g++ -std=c++11   -c -O3 -fPIC  simplekernels.cpp
 
-g++ -std=c++11    -o libcproj.so GPsimple.o bayesutils.o direct.o hypsearch.o kernel.o libGP.o matern.o misctools.o newmain.o simplekernels.o -lblas -llapack -llapacke -shared -fPIC
+g++ -std=c++11    -o libcproj.so  GPsimple.o bayesutils.o direct.o hypsearch.o kernel.o libGP.o matern.o misctools.o newmain.o simplekernels.o -lblas -llapack -llapacke -shared -fPIC

@@ -7,13 +7,36 @@ from matplotlib import pyplot as plt
 from matplotlib import patches
 import gpbo
 from gpbo.core import GPdc as GP
-from gpbo.core.choosers import gmmclassifier
+from gpbo.core.choosers import gmmclassifier,radgmmclassifier
 from sklearn.neighbors import kneighbors_graph
 from sklearn import cluster
 from sklearn.preprocessing import StandardScaler
 from gpbo.core import GPdc
 from gpbo.core.GPdc import kernel
 from gpbo.core import choosers
+from gpbo.core import PES
+
+
+n=42
+ER,M,V,Z_,Y_,Ro,Y,xmin,ymin,persist,data = pickle.load(open("dbout/{}.p".format(n), "rb"))
+
+G = PES.makeG(*data)
+
+def ptox(r,th):
+    y = xmin[1]+r*sp.sin(th)
+    x = xmin[0]+r*sp.cos(th)
+    return x,y
+nr=10
+nt=3
+rad = sp.logspace(-6,0,nr)
+for i in rad:
+    th = sp.random.uniform(low=0.,high=sp.pi*2.,size=nt)
+    for j in th:
+        x,y = ptox(i,j)
+        m,v = G.infer_diag_post(sp.array([[x,y]]*3),[[0,0],[1,1],[0,1]])
+        pr = 1.-sp.product([1.-sps.norm.cdf(0.,loc=m[0,k],scale=sp.sqrt(v[0,k])) for k in range(2)])
+        print x,y ,pr
+
 """
 para = {
     'lrf':lambda x:sp.exp(-2*x)+0.001*sp.exp(-0.01*x),
@@ -25,18 +48,14 @@ para = {
     'lsr':1e-7,
     'brm':700
 }
-print choosers.choice(para)
+#print choosers.choice(para)
 
-n=80
 
 def topolar(x,o):
     z = x-o
     r = sp.log10(sp.sqrt(z[0]**2+z[1]**2)) if z[0]!=0 and z[1]!=0 else -4.
     th = sp.arctan(z[1]/z[0]) if z[0] != 0. else sp.pi/2.
     return [r,1.]
-"""
-n=57
-ER,M,V,Z_,Y_,Ro,Y,xmin,ymin,persist = pickle.load(open("dbout/{}.p".format(n), "rb"))
 Gpred = choosers.predictforward(persist['GBound'])
 Lpred = choosers.predictforward(persist['LRegret'])
 linit = Lpred.predict(57)
@@ -54,8 +73,8 @@ chpara = {
     'brm':90-57,
     'tol':1e-5
     }
-print choosers.choice2(chpara)
-"""
+#print choosers.choice2(chpara)
+
 f,a=plt.subplots(2,2)
 xaxis = sp.linspace(0,min(2*n,n+20),200)
 dplot = [[sp.NaN]]*200
@@ -77,38 +96,29 @@ for ax,data in zip([a[0,0],a[1,0],a[1,1]],[persist['ERegret'],persist['GBound'],
     ax.plot(X,Y,'r.')
 
     #ax.set_yscale('log')
+
 ns = Ro.shape[0]
-R = sp.empty(Ro.shape)
-for i in xrange(ns):
-    R[i,:] = topolar(Ro[i,:],xmin)
-#    print Ro[i,:],R[i,:]
-aug = sp.empty([R.shape[0],1])
-for i in xrange(ns):
-    aug[i,0] = (R[i,0]-xmin[0])**2 + (R[i,1]-xmin[1])**2
 
 
-Y_,classaux = gmmclassifier(R,xmin)
 
-F = StandardScaler().fit_transform(R)
-bandwidth = cluster.estimate_bandwidth(F, quantile=0.3)
-ms = cluster.MeanShift(bandwidth=bandwidth, bin_seeding=True)
-ms.fit(R)
-Ys_ = ms.predict(R)
+Y_,classaux = gmmclassifier(Ro,xmin)
 
+Ys_,classaux_s = radgmmclassifier(Ro,xmin)
 f,a=plt.subplots(4)
 
 for i in xrange(ns):
     sym = ['r.','b.', 'g.','c.','k.','bx','rx','gx','cx','kx']+['grey']*20
     col = sym[Ys_[i]]
-    a[0].plot(R[i,0],R[i,1],col)
+    a[0].plot(Ro[i,0],Ro[i,1],col)
     col = sym[Ys_[i]]
     a[1].plot(Ro[i, 0], Ro[i, 1], col)
 
 for i in xrange(ns):
     sym = ['r.','b.', 'g.','c.','k.','bx','rx','gx','cx','kx']+['grey']*20
     col = sym[Y_[i]]
-    a[2].plot(R[i,0],R[i,1],col)
+    a[2].plot(Ro[i,0],Ro[i,1],col)
     col = sym[Y_[i]]
     a[3].plot(Ro[i, 0], Ro[i, 1], col)
-"""
+
 plt.show()
+"""

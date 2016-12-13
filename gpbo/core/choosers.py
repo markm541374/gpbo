@@ -20,6 +20,7 @@ except ImportError:
     plt=None
 import os
 import time
+from copy import deepcopy
 
 
 def always0(optstate,persist,**para):
@@ -64,6 +65,7 @@ def gpcommitment(optstate,persist,**para):
     [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
     optstate.startlocal = xmin
 
+    #hess inference in rings around xmin
 
     #draw support points
     W = sp.vstack(ESutils.draw_support(G, para['lb'], para['ub'], para['support'], ESutils.SUPPORT_LAPAPROT, para=para['starts']))
@@ -259,7 +261,7 @@ def gpcommitment(optstate,persist,**para):
         plt.close(fig)
         del (fig)
 
-        obj = [ER,M,V,Z_,Y_,R,Y,xmin,ymin,persist]
+        obj = [ER,M,V,Z_,Y_,R,Y,xmin,ymin,persist,deepcopy([x, y, s, dx, para['kindex'], para['mprior'], para['sprior'], para['nhyp']])]
         import pickle
         pickle.dump(obj, open('dbout/{}.p'.format(optstate.n), 'wb'))
         logger.info('endopt')
@@ -459,5 +461,4 @@ def choice2(para):
             Sv[0,i]=Sv[1,i+1]
             Ac[i]=1
             switchat=i
-    print sp.vstack([Sc,Sv,Ac]).T
     return Ac[0],switchat

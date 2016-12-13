@@ -124,8 +124,8 @@ def traincfn1dll(x,c):
         a[1].set_ylabel('out')
 
         f.savefig(os.path.join(debugpath, 'cost1d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
-        fig.clf()
-        plt.close(fig)
+        f.clf()
+        plt.close(f)
         del(f)
     return logcfnobj(g)
 
@@ -192,8 +192,8 @@ def traincfnfull(x,c):
             pass
 
         f.savefig(os.path.join(debugpath, 'cost1d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
-        fig.clf()
-        plt.close(fig)
+        f.clf()
+        plt.close(f)
         del(f)
     return logcfnobjfull(g)
 
@@ -265,7 +265,7 @@ def predictive1d(x,c,t,ofs,C):
         a[2].plot(xaxis,cbase,'b')
         a[2].plot(xaxis,cadj,'g')
         f.savefig(os.path.join(debugpath, 'taq' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
-        fig.clf()
-        plt.close(fig)
+        f.clf()
+        plt.close(f)
         del (f)
     return cfout

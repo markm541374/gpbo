@@ -60,6 +60,6 @@ setup(name='gpbo',
       packages=['gpbo','gpbo.core','gpbo.examples','gpbo.test','gpbo.exps','gpbo.exps.thirdwrap'],
       package_dir={'gpbo':'gpbo'},
       package_data={'gpbo':['cproj/*','VERSION','README.rst']},
-      install_requires=['tqdm','direct'],
+      install_requires=['tqdm','direct','numpy','scipy','matplotlib'],
       ext_modules= extensions,
       zip_safe=False)

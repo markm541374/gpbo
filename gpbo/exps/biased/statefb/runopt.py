@@ -5,15 +5,15 @@ import pandas as pd
 import time
 import gpbo
 gpbo.core.debugoutput=True
-gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':True,'taq':False}
+gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':False,'taq':False}
 
 import gpbo.core.GPdc as GPdc
 
 import os
 import copy
 
-#run=[True,True,True]
-run=[False,False,False]
+run=[True,True,True]
+#run=[False,False,False]
 plot = True
 
 import statefb
@@ -25,14 +25,14 @@ f_inplane = statefb.f_inplane
 D=2
 N=40
 s=1e-9
-nopts=10
+nopts=20
 
 
 if run[0]:
     for k in xrange(nopts):
         C = gpbo.core.config.pesbsdefault(f, D, N, s, 'results', 'statefbbs{}.csv'.format(k))
         C.stopfn = gpbo.core.optimize.cstopfn
-        C.stoppara = {'cmax': 10}
+        C.stoppara = {'cmax': 30}
         C.aqpara['traincfn'] = 'llogfull'
         #C.aqpara['cmax'] = C.stoppara['cmax']
         out = gpbo.search(C)
@@ -70,6 +70,7 @@ if plot:
         print [d1[k]['cacc'][0],d1[k]['cacc'][len(d1[k]['cacc'])-1]]
         a.plot(d1[k]['cacc'], d1[k]['trueyatxrecc'], 'r')
         a.plot(d2[k]['cacc'], d2[k]['trueyatxrecc'], 'g')
+    a.set_xscale('log')
     f.savefig('plots/out0.pdf')
     f, a = plt.subplots(1)
 
