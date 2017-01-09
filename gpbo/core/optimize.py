@@ -95,18 +95,18 @@ class optimizer:
 
             logger.info("---------------------\nstep {}\naquisition:".format(stepn))
             
-            t0 = time.time()
+            t0 = time.clock()
             x,ev,self.aqpersist[mode],aqaux = self.aqfn[mode](self.state,self.aqpersist[mode],**self.aqpara[mode])
-            t1 = time.time()
+            t1 = time.clock()
             self.state.aux = aqaux
             logger.info("{} : {}    aqtime: {}\nevaluate:".format(x,ev,t1-t0))
             
             y,c,ojaux  = self.ojf(x,**ev)
-            t2 = time.time()
+            t2 = time.clock()
             self.state.update(x,ev,y,c,t1-t0)
             logger.info("{} : {}     evaltime: {}\nreccomend:".format(y,c,t2-t1))
             rx,self.reccpersist[mode],reaux = self.reccfn[mode](self.state,self.reccpersist[mode],**self.reccpara[mode])
-            t3 = time.time()
+            t3 = time.clock()
             
             if self.reccpara[mode]['check']:
                 #logger.info("checkin {} : {}".format(rx,self.aqpara['ev']))
@@ -148,7 +148,8 @@ def cstopfn(optstate,cmax = 1,includeaq=False):
         return optstate.Cfull >= cmax
 
 def totaltstopfn(optstate,**para):
-    tused = time.clock()-para['t0']
+    tused = sum(optstate.aqtime)+optstate.C
+
     if tused>=para['tmax']:
         logger.info('Time limit reached')
         return True
@@ -159,7 +160,7 @@ def totaltstopfn(optstate,**para):
         ht=int(para['tmax'])/3600
         mt=(int(para['tmax'])%3600)/60
         st=int(para['tmax'])%60
-        logger.info('Used {}h {}m {}s of {}h {}m {}s budget'.format(hu,mu,su,ht,mt,st))
+        logger.info('Used {}h {}m {}s of {}h {}m {}s budget \n of which {} acquisition {} evaluation'.format(hu,mu,su,ht,mt,st,(tused-optstate.C)/(1e-9+tused),optstate.C/(tused+1e-9)))
         return False
 
 
