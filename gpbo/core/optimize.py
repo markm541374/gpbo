@@ -82,7 +82,7 @@ class optimizer:
     
     def run(self):
         logger.info('startopt:')
-        
+        self.stoppara['t0']=time.clock()
         lf = open(os.path.join(self.dirpath,self.name),'wb',0)
         lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara[0]['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, aqauxdata'])+'\n')
         self.state = optstate()
@@ -147,6 +147,20 @@ def cstopfn(optstate,cmax = 1,includeaq=False):
         logger.info('Used {} of {} evaluation budget.'.format(optstate.Cfull, cmax))
         return optstate.Cfull >= cmax
 
+def totaltstopfn(optstate,**para):
+    tused = time.clock()-para['t0']
+    if tused>=para['tmax']:
+        logger.info('Time limit reached')
+        return True
+    else:
+        hu=int(tused)/3600
+        mu=(int(tused)%3600)/60
+        su=int(tused)%60
+        ht=int(para['tmax'])/3600
+        mt=(int(para['tmax'])%3600)/60
+        st=int(para['tmax'])%60
+        logger.info('Used {}h {}m {}s of {}h {}m {}s budget'.format(hu,mu,su,ht,mt,st))
+        return False
 
 
 def search(optconfig):
