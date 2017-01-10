@@ -23,19 +23,22 @@ def f(x, **ev):
 
 def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv'):
     D=len(ub)
+    log=[]
+    tinit=time.clock()
     def objective_function(x, s):
-
+        t0=time.clock()
         if s==1:
             y,c,aux = fn(x,**{'xa':0})
         elif s==0:
             y,c,aux = fn(x,**{'xa':salt})
         else:
             raise IndexError
-
+        t1=time.clock()
         print "\nevaluation at {} {} returned {} {}\n".format(x,s,y,c)
         print "truetime {} clocktime {}".format(time.time()-tt0,time.clock()-tc0)
         sys.stdout.flush()
         sys.stderr.flush()
+        log.append({'x':x,'s':s,'y':y,'c':c,'t0':t0,'t1':t1})
         return y, c
 
     res = mtbo(objective_function, lb, ub, n_tasks=2, n_init=ninit,num_iterations=n,burnin=100, chain_length=200)
@@ -48,10 +51,26 @@ def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv'):
     for i in xrange(n):
         st=''
         st+=str(i)+','
+
+        for j in xrange(D):
+            st+=str(log[i]['x'][j])+','
+        st+=str(log[i]['s'])+','
+        st+=str(log[i]['y'])+','
+        st+=str(log[i]['c'])+','
+        for j in xrange(D):
+            st+=str(res['trajectory'][i+1][j])+','
+        st+=str(fn(res['trajectory'][i+1][:D],**{'xa':0,'cheattrue':True})[0])+','
+        if i==0:
+            st+=str(log[0]['t0']-tinit)+','
+        else:
+            st+=str(log[i]['t0']-log[i-1]['t1'])+','
+        st+=str(log[i]['t1']-log[i]['t0'])+','
+        st+='-1,'
+        st+=time.strftime('%H:%M:%S  %d-%m-%y')
         st+='\n'
         lf.write(st)
     lf.close()
 
 lb=sp.array([-1.,-1.])
 ub=sp.array([ 1., 1.])
-optmtbo(f,lb,ub,0.5,4,ninit=4)
+optmtbo(f,lb,ub,0.5,14,ninit=10)
