@@ -94,9 +94,10 @@ def EIMAPaq(optstate,persist,**para):
 
 #PES with fixed s ev
 def PESfsaq(optstate,persist,**para):
+    t0=time.clock()
     para = copy.deepcopy(para)
     if persist==None:
-        persist = {'n':0,'d':len(para['ub'])}
+        persist = {'n':0,'d':len(para['ub']),'overhead':0.}
     n = persist['n']
     d = persist['d']
     if n<para['nrandinit']:
@@ -123,15 +124,17 @@ def PESfsaq(optstate,persist,**para):
     lhmax = lhyp.max(axis=0)
     logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean,lhstd,lhmin,lhmax))
 
+    persist['overhead']=time.clock()-t0
     return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],}
 
 
 
 #PES with variable s ev give costfunction
 def PESvsaq(optstate,persist,**para):
+    t0=time.clock()
     para = copy.deepcopy(para)
     if persist==None:
-        persist = {'n':0,'d':len(para['ub'])}
+        persist = {'n':0,'d':len(para['ub']),'overhead':0.}
     n = persist['n']
     d = persist['d']
     if n<para['nrandinit']:
@@ -148,7 +151,12 @@ def PESvsaq(optstate,persist,**para):
     dx=[e['d'] for e in optstate.ev]
     
     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'])
-    [xmin,ymin,ierror] = pesobj.search_acq(para['cfn'],para['logsl'],para['logsu'],volper=para['volper'])
+
+    if para['overhead']=='last':
+        over=persist['overhead']
+    else:
+        over=0.
+    [xmin,ymin,ierror] = pesobj.search_acq(para['cfn'],para['logsl'],para['logsu'],volper=para['volper'],over=over)
     
     logger.debug([xmin,ymin,ierror])
     para['ev']['s']=10**xmin[-1]
@@ -161,14 +169,16 @@ def PESvsaq(optstate,persist,**para):
     lhmax = lhyp.max(axis=0)
     logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean, lhstd, lhmin, lhmax))
 
+    persist['overhead']=time.clock()-t0
     return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
 
 
 
 def PESbsaq(optstate,persist,**para):
+    t0=time.clock()
     para = copy.deepcopy(para)
     if persist==None:
-        persist = {'n':0,'d':len(para['ub'])}
+        persist = {'n':0,'d':len(para['ub']),'overhead':0.}
     n = persist['n']
     d = persist['d']
     if n<para['nrandinit'] and para['startmode']=='full':
@@ -223,8 +233,11 @@ def PESbsaq(optstate,persist,**para):
             cfn = costs.traincfn1d(cx,cc)
     else:
         cfn = para['cfn']
-        
-    [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],volper=para['volper'])
+    if para['overhead']=='last':
+        over=persist['overhead']
+    else:
+        over=0.
+    [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],volper=para['volper'],over=over)
     logger.debug([xmin,ymin,ierror])
     para['ev']['xa']=xmin[0]
     xout = [i for i in xmin[1:]]
@@ -235,7 +248,7 @@ def PESbsaq(optstate,persist,**para):
     lhmin = lhyp.min(axis=0)
     lhmax = lhyp.max(axis=0)
     logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean, lhstd, lhmin, lhmax))
-
+    persist['overhead']=time.clock()-t0
     return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
 
 def choiceaq(optstate,persist,**para):

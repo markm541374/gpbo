@@ -285,15 +285,15 @@ class PES:
         [xmin, ymin, ierror] = DIRECT.solve(directwrap,self.lb,self.ub,user_data=[], algmethod=1, volper=volper, logfilename='/dev/null')
         return [xmin,ymin,ierror]
     
-    def search_acq(self,cfn,logsl,logsu,volper=1e-6,dv=[[sp.NaN]]):
+    def search_acq(self,cfn,logsl,logsu,volper=1e-6,dv=[[sp.NaN]],over=0.):
         def directwrap(Q,extra):
             x = sp.array([Q[:-1]])
             s = 10**Q[-1]
             acq = PESgain(self.G,self.Ga,self.Z,x,dv,[s])
             try:
-                R = -acq/cfn(x,**{'s':s})
+                R = -acq/(cfn(x,**{'s':s})+over)
             except TypeError:
-                R = -acq/cfn(x,s)
+                R = -acq/(cfn(x,s)+over)
             return (R,0)
         
         [xmin, ymin, ierror] = DIRECT.solve(directwrap,sp.hstack([self.lb,logsl]),sp.hstack([self.ub,logsu]),user_data=[], algmethod=1, volper=volper, logfilename='/dev/null')
@@ -338,7 +338,8 @@ class PES_inplane:
             a[i] = a[i]/costfn(Xq[i,:].flatten())
         return a
     
-    def search_acq(self,cfn,sfn,volper=1e-6,dv=[[sp.NaN]]):
+    def search_acq(self,cfn,sfn,volper=1e-6,dv=[[sp.NaN]],over=0.):
+        print 'overhead={}'.format(over)
         def directwrap(Q,extra):
             x = sp.array([Q])
             if self.noS:
@@ -349,9 +350,9 @@ class PES_inplane:
             acq = PESgain(self.G,self.Ga,self.Z,x,dv,[s])
             try:
                 #print x[0,1:],x[0,0]
-                R = -acq/cfn(x[0,1:],**{'xa':x[0,0]})
+                R = -acq/(cfn(x[0,1:],**{'xa':x[0,0]})+over)
             except TypeError:
-                R = -acq/cfn(x,s)
+                R = -acq/(cfn(x,s)+over)
             return (R,0)
         #print self.lb
         #print self.ub

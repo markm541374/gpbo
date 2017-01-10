@@ -13,7 +13,7 @@ import os
 import copy
 
 #run=[True,True,True]
-run=[True,False,False]
+run=[False,False,False]
 plot = True
 
 
@@ -133,10 +133,11 @@ if plot:
 
     for k in xrange(nopts):
 
-        a.semilogy(d0[k]['cacc'], d0[k]['trueyatxrecc'], 'b')
+        a.plot(d0[k]['cacc'], d0[k]['trueyatxrecc'], 'b')
         print [d1[k]['cacc'][0],d1[k]['cacc'][len(d1[k]['cacc'])-1]]
-        a.semilogy(d1[k]['cacc'], d1[k]['trueyatxrecc'], 'r')
-        a.semilogy(d2[k]['cacc'], d2[k]['trueyatxrecc'], 'g')
+        a.plot(d1[k]['cacc'], d1[k]['trueyatxrecc'], 'r')
+        a.plot(d2[k]['cacc'], d2[k]['trueyatxrecc'], 'g')
+    a.set_xscale('log')
     f.savefig('plots/out0.pdf')
     f, a = plt.subplots(1)
 

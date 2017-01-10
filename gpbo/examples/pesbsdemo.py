@@ -3,7 +3,7 @@
 import gpbo
 import gpbo.core.objectives as objectives
 gpbo.core.debugoutput=True
-gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':True,'taq':True}
+gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':False,'taq':False}
 import scipy as sp
 import copy
 import os
@@ -18,7 +18,7 @@ plot=True
 D=2
 lb = [-1., -1.]
 ub = [1., 1.]
-s=1e-9
+s=1e-6
 
 
 nopts=1
@@ -32,7 +32,7 @@ if run:
 
         def f(x, **ev):
             #c = 1 - 0.5* ev['xa']
-            c=5*sp.exp(-10.*ev['xa'])
+            c=45*sp.exp(-10.*ev['xa'])
             y = -sp.cos(x[0]) - sp.cos(x[1]) + 2. +0.1*s**2.
             b = ev['xa'] ** 2
             n = sp.random.normal() * sp.sqrt(s)
@@ -53,10 +53,10 @@ if run:
 
 
         C=gpbo.core.config.pesbsdefault(f,D,50,s,'results','pesbsdemo{}.csv'.format(k))
-        C.stopfn = gpbo.core.optimize.cstopfn
-        C.stoppara = {'cmax': 500}
-        C.aqpara['traincfn']='predictive1d'
-        C.aqpara['cmax']=C.stoppara['cmax']
+        C.stoppara = {'tmax': 60 * 5}
+        C.stopfn = gpbo.core.optimize.totaltstopfn
+        C.aqpara['overhead']='last'
+        #C.aqpara['cmax']=C.stoppara['cmax']
         out = gpbo.search(C)
 
 
@@ -67,7 +67,7 @@ if plot:
     y=sp.empty(nopts)
     r = re.compile('y (-?\d.\d+)')
 
-    d0 = [gpbo.optimize.readoptdata('results/pesbsdemo{}.csv'.format(k)) for k in xrange(nopts)]
+    d0 = [gpbo.optimize.readoptdata('results/pesbsdemo{}.csv'.format(k),includetaq=True) for k in xrange(nopts)]
 
     for k in xrange(nopts):
         txt = open('results/pesbsdemo{}.txt'.format(k)).read()
@@ -79,7 +79,7 @@ if plot:
 
     f, a = plt.subplots(1)
 
-    xaxis = sp.linspace(0,30,100)
+    xaxis = sp.linspace(0,max(d0[0]['cacc']),100)
     low0, med0, upp0 = gpbo.core.ESutils.quartsirregular([d0[k]['cacc'] for k in xrange(nopts)],
                                                          [d0[k]['trueyatxrecc'] for k in xrange(nopts)], xaxis)
 
