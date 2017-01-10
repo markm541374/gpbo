@@ -3,7 +3,7 @@ import scipy as sp
 
 
 D=2
-n=20
+n=50
 s=1e-6
 def f(x,**ev):
 

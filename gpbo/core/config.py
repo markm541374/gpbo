@@ -92,16 +92,16 @@ class pesfsdefault():
             'ev': {'s': s, 'd': [sp.NaN]},
             'lb': [-1.]*D,
             'ub': [1.]*D,
-            'nrandinit': 10,
+            'nrandinit': 20,
             'volper': 1e-6,
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
             'DH_SAMPLES': 16,
-            'DM_SAMPLES': 64,
-            'DM_SUPPORT': 800,
+            'DM_SAMPLES': 32,
+            'DM_SUPPORT': 1000,
             'SUPPORT_MODE': [gpbo.core.ESutils.SUPPORT_LAPAPROT],
-            'DM_SLICELCBPARA': 1.,
+            'DM_SLICELCBPARA': 16.,
             'noS': False,
         }
 
@@ -119,7 +119,7 @@ class pesfsdefault():
                 'volper':1e-6,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
-                'everyn':1
+                'everyn':16
                 }
         self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
         self.ojf=f
@@ -141,10 +141,10 @@ class pesfslearns():
             'sprior': sp.array([1.]*(D+1)+[3]),
             'kindex': GPdc.MAT52CS,
             'DH_SAMPLES': 16,
-            'DM_SAMPLES': 16,
+            'DM_SAMPLES': 32,
             'DM_SUPPORT': 800,
             'SUPPORT_MODE': [gpbo.core.ESutils.SUPPORT_LAPAPROT],
-            'DM_SLICELCBPARA': 1.,
+            'DM_SLICELCBPARA': 16,
             'noS': False,
         }
 
@@ -184,10 +184,10 @@ class pesvsdefault():
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
             'DH_SAMPLES': 16,
-            'DM_SAMPLES': 50,
+            'DM_SAMPLES': 32,
             'DM_SUPPORT': 2000,
             'SUPPORT_MODE': [gpbo.core.ESutils.SUPPORT_LAPAPROT],
-            'DM_SLICELCBPARA': 20.,
+            'DM_SLICELCBPARA': 16.,
             'noS': False,
             'logsu': lsu,
             'logsl': lsl,
@@ -230,7 +230,7 @@ class pesbsdefault():
             'sprior': sp.array([1.]*(D+2)),
             'kindex':GPdc.MAT52,
             'DH_SAMPLES':16,
-            'DM_SAMPLES':16,
+            'DM_SAMPLES':32,
             'DM_SUPPORT':1000,
             'SUPPORT_MODE':[gpbo.core.ESutils.SUPPORT_LAPAPROT],
             'DM_SLICELCBPARA':16.,
@@ -277,7 +277,7 @@ class pesbslearns():
             'sprior': sp.array([1.]*(D+2)+[3]),
             'kindex':GPdc.MAT52CS,
             'DH_SAMPLES':16,
-            'DM_SAMPLES':16,
+            'DM_SAMPLES':32,
             'DM_SUPPORT':1000,
             'SUPPORT_MODE':[gpbo.core.ESutils.SUPPORT_LAPAPROT],
             'DM_SLICELCBPARA':16.,

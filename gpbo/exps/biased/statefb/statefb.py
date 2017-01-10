@@ -40,7 +40,7 @@ def f(x,**ev):
     r = run([0.05,0.1],n,10,[2.*x[0],2.*x[1]],trace=False)
     t1=time.time()
     print 'running with C={} n={} (xa={})returned {} (10**{}) in {}'.format(x,n,ev['xa'],r,sp.log10(r),t1-t0)
-    return sp.log10(r),t1-t0,dict()
+    return sp.log10(r),500*(t1-t0),dict()
 
 def f_inplane(x,**ev):
     e = copy.deepcopy(ev)

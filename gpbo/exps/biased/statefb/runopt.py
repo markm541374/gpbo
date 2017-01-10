@@ -5,7 +5,7 @@ import pandas as pd
 import time
 import gpbo
 gpbo.core.debugoutput=True
-gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':False,'taq':False}
+gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':False,'taq':False,'support':False}
 
 import gpbo.core.GPdc as GPdc
 
@@ -25,14 +25,15 @@ f_inplane = statefb.f_inplane
 D=2
 N=40
 s=1e-9
-nopts=20
+nopts=5
 
 
 if run[0]:
     for k in xrange(nopts):
         C = gpbo.core.config.pesbsdefault(f, D, N, s, 'results', 'statefbbs{}.csv'.format(k))
-        C.stopfn = gpbo.core.optimize.cstopfn
-        C.stoppara = {'cmax': 30}
+        C.stoppara = {'tmax': 60 * 60 *2}
+        C.stopfn = gpbo.core.optimize.totaltstopfn
+        C.aqpara['overhead'] = 'last'
         C.aqpara['traincfn'] = 'llogfull'
         #C.aqpara['cmax'] = C.stoppara['cmax']
         out = gpbo.search(C)
@@ -40,8 +41,9 @@ if run[0]:
 if run[1]:
     for k in xrange(nopts):
         C = gpbo.core.config.eimledefault(f_inplane, D, N, 1e-9, 'results', 'statefbei{}.csv'.format(k))
-        C.stopfn = gpbo.core.optimize.cstopfn
-        C.stoppara = {'cmax': 50}
+        C.stoppara = {'tmax': 60 * 60*2}
+        C.stopfn = gpbo.core.optimize.totaltstopfn
+        C.aqpara['overhead'] = 'last'
         out = gpbo.search(C)
 
 
@@ -49,8 +51,9 @@ if run[1]:
 if run[2]:
     for k in xrange(nopts):
         C = gpbo.core.config.pesfsdefault(f_inplane, D, N, 1e-9, 'results', 'statefbfs{}.csv'.format(k))
-        C.stopfn = gpbo.core.optimize.cstopfn
-        C.stoppara = {'cmax': 50}
+        C.stoppara = {'tmax': 60 * 60*2}
+        C.stopfn = gpbo.core.optimize.totaltstopfn
+        C.aqpara['overhead'] = 'last'
         out = gpbo.search(C)
 
 
@@ -60,9 +63,9 @@ if plot:
     from matplotlib import pyplot as plt
     f,a = plt.subplots(1)
 
-    d0 = [gpbo.optimize.readoptdata('results/statefbbs{}.csv'.format(k)) for k in xrange(nopts)]
-    d1 = [gpbo.optimize.readoptdata('results/statefbfs{}.csv'.format(k)) for k in xrange(nopts)]
-    d2 = [gpbo.optimize.readoptdata('results/statefbei{}.csv'.format(k)) for k in xrange(nopts)]
+    d0 = [gpbo.optimize.readoptdata('results/statefbbs{}.csv'.format(k),includetaq=True) for k in xrange(nopts)]
+    d1 = [gpbo.optimize.readoptdata('results/statefbfs{}.csv'.format(k),includetaq=True) for k in xrange(nopts)]
+    d2 = [gpbo.optimize.readoptdata('results/statefbei{}.csv'.format(k),includetaq=True) for k in xrange(nopts)]
 
     for k in xrange(nopts):
 
@@ -74,7 +77,7 @@ if plot:
     f.savefig('plots/out0.pdf')
     f, a = plt.subplots(1)
 
-    xaxis = sp.linspace(0,50,1000)
+    xaxis = sp.linspace(0,60*60*2,1000)
     low0, med0, upp0 = gpbo.core.ESutils.quartsirregular([d0[k]['cacc'] for k in xrange(nopts)],
                                                          [d0[k]['trueyatxrecc'] for k in xrange(nopts)], xaxis)
 

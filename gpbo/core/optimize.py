@@ -133,8 +133,8 @@ class optimizer:
 def norlocalstopfn(optstate,**para):
     return nstopfn(optstate,**para) or localstopfn(optstate,**para)
 
-def nstopfn(optstate,nmax = 1):
-    return optstate.n >= nmax
+def nstopfn(optstate,**para):
+    return optstate.n >= para['nmax']
 
 def localstopfn(optstate,**para):
     return optstate.localdone

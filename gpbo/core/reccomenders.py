@@ -246,7 +246,7 @@ def gphinrecc(optstate,persist,**para):
     y=sp.vstack(optstate.y)
     s= sp.vstack([e['s'] for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
-    print optstate.aux
+   # print optstate.aux
     G = GPdc.GPcore(x, y, s, dx, [GPdc.kernel(optstate.aux['kindex'], d, h) for h in optstate.aux['HYPdraws']])
     def directwrap(xq,y):
         xq.resize([1,d])
