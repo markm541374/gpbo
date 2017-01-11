@@ -5,12 +5,13 @@
 #from numpy import get_include
 #pyximport.install(setup_args={'include_dirs': get_include()})
 import scipy as sp
+import sys
+import os
 from scipy import linalg as spl
 import time
 import GPdc
 from matplotlib import pyplot as plt
 import DIRECT
-import PES
 import ESutils
 def cosines(x,s,d):
     x.resize([1,x.size])
@@ -714,3 +715,16 @@ def mergelines(x,y):
         lb[i] = Y[i]-2.*sp.sqrt(v)
     
     return X,Y,lb,ub
+
+def silentdirect(f,l,u,*args,**kwargs):
+    print 'searching...'
+    fileno = sys.stdout.fileno()
+    with os.fdopen(os.dup(fileno), 'wb') as stdout:
+        with os.fdopen(os.open(os.devnull, os.O_WRONLY), 'wb') as devnull:
+            sys.stdout.flush();
+            os.dup2(devnull.fileno(), fileno)  # redirect
+            [xmin, ymin, ierror] = DIRECT.solve(f,l,u,*args,**kwargs)
+        sys.stdout.flush();
+        os.dup2(stdout.fileno(), fileno)
+    print 'direct found {} at {} {}'.format(ymin,xmin,ierror)
+    return xmin,ymin,ierror

@@ -93,18 +93,18 @@ class optimizer:
             #print self.choosefn
             mode,self.choosepersist,chooseaux = self.choosefn(self.state,self.choosepersist,**self.choosepara)
 
-            logger.info("---------------------\nstep {}\naquisition:".format(stepn))
+            logger.info("---------------------\nstep {}:".format(stepn))
             
             t0 = time.clock()
             x,ev,self.aqpersist[mode],aqaux = self.aqfn[mode](self.state,self.aqpersist[mode],**self.aqpara[mode])
             t1 = time.clock()
             self.state.aux = aqaux
-            logger.info("{} : {}    aqtime: {}\nevaluate:".format(x,ev,t1-t0))
+            logger.info("AQ returned {} : {}    aqtime: {}\nevaluate:".format(x,ev,t1-t0))
             
             y,c,ojaux  = self.ojf(x,**ev)
             t2 = time.clock()
             self.state.update(x,ev,y,c,t1-t0)
-            logger.info("{} : {}     evaltime: {}\nreccomend:".format(y,c,t2-t1))
+            logger.info("EV returned {} : {}     evaltime: {}".format(y,c,t2-t1))
             rx,self.reccpersist[mode],reaux = self.reccfn[mode](self.state,self.reccpersist[mode],**self.reccpara[mode])
             t3 = time.clock()
             
@@ -119,7 +119,7 @@ class optimizer:
                 checky=sp.NaN
 
             
-            logger.info("{}     recctime: {}\n".format(rx,t3-t2))
+            logger.info("RC returned {}     recctime: {}\n".format(rx,t3-t2))
             logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+','+''.join([str(k)+' '+str(aqaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in aqaux.keys()])[:-1]+'\n'
             lf.write(logstr)
 

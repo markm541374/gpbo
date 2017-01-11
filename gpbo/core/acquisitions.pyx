@@ -4,8 +4,9 @@
 import scipy as sp
 from scipy.optimize import minimize
 import os
+import sys
 import time
-import DIRECT
+from OPTutils import silentdirect as direct
 import logging
 import copy
 import GPdc
@@ -78,15 +79,19 @@ def EIMAPaq(optstate,persist,**para):
     s= sp.vstack([e['s'] for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
     MAP = GPdc.searchMAPhyp(x, y, s, dx, mprior, sprior, kindex)
-    logger.info('MAPHYP {}'.format(MAP))
+    logger.info('found MAPHYP {}'.format(MAP))
 
     G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(kindex, d, MAP))
     def directwrap(xq,y):
         xq.resize([1,d])
         a = G.infer_lEI(xq,[ev['d']])
         return (-a[0,0],0)
-    
-    [xmin,ymin,ierror] = DIRECT.solve(directwrap,lb,ub,user_data=[], algmethod=1, volper = volper, logfilename='/dev/null')
+
+
+
+    [xmin,ymin,ierror] = direct(directwrap,lb,ub,user_data=[], algmethod=1, volper = volper, logfilename='/dev/null')
+
+    logger.info('DIRECT found max EI at {} {}'.format(xmin,ierror))
     #logger.debug([xmin,ymin,ierror])
     persist['n']+=1
     return [i for i in xmin],ev,persist,{'MAPHYP':MAP,'logEImin':ymin,'DIRECTmessage':ierror}
@@ -117,6 +122,7 @@ def PESfsaq(optstate,persist,**para):
 
     [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],volper=para['volper'])
 
+    logger.info('DIRECT found max PES at {} {}'.format(xmin,ierror))
     lhyp = sp.log10([k.hyp for k in pesobj.G.kf])
     lhmean = sp.mean(lhyp, axis=0)
     lhstd = sp.sqrt(sp.var(lhyp, axis=0))
@@ -161,6 +167,7 @@ def PESvsaq(optstate,persist,**para):
     logger.debug([xmin,ymin,ierror])
     para['ev']['s']=10**xmin[-1]
     xout = [i for i in xmin[:-1]]
+
 
     lhyp = sp.log10([k.hyp for k in pesobj.G.kf])
     lhmean = sp.mean(lhyp, axis=0)

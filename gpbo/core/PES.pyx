@@ -1,13 +1,14 @@
 # Classes to run PES. Classes for constant or variable obs noise and augmented space
 
 #make a single posterior gp form data and take draws on this
-
+import sys
 import ESutils
 import GPdc
 import eprop
 import scipy as sp
 from scipy import stats as sps
-import DIRECT
+from OPTutils import silentdirect as direct
+
 try:
     from matplotlib import pyplot as plt
     plots=True
@@ -237,24 +238,13 @@ class PES:
         self.Z = drawmins(self.G,DM_SAMPLES,lb,ub,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode)
         #print "mindraws: "+str(self.Z)
         self.Ga = [GPdc.GPcore(*addmins(self.G, X, Y, S, D, self.Z[i, :]) + [self.G.kf]) for i in xrange(DM_SAMPLES)]
-        #class MJMError(Exception):
-            #pass
-        
-        #print [k(sp.array([0.1,0.1]),sp.array([0.1,0.2]),[[sp.NaN]],[[sp.NaN]],gets=True) for k in self.G.kf]
-        #if noS:
-        #    self.postS = 
-        #raise MJMError("tmp!!!")
     def __del__(self):
         try:
-            #print "1"
             self.G.__del__()
-            #print "2"
         except:
             pass
         try:
-            #print "3"
             self.Ga.__del__()
-            #print "4"
         except:
             pass
         return    
@@ -281,8 +271,9 @@ class PES:
             acq = PESgain(self.G,self.Ga,self.Z,x,dv,[s])
             R = -acq
             return (R,0)
-        
-        [xmin, ymin, ierror] = DIRECT.solve(directwrap,self.lb,self.ub,user_data=[], algmethod=1, volper=volper, logfilename='/dev/null')
+
+        [xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=1, volper=volper, logfilename='/dev/null')
+
         return [xmin,ymin,ierror]
     
     def search_acq(self,cfn,logsl,logsu,volper=1e-6,dv=[[sp.NaN]],over=0.):
@@ -295,8 +286,8 @@ class PES:
             except TypeError:
                 R = -acq/(cfn(x,s)+over)
             return (R,0)
-        
-        [xmin, ymin, ierror] = DIRECT.solve(directwrap,sp.hstack([self.lb,logsl]),sp.hstack([self.ub,logsu]),user_data=[], algmethod=1, volper=volper, logfilename='/dev/null')
+
+        [xmin, ymin, ierror] = direct(directwrap,sp.hstack([self.lb,logsl]),sp.hstack([self.ub,logsu]),user_data=[], algmethod=1, volper=volper, logfilename='/dev/null')
         return [xmin,ymin,ierror]
 
 #augmented space PES
@@ -356,7 +347,7 @@ class PES_inplane:
             return (R,0)
         #print self.lb
         #print self.ub
-        [xmin, ymin, ierror] = DIRECT.solve(directwrap,self.lb,self.ub,user_data=[], algmethod=1, volper=volper, logfilename='/dev/null')
+        [xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=1, volper=volper, logfilename='/dev/null')
         
         
         if False and plots:

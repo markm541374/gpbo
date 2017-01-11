@@ -6,8 +6,10 @@ import scipy as sp
 from scipy import linalg as spl
 from scipy import stats as sps
 import os
+import sys
 import time
-import DIRECT
+
+from OPTutils import silentdirect as direct
 import itertools
 import logging
 from scipy.optimize import minimize as spm
@@ -55,7 +57,12 @@ def gpmaprecc(optstate,persist,**para):
         xq.resize([1,d])
         a = G.infer_m(xq,[[sp.NaN]])
         return (a[0,0],0)
-    [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
+
+
+    [xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
+
+
+    logger.info('DIRECT found post. min {} at {} {}'.format(ymin,xmin,ierror))
     return [i for i in xmin],persist,{'MAPHYP':MAP,'ymin':ymin}
 
 gpmapprior = {
@@ -95,7 +102,7 @@ def gpmapasrecc(optstate,persist,**para):
         #print xe
         a = G.infer_m(xe,[[sp.NaN]])
         return (a[0,0],0)
-    [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
+    [xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
     logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
     from gpbo.core import debugoutput, debugoptions
     if debugoutput and debugoptions['datavis']:
@@ -169,7 +176,7 @@ def gphinasrecc(optstate,persist,**para):
         #print xe
         a = G.infer_m_post(xe,[[sp.NaN]])
         return (a[0,0],0)
-    [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
+    [xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
     logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
 
     from gpbo.core import debugoutput, debugoptions
@@ -254,10 +261,13 @@ def gphinrecc(optstate,persist,**para):
         #print xe
         a = G.infer_m_post(xe,[[sp.NaN]])
         return (a[0,0],0)
-    [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
-    logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
 
-    
+
+    [xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
+
+
+    logger.info('DIRECT found post. min {} at {} {}'.format(ymin,xmin,ierror))
+
     return [i for i in xmin],persist,{'ymin':ymin}
 
 gphinprior = {
@@ -300,7 +310,7 @@ def adaptiverecc(optstate,persist,**para):
         xq.resize([1,d])
         a = G.infer_m(xq,[[sp.NaN]])
         return (a[0,0],0)
-    [xmin,ymin,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
+    [xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
 
     def spowrap(x):
         a = G.infer_m(x,[[sp.NaN]])[0,0]
@@ -314,7 +324,7 @@ def adaptiverecc(optstate,persist,**para):
         xq.resize([1,d])
         e = G.infer_EI_post(xq,[[sp.NaN]],wrt=ymin)
         return (-e[0,0],0)
-    [xcmax,cmax,ierror] = DIRECT.solve(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
+    [xcmax,cmax,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
 
     def spowrap(x):
         e = G.infer_EI_post(x,[[sp.NaN]])

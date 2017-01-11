@@ -10,3 +10,4 @@ from .GPdc import *
 from .ESutils import *
 from .choosers import *
 from .GP1dg import *
+from .OPTutils import *
