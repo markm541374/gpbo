@@ -12,8 +12,8 @@ import gpbo.core.GPdc as GPdc
 import os
 import copy
 
-run=[True,True,True]
-#run=[False,False,False]
+run=[True,True,True,True]
+#run=[False,False,False,True]
 plot = True
 
 import statefb
@@ -25,7 +25,7 @@ f_inplane = statefb.f_inplane
 D=2
 N=40
 s=1e-9
-nopts=5
+nopts=8
 
 
 if run[0]:
@@ -55,7 +55,10 @@ if run[2]:
         C.stopfn = gpbo.core.optimize.totaltstopfn
         C.aqpara['overhead'] = 'last'
         out = gpbo.search(C)
-
+from gpbo.exps.thirdwrap.mtbowrap import optmtbo
+if run[3]:
+    for k in xrange(nopts):
+        out = optmtbo(f,sp.array([-1.]*3),sp.array([1.]*3),0.5,50,fname='statefbmt{}.csv'.format(k),fpath='results')
 
 
 
@@ -67,12 +70,14 @@ if plot:
     d1 = [gpbo.optimize.readoptdata('results/statefbfs{}.csv'.format(k),includetaq=True) for k in xrange(nopts)]
     d2 = [gpbo.optimize.readoptdata('results/statefbei{}.csv'.format(k),includetaq=True) for k in xrange(nopts)]
 
+    d3 = [gpbo.optimize.readoptdata('results/statefbmt{}.csv'.format(k),includetaq=True) for k in xrange(nopts)]
     for k in xrange(nopts):
 
         a.plot(d0[k]['cacc'], d0[k]['trueyatxrecc'], 'b')
         print [d1[k]['cacc'][0],d1[k]['cacc'][len(d1[k]['cacc'])-1]]
         a.plot(d1[k]['cacc'], d1[k]['trueyatxrecc'], 'r')
         a.plot(d2[k]['cacc'], d2[k]['trueyatxrecc'], 'g')
+        a.plot(d3[k]['cacc'], d3[k]['trueyatxrecc'], 'k')
     a.set_xscale('log')
     f.savefig('plots/out0.pdf')
     f, a = plt.subplots(1)
@@ -93,7 +98,12 @@ if plot:
                                                          [d2[k]['trueyatxrecc'] for k in xrange(nopts)], xaxis)
 
     a.fill_between(xaxis, low2, upp2, facecolor='lightgreen', edgecolor='lightgreen', alpha=0.5)
-    a.plot(xaxis, med2, 'g')
+
+    low3, med3, upp3 = gpbo.core.ESutils.quartsirregular([d3[k]['cacc'] for k in xrange(nopts)],
+                                                         [d3[k]['trueyatxrecc'] for k in xrange(nopts)], xaxis)
+
+    a.fill_between(xaxis, low3, upp3, facecolor='lightgreen', edgecolor='lightgreen', alpha=0.5)
+    a.plot(xaxis, med3, 'k')
     a.set_xscale('log')
     f.savefig('plots/out1.pdf')
     plt.show()

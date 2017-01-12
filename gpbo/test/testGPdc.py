@@ -14,17 +14,26 @@ def main():
     sup = sp.linspace(-1,1,ns)
 
     #points are a high noise obs, a low noise obs, a derivative obs and a second derivative obs
-    X = sp.array([[-0.8],[-0.25],[0.25],[0.8]])
-    Y = sp.array([[0.3],[-0.2],[2.5],[50.]])
-    S = sp.array([[1e-1],[1e-6],[1e-6],[1e-6]])
-    D = [[sp.NaN],[sp.NaN],[0],[0,0]]
-
-    a[0].plot([-0.8,-0.8],[0.3-sp.sqrt(1e-1),0.3+sp.sqrt(1e-1)],'r')
-    a[0].plot([-0.8],[0.3],'ro')
-    a[0].plot([-0.25],[-0.2],'ro')
-    a[1].plot([0.25],[2.5],'ro')
-    a[2].plot([0.8],[50],'ro')
-
+#    X = sp.array([[-0.8],[-0.25],[0.25],[0.8]])
+#    Y = sp.array([[0.3],[-0.2],[2.5],[50.]])
+#    S = sp.array([[1e-1],[1e-6],[1e-6],[1e-6]])
+#    D = [[sp.NaN],[sp.NaN],[0],[0,0]]
+    nn=30
+    X = sp.array([sp.linspace(-1,1,nn)]).T
+    Y = sp.array([map(lambda x:sp.sin(6*x), sp.linspace(-1,1,nn))]).T
+    S = sp.array([[1e-1]*nn]).T
+    D = [[sp.NaN]]*nn
+    print X.shape
+    print Y.shape
+    print S.shape
+    print len(D)
+    #a[0].plot([-0.8,-0.8],[0.3-sp.sqrt(1e-1),0.3+sp.sqrt(1e-1)],'r')
+    #a[0].plot([-0.8],[0.3],'ro')
+    #a[0].plot([-0.25],[-0.2],'ro')
+    #a[1].plot([0.25],[2.5],'ro')
+    #a[2].plot([0.8],[50],'ro')
+    for i in range(nn):
+        a[0].plot(X[i,0],Y[i,0],'ro')
     k= GPdc.kernel(GPdc.SQUEXP, 1, sp.array([0.5, 0.2]))
     K = sp.empty([4,4])
     for i in xrange(4):

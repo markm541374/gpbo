@@ -1,7 +1,7 @@
-from robo.fmin import mtbo
+from robo.fmin import fabolas
 import numpy as np
 import scipy as sp
-
+import os
 import time
 import sys
 s=1e-6
@@ -9,41 +9,38 @@ tt0=time.time()
 tc0=time.clock()
 
 def f(x, **ev):
-    # c = 1 - 0.5* ev['xa']
-    c = 45 * sp.exp(-10. * ev['xa'])
-    y = -sp.cos(x[0]) - sp.cos(x[1]) + 2. + 0.1 * s ** 2.
-    b = ev['xa'] ** 2
-    n = sp.random.normal() * sp.sqrt(s)
-    if 'cheattrue' in ev.keys():
-        if ev['cheattrue']:
-            b = 0
-            n = 0
-    print 'f inputs x:{} ev:{} outputs y:{} (b:{} n:{}) c:{}'.format(x, ev, y + n + b, b, n, c)
-    return y + b + n, c, dict()
+    sn=ev['xa']
+    y = 3.-np.cos(2.9*(1-0.2*sn)*(x[0]-sn*0.5))-np.cos(3.1*(x[1]+sn*0.2))+sn**2
+    c=0.5+3.*(1.-sn)**2
 
-def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv'):
+    print 'f inputs x:{} ev:{} outputs y:{}  c:{}'.format(x, ev, y ,c)
+    return y , c, dict()
+
+def optfabolas(fn,lb,ub,n,ninit=10,fname='results.csv',fpath='.'):
     D=len(ub)
     log=[]
     tinit=time.clock()
     def objective_function(x, s):
         t0=time.clock()
-        if s==1:
-            y,c,aux = fn(x,**{'xa':0})
-        elif s==0:
-            y,c,aux = fn(x,**{'xa':salt})
-        else:
-            raise IndexError
+        #adjust s to 0-1 where 0 is full
+        sn=1-np.log10(s)/4.+0.5
+
+        y,c,aux = fn(x,**{'xa':sn})
+
         t1=time.clock()
         print "\nevaluation at {} {} returned {} {}\n".format(x,s,y,c)
         print "truetime {} clocktime {}".format(time.time()-tt0,time.clock()-tc0)
         sys.stdout.flush()
         sys.stderr.flush()
-        log.append({'x':x,'s':s,'y':y,'c':c,'t0':t0,'t1':t1})
+        log.append({'x':x,'s':sn,'y':y,'c':c,'t0':t0,'t1':t1})
         return y, c
 
-    res = mtbo(objective_function, lb, ub, n_tasks=2, n_init=ninit,num_iterations=n,burnin=100, chain_length=200)
+    s_min = 100
+    s_max = 1000000
+    res = fabolas(objective_function, lower=lb, upper=ub, s_min=s_min,s_max=s_max,n_init=ninit,num_iterations=n)
     print res
-    lf = open(fname, 'wb')
+    print 'results: {}'.format(os.path.join(fpath,fname))
+    lf = open(os.path.join(fpath,fname),'wb')
     lf.write(''.join(
         ['n, '] + ['x' + str(i) + ', ' for i in xrange(D)] + ['xa,']+ [
             'y, c, '] + ['rx' + str(i) + ', ' for i in xrange(D)] + [
@@ -58,8 +55,8 @@ def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv'):
         st+=str(log[i]['y'])+','
         st+=str(log[i]['c'])+','
         for j in xrange(D):
-            st+=str(res['trajectory'][i+1][j])+','
-        st+=str(fn(res['trajectory'][i+1][:D],**{'xa':0,'cheattrue':True})[0])+','
+            st+=str(res['incumbents'][i+1][j])+','
+        st+=str(fn(res['incumbents'][i+1][:D],**{'xa':0,'cheattrue':True})[0])+','
         if i==0:
             st+=str(log[0]['t0']-tinit)+','
         else:
@@ -73,4 +70,4 @@ def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv'):
 
 lb=sp.array([-1.,-1.])
 ub=sp.array([ 1., 1.])
-optmtbo(f,lb,ub,0.5,14,ninit=10)
+optfabolas(f,lb,ub,50,ninit=20)
