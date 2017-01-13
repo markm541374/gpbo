@@ -68,6 +68,6 @@ def optfabolas(fn,lb,ub,n,ninit=10,fname='results.csv',fpath='.'):
         lf.write(st)
     lf.close()
 
-lb=sp.array([-1.,-1.])
-ub=sp.array([ 1., 1.])
-optfabolas(f,lb,ub,50,ninit=20)
+#lb=sp.array([-1.,-1.])
+#ub=sp.array([ 1., 1.])
+#optfabolas(f,lb,ub,50,ninit=20)

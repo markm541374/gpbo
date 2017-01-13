@@ -82,6 +82,7 @@ class optimizer:
     
     def run(self):
         logger.info('startopt:')
+        print self.aqpara
         self.stoppara['t0']=time.clock()
         lf = open(os.path.join(self.dirpath,self.name),'wb',0)
         lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara[0]['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, aqauxdata'])+'\n')
@@ -203,18 +204,27 @@ def readoptdata(fname,includetaq=False):
     df.reset_index(inplace=True)
     l = len(df['c'])
     df['cacc'] = pd.Series(sp.empty(l), index=df.index)
-
+    df['accE'] = pd.Series(sp.empty(l), index=df.index)
+    df['accEA'] = pd.Series(sp.empty(l), index=df.index)
     for c in df.columns:
         try:
             df[c] = df[c].astype(float)  #
         except ValueError:
             pass
+
+
+    #df['accEA'][0] = df.loc[0, ('c')]+df.loc[0, ('taq')]
+    df.loc[0,('accEA')] = df.loc[0, ('c')]+df.loc[0, ('taq')]
+    for i in xrange(1, l):
+        df.loc[i,('accEA')] = df.loc[i - 1, 'accEA'] + df.loc[i, 'c']+df.loc[i, ('taq')]
+
+    df.loc[0,('accE')] = df.loc[0, ('c')]
+    for i in xrange(1, l):
+        df.loc[i,('accE')] = df.loc[i - 1, 'accE'] + df.loc[i, 'c']
+
+
     if includetaq:
-        df['cacc'][0] = df.loc[0, ('c')]+df.loc[0, ('taq')]
-        for i in xrange(1, l):
-            df['cacc'][i] = df.loc[i - 1, 'cacc'] + df.loc[i, 'c']+df.loc[i, ('taq')]
+        df['cacc']=df['accEA']
     else:
-        df['cacc'][0] = df.loc[0, ('c')]
-        for i in xrange(1, l):
-            df['cacc'][i] = df.loc[i - 1, 'cacc'] + df.loc[i, 'c']
+        df['cacc']=df['accE']
     return df

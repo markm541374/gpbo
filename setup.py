@@ -18,11 +18,6 @@ extensions = [
               include_dirs = ['.','core',get_include()],
               extra_compile_args=compile_flags
     ),
-    Extension(name ="gpbo/core/GP1dg",
-              sources = ["gpbo/core/GP1dg.c"],
-              include_dirs = ['.','core',get_include()],
-              extra_compile_args=compile_flags
-    ),
     Extension(name ="gpbo/core/GPdc",
               sources = ["gpbo/core/GPdc.c"],
               include_dirs = ['.','core',get_include()],
