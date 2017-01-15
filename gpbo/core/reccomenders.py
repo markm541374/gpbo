@@ -1,7 +1,7 @@
 # To change this license header, choose License Headers in Project Properties.
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
-
+from __future__ import print_function
 import scipy as sp
 from scipy import linalg as spl
 from scipy import stats as sps
@@ -239,7 +239,7 @@ gpashin = gphinasrecc,gphinasprior
 
 
 def gphinrecc(optstate,persist,**para):
-    print [para['onlyafter'],len(optstate.y)]
+    print( [para['onlyafter'],len(optstate.y)])
     if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
         return argminrecc(optstate, persist,**para)
@@ -356,7 +356,7 @@ def adaptiverecc(optstate,persist,**para):
     from gpbo.core import debugoutput
     from gpbo.core import debugoptions
     if debugoutput and debugoptions['adaptive'] and plots:
-        print 'plotting support...'
+        print( 'plotting support...')
         fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(40, 40))
 
         n = 60
@@ -494,8 +494,8 @@ def adaptiverecc(optstate,persist,**para):
             resob = minimize(f,xmin,method='l-bfgs-b',bounds=[(-1,1),(-1,1)],options={'ftol':1e-10})
             RCtrue = (resob['fun']-para['cheatymin'],resob['nfev'])
 
-            print 'optstart {} {}\n' \
-                  'optend   {} {}'.format(xmin,ymin,resob['x'],resob['fun'])
+            print( 'optstart {} {}\n' \
+                  'optend   {} {}'.format(xmin,ymin,resob['x'],resob['fun']))
         except KeyError:
             CRegret = sp.nan
             RCtrue = (sp.nan,0,)
@@ -595,7 +595,7 @@ def adaptiverecc(optstate,persist,**para):
         obj = [W,R,Y,ERc,Y_,localset,CommitRegret,IRegret,ORegret,ERegret,optstate.n,persist,clf.means_, clf.covariances_,M,V,xmin,ymin,W_,A]
         pickle.dump(obj, open('dbout/{}.p'.format(optstate.n), 'wb'))
         logger.info('endopt')
-        print 'endstep'
+        print( 'endstep')
 
 
     return [i for i in xmin],persist,{'MAPHYP':MAP,'ymin':ymin}

@@ -3,7 +3,7 @@
 #GPcore takes a single hyperparameter value or a set. With a set the infer_ methods produce individual inferences while infer_post methods return the posterior
 #cython: profile=True
 #
-
+from __future__ import print_function
 __author__ = "mark"
 __date__ = "$22-Nov-2015 21:27:19$"
 
@@ -82,7 +82,7 @@ class GPcore:
         return
     
     def printc(self):
-        print self.size
+        print( self.size)
         libGP.ping(self.s, cint(self.size))
         return
     def get_cho(self):
@@ -166,18 +166,18 @@ class GPcore:
         if sp.amin(V)<=-0.:
             class MJMError(Exception):
                 pass
-            print "negative/eq variance"
-            print [m,V,X_i,D_i]
-            print "_______________"
+            print( "negative/eq variance")
+            print( [m,V,X_i,D_i])
+            print( "_______________")
             #self.printc()
             raise(MJMError)
         if sp.amin(sp.var(m,axis=0))<-0.:
             class MJMError(Exception):
                 pass
-            print "negativevar of mean"
-            print X_i.shape
-            print [m,V,sp.var(m,axis=0),X_i,D_i]
-            print "_______________"
+            print( "negativevar of mean")
+            print( X_i.shape)
+            print( [m,V,sp.var(m,axis=0),X_i,D_i])
+            print( "_______________")
             #self.printc()
             raise(MJMError)
         
@@ -220,8 +220,8 @@ class GPcore:
     def infer_LCB_post(self,X_i,D_i,p):
         [m,v] = self.infer_diag_post(X_i,D_i)
         if sp.amin(v)<0.:
-            print "negateive vriance: "
-            print [m,v,X_i]
+            print( "negateive vriance: ")
+            print( [m,v,X_i])
             #self.printc()
             class MJMError(Exception):
                 pass
@@ -350,7 +350,7 @@ def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=20000,fg=-1e9):
     hy = sp.empty(libGP.numhyp(cint(ki),cint(dim)))
     
     lk = sp.empty(1)
-    print "datasetsize = "+str(ns)
+    print( "datasetsize = "+str(ns))
     r = libGP.HypSearchMAP(cint(dim),cint(len(Dx)),X.ctypes.data_as(ctpd),Y.ctypes.data_as(ctpd),S.ctypes.data_as(ctpd),(cint*len(Dx))(*Dx),m.ctypes.data_as(ctpd),s.ctypes.data_as(ctpd),ct.c_double(MAPmargin),cint(ki), hy.ctypes.data_as(ctpd),lk.ctypes.data_as(ctpd))
     #print "yyy"
     return hy

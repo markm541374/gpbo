@@ -4,6 +4,7 @@
 #import pyximport
 #from numpy import get_include
 #pyximport.install(setup_args={'include_dirs': get_include()})
+from __future__ import print_function
 import scipy as sp
 import sys
 import os
@@ -138,7 +139,7 @@ def gensquexpdraw(d,lb,ub,ignores=-1):
             noise = 0.
         else:
             noise = sp.random.normal(scale=sp.sqrt(s))
-        print "EVAL WITH NOISE: "+str(noise) + "FROM S= "+str(s)
+        print( "EVAL WITH NOISE: "+str(noise) + "FROM S= "+str(s))
         return [G.infer_m(x,[d])[0,0]+noise,1.]
     def dirwrap(x,y):
         z = G.infer_m(x,[[sp.NaN]])[0,0]
@@ -233,7 +234,7 @@ def mergelines(x,y):
     return X,Y,lb,ub
 
 def silentdirect(f,l,u,*args,**kwargs):
-    print 'searching...'
+    print( 'searching...')
     fileno = sys.stdout.fileno()
     with os.fdopen(os.dup(fileno), 'wb') as stdout:
         with os.fdopen(os.open(os.devnull, os.O_WRONLY), 'wb') as devnull:
@@ -242,5 +243,5 @@ def silentdirect(f,l,u,*args,**kwargs):
             [xmin, ymin, ierror] = DIRECT.solve(f,l,u,*args,**kwargs)
         sys.stdout.flush();
         os.dup2(stdout.fileno(), fileno)
-    print 'direct found {} at {} {}'.format(ymin,xmin,ierror)
+    print( 'direct found {} at {} {}'.format(ymin,xmin,ierror))
     return xmin,ymin,ierror

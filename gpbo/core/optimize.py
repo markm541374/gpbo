@@ -1,7 +1,7 @@
 # To change this license header, choose License Headers in Project Properties.
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
-
+from __future__ import print_function
 import pickle
 import scipy as sp
 import os
@@ -82,7 +82,7 @@ class optimizer:
     
     def run(self):
         logger.info('startopt:')
-        print self.aqpara
+        print( self.aqpara)
         self.stoppara['t0']=time.clock()
         lf = open(os.path.join(self.dirpath,self.name),'wb',0)
         lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara[0]['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, aqauxdata'])+'\n')

@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import gpbo
 import copy
 import os
@@ -54,7 +56,7 @@ def runexp(f,lb,ub,path,nreps,confs):
             elif C[0][:7]=='fabolas':
                 optfabolas(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path)
             else:
-                print "not an optimization method"
+                print( "not an optimization method")
 def plotquarts(a,data1,data2,col,lab):
     n=len(data1)
     mx=-sp.Inf

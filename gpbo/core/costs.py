@@ -1,3 +1,4 @@
+from __future__ import print_function
 import scipy as sp
 from scipy import linalg as spl
 import logging
@@ -53,7 +54,7 @@ def traincfn1d(x,c):
     g = GPdc.GPcore(x, c, sp.array([1e-1] * n), [[sp.NaN]] * n, GPdc.kernel(GPdc.MAT52, 1, [1., 0.2]))
 
     if gpbo.core.debugoutput and gpbo.core.debugoptions['cost1d']:
-        print 'plotting cost1d...'
+        print( 'plotting cost1d...')
         from gpbo.core import debugpath
         import os
         if not os.path.exists(debugpath):
@@ -86,11 +87,11 @@ def traincfn1dll(x,c):
     n = x.size
     cl=sp.log(c)
     MAP = GPdc.searchMAPhyp(x, cl, sp.array([1e-3] * n), [[sp.NaN]] * n, sp.array([1.,0.,-1.]), sp.array([2.,2.,2.]), GPdc.MAT52CS)
-    print 'MAPhyp in costfn {}'.format(MAP)
+    print( 'MAPhyp in costfn {}'.format(MAP))
     g = GPdc.GPcore(x, cl, sp.array([1e-3] * n), [[sp.NaN]] * n, GPdc.kernel(GPdc.MAT52CS,1,MAP))
 
     if gpbo.core.debugoutput and gpbo.core.debugoptions['cost1d']:
-        print 'plotting cost1d...'
+        print( 'plotting cost1d...')
         from gpbo.core import debugpath
         import os
         if not os.path.exists(debugpath):
@@ -134,10 +135,10 @@ def traincfnfull(x,c):
     n,d = x.shape
     cl=sp.log(c)
     MAP = GPdc.searchMAPhyp(x, cl, sp.array([1e-6] * n), [[sp.NaN]] * n, sp.array([1.]+[-0.]*d ), sp.array([2.]*(d+1)), GPdc.MAT52)
-    print 'MAPhyp in costfn {}'.format(MAP)
+    print( 'MAPhyp in costfn {}'.format(MAP))
     g = GPdc.GPcore(x, cl, sp.array([1e-3] * n), [[sp.NaN]] * n, GPdc.kernel(GPdc.MAT52,1,MAP))
     if gpbo.core.debugoutput and gpbo.core.debugoptions['cost1d']:
-        print 'plotting cost...'
+        print( 'plotting cost...')
         from gpbo.core import debugpath
         import os
         if not os.path.exists(debugpath):
@@ -243,7 +244,7 @@ def predictive1d(x,c,t,ofs,C):
     if gpbo.core.debugoutput and gpbo.core.debugoptions['taq']:
         from gpbo.core import debugpath
         from matplotlib import pyplot as plt
-        print 'plotting taq...'
+        print( 'plotting taq...')
         f, a = plt.subplots(3)
         a[0].plot(t)
 

@@ -1,6 +1,7 @@
 # To change this license header, choose License Headers in Project Properties.
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
+from __future__ import print_function
 import scipy as sp
 cimport numpy as np
 from scipy import linalg as spl
@@ -21,7 +22,7 @@ def expectation_prop(m0,V0,Y,Z,F,z):
     for i in xrange(V0.shape[0]):
         needed[i] =  not [Z[i]*(m0[0,i]-Z[i]*5*V0[i,i])>Z[i]*Y[i]]
     if any(needed):
-        print "EP not needed for all values (>5std): "+str(needed)
+        print( "EP not needed for all values (>5std): "+str(needed))
     try:
         return expectation_prop_inner(m0,V0,Y,Z,F,z,needed)
     except:
@@ -52,7 +53,7 @@ def expectation_prop_inner(m0,V0,Y,Z,F,z,needed):
         mtprev=mt.copy()
         Vtprev=Vt.copy()
         for j in [k for k in range(n) if needed[k]]:
-            print [i,j]
+            print( [i,j])
             #the cavity dist at index j
             tmp = 1./(Vt[j,j]-V[j,j])
             v_ = (V[j,j]*Vt[j,j])*tmp

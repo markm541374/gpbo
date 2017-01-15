@@ -1,3 +1,4 @@
+from __future__ import print_function
 import scipy as sp
 from scipy import linalg as spl
 from itertools import groupby
@@ -157,7 +158,7 @@ def gpcommitment(optstate,persist,**para):
 
     from gpbo.core import debugoutput, debugoptions, debugpath
     if debugoutput and debugoptions['adaptive'] and plots:
-        print 'plotting choice...'
+        print( 'plotting choice...')
         fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(40, 40))
         #plot the current GP
         n = 60
@@ -452,7 +453,7 @@ def choice2(para):
     Sv[1,M-1]=grf(M-1)+lsr +Sc[1,M-1] if Sc[1,M-1]<brm and grf(M-1)+lsr<tol else sp.Inf
     switchat=-1
     for i in reversed(range(M-1)):
-        print grf(i-1)+lsr,grf(i-1)+lsr<tol,tol,Sc[1,i],Sc[1,i]<brm
+        print(grf(i-1)+lsr,grf(i-1)+lsr<tol,tol,Sc[1,i],Sc[1,i]<brm)
         Sv[1,i]=grf(i-1)+lsr+Sc[1,i] if Sc[1,i]<brm and grf(i-1)+lsr<tol else sp.Inf
         if Sv[1,i+1]>=Sv[0,i+1]:
             Sv[0,i]=Sv[0,i+1]

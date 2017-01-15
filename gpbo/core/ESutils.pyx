@@ -2,7 +2,7 @@
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
 #cython: profile=True
-
+from __future__ import print_function
 import os
 import GPdc
 import slice
@@ -43,14 +43,14 @@ def draw_support(g, lb, ub, n, method, para=1.):
     #print 'Draw support input GP with d={} lb {} ub {}'.format(d,lb,ub)
     cdef int i,j
     if method==SUPPORT_UNIFORM:
-        print "Drawing support using uniform:"
+        print( "Drawing support using uniform:")
         X=sp.random.uniform(size=[n,d])
         for i in range(d):
             X[:,i] *= ub[i]-lb[i]
             X[:,i] += lb[i]
     elif method==SUPPORT_LAPAPR:
 
-        print "Drawing support using lapapr:"
+        print( "Drawing support using lapapr:")
         #start with 4 times as many points as needed
         #print 'a'
         para = int(para)
@@ -87,11 +87,11 @@ def draw_support(g, lb, ub, n, method, para=1.):
             if not res.success:
                 class MJMError(Exception):
                     pass
-                print res
+                print( res)
                 if not res.status==2:
                     raise MJMError('failed in opt in support lapapr')
                 else:
-                    print "warn, lapapr opt did not fully vconverge "
+                    print( "warn, lapapr opt did not fully vconverge ")
             Xst[i+int(para),:] = res.x
             
         
@@ -137,7 +137,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
         from gpbo.core import debugoutput
 
         if debugoutput and  gpbo.core.debugoptions['drawlap'] and plots:
-            print "plotting draw_support...",
+            print( "plotting draw_support...",)
             from gpbo.core import debugpath
             if not os.path.exists(debugpath):
                 os.mkdir(debugpath)
@@ -175,9 +175,9 @@ def draw_support(g, lb, ub, n, method, para=1.):
             fig.clf()
             plt.close(fig)
             del(fig)
-            print 'done'
+            print( 'done')
     elif method==SUPPORT_LAPAPROT:
-        print "Drawing support using lapaprot:"
+        print( "Drawing support using lapaprot:")
         #start with 4 times as many points as needed
         #print 'a'
         para = int(para)
@@ -220,11 +220,11 @@ def draw_support(g, lb, ub, n, method, para=1.):
             if not res.success:
                 class MJMError(Exception):
                     pass
-                print res
+                print( res)
                 if not res.status==2:
                     raise MJMError('failed in opt in support lapapr')
                 else:
-                    print "warn, lapapr opt did not fully vconverge "
+                    print( "warn, lapapr opt did not fully vconverge ")
             Xst[i+int(para),:] = res.x
 
         #find endpoints that are unique
@@ -291,7 +291,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
         from gpbo.core import debugoutput
 
         if debugoutput and gpbo.core.debugoptions['drawlap'] and plots:
-            print "plotting draw_support...",
+            print( "plotting draw_support...",)
             from gpbo.core import debugpath
             if not os.path.exists(debugpath):
                 os.mkdir(debugpath)
@@ -336,7 +336,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
             fig.clf()
             plt.close(fig)
             del(fig)
-            print 'done'
+            print( 'done')
 
 
     elif method==SUPPORT_SLICELCB:
@@ -350,7 +350,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
                     raise
             else:
                 return -1e99
-        print "Drawing support using slice sample over LCB:"
+        print( "Drawing support using slice sample over LCB:")
         X = slice.slice_sample(f,0.5*(ub+lb),n,0.1*(ub-lb))
     
     elif method==SUPPORT_SLICEEI:
@@ -366,7 +366,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
                     raise
             else:
                 return -1e99
-        print "Drawing support using slice sample over EI:"
+        print( "Drawing support using slice sample over EI:")
         X = slice.slice_sample(f,0.5*(ub+lb),n,0.1*(ub-lb))
     
     elif method==SUPPORT_SLICEPM:
@@ -378,7 +378,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
                     p+= -0.5*(m[0,i]**2)/v[0,i]
                 ym = g.infer_m_post(sp.array(x),[[sp.NaN]])[0,0]
                 if not sp.isfinite(p):
-                    print [m,p]
+                    print( [m,p])
                     #raise ValueError
                 return -10*ym+0.01*p
             else:
@@ -388,14 +388,14 @@ def draw_support(g, lb, ub, n, method, para=1.):
             sup = sp.linspace(-0.999,0.999,100)
             for i in range(100):
                 for j in range(100):
-                    print sp.array([sup[i],sup[j]])
+                    print( sp.array([sup[i],sup[j]]))
                     A[99-j,i] = f([sup[i],sup[j]])
-                    print A[99-j,i]
-            print A
+                    print( A[99-j,i])
+            print(A)
             plt.figure()
             plt.imshow(A)
             plt.figure()
-        print "Drawing support using slice sample over PM:"
+        print( "Drawing support using slice sample over PM:")
         X = slice.slice_sample(f,0.5*(ub+lb),n,0.1*(ub-lb))
     else:
         raise RuntimeError("draw_support method invalid")
@@ -415,7 +415,7 @@ def draw_min(g,support,n):
         R[i,:] = support[a,:]
     from itertools import groupby
     amins = [len(list(group)) for key, group in groupby(sorted(args))]
-    print "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(support.shape[0],len(amins),100.*max(amins)/float(n))
+    print( "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(support.shape[0],len(amins),100.*max(amins)/float(n)))
 
 
     return R
@@ -436,7 +436,7 @@ def draw_min_xypairgrad(g,support,n,x):
         Y[i,1:] = Z[i,m:]
     from itertools import groupby
     amins = [len(list(group)) for key, group in groupby(sorted(args))]
-    print "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(m,len(amins),100.*max(amins)/float(n))
+    print( "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(m,len(amins),100.*max(amins)/float(n)))
     #print R,Y
     return R,Y,args
 
@@ -511,8 +511,8 @@ def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5):
             if isnan(r):
                 class MJMError(Exception):
                     pass
-                print 'nan from GPLKonly with input'
-                print [X,Y,S,D,ki,hm,hs,n,burn,subsam]
+                print( 'nan from GPLKonly with input')
+                print( [X,Y,S,D,ki,hm,hs,n,burn,subsam])
                 raise MJMError('nan from GPLKonly with input')
         else:
             r=-1e99
@@ -533,7 +533,7 @@ def gen_dataset(nt,d,lb,ub,kindex,hyp,s=1e-9):
 
 def plot2dFtofile(f,fname,xmin=[False],atxa=0.):
     if not plots:
-        print 'XXXplots disabled'
+        print( 'XXXplots disabled')
         return
     cdef int i,j
     n = 50

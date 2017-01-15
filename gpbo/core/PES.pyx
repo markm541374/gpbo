@@ -1,6 +1,7 @@
 # Classes to run PES. Classes for constant or variable obs noise and augmented space
 
 #make a single posterior gp form data and take draws on this
+from __future__ import print_function
 import sys
 import ESutils
 import GPdc
@@ -43,7 +44,7 @@ def drawmins(G,n,lb,ub,SUPPORT=300,mode = [ESutils.SUPPORT_SLICELCB],SLICELCB_PA
 
     R = ESutils.draw_min(G,W,n)
     #draw in samples on the support
-    print "drawing mins from support"
+    print( "drawing mins from support")
 
     from gpbo.core import debugoutput
     from gpbo.core import debugoptions
@@ -102,7 +103,7 @@ def addmins(G,X,Y,S,D,xmin,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,int
         if V[i,i]<0:
             class MJMError(Exception):
                 pass
-            print [m,V]
+            print( [m,V])
             raise MJMError('negative on diagonal')
         
     yminarg = sp.argmin(Y)
@@ -163,7 +164,7 @@ def addmins_inplane(G,X,Y,S,D,xmin,axis,value,mode=OFFHESSZERO, GRADNOISE=1e-9,E
         Sd.resize([dim-1,1])
         Yd.resize([dim-1,1])
     else:
-        print "this isn't a valid approach!!!!!!!!!"
+        print( "this isn't a valid approach!!!!!!!!!")
         Xd = sp.vstack([xmin]*(dim-1+1))
         Dd = [[sp.NaN]]+[[i,i] for i in xrange(dim) if i !=axis]
         [m,V] = G.infer_full_post(Xd,Dd)
@@ -224,10 +225,7 @@ def Vadj(m,V):
 #basic PES class if search_pes is used. variable noise if search_acq is used
 class PES:
     def __init__(self,X,Y,S,D,lb,ub,kindex,mprior,sprior,DH_SAMPLES=8,DM_SAMPLES=8, DM_SUPPORT=400,DM_SLICELCBPARA=1.,mode=ESutils.SUPPORT_SLICELCB,noS=False):
-        
-        
-        
-        print "PES init:"
+        print( "PES init:")
         self.lb=lb
         self.ub=ub
         self.noS=noS
@@ -330,7 +328,7 @@ class PES_inplane:
         return a
     
     def search_acq(self,cfn,sfn,volper=1e-6,dv=[[sp.NaN]],over=0.):
-        print 'overhead={}'.format(over)
+        print( 'overhead={}'.format(over))
         def directwrap(Q,extra):
             x = sp.array([Q])
             if self.noS:
@@ -405,7 +403,7 @@ class PES_inplane:
             
             
             a[2*D-1].hist(self.X[:,0].flatten(),50,facecolor='g')    
-            print xmin
+            print( xmin)
             
             f.savefig('../figcache/{0}.png'.format(time.time()))
             f.clf()
