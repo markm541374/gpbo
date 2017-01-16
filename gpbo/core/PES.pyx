@@ -8,7 +8,7 @@ import GPdc
 import eprop
 import scipy as sp
 from scipy import stats as sps
-from OPTutils import silentdirect as direct
+from optutils import silentdirect as direct
 
 try:
     from matplotlib import pyplot as plt

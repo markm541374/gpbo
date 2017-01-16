@@ -7,7 +7,7 @@ from scipy.optimize import minimize
 import os
 import sys
 import time
-from OPTutils import silentdirect as direct
+from optutils import silentdirect as direct
 import logging
 import copy
 import GPdc

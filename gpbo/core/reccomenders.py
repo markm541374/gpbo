@@ -9,7 +9,7 @@ import os
 import sys
 import time
 
-from OPTutils import silentdirect as direct
+from optutils import silentdirect as direct
 import itertools
 import logging
 from scipy.optimize import minimize as spm
