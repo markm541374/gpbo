@@ -7,9 +7,11 @@ import os
 from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 import scipy as sp
-from gpbo.exps.thirdwrap.mtbowrap import optmtbo
-from gpbo.exps.thirdwrap.fabwrap import  optfabolas
-
+try:
+    from gpbo.exps.thirdwrap.mtbowrap import optmtbo
+    from gpbo.exps.thirdwrap.fabwrap import  optfabolas
+except:
+    print('\n\ndidnt import robo!!!!!!\n\n')
 def runexp(f,lb,ub,path,nreps,confs):
     for ii in range(nreps):
         for C in confs:
