@@ -2,7 +2,7 @@ import gpbo
 import numpy as np
 import scipy as sp
 #mode='run'
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 
 D=2
 
@@ -71,11 +71,11 @@ allconfs.append(['mtbo8',C])
 #fabolas
 C={'ninit':20,
    'nsteps':60}
-#allconfs.append(['fabolas',C])
+allconfs.append(['fabolas',C])
 
 if mode=='run':
     gpbo.runexp(f,lb,ub,rpath,4,allconfs)
 elif mode=='plot':
-    gpbo.plotall(allconfs,2,rpath,trueopt=truemin)
+    gpbo.plotall(allconfs,4,rpath,trueopt=truemin)
 else:
     pass
