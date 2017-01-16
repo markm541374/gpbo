@@ -1,3 +1,4 @@
+from __future__ import print_function
 from robo.fmin import fabolas
 import numpy as np
 import scipy as sp
@@ -13,7 +14,7 @@ def f(x, **ev):
     y = 3.-np.cos(2.9*(1-0.2*sn)*(x[0]-sn*0.5))-np.cos(3.1*(x[1]+sn*0.2))+sn**2
     c=0.5+3.*(1.-sn)**2
 
-    print 'f inputs x:{} ev:{} outputs y:{}  c:{}'.format(x, ev, y ,c)
+    print( 'f inputs x:{} ev:{} outputs y:{}  c:{}'.format(x, ev, y ,c))
     return y , c, dict()
 
 def optfabolas(fn,lb,ub,n,ninit=10,fname='results.csv',fpath='.'):
@@ -28,8 +29,8 @@ def optfabolas(fn,lb,ub,n,ninit=10,fname='results.csv',fpath='.'):
         y,c,aux = fn(x,**{'xa':sn})
 
         t1=time.clock()
-        print "\nevaluation at {} {} returned {} {}\n".format(x,s,y,c)
-        print "truetime {} clocktime {}".format(time.time()-tt0,time.clock()-tc0)
+        print( "\nevaluation at {} {} returned {} {}\n".format(x,s,y,c))
+        print( "truetime {} clocktime {}".format(time.time()-tt0,time.clock()-tc0))
         sys.stdout.flush()
         sys.stderr.flush()
         log.append({'x':x,'s':sn,'y':y,'c':c,'t0':t0,'t1':t1})
@@ -38,8 +39,8 @@ def optfabolas(fn,lb,ub,n,ninit=10,fname='results.csv',fpath='.'):
     s_min = 100
     s_max = 1000000
     res = fabolas(objective_function, lower=lb, upper=ub, s_min=s_min,s_max=s_max,n_init=ninit,num_iterations=n)
-    print res
-    print 'results: {}'.format(os.path.join(fpath,fname))
+    print( res)
+    print( 'results: {}'.format(os.path.join(fpath,fname)))
     lf = open(os.path.join(fpath,fname),'wb')
     lf.write(''.join(
         ['n, '] + ['x' + str(i) + ', ' for i in xrange(D)] + ['xa,']+ [

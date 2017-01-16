@@ -1,4 +1,4 @@
-from robo.fmin import fabolas_fmin
+"""from robo.fmin import fabolas_fmin
 import scipy as sp
 import re
 
@@ -48,3 +48,4 @@ def augres(outfile,xl,xu,sbest,f):
             yatxi = f(incumbenttrue,sbest)[0]
             out.write(line.strip('\r\n')+','+str(xtrue).replace(',',' ')+','+str(strue)+','+str(ctrue)+','+str(incumbenttrue).replace(',',' ')+','+str(yatxi)+'\n')
     out.close()
+"""

@@ -1,3 +1,4 @@
+from __future__ import print_function
 from robo.fmin import mtbo
 import numpy as np
 import scipy as sp
@@ -18,7 +19,7 @@ def f(x, **ev):
         if ev['cheattrue']:
             b = 0
             n = 0
-    print 'f inputs x:{} ev:{} outputs y:{} (b:{} n:{}) c:{}'.format(x, ev, y + n + b, b, n, c)
+    print( 'f inputs x:{} ev:{} outputs y:{} (b:{} n:{}) c:{}'.format(x, ev, y + n + b, b, n, c))
     return y + b + n, c, dict()
 
 def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv',fpath='.'):
@@ -34,15 +35,15 @@ def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv',fpath='.'):
         else:
             raise IndexError
         t1=time.clock()
-        print "\nevaluation at {} {} returned {} {}\n".format(x,s,y,c)
-        print "truetime {} clocktime {}".format(time.time()-tt0,time.clock()-tc0)
+        print( "\nevaluation at {} {} returned {} {}\n".format(x,s,y,c))
+        print( "truetime {} clocktime {}".format(time.time()-tt0,time.clock()-tc0))
         sys.stdout.flush()
         sys.stderr.flush()
         log.append({'x':x,'s':s,'y':y,'c':c,'t0':t0,'t1':t1})
         return y, c
 
     res = mtbo(objective_function, lb, ub, n_tasks=2, n_init=ninit,num_iterations=n,burnin=100, chain_length=200)
-    print 'results: {}'.format(os.path.join(fpath,fname))
+    print( 'results: {}'.format(os.path.join(fpath,fname)))
     lf = open(os.path.join(fpath,fname),'wb')
     lf.write(''.join(
         ['n, '] + ['x' + str(i) + ', ' for i in xrange(D)] + ['xa,']+ [
