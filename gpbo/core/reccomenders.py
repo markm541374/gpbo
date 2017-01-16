@@ -22,7 +22,7 @@ except ImportError:
     plots=False
     plt=None
 
-import GPdc
+from gpbo.core import GPdc
 
 def argminrecc(optstate,persist,**para):
     #if para['onlyafter']>len(optstate.y) or not len(optstate.y)%para['everyn']==0:
