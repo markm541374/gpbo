@@ -35,7 +35,7 @@ def slice_sample(loglike, init, iters, sigma, step_out=True,burn=20,subsam=4):
         #print '\r Drawn %d    ' % mn,
         #sys.stdout.flush()
 
-        perm = range(D)
+        perm = list(range(D))
         sp.random.shuffle(perm)
         
         last_llh = loglike(xx)

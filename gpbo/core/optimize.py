@@ -85,7 +85,7 @@ class optimizer:
         logger.info('startopt:')
         print( self.aqpara)
         self.stoppara['t0']=time.clock()
-        lf = open(os.path.join(self.dirpath,self.name),'wb',0)
+        lf = open(os.path.join(self.dirpath,self.name),'w')
         lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara[0]['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, aqauxdata'])+'\n')
         self.state = optstate()
         stepn=0
