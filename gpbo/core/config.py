@@ -1,4 +1,5 @@
 import gpbo
+xrange=range
 from gpbo.core import GPdc as GPdc
 import scipy as sp
 

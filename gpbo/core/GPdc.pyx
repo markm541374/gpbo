@@ -4,6 +4,7 @@
 #cython: profile=True
 #
 from __future__ import print_function
+xrange=range
 __author__ = "mark"
 __date__ = "$22-Nov-2015 21:27:19$"
 

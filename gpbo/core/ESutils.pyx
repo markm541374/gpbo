@@ -3,6 +3,7 @@
 # and open the template in the editor.
 #cython: profile=True
 from __future__ import print_function
+xrange=range
 import os
 from gpbo.core import GPdc
 from gpbo.core import slice

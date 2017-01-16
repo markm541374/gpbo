@@ -5,6 +5,7 @@
 #from numpy import get_include
 #pyximport.install(setup_args={'include_dirs': get_include()})
 from __future__ import print_function
+xrange=range
 import scipy as sp
 import sys
 import os

@@ -6,6 +6,7 @@
 #slice sampling
 #TODO need to check initial steps
 from __future__ import print_function
+xrange=range
 import scipy as sp
 from tqdm import tqdm
 def slice_sample(loglike, init, iters, sigma, step_out=True,burn=20,subsam=4):

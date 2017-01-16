@@ -2,6 +2,7 @@
 
 #make a single posterior gp form data and take draws on this
 from __future__ import print_function
+xrange=range
 import sys
 from gpbo.core import ESutils
 from gpbo.core import GPdc

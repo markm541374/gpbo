@@ -2,6 +2,7 @@
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
 from __future__ import print_function
+xrange=range
 import scipy as sp
 from scipy.optimize import minimize
 import os
@@ -15,6 +16,7 @@ from gpbo.core import PES
 import ESutils
 #start with random
 import objectives
+
 import costs
 logger = logging.getLogger(__name__)
 

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import scipy as sp
 
 
@@ -13,7 +14,7 @@ def f(x, **ev):
 
     c = 1. + 24. * (1. - sn) ** 2
 
-    print 'f inputs x:{} ev:{} outputs y:{}  c:{}'.format(x, ev, f, c)
+    print( 'f inputs x:{} ev:{} outputs y:{}  c:{}'.format(x, ev, f, c))
     return f, c, dict()
 
 truemin = 0.39788735772973816
