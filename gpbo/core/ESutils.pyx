@@ -453,9 +453,9 @@ class gpfake():
     
     def augx(self,x):
         if x.ndim==1:
-            ax = sp.hstack([x[:self.axis],sp.array([self.value]*(x.size/self.D)).T,x[self.axis:]])
+            ax = sp.hstack([x[:self.axis],sp.array([self.value]*int(x.size/self.D)).T,x[self.axis:]])
         else:
-            ax = sp.hstack([x[:self.axis].reshape(x.shape[0],self.axis),sp.array([[self.value]*(x.size/self.D)]).T,x[self.axis:].reshape(x.shape[0],self.D-self.axis)])
+            ax = sp.hstack([x[:self.axis].reshape(x.shape[0],self.axis),sp.array([[self.value]*int(x.size/self.D)]).T,x[self.axis:].reshape(x.shape[0],self.D-self.axis)])
         return ax
     
     def infer_m_post(self,x,d):
