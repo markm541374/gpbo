@@ -2,7 +2,7 @@ from __future__ import print_function
 import scipy as sp
 from scipy import linalg as spl
 import logging
-import GPdc
+from gpbo.core import GPdc
 import os
 import time
 import DIRECT

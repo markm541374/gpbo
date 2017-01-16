@@ -1163,7 +1163,6 @@ static const char __pyx_k_logEImin[] = "logEImin";
 static const char __pyx_k_mindraws[] = "mindraws";
 static const char __pyx_k_minimize[] = "minimize";
 static const char __pyx_k_optstate[] = "optstate";
-static const char __pyx_k_optutils[] = "optutils";
 static const char __pyx_k_overhead[] = "overhead";
 static const char __pyx_k_randomaq[] = "randomaq";
 static const char __pyx_k_traincfn[] = "traincfn";
@@ -1171,6 +1170,7 @@ static const char __pyx_k_transfer[] = "transfer";
 static const char __pyx_k_algmethod[] = "algmethod";
 static const char __pyx_k_aqoptions[] = "aqoptions";
 static const char __pyx_k_getLogger[] = "getLogger";
+static const char __pyx_k_gpbo_core[] = "gpbo.core";
 static const char __pyx_k_infer_lEI[] = "infer_lEI";
 static const char __pyx_k_localdone[] = "localdone";
 static const char __pyx_k_nrandinit[] = "nrandinit";
@@ -1203,6 +1203,7 @@ static const char __pyx_k_choosepersist[] = "choosepersist";
 static const char __pyx_k_scipy_optimize[] = "scipy.optimize";
 static const char __pyx_k_DM_SLICELCBPARA[] = "DM_SLICELCBPARA";
 static const char __pyx_k_bruteaq_griddiv[] = "bruteaq griddiv={}";
+static const char __pyx_k_gpbo_core_optutils[] = "gpbo.core.optutils";
 static const char __pyx_k_splocalaq_from_step[] = "splocalaq from {} step {}";
 static const char __pyx_k_localopt_is_complete[] = "localopt is complete";
 static const char __pyx_k_PESbsaq_locals_lambda[] = "PESbsaq.<locals>.<lambda>";
@@ -1286,7 +1287,9 @@ static PyObject *__pyx_kp_s_found_MAPHYP;
 static PyObject *__pyx_n_s_full;
 static PyObject *__pyx_n_s_fwrap;
 static PyObject *__pyx_n_s_getLogger;
+static PyObject *__pyx_n_s_gpbo_core;
 static PyObject *__pyx_n_s_gpbo_core_acquisitions;
+static PyObject *__pyx_n_s_gpbo_core_optutils;
 static PyObject *__pyx_kp_s_home_mark_Dropbox_workspace_gpb;
 static PyObject *__pyx_n_s_hstack;
 static PyObject *__pyx_n_s_hyp;
@@ -1343,7 +1346,6 @@ static PyObject *__pyx_n_s_noS;
 static PyObject *__pyx_n_s_nrandinit;
 static PyObject *__pyx_n_s_objectives;
 static PyObject *__pyx_n_s_optstate;
-static PyObject *__pyx_n_s_optutils;
 static PyObject *__pyx_n_s_os;
 static PyObject *__pyx_n_s_over;
 static PyObject *__pyx_n_s_overhead;
@@ -11421,7 +11423,9 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_full, __pyx_k_full, sizeof(__pyx_k_full), 0, 0, 1, 1},
   {&__pyx_n_s_fwrap, __pyx_k_fwrap, sizeof(__pyx_k_fwrap), 0, 0, 1, 1},
   {&__pyx_n_s_getLogger, __pyx_k_getLogger, sizeof(__pyx_k_getLogger), 0, 0, 1, 1},
+  {&__pyx_n_s_gpbo_core, __pyx_k_gpbo_core, sizeof(__pyx_k_gpbo_core), 0, 0, 1, 1},
   {&__pyx_n_s_gpbo_core_acquisitions, __pyx_k_gpbo_core_acquisitions, sizeof(__pyx_k_gpbo_core_acquisitions), 0, 0, 1, 1},
+  {&__pyx_n_s_gpbo_core_optutils, __pyx_k_gpbo_core_optutils, sizeof(__pyx_k_gpbo_core_optutils), 0, 0, 1, 1},
   {&__pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_k_home_mark_Dropbox_workspace_gpb, sizeof(__pyx_k_home_mark_Dropbox_workspace_gpb), 0, 0, 1, 0},
   {&__pyx_n_s_hstack, __pyx_k_hstack, sizeof(__pyx_k_hstack), 0, 0, 1, 1},
   {&__pyx_n_s_hyp, __pyx_k_hyp, sizeof(__pyx_k_hyp), 0, 0, 1, 1},
@@ -11478,7 +11482,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_nrandinit, __pyx_k_nrandinit, sizeof(__pyx_k_nrandinit), 0, 0, 1, 1},
   {&__pyx_n_s_objectives, __pyx_k_objectives, sizeof(__pyx_k_objectives), 0, 0, 1, 1},
   {&__pyx_n_s_optstate, __pyx_k_optstate, sizeof(__pyx_k_optstate), 0, 0, 1, 1},
-  {&__pyx_n_s_optutils, __pyx_k_optutils, sizeof(__pyx_k_optutils), 0, 0, 1, 1},
   {&__pyx_n_s_os, __pyx_k_os, sizeof(__pyx_k_os), 0, 0, 1, 1},
   {&__pyx_n_s_over, __pyx_k_over, sizeof(__pyx_k_over), 0, 0, 1, 1},
   {&__pyx_n_s_overhead, __pyx_k_overhead, sizeof(__pyx_k_overhead), 0, 0, 1, 1},
@@ -11945,7 +11948,7 @@ PyMODINIT_FUNC PyInit_acquisitions(void)
  * import os
  * import sys             # <<<<<<<<<<<<<<
  * import time
- * from optutils import silentdirect as direct
+ * from gpbo.core.optutils import silentdirect as direct
  */
   __pyx_t_2 = __Pyx_Import(__pyx_n_s_sys, 0, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -11956,7 +11959,7 @@ PyMODINIT_FUNC PyInit_acquisitions(void)
  * import os
  * import sys
  * import time             # <<<<<<<<<<<<<<
- * from optutils import silentdirect as direct
+ * from gpbo.core.optutils import silentdirect as direct
  * import logging
  */
   __pyx_t_2 = __Pyx_Import(__pyx_n_s_time, 0, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
@@ -11967,7 +11970,7 @@ PyMODINIT_FUNC PyInit_acquisitions(void)
   /* "gpbo/core/acquisitions.pyx":10
  * import sys
  * import time
- * from optutils import silentdirect as direct             # <<<<<<<<<<<<<<
+ * from gpbo.core.optutils import silentdirect as direct             # <<<<<<<<<<<<<<
  * import logging
  * import copy
  */
@@ -11976,7 +11979,7 @@ PyMODINIT_FUNC PyInit_acquisitions(void)
   __Pyx_INCREF(__pyx_n_s_silentdirect);
   __Pyx_GIVEREF(__pyx_n_s_silentdirect);
   PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_silentdirect);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_optutils, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_gpbo_core_optutils, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_silentdirect); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
@@ -11987,10 +11990,10 @@ PyMODINIT_FUNC PyInit_acquisitions(void)
 
   /* "gpbo/core/acquisitions.pyx":11
  * import time
- * from optutils import silentdirect as direct
+ * from gpbo.core.optutils import silentdirect as direct
  * import logging             # <<<<<<<<<<<<<<
  * import copy
- * import GPdc
+ * from gpbo.core import GPdc
  */
   __pyx_t_1 = __Pyx_Import(__pyx_n_s_logging, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -11998,11 +12001,11 @@ PyMODINIT_FUNC PyInit_acquisitions(void)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "gpbo/core/acquisitions.pyx":12
- * from optutils import silentdirect as direct
+ * from gpbo.core.optutils import silentdirect as direct
  * import logging
  * import copy             # <<<<<<<<<<<<<<
- * import GPdc
- * import PES
+ * from gpbo.core import GPdc
+ * from gpbo.core import PES
  */
   __pyx_t_1 = __Pyx_Import(__pyx_n_s_copy, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -12012,30 +12015,48 @@ PyMODINIT_FUNC PyInit_acquisitions(void)
   /* "gpbo/core/acquisitions.pyx":13
  * import logging
  * import copy
- * import GPdc             # <<<<<<<<<<<<<<
- * import PES
+ * from gpbo.core import GPdc             # <<<<<<<<<<<<<<
+ * from gpbo.core import PES
  * import ESutils
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_GPdc, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_n_s_GPdc);
+  __Pyx_GIVEREF(__pyx_n_s_GPdc);
+  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_GPdc);
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_gpbo_core, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_GPdc); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_GPdc, __pyx_t_1) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "gpbo/core/acquisitions.pyx":14
  * import copy
- * import GPdc
- * import PES             # <<<<<<<<<<<<<<
+ * from gpbo.core import GPdc
+ * from gpbo.core import PES             # <<<<<<<<<<<<<<
  * import ESutils
  * #start with random
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_PES, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_INCREF(__pyx_n_s_PES);
+  __Pyx_GIVEREF(__pyx_n_s_PES);
+  PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_PES);
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_gpbo_core, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_PES, __pyx_t_1) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_PES); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_PES, __pyx_t_2) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "gpbo/core/acquisitions.pyx":15
- * import GPdc
- * import PES
+ * from gpbo.core import GPdc
+ * from gpbo.core import PES
  * import ESutils             # <<<<<<<<<<<<<<
  * #start with random
  * import objectives

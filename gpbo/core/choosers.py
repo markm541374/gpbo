@@ -4,7 +4,7 @@ from scipy import linalg as spl
 from itertools import groupby
 from collections import defaultdict
 from gpbo.core import PES
-import ESutils
+from gpbo.core import ESutils
 import DIRECT
 from sklearn import mixture
 import logging

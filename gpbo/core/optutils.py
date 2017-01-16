@@ -10,10 +10,10 @@ import sys
 import os
 from scipy import linalg as spl
 import time
-import GPdc
+from gpbo.core import GPdc
 from matplotlib import pyplot as plt
 import DIRECT
-import ESutils
+from gpbo.core import ESutils
 def cosines(x,s,d):
     x.resize([1,x.size])
     assert(d==[sp.NaN])

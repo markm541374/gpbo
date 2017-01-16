@@ -3,12 +3,12 @@
 #make a single posterior gp form data and take draws on this
 from __future__ import print_function
 import sys
-import ESutils
-import GPdc
-import eprop
+from gpbo.core import ESutils
+from gpbo.core import GPdc
+from gpbo.core import eprop
 import scipy as sp
 from scipy import stats as sps
-from optutils import silentdirect as direct
+from gpbo.core.optutils import silentdirect as direct
 
 try:
     from matplotlib import pyplot as plt

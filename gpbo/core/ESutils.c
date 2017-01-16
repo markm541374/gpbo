@@ -22132,8 +22132,8 @@ PyMODINIT_FUNC PyInit_ESutils(void)
  * #cython: profile=True
  * from __future__ import print_function
  * import os             # <<<<<<<<<<<<<<
- * import GPdc
- * import slice
+ * from gpbo.core import GPdc
+ * from gpbo.core import slice
  */
   __pyx_t_1 = __Pyx_Import(__pyx_n_s_os, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -22143,30 +22143,48 @@ PyMODINIT_FUNC PyInit_ESutils(void)
   /* "gpbo/core/ESutils.pyx":7
  * from __future__ import print_function
  * import os
- * import GPdc             # <<<<<<<<<<<<<<
- * import slice
+ * from gpbo.core import GPdc             # <<<<<<<<<<<<<<
+ * from gpbo.core import slice
  * import scipy as sp
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_GPdc, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_n_s_GPdc);
+  __Pyx_GIVEREF(__pyx_n_s_GPdc);
+  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_GPdc);
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_gpbo_core, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_GPdc); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_GPdc, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "gpbo/core/ESutils.pyx":8
  * import os
- * import GPdc
- * import slice             # <<<<<<<<<<<<<<
+ * from gpbo.core import GPdc
+ * from gpbo.core import slice             # <<<<<<<<<<<<<<
  * import scipy as sp
  * from scipy import linalg as spl
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_slice, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_INCREF(__pyx_n_s_slice);
+  __Pyx_GIVEREF(__pyx_n_s_slice);
+  PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_slice);
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_gpbo_core, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_slice, __pyx_t_1) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_slice); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_slice, __pyx_t_2) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "gpbo/core/ESutils.pyx":9
- * import GPdc
- * import slice
+ * from gpbo.core import GPdc
+ * from gpbo.core import slice
  * import scipy as sp             # <<<<<<<<<<<<<<
  * from scipy import linalg as spl
  * from scipy import stats as sps
@@ -22177,7 +22195,7 @@ PyMODINIT_FUNC PyInit_ESutils(void)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "gpbo/core/ESutils.pyx":10
- * import slice
+ * from gpbo.core import slice
  * import scipy as sp
  * from scipy import linalg as spl             # <<<<<<<<<<<<<<
  * from scipy import stats as sps

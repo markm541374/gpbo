@@ -7,11 +7,11 @@ from scipy.optimize import minimize
 import os
 import sys
 import time
-from optutils import silentdirect as direct
+from gpbo.core.optutils import silentdirect as direct
 import logging
 import copy
-import GPdc
-import PES
+from gpbo.core import GPdc
+from gpbo.core import PES
 import ESutils
 #start with random
 import objectives

@@ -4,8 +4,8 @@
 #cython: profile=True
 from __future__ import print_function
 import os
-import GPdc
-import slice
+from gpbo.core import GPdc
+from gpbo.core import slice
 import scipy as sp
 from scipy import linalg as spl
 from scipy import stats as sps

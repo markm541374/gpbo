@@ -5,7 +5,7 @@ from __future__ import print_function
 import scipy as sp
 from scipy import linalg as spl
 import logging
-import GPdc
+from gpbo.core import GPdc
 import DIRECT
 from scipy.optimize import minimize as spm
 import gpbo
