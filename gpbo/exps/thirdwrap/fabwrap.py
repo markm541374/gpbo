@@ -42,7 +42,7 @@ def optfabolas(fn,lb,ub,n,ninit=10,fname='results.csv',fpath='.'):
     res = fabolas(objective_function, lower=lb, upper=ub, s_min=s_min,s_max=s_max,n_init=ninit,num_iterations=n)
     print( res)
     print( 'results: {}'.format(os.path.join(fpath,fname)))
-    lf = open(os.path.join(fpath,fname),'wb')
+    lf = open(os.path.join(fpath,fname),'w')
     lf.write(''.join(
         ['n, '] + ['x' + str(i) + ', ' for i in xrange(D)] + ['xa,']+ [
             'y, c, '] + ['rx' + str(i) + ', ' for i in xrange(D)] + [

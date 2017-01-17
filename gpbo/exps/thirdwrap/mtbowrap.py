@@ -45,7 +45,7 @@ def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv',fpath='.'):
 
     res = mtbo(objective_function, lb, ub, n_tasks=2, n_init=ninit,num_iterations=n,burnin=100, chain_length=200)
     print( 'results: {}'.format(os.path.join(fpath,fname)))
-    lf = open(os.path.join(fpath,fname),'wb')
+    lf = open(os.path.join(fpath,fname),'w')
     lf.write(''.join(
         ['n, '] + ['x' + str(i) + ', ' for i in xrange(D)] + ['xa,']+ [
             'y, c, '] + ['rx' + str(i) + ', ' for i in xrange(D)] + [
