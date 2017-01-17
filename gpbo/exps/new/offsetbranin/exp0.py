@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sp
 #mode='run'
 mode=['run','plot'][1]
-
+vers=[2,3][0]
 D=2
 
 s=1e-6
@@ -13,7 +13,8 @@ ub = sp.array([1.,1.])
 from objective import f
 
 from objective import truemin
-allconfs=[]
+all2confs=[]
+all3confs=[]
 rpath='results0'
 #-----------------------
 #eimle
@@ -22,7 +23,7 @@ C.aqpara['nrandinit']=10
 C.stoppara = {'tmax': 60*50}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 
-allconfs.append(['eimle',C])
+all2confs.append(['eimle',C])
 
 #----------------------
 #pesfs
@@ -31,7 +32,7 @@ C.stoppara = {'tmax': 60*1}
 C.aqpara['nrandinit']=10
 C.stopfn = gpbo.core.optimize.totaltstopfn
 
-#allconfs.append(['pesfs',C])
+#all2confs.append(['pesfs',C])
 
 #-----------------
 #pesbs
@@ -42,7 +43,7 @@ C.aqpara['overhead']='last'
 C.aqpara['nrandinit']=20
 
 
-allconfs.append(['pesbs',C])
+all2confs.append(['pesbs',C])
 
 #-----------------
 #mtbo
@@ -50,7 +51,7 @@ C={'lowtask':2,
    'ninit':15,
    'nsteps':50}
 
-allconfs.append(['mtbo2',C])
+all3confs.append(['mtbo2',C])
 
 #-----------------
 #mtbo
@@ -58,7 +59,7 @@ C={'lowtask':4,
    'ninit':10,
    'nsteps':11}
 
-#allconfs.append(['mtbo4',C])
+#all3confs.append(['mtbo4',C])
 
 #-----------------
 #mtbo
@@ -66,16 +67,19 @@ C={'lowtask':8,
    'ninit':15,
    'nsteps':50}
 
-allconfs.append(['mtbo8',C])
+all3confs.append(['mtbo8',C])
 #---------------
 #fabolas
 C={'ninit':20,
    'nsteps':60}
-allconfs.append(['fabolas',C])
+all3confs.append(['fabolas',C])
 
 if mode=='run':
-    gpbo.runexp(f,lb,ub,rpath,4,allconfs)
+    if vers==2:
+        gpbo.runexp(f,lb,ub,rpath,4,all2confs)
+    else:
+        gpbo.runexp(f,lb,ub,rpath,4,all3confs)
 elif mode=='plot':
-    gpbo.plotall(allconfs,4,rpath,trueopt=truemin)
+    gpbo.plotall(all2confs+all3confs,4,rpath,trueopt=truemin)
 else:
     pass

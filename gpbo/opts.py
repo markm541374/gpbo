@@ -12,8 +12,9 @@ try:
     from gpbo.exps.thirdwrap.fabwrap import  optfabolas
 except:
     print('\n\ndidnt import robo!!!!!!\n\n')
-def runexp(f,lb,ub,path,nreps,confs):
-    for ii in range(nreps):
+def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
+    for i_ in range(nreps):
+        ii=i_+indexoffset
         for C in confs:
             if C[0][:5]=='eimle':
                 C[1].path=path
