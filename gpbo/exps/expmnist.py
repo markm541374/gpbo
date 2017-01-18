@@ -7,7 +7,7 @@
 import scipy as sp
 from matplotlib import pyplot as plt
 import gpbo.core.GPdc
-import gpbo.core.OPTutils
+import gpbo.core.optutils
 import gpbo.core.search
 import os
 import pickle

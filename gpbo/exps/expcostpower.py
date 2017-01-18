@@ -7,7 +7,7 @@
 import scipy as sp
 from matplotlib import pyplot as plt
 import gpbo.core.GPdc
-import gpbo.core.OPTutils
+import gpbo.core.optutils
 import gpbo.core.search
 import os
 import pickle
@@ -21,7 +21,7 @@ def cfn(s):
     #print s
     #print 'cfn'+str(((1e-6)/s)**pwr)
     return ((1e-6)/s)**pwr
-ojf = gpbo.core.OPTutils.genbranin(cfn=cfn)
+ojf = gpbo.core.optutils.genbranin(cfn=cfn)
 braninmin = 0.39788735772973816
 kindex = gpbo.core.GPdc.MAT52
 prior = sp.array([0.]+[-1.]*d)

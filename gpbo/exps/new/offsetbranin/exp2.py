@@ -10,7 +10,7 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 #mode='plot'
 vers=[2,3][0]
 
@@ -35,7 +35,7 @@ rpath='results2'
 C=gpbo.core.config.pesbsdefault(f,D,60,s,rpath,'null.csv')
 C.stoppara = {'tmax': 60 * 60}
 C.stopfn = gpbo.core.optimize.totaltstopfn
-C.aqpara['overhead']='last'
+C.aqpara['overhead']='none'
 C.aqpara['nrandinit']=16
 C.aqpara['DH_SAMPLES']=16
 C.aqpara['DM_SAMPLES']=32
@@ -49,7 +49,7 @@ all2confs.append(['pesbs_lap',C])
 C=gpbo.core.config.pesbsdefault(f,D,60,s,rpath,'null.csv')
 C.stoppara = {'tmax': 60 * 60}
 C.stopfn = gpbo.core.optimize.totaltstopfn
-C.aqpara['overhead']='last'
+C.aqpara['overhead']='none'
 C.aqpara['nrandinit']=16
 C.aqpara['DH_SAMPLES']=16
 C.aqpara['DM_SAMPLES']=32
@@ -64,7 +64,7 @@ all2confs.append(['pesbs_ei',C])
 C=gpbo.core.config.pesbsdefault(f,D,60,s,rpath,'null.csv')
 C.stoppara = {'tmax': 60 * 60}
 C.stopfn = gpbo.core.optimize.totaltstopfn
-C.aqpara['overhead']='last'
+C.aqpara['overhead']='none'
 C.aqpara['nrandinit']=16
 C.aqpara['DH_SAMPLES']=16
 C.aqpara['DM_SAMPLES']=32
@@ -78,7 +78,7 @@ all2confs.append(['pesbs_lcb',C])
 C=gpbo.core.config.pesbsdefault(f,D,60,s,rpath,'null.csv')
 C.stoppara = {'tmax': 60 * 60}
 C.stopfn = gpbo.core.optimize.totaltstopfn
-C.aqpara['overhead']='last'
+C.aqpara['overhead']='none'
 C.aqpara['nrandinit']=16
 C.aqpara['DH_SAMPLES']=16
 C.aqpara['DM_SAMPLES']=32
@@ -94,7 +94,7 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,3,rpath,trueopt=truemin)
+    gpbo.plotall(all2confs+all3confs,7,rpath,trueopt=truemin)
 else:
     pass
 

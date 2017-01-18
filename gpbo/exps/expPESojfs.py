@@ -7,7 +7,7 @@ import scipy as sp
 from scipy import linalg as spl
 from matplotlib import pyplot as plt
 import gpbo.core.GPdc
-import gpbo.core.OPTutils
+import gpbo.core.optutils
 import gpbo.core.ESutils
 import DIRECT
 

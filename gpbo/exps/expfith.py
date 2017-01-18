@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 import time
 import gpbo.core.GPdc
 import gpbo.core.search
-import gpbo.core.OPTutils
+import gpbo.core.optutils
 
 days = 32
 t0=time.clock()
@@ -145,7 +145,7 @@ for stateEI in statesEI:
     x.append([sum(stateEI[5][:i]) for i in xrange(len(stateEI[5]))])
     y.append(stateEI[11].flatten())
     print 'reccomended under EI: {} : {}'.format([10**i for i in stateEI[4][-1]],ojf(stateEI[4][-1],None,None)[0])
-X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(x, y)
+X_,Y_,lb_,ub_ = gpbo.core.optutils.mergelines(x, y)
 a[3].fill_between(X_,lb_,ub_,facecolor='lightcoral',edgecolor='lightcoral',alpha=0.5)
 a[3].plot(X_,Y_,'r')
 
@@ -158,7 +158,7 @@ for statePE in statesPE:
     y.append(statePE[11].flatten())
     print 'reccomended under PE: {} : {}'.format([10**i for i in statePE[4][-1]],ojf(statePE[4][-1],None,None)[0])
     
-X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(x, y)
+X_,Y_,lb_,ub_ = gpbo.core.optutils.mergelines(x, y)
 a[3].fill_between(X_,lb_,ub_,facecolor='lightblue',edgecolor='lightblue',alpha=0.5)
 a[3].plot(X_,Y_,'b')
 
@@ -173,7 +173,7 @@ for statePI in statesPI:
 
     print 'reccomended under PI: {} : {}'.format([10**i for i in statePI[4][-1][1:]],ojf(statePI[4][-1][1:],None,None)[0])
 
-X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(x, y)
+X_,Y_,lb_,ub_ = gpbo.core.optutils.mergelines(x, y)
 a[3].fill_between(X_,lb_,ub_,facecolor='lightgreen',edgecolor='lightgreen',alpha=0.5)
 a[3].plot(X_,Y_,'g')
 a[3].set_xscale('log')

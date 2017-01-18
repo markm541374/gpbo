@@ -119,6 +119,12 @@ def plotall(confs,nreps,path,trueopt=False):
             #and averaged
             plotquarts(a[7],[data[k]['index'] for k in range(nreps)],[data[k]['c'] for k in range(nreps)],col,C[0])
 
+            #fiifth is overhead clock time
+            for ii in range(nreps):
+                a[14].plot(data[ii]['index'],data[ii]['taq'],color=col,label=C[0])
+            #and averaged
+            plotquarts(a[15],[data[k]['index'] for k in range(nreps)],[data[k]['taq'] for k in range(nreps)],col,C[0])
+
         if trueopt:
             #first plot is all the opts per step
             for ii in range(nreps):
@@ -178,6 +184,16 @@ def plotall(confs,nreps,path,trueopt=False):
     a[7].set_xlabel('steps')
     a[7].set_ylabel('EVcost')
     f[7].savefig(os.path.join(path,'out7.png'))
+
+    a[14].legend()
+    a[14].set_xlabel('steps')
+    a[14].set_ylabel('overhead clocktime')
+    f[14].savefig(os.path.join(path,'out14.png'))
+
+    a[15].legend()
+    a[15].set_xlabel('steps')
+    a[15].set_ylabel('overhead clocktime')
+    f[15].savefig(os.path.join(path,'out15.png'))
 
     if trueopt:
         a[8].legend()

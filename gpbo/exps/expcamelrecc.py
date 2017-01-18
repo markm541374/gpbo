@@ -7,7 +7,7 @@
 import scipy as sp
 from matplotlib import pyplot as plt
 import gpbo.core.GPdc
-import gpbo.core.OPTutils
+import gpbo.core.optutils
 import gpbo.core.search
 import os
 import pickle
@@ -18,7 +18,7 @@ lb = sp.array([[-1.]*d])
 ub = sp.array([[1.]*d])
 pwr = 0.2
 cfn = lambda s:((1e-6)/s)**pwr
-ojf = gpbo.core.OPTutils.gencamel(cfn=cfn)
+ojf = gpbo.core.optutils.gencamel(cfn=cfn)
 camelmin = -1.031628453489877
 kindex = gpbo.core.GPdc.MAT52
 prior = sp.array([0.]+[-1.]*d)

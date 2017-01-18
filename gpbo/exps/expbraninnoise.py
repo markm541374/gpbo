@@ -7,7 +7,7 @@
 import scipy as sp
 from matplotlib import pyplot as plt
 import gpbo.core.GPdc
-import gpbo.core.OPTutils
+import gpbo.core.optutils
 import gpbo.core.search
 import os
 import pickle
@@ -21,7 +21,7 @@ def cfn(s):
     ##print s
     #print 'cfn'+str(((1e-6)/s)**pwr)
     return ((1e-6)/s)**pwr
-ojf = gpbo.core.OPTutils.genbranin(cfn=cfn)
+ojf = gpbo.core.optutils.genbranin(cfn=cfn)
 braninmin = 0.39788735772973816
 kindex = gpbo.core.GPdc.MAT52
 prior = sp.array([0.]+[-1.]*d)
@@ -96,7 +96,7 @@ for r in results:
     y.append(sp.array(sp.log10([1e-6/(c**(1./pwr)) for c in r[5]])))
     print y
     x.append(range(len(r[5])))
-X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(x, y)
+X_,Y_,lb_,ub_ = gpbo.core.optutils.mergelines(x, y)
 a[1].fill_between(X_,lb_,ub_,facecolor='lightcoral',edgecolor='lightcoral',alpha=0.5)
 a[1].plot(X_,Y_,'r')
     #a[2].plot(sp.array([sum(C2[:j]) for j in xrange(len(C2))]).flatten(),(sp.log(Yreg)).flatten(),'ro-')

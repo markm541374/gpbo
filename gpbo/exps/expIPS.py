@@ -4,7 +4,7 @@
 #Run the env variable PES on synthetic functions, compare regular PES fixed at s=0, 0.25, 1. The !=0 should converge to a high regret according to the min in the plane they are in, the =0 and env var should kee[p improving
 
 
-import gpbo.core.OPTutils
+import gpbo.core.optutils
 import scipy as sp
 from matplotlib import pyplot as plt
 import gpbo.core.GPdc
@@ -26,7 +26,7 @@ fls = 1.0
 sls = (su-sl)*fls
 dcc=1.0
 cfn = lambda x: sp.exp(-dcc*x.flatten()[0])
-[ojf,truexmin,ymin] = gpbo.core.OPTutils.gensquexpIPdraw(d, lb, ub, sl, su, sfn, sls, cfn)
+[ojf,truexmin,ymin] = gpbo.core.optutils.gensquexpIPdraw(d, lb, ub, sl, su, sfn, sls, cfn)
 
 #what are the best mins in planes away from true?
 def planemin(xp):
@@ -73,11 +73,11 @@ for r in results:
     #a[0].plot([sum(r[5][:j]) for j in xrange(len(r[5]))],(r[11].flatten()-ymin),'b')
     w.append([sum(r[5][:j]) for j in xrange(len(r[5]))])
 
-X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(w, y)
+X_,Y_,lb_,ub_ = gpbo.core.optutils.mergelines(w, y)
 a[0].fill_between(X_,lb_,ub_,facecolor='lightblue',edgecolor='lightblue',alpha=0.5)
 a[0].plot(X_,Y_,'b')
 
-X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(x, y)
+X_,Y_,lb_,ub_ = gpbo.core.optutils.mergelines(x, y)
 a[1].fill_between(X_,lb_,ub_,facecolor='lightblue',edgecolor='lightblue',alpha=0.5)
 a[1].plot(X_,Y_,'b')
 
@@ -126,7 +126,7 @@ for i,xs in enumerate(subset):
         #a[1].plot(sp.log10((z-ymin)),color=c[i])
         y.append(sp.log10((z-ymin)))
         x.append(range(len(y[-1])))
-    X_,Y_,lb_,ub_ = gpbo.core.OPTutils.mergelines(x, y)
+    X_,Y_,lb_,ub_ = gpbo.core.optutils.mergelines(x, y)
     a[1].fill_between(X_,lb_,ub_,facecolor=c[i],edgecolor=c[i],alpha=0.5)
     a[1].plot(X_,Y_,c[i])
         
