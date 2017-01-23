@@ -155,6 +155,43 @@ gpmapasprior = {
 
 gpasmap = gpmapasrecc,gpmapasprior
 
+
+def gphinasargminrecc(optstate, persist, **para):
+    if para['onlyafter'] >= len(optstate.y) or not len(optstate.y) % para['everyn'] == 0:
+        # return [sp.NaN for i in para['lb']],{'didnotrun':True}
+        return argminrecc(optstate, persist, **para)
+    logger.info('gpmapas reccomender')
+    d = len(para['lb'])
+
+    x = sp.hstack([sp.vstack([e['xa'] for e in optstate.ev]), sp.vstack(optstate.x)])
+
+    y = sp.vstack(optstate.y)
+    s = sp.vstack([e['s'] for e in optstate.ev])
+    dx = [e['d'] for e in optstate.ev]
+
+    G = GPdc.GPcore(x, y, s, dx, [GPdc.kernel(optstate.aux['kindex'], d + 1, h) for h in optstate.aux['HYPdraws']])
+
+    def wrap(xq):
+        xq.resize([1, d])
+        xe = sp.hstack([sp.array([[0.]]), xq])
+        # print xe
+        a = G.infer_m_post(xe, [[sp.NaN]])
+        return a[0, 0]
+    best=sp.Inf
+    incumbent = None
+    for i in range(len(optstate.x)):
+        thisone = wrap(sp.array(optstate.x[i]))
+        if thisone<best:
+            best=thisone
+            incumbent=optstate.x[i]
+
+    logger.info('reccsearchresult: x {} pred.y {}'.format(incumbent,best))
+
+
+
+    return [i for i in incumbent], persist, {'ymin': best}
+
+
 def gphinasrecc(optstate,persist,**para):
     if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}

@@ -26,7 +26,7 @@ from objective import f
 #from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='results1'
+rpath='results0'
 
 #-----------------------
 #eimle
@@ -49,7 +49,7 @@ C.stopfn = gpbo.core.optimize.totaltstopfn
 #-----------------
 #pesbs
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
-C.stoppara = {'tmax': 60 * 60*3}
+C.stoppara = {'tmax': 60 * 60}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='last'
 C.aqpara['nrandinit']=20
@@ -63,7 +63,7 @@ C={'lowtask':2,
    'ninit':15,
    'nsteps':50}
 
-#all3confs.append(['mtbo2',C])
+all3confs.append(['mtbo2',C])
 
 #-----------------
 #mtbo
@@ -79,7 +79,7 @@ C={'lowtask':8,
    'ninit':15,
    'nsteps':50}
 
-#all3confs.append(['mtbo8',C])
+all3confs.append(['mtbo8',C])
 #---------------
 #fabolas
 C={'ninit':20,
@@ -94,6 +94,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,2,rpath)
+    gpbo.plotall(all2confs+all3confs,4,rpath)
 else:
     pass

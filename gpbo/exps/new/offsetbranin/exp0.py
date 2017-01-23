@@ -72,14 +72,14 @@ all3confs.append(['mtbo8',C])
 #fabolas
 C={'ninit':20,
    'nsteps':60}
-all3confs.append(['fabolas',C])
+#all3confs.append(['fabolas',C])
 
 if mode=='run':
     if vers==2:
-        gpbo.runexp(f,lb,ub,rpath,4,all2confs)
+        gpbo.runexp(f,lb,ub,rpath,1,all2confs)
     else:
-        gpbo.runexp(f,lb,ub,rpath,4,all3confs)
+        gpbo.runexp(f,lb,ub,rpath,1,all3confs)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,4,rpath,trueopt=truemin)
+    gpbo.plotall(all2confs+all3confs,1,rpath,trueopt=truemin)
 else:
     pass

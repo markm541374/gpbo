@@ -14,7 +14,7 @@ mode=['run','plot'][1]
 #mode='plot'
 vers=[2,3][0]
 
-nreps=1
+nreps=11
 D=2
 
 s=1e-6
@@ -26,7 +26,7 @@ from objective import f
 from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='results2'
+rpath='restmp'
 
 
 
@@ -42,7 +42,7 @@ C.aqpara['DM_SAMPLES']=32
 C.aqpara['DM_SUPPORT']=1000
 C.aqpara['SUPPORT_MODE']=[gpbo.core.ESutils.SUPPORT_LAPAPROT]
 C.aqpara['DM_SLICELCBPARA']=20
-all2confs.append(['pesbs_lap',C])
+#all2confs.append(['pesbs_lap',C])
 
 #-----------------
 #pesbs
@@ -71,7 +71,7 @@ C.aqpara['DM_SAMPLES']=32
 C.aqpara['DM_SUPPORT']=1000
 C.aqpara['SUPPORT_MODE']=[gpbo.core.ESutils.SUPPORT_SLICELCB]
 C.aqpara['DM_SLICELCBPARA']=2.
-all2confs.append(['pesbs_lcb',C])
+#all2confs.append(['pesbs_lcb',C])
 
 #------------------
 #pesbs
@@ -85,7 +85,7 @@ C.aqpara['DM_SAMPLES']=32
 C.aqpara['DM_SUPPORT']=1000
 C.aqpara['SUPPORT_MODE']=[gpbo.core.ESutils.SUPPORT_SLICEPM]
 C.aqpara['DM_SLICELCBPARA']=2.
-all2confs.append(['pesbs_pm',C])
+#all2confs.append(['pesbs_pm',C])
 
 
 if mode=='run':
@@ -94,7 +94,7 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,7,rpath,trueopt=truemin)
+    gpbo.plotall(all2confs+all3confs,4,rpath,trueopt=truemin)
 else:
     pass
 

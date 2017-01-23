@@ -1,7 +1,8 @@
+from __future__ import print_function
 import scipy as sp
 import time
 import copy
-
+xrange=range
 def run(x0,n,T,con,trace=False):
     A = sp.array([[-0.5,0.],[0.,-1.]])
     B=sp.array([[1.],[1.]])
@@ -35,11 +36,11 @@ def run(x0,n,T,con,trace=False):
 
 def f(x,**ev):
     l=-sp.log(2*10**-4)
-    n=int((1e5)*sp.exp(-l*ev['xa']))
+    n=int((1e6)*sp.exp(-l*ev['xa']))
     t0=time.time()
     r = run([0.05,0.1],n,10,[2.*x[0],2.*x[1]],trace=False)
     t1=time.time()
-    print 'running with C={} n={} (xa={})returned {} (10**{}) in {}'.format(x,n,ev['xa'],r,sp.log10(r),t1-t0)
+    print('running with C={} n={} (xa={})returned {} (10**{}) in {}'.format(x,n,ev['xa'],r,sp.log10(r),t1-t0))
     return sp.log10(r),(t1-t0),dict()
 
 def f_inplane(x,**ev):
@@ -51,7 +52,6 @@ def f_inplane(x,**ev):
 def test():
     from matplotlib import pyplot as plt
     r,sys = run([0.05,0.1],10000,10,[0.05,0.3],trace=True)
-    print r
     f,a = plt.subplots(2)
     a[0].plot(sys[0,:],'b')
     a[0].plot(sys[1,:],'r')
@@ -68,5 +68,4 @@ def plot():
 if __name__=="__main__":
     test()
     #plot()
-
 
