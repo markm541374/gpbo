@@ -120,7 +120,7 @@ class pesfsdefault():
                 'volper':1e-6,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
-                'everyn':16
+                'everyn':1
                 }
         self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
         self.ojf=f
