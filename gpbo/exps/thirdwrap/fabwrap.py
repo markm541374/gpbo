@@ -1,6 +1,6 @@
 from __future__ import print_function
 xrange=range
-from robo.fmin import fabolas
+from robo.fmin import fabolas, fabolas_mod
 import numpy as np
 import scipy as sp
 import os
@@ -18,7 +18,7 @@ def f(x, **ev):
     print( 'f inputs x:{} ev:{} outputs y:{}  c:{}'.format(x, ev, y ,c))
     return y , c, dict()
 
-def optfabolas(fn,lb,ub,n,ninit=10,fname='results.csv',fpath='.'):
+def optfabolas(fn,lb,ub,n,ninit=10,fname='results.csv',fpath='.',mod=False):
     D=len(ub)
     log=[]
     tinit=time.clock()
@@ -39,7 +39,10 @@ def optfabolas(fn,lb,ub,n,ninit=10,fname='results.csv',fpath='.'):
 
     s_min = 100
     s_max = 1000000
-    res = fabolas(objective_function, lower=lb, upper=ub, s_min=s_min,s_max=s_max,n_init=ninit,num_iterations=n)
+    if mod:
+        res = fabolas_mod(objective_function, lower=lb, upper=ub, s_min=s_min,s_max=s_max,n_init=ninit,num_iterations=n)
+    else:
+        res = fabolas(objective_function, lower=lb, upper=ub, s_min=s_min,s_max=s_max,n_init=ninit,num_iterations=n)
     print( res)
     print( 'results: {}'.format(os.path.join(fpath,fname)))
     lf = open(os.path.join(fpath,fname),'w')
@@ -70,6 +73,8 @@ def optfabolas(fn,lb,ub,n,ninit=10,fname='results.csv',fpath='.'):
         lf.write(st)
     lf.close()
 
+def optfabolas_mod(fn, lb, ub, n, ninit=10, fname='results.csv', fpath='.'):
+    return optfabolas(fn, lb, ub, n, ninit=ninit, fname=fname, fpath=fpath,mod=True)
 #lb=sp.array([-1.,-1.])
 #ub=sp.array([ 1., 1.])
 #optfabolas(f,lb,ub,50,ninit=20)

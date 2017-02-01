@@ -10,9 +10,9 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 
-mode=['run','plot'][1]
+mode=['run','plot'][0]
 #mode='plot'
-vers=[2,3][0]
+vers=[2,3][1]
 
 nreps=2
 D=2
@@ -63,7 +63,7 @@ C={'lowtask':2,
    'ninit':15,
    'nsteps':50}
 
-all3confs.append(['mtbo2',C])
+#all3confs.append(['mtbo2',C])
 
 #-----------------
 #mtbo
@@ -79,13 +79,18 @@ C={'lowtask':8,
    'ninit':15,
    'nsteps':50}
 
-all3confs.append(['mtbo8',C])
+#all3confs.append(['mtbo8',C])
 #---------------
 #fabolas
 C={'ninit':20,
    'nsteps':60}
 #all3confs.append(['fabolas',C])
 
+#---------------
+#fabolas_mod
+C={'ninit':20,
+   'nsteps':60}
+#all3confs.append(['fabolas',C])
 
 
 if mode=='run':

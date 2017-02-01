@@ -12,7 +12,7 @@ args = parser.parse_args()
 
 mode=['run','plot'][0]
 #mode='plot'
-vers=[2,3][0]
+vers=[2,3][1]
 
 nreps=1
 D=2

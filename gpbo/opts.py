@@ -10,6 +10,7 @@ import scipy as sp
 try:
     from gpbo.exps.thirdwrap.mtbowrap import optmtbo
     from gpbo.exps.thirdwrap.fabwrap import  optfabolas
+    from gpbo.exps.thirdwrap.fabwrap import  optfabolas_mod
 except:
     print('\n\ndidnt import robo!!!!!!\n\n')
 def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
@@ -59,6 +60,8 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
 
             elif C[0][:7]=='fabolas':
                 optfabolas(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path)
+            elif C[0][:6]=='fabmod':
+                optfabolas_mod(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path)
             else:
                 print( "not an optimization method")
 def plotquarts(a,data1,data2,col,lab):

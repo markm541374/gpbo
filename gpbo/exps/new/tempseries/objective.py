@@ -12,7 +12,7 @@ import os
 import copy
 
 
-days = 220
+days =364
 t0 = time.clock()
 df = pd.read_csv('data/DemandData_Historic-2015.csv')
 t1 = time.clock()

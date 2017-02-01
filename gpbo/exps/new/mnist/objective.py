@@ -116,7 +116,7 @@ X_train, y_train, X_val, y_val, X_test, y_test = load_dataset()
 # We optimize s on a log scale, as we expect that the performance varies
 # logarithmically across s
 s_min = 100
-s_max = 5000
+s_max = 50000
 
 # Defining the bounds and dimensions of the
 # input space (configuration space + environment space)

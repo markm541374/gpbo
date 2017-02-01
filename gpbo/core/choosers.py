@@ -8,6 +8,7 @@ from gpbo.core import ESutils
 import DIRECT
 from sklearn import mixture
 import logging
+import tqdm
 import gpbo
 from scipy.stats import norm as norms
 from gpbo.core import GPdc as GP
@@ -171,28 +172,32 @@ def gpcommitment(optstate,persist,**para):
                 m_, v_ = G.infer_diag_post(sp.array([y_[j], x_[i]]), [[sp.NaN]])
                 z_[i, j] = m_[0, 0]
                 s_[i, j] = sp.sqrt(v_[0, 0])
-
+        print('0')
         CS = ax[0, 0].contour(x_, y_, z_, 20)
         ax[0, 0].clabel(CS, inline=1, fontsize=10)
+        print('1')
         CS = ax[1, 0].contour(x_, y_, s_, 20)
         ax[0, 0].axis([-1., 1., -1., 1.])
         ax[1, 0].clabel(CS, inline=1, fontsize=10)
+        print('2')
         ax[0, 0].plot(xmin[0], xmin[1], 'ro')
 
 
         #plot support points and draws
-        for i in xrange(para['support']):
-            symbol = ['r.','g.','bx'][Z_[i]]
-            ax[0,1].plot(W[i,0],W[i,1],symbol)
+        print('3')
+        #for i in tqdm.tqdm(xrange(para['support'])):
+         #   symbol = ['r.','g.','bx'][Z_[i]]
+          #  ax[0,1].plot(W[i,0],W[i,1],symbol)
             #if ER[0,i]>0.:
             #    ax[2,2].plot(W[i,0],W[i,1],'b.')
             #else:
             #    ax[2,2].plot(W[i,0],W[i,1],'r.')
         ax[0, 1].axis([-1, 1, -1, 1])
 
-        for i in xrange(nd):
-            symbol = ['r.', 'g.'][Y_[i]]
-            ax[1, 1].plot(R[i, 0], R[i, 1], symbol)
+        print('5')
+        #for i in tqdm.tqdm(xrange(nd)):
+        #    symbol = ['r.', 'g.'][Y_[i]]
+        #    ax[1, 1].plot(R[i, 0], R[i, 1], symbol)
         #for i in xrange(nd):
         #    symbol = ['r.', 'g.'][Y_r[i]]
         #    ax[1, 2].plot(R[i, 0], R[i, 1], symbol)
