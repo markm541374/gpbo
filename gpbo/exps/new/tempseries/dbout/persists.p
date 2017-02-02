@@ -7,5 +7,5 @@ p4
 I2
 sS'n'
 p5
-I17
+I10
 saa.

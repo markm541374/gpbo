@@ -12,7 +12,7 @@ args = parser.parse_args()
 
 mode=['run','plot'][1]
 #mode='plot'
-vers=[2,3][0]
+vers=[2,3][1]
 
 nreps=1
 D=2
@@ -32,54 +32,55 @@ rpath='results0'
 #eimle
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
 C.aqpara['nrandinit']=10
-C.stoppara = {'tmax': 60*60}
+C.stoppara = {'tmax': 60*60*2}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 
 all2confs.append(['eimle',C])
 
-#----------------------
-#pesfs
-C=gpbo.core.config.pesfsdefault(f,D,12,s,rpath,'null.csv')
-C.stoppara = {'tmax': 60*60}
-C.aqpara['nrandinit']=10
-C.stopfn = gpbo.core.optimize.totaltstopfn
-
-#all2confs.append(['pesfs',C])
-
-#-----------------
-#pesbs
+#pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
-C.stoppara = {'tmax': 60 * 60*3}
+C.stoppara = {'tmax': 60 * 60 * 2}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='last'
 C.aqpara['nrandinit']=20
+C.reccfn=gpbo.core.reccomenders.gphinasargminrecc
 
+all2confs.append(['pesbs_argmin',C])
 
-all2confs.append(['pesbs',C])
+#pesbs----------------------------
+C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
+C.stoppara = {'tmax': 60 * 60 * 2}
+C.stopfn = gpbo.core.optimize.totaltstopfn
+C.aqpara['overhead']='last'
+C.aqpara['nrandinit']=20
+C.reccfn=gpbo.core.reccomenders.gphinasrecc
 
-#-----------------
-#mtbo
-C={'lowtask':2,
-   'ninit':15,
-   'nsteps':50}
+all2confs.append(['pesbs_postmin',C])
 
-#all3confs.append(['mtbo2',C])
 
 #-----------------
 #mtbo
 C={'lowtask':4,
-   'ninit':10,
-   'nsteps':11}
+   'ninit':15,
+   'nsteps':40}
 
-#all3confs.append(['mtbo4',C])
+all3confs.append(['mtbo4',C])
 
 #-----------------
 #mtbo
-C={'lowtask':8,
+C={'lowtask':16,
    'ninit':15,
-   'nsteps':50}
+   'nsteps':40}
 
-#all3confs.append(['mtbo8',C])
+all3confs.append(['mtbo16',C])
+
+#-----------------
+#mtbo
+C={'lowtask':64,
+   'ninit':15,
+   'nsteps':80}
+
+#all3confs.append(['mtbo64',C])
 #---------------
 #fabolas
 C={'ninit':20,

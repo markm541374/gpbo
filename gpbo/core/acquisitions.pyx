@@ -9,6 +9,7 @@ import os
 import sys
 import time
 from gpbo.core.optutils import silentdirect as direct
+from gpbo.core.optutils import geteffectiveoverhead
 import logging
 import copy
 from gpbo.core import GPdc
@@ -75,6 +76,9 @@ def EIMAPaq(optstate,persist,**para):
         persist['n']+=1
         return randomaq(optstate,persist,ev=ev,lb=lb,ub=ub)
     logger.info('EIMAPaq')
+
+    if para['overhead']=='predict':
+       overhead = geteffectiveoverhead(optstate,nrandinit)
     #logger.debug(sp.vstack([e[0] for e in optstate.ev]))
     #raise
     x=sp.vstack(optstate.x)
@@ -245,6 +249,8 @@ def PESbsaq(optstate,persist,**para):
         cfn = para['cfn']
     if para['overhead']=='last':
         over=persist['overhead']
+    elif para['overhead']=='predict':
+        over=geteffectiveoverhead(optstate,para['nrandinit'])
     else:
         over=0.
     [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],volper=para['volper'],over=over)

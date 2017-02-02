@@ -56,7 +56,7 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
 
                 out = gpbo.search(C[1])
             elif C[0][:4]=='mtbo':
-                optmtbo(f, lb, ub, 1./C[1]['lowtask'], C[1]['nsteps'], ninit=C[1]['ninit'],fpath=path,fname='{}_{}.csv'.format(C[0],ii))
+                optmtbo(f, lb, ub, 1.-(1./C[1]['lowtask']), C[1]['nsteps'], ninit=C[1]['ninit'],fpath=path,fname='{}_{}.csv'.format(C[0],ii))
 
             elif C[0][:7]=='fabolas':
                 optfabolas(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path)

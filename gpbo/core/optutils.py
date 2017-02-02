@@ -6,11 +6,17 @@
 #pyximport.install(setup_args={'include_dirs': get_include()})
 from __future__ import print_function
 xrange=range
+import numpy as np
 import scipy as sp
+from scipy.optimize import minimize
+from scipy.stats import gamma
 import sys
 import os
 from scipy import linalg as spl
 import time
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import Pipeline
 from gpbo.core import GPdc
 from matplotlib import pyplot as plt
 import DIRECT
@@ -246,3 +252,85 @@ def silentdirect(f,l,u,*args,**kwargs):
         os.dup2(stdout.fileno(), fileno)
     print( 'direct found {} at {} {}'.format(ymin,xmin,ierror))
     return xmin,ymin,ierror
+
+def overheadregression(x,y):
+    x=list(x)
+    y=list(y)
+    N=len(x)
+
+    def fun(x, theta):
+        a = abs(theta[0])
+        b = abs(theta[1])+1.
+        c = abs(theta[2])
+        return a * x ** b + c
+
+    def llk(x, y, theta):
+        x = list(x)
+        y = list(y)
+        N = len(x)
+        t = abs(theta[3])
+        acc = 0.
+        for i in range(N):
+            acc += -0.5 * ((fun(x[i], theta) - y[i]) ** 2)
+        # print acc
+        return acc / (t ** 2) - N * np.log(t)
+
+    def lpr(theta, prshp, prscl):
+        acc = 0.
+        for i in range(4):
+            # print(gamma.logpdf(theta[i],prshp[i],scale=prscl[i]),theta[i],prshp[i],prscl[i])
+            acc += gamma.logpdf(abs(theta[i]), prshp[i], scale=prscl[i])
+        # print acc
+        return acc
+
+    def lpr(theta, prmean, prstd):
+        acc = 0.
+        for i in range(4):
+            acc += -0.5 * ((theta[i] - prmean[i]) ** 2) / prstd[i] ** 2
+        return acc
+
+    prshp = [0.25, 0.4, 5., 0.5]
+    prscl = [0.4,0.05, 5., 1.]
+
+    def f(theta):
+        v = -llk(x, y, theta) - lpr(theta, prshp, prscl)
+        # print theta,v
+        return v
+
+    res = minimize(f,[1.,1.5,1.,0.1])
+    para = [abs(i) for i in res.x]
+    #print( x,y)
+    #from matplotlib import pyplot as plt
+    z= sp.linspace(0,50,200)
+    #plt.figure()
+    #plt.plot(x,y,'r.')
+    #plt.plot(z,map(lambda q:fun(q,para),z),'b')
+    #plt.show()
+    #plt.savefig('/home/mark/Desktop/zzz{}.png'.format(N))
+    #plt.close()
+    para[1]+=1
+    print( 'overheadfit  {}*n^{} +{}+ N(0,{})'.format(*para))
+    return para
+
+def geteffectiveoverhead(optstate,nrandinit):
+    coefs = overheadregression(range(1, optstate.n + 1)[nrandinit:], optstate.aqtime[nrandinit:])
+    print('remaining {}'.format(optstate.remaining))
+    print('CEVavg = {}'.format(sp.mean(optstate.c)))
+    remain = optstate.remaining
+    cev = sp.mean(optstate.c)
+    over = lambda i: coefs[0] * i ** coefs[1] + coefs[2]
+    lastover = optstate.aqtime[-1]
+
+    # remaining steps under constant overhead
+    R = int(remain / (lastover + cev))
+    # remaining steps under growth prediction
+    Nr = 0
+    acc = 0.
+    while remain > acc + Nr * cev:
+        Nr += 1
+        acc += over(Nr + optstate.n)
+    print('const remain {} var remain {}'.format(R, Nr))
+    print('under const acq: {} ev: {}'.format(R * lastover, R * cev))
+    print('under predi acq: {} ev: {}'.format(acc, Nr * cev))
+    print('current overhead: {} predicted av overhead: {}'.format(lastover, acc / float(Nr)))
+    return acc/float(Nr)

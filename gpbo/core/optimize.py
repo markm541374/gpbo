@@ -27,6 +27,7 @@ class optstate:
         self.aux=None
         self.localdone=False
         self.startlocal= None
+        self.remaining = sp.Inf
         return
     
     def update(self,x,ev,y,c,taq):
@@ -163,6 +164,7 @@ def totaltstopfn(optstate,**para):
         mt=(int(para['tmax'])%3600)/60
         st=int(para['tmax'])%60
         logger.info('Used {}h {}m {}s of {}h {}m {}s budget \n of which {} acquisition {} evaluation'.format(hu,mu,su,ht,mt,st,(tused-optstate.C)/(1e-9+tused),optstate.C/(tused+1e-9)))
+        optstate.remaining = para['tmax'] - tused
         return False
 
 
