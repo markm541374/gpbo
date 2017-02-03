@@ -122,12 +122,20 @@ def plotall(confs,nreps,path,trueopt=False):
             #and averaged
             plotquarts(a[7],[data[k]['index'] for k in range(nreps)],[data[k]['c'] for k in range(nreps)],col,C[0])
 
-            #fiifth is overhead clock time
+             #fiifth is overhead clock time
             for ii in range(nreps):
                 a[14].plot(data[ii]['index'],data[ii]['taq'],color=col,label=C[0])
             #and averaged
             plotquarts(a[15],[data[k]['index'] for k in range(nreps)],[data[k]['taq'] for k in range(nreps)],col,C[0])
 
+            #fiifth is overhead clock time
+            try:
+                for ii in range(nreps):
+                    a[16].plot(data[ii]['index'],data[ii]['xa'],color=col,label=C[0])
+                #and averaged
+                plotquarts(a[17],[data[k]['index'] for k in range(nreps)],[data[k]['xa'] for k in range(nreps)],col,C[0])
+            except:
+                pass
         if trueopt:
             #first plot is all the opts per step
             for ii in range(nreps):
@@ -197,6 +205,16 @@ def plotall(confs,nreps,path,trueopt=False):
     a[15].set_xlabel('steps')
     a[15].set_ylabel('overhead clocktime')
     f[15].savefig(os.path.join(path,'out15.png'))
+
+    a[16].legend()
+    a[16].set_xlabel('steps')
+    a[16].set_ylabel('env Var')
+    f[16].savefig(os.path.join(path,'out14.png'))
+
+    a[17].legend()
+    a[17].set_xlabel('steps')
+    a[17].set_ylabel('env Var')
+    f[17].savefig(os.path.join(path,'out15.png'))
 
     if trueopt:
         a[8].legend()
