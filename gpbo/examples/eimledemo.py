@@ -18,7 +18,7 @@ def f(x, **ev):
 
 
 C=gpbo.core.config.eimledefault(f,D,n,s,'results','eimle.csv')
-C.stoppara = {'tmax': 60*30,'includeaq':True}
+C.stoppara = {'tmax': 60*60*3,'includeaq':True}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 out = gpbo.search(C)

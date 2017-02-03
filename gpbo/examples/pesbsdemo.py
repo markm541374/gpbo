@@ -53,9 +53,9 @@ if run:
 
 
         C=gpbo.core.config.pesbsdefault(f,D,50,s,'results','pesbsdemo{}.csv'.format(k))
-        C.stoppara = {'tmax': 60 * 5}
+        C.stoppara = {'tmax': 60 * 60*3}
         C.stopfn = gpbo.core.optimize.totaltstopfn
-        C.aqpara['overhead']='last'
+        C.aqpara['overhead']='predict'
         #C.aqpara['cmax']=C.stoppara['cmax']
         out = gpbo.search(C)
 

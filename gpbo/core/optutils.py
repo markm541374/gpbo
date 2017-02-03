@@ -253,63 +253,39 @@ def silentdirect(f,l,u,*args,**kwargs):
     print( 'direct found {} at {} {}'.format(ymin,xmin,ierror))
     return xmin,ymin,ierror
 
-def overheadregression(x,y):
-    x=list(x)
-    y=list(y)
-    N=len(x)
+def llk(X,Y,theta,pr_alpha, pr_beta):
+    X=list(X)
+    Y=list(Y)
+    N=len(X)
+    a,b,c,s = theta
+    accf=-N*np.log(s)
+    accD = np.array([0.,0.,0.,-N/s])
+    for i in range(4):
+        accf+= (pr_alpha[i]-1.)*np.log(theta[i])-theta[i]*pr_beta[i]
+        accD[i] += (pr_alpha[i]-1.)/theta[i] - pr_beta[i]
+    for i in xrange(N):
+        error = (a*X[i]**b+c-Y[i])/(s**2)
+        accD[0] -= error*(X[i]**b)
+        accD[1] -= error*(a*np.log(X[i])*X[i]**b)
+        accD[2] -= error
+        accD[3] += (error**2)*s
+        accf -= (0.5*error**2)*s**2
+    #print theta,accf
+    return accf,accD
 
-    def fun(x, theta):
-        a = abs(theta[0])
-        b = abs(theta[1])+1.
-        c = abs(theta[2])
-        return a * x ** b + c
 
-    def llk(x, y, theta):
-        x = list(x)
-        y = list(y)
-        N = len(x)
-        t = abs(theta[3])
-        acc = 0.
-        for i in range(N):
-            acc += -0.5 * ((fun(x[i], theta) - y[i]) ** 2)
-        # print acc
-        return acc / (t ** 2) - N * np.log(t)
+def overheadregression(X,Y):
+    print(X,Y)
+    pr_alpha = [4.,8.,10.,2.]
+    pr_beta = [2.,4.,1,0.5]
+    def f(x):
+        l,g =llk(X,Y,x,pr_alpha,pr_beta)
+        #print x,-l
+        return -l,-g
 
-    def lpr(theta, prshp, prscl):
-        acc = 0.
-        for i in range(4):
-            # print(gamma.logpdf(theta[i],prshp[i],scale=prscl[i]),theta[i],prshp[i],prscl[i])
-            acc += gamma.logpdf(abs(theta[i]), prshp[i], scale=prscl[i])
-        # print acc
-        return acc
-
-    def lpr(theta, prmean, prstd):
-        acc = 0.
-        for i in range(4):
-            acc += -0.5 * ((theta[i] - prmean[i]) ** 2) / prstd[i] ** 2
-        return acc
-
-    prshp = [0.25, 0.4, 5., 0.5]
-    prscl = [0.4,0.05, 5., 1.]
-
-    def f(theta):
-        v = -llk(x, y, theta) - lpr(theta, prshp, prscl)
-        # print theta,v
-        return v
-
-    res = minimize(f,[1.,1.5,1.,0.1])
-    para = [abs(i) for i in res.x]
-    #print( x,y)
-    #from matplotlib import pyplot as plt
-    z= sp.linspace(0,50,200)
-    #plt.figure()
-    #plt.plot(x,y,'r.')
-    #plt.plot(z,map(lambda q:fun(q,para),z),'b')
-    #plt.show()
-    #plt.savefig('/home/mark/Desktop/zzz{}.png'.format(N))
-    #plt.close()
-    para[1]+=1
-    print( 'overheadfit  {}*n^{} +{}+ N(0,{})'.format(*para))
+    res = minimize(f,[1.,2.,1.,1.],method='L-BFGS-B',jac=True,bounds=((1e-6,None),(1.,None),(1e-6,None),(1e-6,None)))#,bounds=((0.,1e3),(0.,1e3),(0.,1e3),(0.,1e3)))
+    para = map(abs,res.x)
+    print( 'fit model {}*x^{} + {} +N(0,{})'.format(*para))
     return para
 
 def geteffectiveoverhead(optstate,nrandinit):

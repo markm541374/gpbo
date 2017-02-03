@@ -10,11 +10,11 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 #mode='plot'
 vers=[2,3][0]
 
-nreps=1
+nreps=8
 D=2
 
 s=1e-6
@@ -36,7 +36,7 @@ C=gpbo.core.config.pesbsdefault(f,D,60,s,rpath,'null.csv')
 C.stoppara = {'tmax': 60 * 60 * 2}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='none'
-#all2confs.append(['pesbs_none',C])
+all2confs.append(['pesbs_none',C])
 
 
 #-----------------
@@ -45,7 +45,7 @@ C=gpbo.core.config.pesbsdefault(f,D,60,s,rpath,'null.csv')
 C.stoppara = {'tmax': 60 * 60 * 2}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='last'
-#all2confs.append(['pesbs_last',C])
+all2confs.append(['pesbs_last',C])
 
 
 #-----------------
@@ -54,7 +54,7 @@ C=gpbo.core.config.pesbsdefault(f,D,60,s,rpath,'null.csv')
 C.stoppara = {'tmax': 60 * 60 * 2}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
-#all2confs.append(['pesbs_predict',C])
+all2confs.append(['pesbs_predict',C])
 
 
 
