@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 nreps=4
 import argparse
 
@@ -12,7 +12,7 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 
 args = parser.parse_args()
 
-vers=[2,3][1]
+vers=[2,3][0]
 D=2
 
 s=1e-6
@@ -76,7 +76,7 @@ C={'lowtask':64,
    'ninit':20,
    'nsteps':150}
 
-all3confs.append(['mtbo8',C])
+#all3confs.append(['mtbo8',C])
 #---------------
 #fabolas
 C={'ninit':30,
@@ -93,6 +93,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,1,rpath,trueopt=truemin)
+    gpbo.plotall(all2confs+all3confs,3,rpath,trueopt=truemin)
 else:
     pass

@@ -54,12 +54,13 @@ def gpmaprecc(optstate,persist,**para):
     MAP = GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
     logger.info('MAPHYP {}'.format(MAP))
     G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(para['kindex'], d, MAP))
+    count=0
     def directwrap(xq,y):
         xq.resize([1,d])
         a = G.infer_m(xq,[[sp.NaN]])
         return (a[0,0],0)
 
-
+    print('nevals={}\n\n'.format(count))
     [xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, volper=para['volper'], logfilename='/dev/null')
 
 

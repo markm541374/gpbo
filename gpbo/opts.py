@@ -209,12 +209,12 @@ def plotall(confs,nreps,path,trueopt=False):
     a[16].legend()
     a[16].set_xlabel('steps')
     a[16].set_ylabel('env Var')
-    f[16].savefig(os.path.join(path,'out14.png'))
+    f[16].savefig(os.path.join(path,'out16.png'))
 
     a[17].legend()
     a[17].set_xlabel('steps')
     a[17].set_ylabel('env Var')
-    f[17].savefig(os.path.join(path,'out15.png'))
+    f[17].savefig(os.path.join(path,'out17.png'))
 
     if trueopt:
         a[8].legend()

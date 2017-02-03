@@ -19,7 +19,8 @@ class eimledefault():
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
-            'volper':1e-6
+            'volper':1e-9,
+            'overhead':None
         }
 
         self.stoppara = {'nmax': n}
@@ -33,7 +34,7 @@ class eimledefault():
                 'mprior':self.aqpara['mprior'],
                 'sprior':self.aqpara['sprior'],
                 'kindex':self.aqpara['kindex'],
-                'volper':1e-6,
+                'volper':1e-9,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
                 'everyn':1
