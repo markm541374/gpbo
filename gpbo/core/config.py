@@ -227,7 +227,7 @@ class pesbsdefault():
             'ev':{'s':s,'d':[sp.NaN],'xa':0.},
             'lb':[-1.] * D,
             'ub':[ 1.] * D,
-            'volper':1e-6,
+            'volper':10**(-min(12,max(6.,3*(D+1)))),
             'mprior': sp.array([1.]+[0.]*(D+1)),
             'sprior': sp.array([1.]*(D+2)),
             'kindex':GPdc.MAT52,
@@ -256,7 +256,7 @@ class pesbsdefault():
             'mprior': self.aqpara['mprior'],
             'sprior': self.aqpara['sprior'],
             'kindex': self.aqpara['kindex'],
-            'volper': 1e-6,
+            'volper': 10**(-min(12,max(6.,3*D))),
             'onlyafter': self.aqpara['nrandinit'],
             'check': True,
             'everyn': 1

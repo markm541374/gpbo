@@ -4,7 +4,7 @@ import scipy as sp
 #mode='run'
 
 mode=['run','plot'][0]
-nreps=4
+nreps=1
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -29,7 +29,7 @@ rpath='results0'
 #eimle
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
 C.aqpara['nrandinit']=10
-C.stoppara = {'tmax': 60*60*3}
+C.stoppara = {'tmax': 60*60*1}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 all2confs.append(['eimle',C])
 
@@ -45,7 +45,7 @@ C.reccfn=gpbo.core.reccomenders.gphinasargminrecc
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
-C.stoppara = {'tmax': 60 * 60 * 3}
+C.stoppara = {'tmax': 60 * 60 * 1}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=20
@@ -92,6 +92,6 @@ if mode=='run':
     #else:
     gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,3,rpath)
+    gpbo.plotall(all2confs+all3confs,1,rpath)
 else:
     pass

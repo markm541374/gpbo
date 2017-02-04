@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 nreps=1
 import argparse
 
@@ -13,7 +13,7 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 vers=[2,3][0]
-D=3
+D=6
 
 s=1e-8
 lb = sp.array([-1.]*D)
@@ -31,7 +31,7 @@ C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
 C.aqpara['nrandinit']=10
 C.stoppara = {'tmax': 60*60*3}
 C.stopfn = gpbo.core.optimize.totaltstopfn
-#all2confs.append(['eimle',C])
+all2confs.append(['eimle',C])
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
@@ -48,7 +48,8 @@ C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
 C.stoppara = {'tmax': 60 * 60 * 3}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
-C.aqpara['nrandinit']=20
+C.aqpara['nrandinit']=30
+C.reccpara['onlyafter']=C.aqpara['nrandinit']
 C.reccfn=gpbo.core.reccomenders.gphinasrecc
 
 all2confs.append(['pesbs_postmin',C])

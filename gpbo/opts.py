@@ -72,6 +72,9 @@ def plotquarts(a,data1,data2,col,lab):
         mn = min(mn,min(data1[i]))
         mx = max(mx,max(data1[i]))
     xaxis = sp.linspace(mn,mx,200)
+##    print( data1)
+#    print( data2)
+#    print( xaxis)
     low0, med0, upp0 = gpbo.core.ESutils.quartsirregular(data1,data2,xaxis)
 
     #        a.fill_between(xaxis, low0, upp0, facecolor='lightblue', edgecolor='lightblue', alpha=0.5)
@@ -99,6 +102,7 @@ def plotall(confs,nreps,path,trueopt=False):
 
         if True:
             #first plot is all the opts per step
+
             for ii in range(nreps):
                 a[0].plot(data[ii]['index'],data[ii]['trueyatxrecc'],color=col,label=C[0])
             #and averaged
