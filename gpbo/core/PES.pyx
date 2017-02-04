@@ -258,7 +258,7 @@ class PES:
             a[i] = a[i]/costfn(Xq[i,:].flatten(),Sq[i,:].flatten())
         return a
     
-    def search_pes(self,s,volper=1e-6,dv=[[sp.NaN]]):
+    def search_pes(self,s,maxf=1000,dv=[[sp.NaN]]):
         self.stmp = s
         def directwrap(Q,extra):
             x = sp.array([Q])
@@ -271,11 +271,11 @@ class PES:
             R = -acq
             return (R,0)
 
-        [xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=1, volper=volper, logfilename='/dev/null')
+        [xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
 
         return [xmin,ymin,ierror]
     
-    def search_acq(self,cfn,logsl,logsu,volper=1e-6,dv=[[sp.NaN]],over=0.):
+    def search_acq(self,cfn,logsl,logsu,maxf=1000,dv=[[sp.NaN]],over=0.):
         def directwrap(Q,extra):
             x = sp.array([Q[:-1]])
             s = 10**Q[-1]
@@ -286,7 +286,7 @@ class PES:
                 R = -acq/(cfn(x,s)+over)
             return (R,0)
 
-        [xmin, ymin, ierror] = direct(directwrap,sp.hstack([self.lb,logsl]),sp.hstack([self.ub,logsu]),user_data=[], algmethod=1, volper=volper, logfilename='/dev/null')
+        [xmin, ymin, ierror] = direct(directwrap,sp.hstack([self.lb,logsl]),sp.hstack([self.ub,logsu]),user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
         return [xmin,ymin,ierror]
 
 #augmented space PES
@@ -328,7 +328,7 @@ class PES_inplane:
             a[i] = a[i]/costfn(Xq[i,:].flatten())
         return a
     
-    def search_acq(self,cfn,sfn,volper=1e-6,dv=[[sp.NaN]],over=0.):
+    def search_acq(self,cfn,sfn,maxf=1000,dv=[[sp.NaN]],over=0.):
         print( 'overhead={}'.format(over))
         def directwrap(Q,extra):
             x = sp.array([Q])
@@ -346,7 +346,7 @@ class PES_inplane:
             return (R,0)
         #print self.lb
         #print self.ub
-        [xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=1, volper=volper, logfilename='/dev/null')
+        [xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=0, maxf=maxf, logfilename='directoutput{}.txt'.format(self.G.n))
         
         
         if False and plots:

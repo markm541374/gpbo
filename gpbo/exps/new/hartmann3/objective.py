@@ -32,7 +32,7 @@ def f(x, **ev):
         new = al[ii] * np.exp(-inner)
         outer = outer + new
     f = -outer + sn*0.5
-    c = 10. + 290. * (1. - sn) ** 2
+    c = 30. + 570. * (1. - sn) ** 2
 
     print( 'f inputs x:{} ev:{} outputs y:{}  c:{}'.format(x, ev, f, c))
     return f, c, dict()

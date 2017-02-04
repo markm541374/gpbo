@@ -19,7 +19,7 @@ class eimledefault():
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
-            'volper':1e-9,
+            'maxf':500*D,
             'overhead':None
         }
 
@@ -34,7 +34,7 @@ class eimledefault():
                 'mprior':self.aqpara['mprior'],
                 'sprior':self.aqpara['sprior'],
                 'kindex':self.aqpara['kindex'],
-                'volper':1e-9,
+                'maxf':500*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
                 'everyn':1
@@ -61,7 +61,7 @@ class eimlelearns():
             'mprior': sp.array([1.]+[0.]*D+[-2]),
             'sprior': sp.array([1.]*(D+1)+[5]),
             'kindex': GPdc.SQUEXPCS,
-            'volper':1e-6
+            'maxf':500*D
         }
 
         self.stoppara = {'nmax': n}
@@ -75,7 +75,7 @@ class eimlelearns():
                 'mprior':self.aqpara['mprior'],
                 'sprior':self.aqpara['sprior'],
                 'kindex':self.aqpara['kindex'],
-                'volper':1e-6,
+                'maxf':500*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
                 'everyn':1
@@ -95,7 +95,7 @@ class pesfsdefault():
             'lb': [-1.]*D,
             'ub': [1.]*D,
             'nrandinit': 20,
-            'volper': 1e-6,
+            'maxf': 1000*D,
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
@@ -118,7 +118,7 @@ class pesfsdefault():
                 'mprior':self.aqpara['mprior'],
                 'sprior':self.aqpara['sprior'],
                 'kindex':self.aqpara['kindex'],
-                'volper':1e-6,
+                'maxf':500*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
                 'everyn':1
@@ -138,7 +138,7 @@ class pesfslearns():
             'lb': [-1.]*D,
             'ub': [1.]*D,
             'nrandinit': 10,
-            'volper': 1e-6,
+            'maxf': 1000*D,
             'mprior': sp.array([1.]+[0.]*D+[-2]),
             'sprior': sp.array([1.]*(D+1)+[3]),
             'kindex': GPdc.MAT52CS,
@@ -161,7 +161,7 @@ class pesfslearns():
                 'mprior':self.aqpara['mprior'],
                 'sprior':self.aqpara['sprior'],
                 'kindex':self.aqpara['kindex'],
-                'volper':1e-6,
+                'maxf':500*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
                 'everyn':1
@@ -181,7 +181,7 @@ class pesvsdefault():
             'lb': [-1.]*D,
             'ub': [1.]*D,
             'nrandinit': 10,
-            'volper': 1e-6,
+            'maxf': 1000*D,
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
@@ -208,7 +208,7 @@ class pesvsdefault():
                 'mprior':self.aqpara['mprior'],
                 'sprior':self.aqpara['sprior'],
                 'kindex':self.aqpara['kindex'],
-                'volper':1e-6,
+                'maxf':500*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
                 'everyn':1
@@ -227,7 +227,7 @@ class pesbsdefault():
             'ev':{'s':s,'d':[sp.NaN],'xa':0.},
             'lb':[-1.] * D,
             'ub':[ 1.] * D,
-            'volper':10**(-min(12,max(6.,3*(D+1)))),
+            'maxf':500*D,
             'mprior': sp.array([1.]+[0.]*(D+1)),
             'sprior': sp.array([1.]*(D+2)),
             'kindex':GPdc.MAT52,
@@ -256,7 +256,7 @@ class pesbsdefault():
             'mprior': self.aqpara['mprior'],
             'sprior': self.aqpara['sprior'],
             'kindex': self.aqpara['kindex'],
-            'volper': 10**(-min(12,max(6.,3*D))),
+            'maxf': 1000*D, #10**(-min(12,max(6.,3*D))),
             'onlyafter': self.aqpara['nrandinit'],
             'check': True,
             'everyn': 1
@@ -274,7 +274,7 @@ class pesbslearns():
             'ev':{'s':s,'d':[sp.NaN],'xa':0.},
             'lb':[-1.] * D,
             'ub':[ 1.] * D,
-            'volper':1e-6,
+            'maxf':500*D,
             'mprior': sp.array([1.]+[0.]*(D+1)+[-3]),
             'sprior': sp.array([1.]*(D+2)+[3]),
             'kindex':GPdc.MAT52CS,
@@ -303,7 +303,7 @@ class pesbslearns():
             'mprior': self.aqpara['mprior'],
             'sprior': self.aqpara['sprior'],
             'kindex': self.aqpara['kindex'],
-            'volper': 1e-6,
+            'maxf': 1000*D,
             'onlyafter': self.aqpara['nrandinit'],
             'check': True,
             'everyn': 1

@@ -65,7 +65,7 @@ def EIMAPaq(optstate,persist,**para):
     mprior = para['mprior']
     sprior = para['sprior']
     kindex = para['kindex']
-    volper = para['volper']
+    maxf = para['maxf']
 
     #para = copy.deepcopy(para)
     if persist==None:
@@ -96,7 +96,7 @@ def EIMAPaq(optstate,persist,**para):
 
 
 
-    [xmin,ymin,ierror] = direct(directwrap,lb,ub,user_data=[], algmethod=1, volper = volper, logfilename='/dev/null')
+    [xmin,ymin,ierror] = direct(directwrap,lb,ub,user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
 
     logger.info('DIRECT found max EI at {} {}'.format(xmin,ierror))
     #logger.debug([xmin,ymin,ierror])
@@ -127,7 +127,7 @@ def PESfsaq(optstate,persist,**para):
     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'])
 
 
-    [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],volper=para['volper'])
+    [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],maxf=para['maxf'])
 
     logger.info('DIRECT found max PES at {} {}'.format(xmin,ierror))
     lhyp = sp.log10([k.hyp for k in pesobj.G.kf])
@@ -169,7 +169,7 @@ def PESvsaq(optstate,persist,**para):
         over=persist['overhead']
     else:
         over=0.
-    [xmin,ymin,ierror] = pesobj.search_acq(para['cfn'],para['logsl'],para['logsu'],volper=para['volper'],over=over)
+    [xmin,ymin,ierror] = pesobj.search_acq(para['cfn'],para['logsl'],para['logsu'],maxf=para['maxf'],over=over)
     
     logger.debug([xmin,ymin,ierror])
     para['ev']['s']=10**xmin[-1]
@@ -253,7 +253,7 @@ def PESbsaq(optstate,persist,**para):
         over=geteffectiveoverhead(optstate,para['nrandinit'])
     else:
         over=0.
-    [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],volper=para['volper'],over=over)
+    [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],maxf=para['maxf'],over=over)
     logger.debug([xmin,ymin,ierror])
     para['ev']['xa']=xmin[0]
     xout = [i for i in xmin[1:]]

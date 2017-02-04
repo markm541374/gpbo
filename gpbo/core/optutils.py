@@ -242,15 +242,17 @@ def mergelines(x,y):
 
 def silentdirect(f,l,u,*args,**kwargs):
     print( 'searching...')
-    fileno = sys.stdout.fileno()
-    with os.fdopen(os.dup(fileno), 'wb') as stdout:
-        with os.fdopen(os.open(os.devnull, os.O_WRONLY), 'wb') as devnull:
-            sys.stdout.flush();
-            os.dup2(devnull.fileno(), fileno)  # redirect
-            [xmin, ymin, ierror] = DIRECT.solve(f,l,u,*args,**kwargs)
-        sys.stdout.flush();
-        os.dup2(stdout.fileno(), fileno)
+    t0=time.clock()
+#    fileno = sys.stdout.fileno()
+#    with os.fdopen(os.dup(fileno), 'wb') as stdout:
+#        with os.fdopen(os.open(os.devnull, os.O_WRONLY), 'wb') as devnull:
+#            sys.stdout.flush();
+#            os.dup2(devnull.fileno(), fileno)  # redirect
+    [xmin, ymin, ierror] = DIRECT.solve(f,l,u,*args,**kwargs)
+#        sys.stdout.flush();
+#        os.dup2(stdout.fileno(), fileno)
     print( 'direct found {} at {} {}'.format(ymin,xmin,ierror))
+    print('directtime {}'.format(time.clock()-t0))
     return xmin,ymin,ierror
 
 def llk(X,Y,theta,pr_alpha, pr_beta):
