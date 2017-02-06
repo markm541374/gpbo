@@ -7,12 +7,12 @@ import os
 from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 import scipy as sp
-try:
-    from gpbo.exps.thirdwrap.mtbowrap import optmtbo
-    from gpbo.exps.thirdwrap.fabwrap import  optfabolas
-    from gpbo.exps.thirdwrap.fabwrap import  optfabolas_mod
-except:
-    print('\n\ndidnt import robo!!!!!!\n\n')
+
+from gpbo.exps.thirdwrap.mtbowrap import optmtbo
+from gpbo.exps.thirdwrap.fabwrap import optfabolas
+from gpbo.exps.thirdwrap.fabwrap import optfabolas_mod
+#except:
+#    print('\n\ndidnt import robo!!!!!!\n\n')
 def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
     for i_ in range(nreps):
         ii=i_+indexoffset
@@ -29,8 +29,10 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                     tmp['xa']=0
                     return f(x,**tmp)
                 C[1].ojf = wrap
-                out = gpbo.search(C[1])
-
+                try:
+                    out = gpbo.search(C[1])
+                except:
+                    pass
             elif C[0][:5]=='pesfs':
                 C[1].path = path
                 C[1].fname = '{}_{}.csv'.format(C[0],ii)
@@ -43,7 +45,10 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                     tmp['xa'] = 0
                     return f(x, **tmp)
                 C[1].ojf = wrap
-                out = gpbo.search(C[1])
+                try:
+                    out = gpbo.search(C[1])
+                except:
+                    pass
 
             elif C[0][:5]=='pesbs':
                 C[1].path = path
@@ -54,14 +59,25 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                 C[1].reccpara['ub'] = [i for i in ub]
                 C[1].ojf=f
 
-                out = gpbo.search(C[1])
+                try:
+                    out = gpbo.search(C[1])
+                except:
+                    pass
             elif C[0][:4]=='mtbo':
-                optmtbo(f, lb, ub, 1.-(1./C[1]['lowtask']), C[1]['nsteps'], ninit=C[1]['ninit'],fpath=path,fname='{}_{}.csv'.format(C[0],ii))
-
+                try:
+                    optmtbo(f, lb, ub, 1.-(1./C[1]['lowtask']), C[1]['nsteps'], ninit=C[1]['ninit'],fpath=path,fname='{}_{}.csv'.format(C[0],ii),mod=C[1]['switchestimator'])
+                except:
+                    pass
             elif C[0][:7]=='fabolas':
-                optfabolas(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path)
+                try:
+                    optfabolas(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path)
+                except:
+                    pass
             elif C[0][:6]=='fabmod':
-                optfabolas_mod(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path)
+                try:
+                    optfabolas_mod(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path,switchestimator=C[1]['switchestimator'],switchkernel=C[1]['switchkernel'])
+                except:
+                    pass
             else:
                 print( "not an optimization method")
 def plotquarts(a,data1,data2,col,lab):

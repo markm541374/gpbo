@@ -18,7 +18,7 @@ def f(x, **ev):
     print( 'f inputs x:{} ev:{} outputs y:{}  c:{}'.format(x, ev, y ,c))
     return y , c, dict()
 
-def optfabolas(fn,lb,ub,n,ninit=10,fname='results.csv',fpath='.',mod=False):
+def optfabolas(fn,lb,ub,n,ninit,fname='results.csv',fpath='.',mod=False,switchestimator=False,switchkernel=False):
     D=len(ub)
     log=[]
     tinit=time.clock()
@@ -40,7 +40,7 @@ def optfabolas(fn,lb,ub,n,ninit=10,fname='results.csv',fpath='.',mod=False):
     s_min = 100
     s_max = 1000000
     if mod:
-        res = fabolas_mod(objective_function, lower=lb, upper=ub, s_min=s_min,s_max=s_max,n_init=ninit,num_iterations=n)
+        res = fabolas_mod(objective_function, lower=lb, upper=ub, s_min=s_min,s_max=s_max,n_init=ninit,num_iterations=n,switchestimator=switchestimator,switchkernel=switchkernel)
     else:
         res = fabolas(objective_function, lower=lb, upper=ub, s_min=s_min,s_max=s_max,n_init=ninit,num_iterations=n)
     print( res)
@@ -73,8 +73,9 @@ def optfabolas(fn,lb,ub,n,ninit=10,fname='results.csv',fpath='.',mod=False):
         lf.write(st)
     lf.close()
 
-def optfabolas_mod(fn, lb, ub, n, ninit=10, fname='results.csv', fpath='.'):
-    return optfabolas(fn, lb, ub, n, ninit=ninit, fname=fname, fpath=fpath,mod=True)
+def optfabolas_mod(fn, lb, ub, n, ninit, fname='results.csv', fpath='.',switchkernel=False,switchestimator=False):
+    return optfabolas(fn, lb, ub, n, ninit, fname=fname, fpath=fpath,mod=True,switchestimator=switchestimator,switchkernel=switchkernel)
+
 #lb=sp.array([-1.,-1.])
 #ub=sp.array([ 1., 1.])
-#optfabolas(f,lb,ub,50,ninit=20)
+#optfabolas(f,lb,ub,50,ninit=20,mod=True)

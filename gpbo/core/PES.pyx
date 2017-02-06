@@ -70,32 +70,42 @@ def drawmins_inplane(G,n,lb,ub,axis,value, SUPPORT=300, mode=ESutils.SUPPORT_SLI
 OFFHESSZERO=0
 OFFHESSINFER=1
 
-def addmins(G,X,Y,S,D,xmin,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,int EPROP_LOOPS=20):
+def addmins(G,X,Y,S,D,xmin,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,int EPROP_LOOPS=20,dropedge=True):
     cdef int i
     cdef int dim=X.shape[1]
+    dropdims=[]
+    for i in range(dim):
+        if xmin[i]>0.99 or xmin[i]<-0.99:
+            dropdims.append(i)
     #grad elements are zero
     Xg = sp.vstack([xmin]*dim)
     Yg = sp.zeros([dim,1])
     Sg = sp.ones([dim,1])*GRADNOISE
     Dg = [[i] for i in range(dim)]
-    
+    if dropedge:
+        for i in dropdims:
+            Sg[i,0]=1e9
+
     #offdiag hessian elements
     nh = ((dim-1)*dim)/2
     Xh = sp.vstack([sp.empty([0,dim])]+[xmin]*nh)
-    Dh=[]
-    for i in xrange(dim):
-        for j in xrange(i):
-            Dh.append([i,j])
     class MJMError(Exception):
         pass
     if mode==OFFHESSZERO:
         Yh = sp.zeros([nh,1])
         Sh = sp.ones([nh,1])*GRADNOISE
+
+
     elif mode==OFFHESSINFER:
         raise MJMError("addmins with mode offhessinfer not implemented yet")
     else:
         raise MJMError("invalid mode in addmins")
-        
+    Dh=[]
+    for i in xrange(dim):
+        for j in xrange(i):
+            Dh.append([i,j])
+            if (i in dropdims or j in dropdims) and dropedge:
+               Sh[len(Dh)-1]=1e9
     #diag hessian and min
     Xd = sp.vstack([xmin]*(dim+1))
     Dd = [[sp.NaN]]+[[i,i] for i in xrange(dim)]
@@ -115,6 +125,10 @@ def addmins(G,X,Y,S,D,xmin,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,int
     Sd = sp.diagonal(Stmp).flatten()
     Sd.resize([dim+1,1])
     Yd.resize([dim+1,1])
+    if dropedge:
+        for i in dropdims:
+            Sd[i,0]=1e9
+
     #concat the obs
     Xo = sp.vstack([X,Xg,Xd,Xh])
     Yo = sp.vstack([Y,Yg,Yd,Yh])
@@ -124,14 +138,23 @@ def addmins(G,X,Y,S,D,xmin,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,int
     return [Xo,Yo,So,Do]
 
 NOMIN=0
-def addmins_inplane(G,X,Y,S,D,xmin,axis,value,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,EPROP_LOOPS=20,MINPOLICY=NOMIN):
+def addmins_inplane(G,X,Y,S,D,xmin,axis,value,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,EPROP_LOOPS=20,MINPOLICY=NOMIN,dropedge=True):
     cdef int i,j
     cdef int dim=X.shape[1]
+
+    #dropdims=[]
+    #for i in range(dim):
+    #    if (xmin[i]>0.99 or xmin[i]<-0.99) and i!=axis:
+    #        dropdims.append(i)
     #grad elements are zero
     Xg = sp.vstack([xmin]*(dim-1))
     Yg = sp.zeros([dim-1,1])
     Sg = sp.ones([dim-1,1])*GRADNOISE
     Dg = [[i] for i in range(dim) if i!=axis]
+
+    #if dropedge:
+    #    for i in dropdims:
+    #        Sg[i,0]=1e9
     #offdiag hessian elements
     nh = ((dim-1)*(dim-2))/2
     Xh = sp.vstack([sp.empty([0,dim])]+[xmin]*nh)
@@ -225,7 +248,7 @@ def Vadj(m,V):
 
 #basic PES class if search_pes is used. variable noise if search_acq is used
 class PES:
-    def __init__(self,X,Y,S,D,lb,ub,kindex,mprior,sprior,DH_SAMPLES=8,DM_SAMPLES=8, DM_SUPPORT=400,DM_SLICELCBPARA=1.,mode=ESutils.SUPPORT_SLICELCB,noS=False):
+    def __init__(self,X,Y,S,D,lb,ub,kindex,mprior,sprior,DH_SAMPLES=8,DM_SAMPLES=8, DM_SUPPORT=400,DM_SLICELCBPARA=1.,mode=ESutils.SUPPORT_SLICELCB,noS=False,DM_DROP=True):
         print( "PES init:")
         self.lb=lb
         self.ub=ub
@@ -236,7 +259,7 @@ class PES:
         HS = sp.vstack([k.hyp for k in self.G.kf])
         self.Z = drawmins(self.G,DM_SAMPLES,lb,ub,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode)
         #print "mindraws: "+str(self.Z)
-        self.Ga = [GPdc.GPcore(*addmins(self.G, X, Y, S, D, self.Z[i, :]) + [self.G.kf]) for i in xrange(DM_SAMPLES)]
+        self.Ga = [GPdc.GPcore(*addmins(self.G, X, Y, S, D, self.Z[i, :],dropedge=DM_DROP) + [self.G.kf]) for i in xrange(DM_SAMPLES)]
     def __del__(self):
         try:
             self.G.__del__()
@@ -257,7 +280,8 @@ class PES:
         for i in xrange(Xq.shape[0]):
             a[i] = a[i]/costfn(Xq[i,:].flatten(),Sq[i,:].flatten())
         return a
-    
+
+
     def search_pes(self,s,maxf=1000,dv=[[sp.NaN]]):
         self.stmp = s
         def directwrap(Q,extra):
@@ -346,7 +370,7 @@ class PES_inplane:
             return (R,0)
         #print self.lb
         #print self.ub
-        [xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=0, maxf=maxf, logfilename='directoutput{}.txt'.format(self.G.n))
+        [xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=0, maxf=maxf, logfilename='/dev/null')
         
         
         if False and plots:

@@ -23,7 +23,7 @@ def f(x, **ev):
     print( 'f inputs x:{} ev:{} outputs y:{} (b:{} n:{}) c:{}'.format(x, ev, y + n + b, b, n, c))
     return y + b + n, c, dict()
 
-def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv',fpath='.'):
+def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv',fpath='.',mod=False):
     D=len(ub)
     log=[]
     tinit=time.clock()
@@ -43,7 +43,7 @@ def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv',fpath='.'):
         log.append({'x':x,'s':s,'y':y,'c':c,'t0':t0,'t1':t1})
         return y, c
 
-    res = mtbo(objective_function, lb, ub, n_tasks=2, n_init=ninit,num_iterations=n,burnin=100, chain_length=200)
+    res = mtbo(objective_function, lb, ub, n_tasks=2, n_init=ninit,num_iterations=n,burnin=100, chain_length=200,mod=mod)
     print( 'results: {}'.format(os.path.join(fpath,fname)))
     lf = open(os.path.join(fpath,fname),'w')
     lf.write(''.join(

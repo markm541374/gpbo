@@ -30,6 +30,7 @@ ctpd = ct.POINTER(ct.c_double)
 cint = ct.c_int
 
 
+
 class GP_LKonly:
     def __init__(self, X_s, Y_s, S_s, D_s, kf):
         cdef int n, D, i

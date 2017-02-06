@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 nreps=1
 import argparse
 
@@ -29,29 +29,36 @@ rpath='results0'
 #eimle
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
 C.aqpara['nrandinit']=10
-C.stoppara = {'tmax': 60*60*5}
+C.stoppara = {'tmax': 60*60*8}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 all2confs.append(['eimle',C])
 
-#pesbs----------------------------
-C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
-C.stoppara = {'tmax': 60 * 60 * 2}
+#pesfs----------------------------
+C=gpbo.core.config.pesfsdefault(f,D,50,s,rpath,'null.csv')
+C.stoppara = {'tmax': 60 * 60 * 8}
 C.stopfn = gpbo.core.optimize.totaltstopfn
-C.aqpara['overhead']='last'
+C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=20
-C.reccfn=gpbo.core.reccomenders.gphinasargminrecc
-
-#all2confs.append(['pesbs_argmin',C])
+C.aqpara['drop']=True
+all2confs.append(['pesfs_droptrue',C])
+#pesfs----------------------------
+C=gpbo.core.config.pesfsdefault(f,D,50,s,rpath,'null.csv')
+C.stoppara = {'tmax': 60 * 60 * 8}
+C.stopfn = gpbo.core.optimize.totaltstopfn
+C.aqpara['overhead']='predict'
+C.aqpara['nrandinit']=20
+C.aqpara['drop']=False
+all2confs.append(['pesfs_dropfalse',C])
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
-C.stoppara = {'tmax': 60 * 60 * 5}
+C.stoppara = {'tmax': 60 * 60 * 8}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=20
 C.reccfn=gpbo.core.reccomenders.gphinasrecc
 
-all2confs.append(['pesbs_postmin',C])
+all2confs.append(['pesbs',C])
 
 #-----------------
 #mtbo
