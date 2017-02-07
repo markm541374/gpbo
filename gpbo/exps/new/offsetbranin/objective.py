@@ -12,7 +12,7 @@ def f(x, **ev):
     f = (-1.275 * (u / sp.pi) ** 2 + 5 * u / sp.pi + v - 6) ** 2 + (10. - 5. / (4 * sp.pi)) * sp.cos(u) + 10. + 0.5*sn
 
 
-    c = 10. + 290. * (1. - sn) ** 2
+    c = 30. + 570. * (1. - sn) ** 2
 
     print( 'f inputs x:{} ev:{} outputs y:{}  c:{}'.format(x, ev, f, c))
     return f, c, dict()

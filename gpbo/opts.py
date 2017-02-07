@@ -7,12 +7,12 @@ import os
 from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 import scipy as sp
-
-from gpbo.exps.thirdwrap.mtbowrap import optmtbo
-from gpbo.exps.thirdwrap.fabwrap import optfabolas
-from gpbo.exps.thirdwrap.fabwrap import optfabolas_mod
-#except:
-#    print('\n\ndidnt import robo!!!!!!\n\n')
+try:
+    from gpbo.exps.thirdwrap.mtbowrap import optmtbo
+    from gpbo.exps.thirdwrap.fabwrap import optfabolas
+    from gpbo.exps.thirdwrap.fabwrap import optfabolas_mod
+except:
+    print('\n\ndidnt import robo!!!!!!\n\n')
 def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
     for i_ in range(nreps):
         ii=i_+indexoffset
@@ -106,7 +106,7 @@ def plotall(confs,nreps,path,trueopt=False):
         f_,a_ = plt.subplots(1)
         f.append(f_)
         a.append(a_)
-    colorlist = ['b','r','g','pink','c','k']
+    colorlist = ['b','r','g','pink','c','k','grey','orange','purple','lightgreen','lightblue']
     ci=-1
     for C in confs:
         ci+=1

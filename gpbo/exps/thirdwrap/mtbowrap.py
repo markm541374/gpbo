@@ -66,11 +66,11 @@ def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv',fpath='.',mod=False):
             st+=str(res['trajectory'][i+1][j])+','
         st+=str(fn(res['trajectory'][i+1][:D],**{'xa':0,'cheattrue':True})[0])+','
         if i==0:
-            st+=str(log[0]['t0']-tinit)+','
+            st+=str(log[0]['t0']-tinit-res['recctimes'][0])+','
         else:
-            st+=str(log[i]['t0']-log[i-1]['t1'])+','
+            st+=str(log[i]['t0']-log[i-1]['t1']-res['recctimes'][i])+','
         st+=str(log[i]['t1']-log[i]['t0'])+','
-        st+='-1,'
+        st+=str(res['recctimes'][i])+','
         st+=time.strftime('%H:%M:%S  %d-%m-%y')
         st+='\n'
         lf.write(st)

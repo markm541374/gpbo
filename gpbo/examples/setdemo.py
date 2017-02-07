@@ -28,7 +28,7 @@ C.aqpara['nrandinit']=10
 C.stoppara = {'tmax': 60*10}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 
-allconfs.append(['eimle',C])
+#allconfs.append(['eimle',C])
 
 #----------------------
 #pesfs
@@ -37,7 +37,7 @@ C.stoppara = {'tmax': 60*10}
 C.aqpara['nrandinit']=10
 C.stopfn = gpbo.core.optimize.totaltstopfn
 
-allconfs.append(['pesfs',C])
+#allconfs.append(['pesfs',C])
 
 #-----------------
 #pesbs
@@ -47,7 +47,7 @@ C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=20
 
-allconfs.append(['pesbs',C])
+#allconfs.append(['pesbs',C])
 #-----------------
 #mtbo
 C={'lowtask':4,
@@ -55,7 +55,7 @@ C={'lowtask':4,
    'nsteps':50,
    'switchestimator':True}
 
-allconfs.append(['mtbo4_post',C])
+#allconfs.append(['mtbo4_post',C])
 
 #-----------------
 #mtbo
@@ -64,7 +64,7 @@ C={'lowtask':16,
    'nsteps':50,
    'switchestimator':True}
 
-allconfs.append(['mtbo16_post',C])
+#allconfs.append(['mtbo16_post',C])
 
 #-----------------
 #mtbo
@@ -73,7 +73,7 @@ C={'lowtask':64,
    'nsteps':50,
    'switchestimator':True}
 
-allconfs.append(['mtbo64_post',C])
+#allconfs.append(['mtbo64_post',C])
 
 #-----------------
 #mtbo
@@ -82,8 +82,7 @@ C={'lowtask':4,
    'nsteps':50,
    'switchestimator':False}
 
-allconfs.append(['mtbo4_arg',C])
-
+#allconfs.append(['mtbo4_arg',C])
 #-----------------
 #mtbo
 C={'lowtask':16,
@@ -91,33 +90,33 @@ C={'lowtask':16,
    'nsteps':50,
    'switchestimator':False}
 
-allconfs.append(['mtbo16_arg',C])
+#allconfs.append(['mtbo16_arg',C])
 
 #-----------------
 #mtbo
 C={'lowtask':64,
    'ninit':10,
-   'nsteps':50,
+   'nsteps':12,
    'switchestimator':False}
 
-allconfs.append(['mtbo64_arg',C])
+#allconfs.append(['mtbo64_arg',C])
 
 #fabolasmod------------------------------
 C={'ninit':20,
-   'nsteps':80,
+   'nsteps':22,
    'switchkernel':True,
    'switchestimator':True}
-#allconfs.append(['fabmod',C])
+allconfs.append(['fabmod',C])
 #---------------
 #fabolas
 C={'ninit':20,
-   'nsteps':80}
+   'nsteps':22}
 #allconfs.append(['fabolas',C])
 
 
 if mode=='run':
-    gpbo.runexp(f,lb,ub,'results',4,allconfs)
+    gpbo.runexp(f,lb,ub,'resultsX',1,allconfs)
 elif mode=='plot':
-    gpbo.plotall(allconfs,1,'results',trueopt=1.)
+    gpbo.plotall(allconfs,4,'results',trueopt=1.)
 else:
     pass

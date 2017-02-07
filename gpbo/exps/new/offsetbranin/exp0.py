@@ -3,8 +3,8 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-mode=['run','plot'][1]
-nreps=4
+mode=['run','plot'][0]
+nreps=1
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -48,7 +48,6 @@ C.stoppara = {'tmax': 60 * 60 * 5}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=20
-C.reccfn=gpbo.core.reccomenders.gphinasrecc
 
 all2confs.append(['pesbs',C])
 
@@ -56,35 +55,29 @@ all2confs.append(['pesbs',C])
 #mtbo
 C={'lowtask':4,
    'ninit':20,
-   'nsteps':150}
+   'switchestimator':True,
+   'nsteps':100}
 
-#all3confs.append(['mtbo2',C])
-
-#-----------------
-#mtbo
-C={'lowtask':16,
-   'ninit':20,
-   'nsteps':150}
-
-#all3confs.append(['mtbo4',C])
+all3confs.append(['mtbo4',C])
 
 #-----------------
 #mtbo
 C={'lowtask':64,
    'ninit':20,
+   'switchestimator':True,
    'nsteps':150}
 
-#all3confs.append(['mtbo8',C])
+all3confs.append(['mtbo64',C])
+
 #---------------
 #fabolas
 C={'ninit':30,
-   'nsteps':200}
-#all3confs.append(['fabmod',C])
-#---------------
-#fabolas
-C={'ninit':30,
-   'nsteps':150}
-all3confs.append(['fabolas',C])
+   'nsteps':200,
+   'switchkernel':True,
+   'switchestimator':True}
+all3confs.append(['fabmod',C])
+
+#--------------
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
