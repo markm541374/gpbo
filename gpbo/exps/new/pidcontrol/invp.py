@@ -210,7 +210,7 @@ def dZ(t,X,S):
     csx = -(S.kxp*x+S.kxi*cx+S.kxd*dx)
     Ft=csa-csx 
     F = min(20.,max(-20.,Ft))
-    F += -(X[0]+5.)*0.25 -X[1]*0.05
+    #F += -(X[0]+5.)*0.25 -X[1]*0.05
     a0 = S.M+S.m
     a1 = -S.m*S.l*np.cos(a)
     a2 = -np.cos(a)
@@ -223,7 +223,7 @@ def dZ(t,X,S):
     dca = 0. if (ca<-1. and a<0.) or (ca>1. and a>0.) else a
     dcx = 0. if (cx<-5. and x<0.) or (cx>5. and x>0.) else x
 
-    dC = x**2+a**2
+    dC = x**2#+a**2
     return [dx,d2x,da,d2a,dcx,dca,F,dC]
 
 

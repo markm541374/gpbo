@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 nreps=1
 import argparse
 
@@ -34,14 +34,12 @@ C.reccfn = gpbo.core.reccomenders.gpmaprecc
 all2confs.append(['eimle',C])
 
 #pesbs----------------------------
-C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
-C.stoppara = {'tmax': 60 * 60 * 2}
+C=gpbo.core.config.pesfsdefault(f,D,50,s,rpath,'null.csv')
+C.stoppara = {'tmax': 60 * 60 * 1}
 C.stopfn = gpbo.core.optimize.totaltstopfn
-C.aqpara['overhead']='last'
-C.aqpara['nrandinit']=20
-C.reccfn=gpbo.core.reccomenders.gphinasargminrecc
+C.aqpara['nrandinit']=10
 
-#all2confs.append(['pesbs_argmin',C])
+all2confs.append(['pesfs',C])
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')

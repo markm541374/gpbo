@@ -19,7 +19,7 @@ class eimledefault():
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
-            'maxf':250*D,
+            'maxf':500+100*D,
             'overhead':None
         }
 
@@ -34,7 +34,7 @@ class eimledefault():
                 'mprior':self.aqpara['mprior'],
                 'sprior':self.aqpara['sprior'],
                 'kindex':self.aqpara['kindex'],
-                'maxf':250*D,
+                'maxf':500+100*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
                 'everyn':1
@@ -61,7 +61,7 @@ class eimlelearns():
             'mprior': sp.array([1.]+[0.]*D+[-2]),
             'sprior': sp.array([1.]*(D+1)+[5]),
             'kindex': GPdc.SQUEXPCS,
-            'maxf':250*D
+            'maxf':500+100*D
         }
 
         self.stoppara = {'nmax': n}
@@ -75,7 +75,7 @@ class eimlelearns():
                 'mprior':self.aqpara['mprior'],
                 'sprior':self.aqpara['sprior'],
                 'kindex':self.aqpara['kindex'],
-                'maxf':250*D,
+                'maxf':500+100*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
                 'everyn':1
@@ -95,7 +95,7 @@ class pesfsdefault():
             'lb': [-1.]*D,
             'ub': [1.]*D,
             'nrandinit': 8+2*D,
-            'maxf': 250*D,
+            'maxf':500+100*D,
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
@@ -105,6 +105,7 @@ class pesfsdefault():
             'SUPPORT_MODE': [gpbo.core.ESutils.SUPPORT_LAPAPROT],
             'DM_SLICELCBPARA': 12+4.*D,
             'drop':True,
+            'overhead':'none',
             'noS': False,
         }
 
@@ -119,7 +120,7 @@ class pesfsdefault():
                 'mprior':self.aqpara['mprior'],
                 'sprior':self.aqpara['sprior'],
                 'kindex':self.aqpara['kindex'],
-                'maxf':250*D,
+                'maxf':500+100*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
                 'everyn':1
@@ -162,7 +163,7 @@ class pesfslearns():
                 'mprior':self.aqpara['mprior'],
                 'sprior':self.aqpara['sprior'],
                 'kindex':self.aqpara['kindex'],
-                'maxf':250*D,
+                'maxf':500+100*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
                 'everyn':1
@@ -209,7 +210,7 @@ class pesvsdefault():
                 'mprior':self.aqpara['mprior'],
                 'sprior':self.aqpara['sprior'],
                 'kindex':self.aqpara['kindex'],
-                'maxf':250*D,
+                'maxf':500+100*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
                 'everyn':1
@@ -275,7 +276,7 @@ class pesbslearns():
             'ev':{'s':s,'d':[sp.NaN],'xa':0.},
             'lb':[-1.] * D,
             'ub':[ 1.] * D,
-            'maxf':250*D,
+            'maxf':500+100*D,
             'mprior': sp.array([1.]+[0.]*(D+1)+[-3]),
             'sprior': sp.array([1.]*(D+2)+[3]),
             'kindex':GPdc.MAT52CS,

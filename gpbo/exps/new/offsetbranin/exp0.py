@@ -3,8 +3,8 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-mode=['run','plot'][0]
-nreps=1
+mode=['run','plot'][1]
+nreps=8
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -12,7 +12,7 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 
 args = parser.parse_args()
 
-vers=[2,3][0]
+vers=[2,3][1]
 D=2
 
 s=1e-6
@@ -58,7 +58,7 @@ C={'lowtask':4,
    'switchestimator':True,
    'nsteps':100}
 
-all3confs.append(['mtbo4',C])
+#all3confs.append(['mtbo4',C])
 
 #-----------------
 #mtbo
@@ -67,12 +67,12 @@ C={'lowtask':64,
    'switchestimator':True,
    'nsteps':150}
 
-all3confs.append(['mtbo64',C])
+#all3confs.append(['mtbo64',C])
 
 #---------------
 #fabolas
 C={'ninit':30,
-   'nsteps':200,
+   'nsteps':80,
    'switchkernel':True,
    'switchestimator':True}
 all3confs.append(['fabmod',C])
@@ -84,6 +84,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,2,rpath,trueopt=truemin)
+    gpbo.plotall(all2confs+all3confs,8,rpath,trueopt=truemin)
 else:
     pass

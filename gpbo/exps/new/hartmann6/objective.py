@@ -6,7 +6,8 @@ import numpy as np
 def f(x, **ev):
     #hartmann4 with a linear offset agains quadratic cost
     sn = ev['xa']
-    z = [0.5*i+0.5+sn*(1-0.1*i) for i in x]
+    shift = [0.1,-0.15,0.2,0.05,-0.25,0.1]
+    z = [0.5*i+0.5+sn*shift[j] for j,i in enumerate(x)]
 
     al = np.array([1.,1.2,3.,3.2]).T
     A = np.array([[10., 3., 17., 3.5, 1.7, 8.],

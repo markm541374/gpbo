@@ -30,7 +30,7 @@ rpath='results0'
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
 C.stoppara = {'tmax': 60*60*10}
 C.stopfn = gpbo.core.optimize.totaltstopfn
-#all2confs.append(['eimle',C])
+all2confs.append(['eimle',C])
 
 #pesfs----------------------------
 C=gpbo.core.config.pesfsdefault(f,D,50,s,rpath,'null.csv')
@@ -38,14 +38,7 @@ C.stoppara = {'tmax': 60 * 60 * 10}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 C.aqpara['drop']=True
-all2confs.append(['pesfs_droptrue',C])
-#pesfs----------------------------
-C=gpbo.core.config.pesfsdefault(f,D,50,s,rpath,'null.csv')
-C.stoppara = {'tmax': 60 * 60 * 10}
-C.stopfn = gpbo.core.optimize.totaltstopfn
-C.aqpara['overhead']='predict'
-C.aqpara['drop']=False
-all2confs.append(['pesfs_dropfalse',C])
+all2confs.append(['pesfs',C])
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
@@ -55,7 +48,7 @@ C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=20
 C.reccfn=gpbo.core.reccomenders.gphinasrecc
 
-#all2confs.append(['pesbs',C])
+all2confs.append(['pesbs',C])
 
 #-----------------
 #mtbo
@@ -96,6 +89,6 @@ if mode=='run':
     #else:
     gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,1,rpath,trueopt=truemin)
+    gpbo.plotall(all2confs+all3confs,2,rpath,trueopt=truemin)
 else:
     pass

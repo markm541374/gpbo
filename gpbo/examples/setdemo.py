@@ -82,7 +82,7 @@ C={'lowtask':4,
    'nsteps':50,
    'switchestimator':False}
 
-#allconfs.append(['mtbo4_arg',C])
+allconfs.append(['mtbo4_arg',C])
 #-----------------
 #mtbo
 C={'lowtask':16,
@@ -117,6 +117,6 @@ C={'ninit':20,
 if mode=='run':
     gpbo.runexp(f,lb,ub,'resultsX',1,allconfs)
 elif mode=='plot':
-    gpbo.plotall(allconfs,4,'results',trueopt=1.)
+    gpbo.plotall(allconfs,2,'results',trueopt=1.)
 else:
     pass

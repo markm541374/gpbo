@@ -10,7 +10,7 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 #mode='plot'
 vers=[2,3][0]
 
@@ -35,7 +35,7 @@ C.aqpara['nrandinit']=10
 C.stoppara = {'tmax': 60*60*3}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 
-#all2confs.append(['eimle',C])
+all2confs.append(['eimle',C])
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
