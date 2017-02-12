@@ -3,8 +3,8 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-mode=['run','plot'][0]
-nreps=1
+mode=['run','plot'][1]
+nreps=5
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -89,6 +89,6 @@ if mode=='run':
     #else:
     gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,2,rpath,trueopt=truemin)
+    gpbo.plotall(all2confs+all3confs,11,rpath,trueopt=truemin)
 else:
     pass

@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-mode=['run','plot'][1]
+mode=['run','plot'][0]
 nreps=1
 import argparse
 
@@ -13,7 +13,7 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 vers=[2,3][0]
-D=3
+D=6
 
 s=1e-6
 lb = sp.array([-1.]*D)
@@ -39,7 +39,7 @@ C.stoppara = {'tmax': 60 * 60 * 1}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['nrandinit']=10
 
-all2confs.append(['pesfs',C])
+#all2confs.append(['pesfs',C])
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')

@@ -209,7 +209,7 @@ def dZ(t,X,S):
     csa = -(S.kap*a+S.kai*ca+S.kad*da)
     csx = -(S.kxp*x+S.kxi*cx+S.kxd*dx)
     Ft=csa-csx 
-    F = min(20.,max(-20.,Ft))
+    F = max(-20.,min(20.,Ft))-1.
     #F += -(X[0]+5.)*0.25 -X[1]*0.05
     a0 = S.M+S.m
     a1 = -S.m*S.l*np.cos(a)
@@ -223,12 +223,12 @@ def dZ(t,X,S):
     dca = 0. if (ca<-1. and a<0.) or (ca>1. and a>0.) else a
     dcx = 0. if (cx<-5. and x<0.) or (cx>5. and x>0.) else x
 
-    dC = x**2#+a**2
+    dC = a**2+0.1*abs(da) + x**2 + 0.1*abs(dx)# + 0.*0.1*abs(F+1)#+x**2
     return [dx,d2x,da,d2a,dcx,dca,F,dC]
 
 
 
-def runsim(controlpara,step=-10,plot=False):
+def runsim(controlpara,step=-6,plot=False):
 #   K = [100.,0.1,8.,5., 1.,8. ]
 #   K = [100.0, 0.1, 8.0,26.750950865287365, 2.396342520518441, 11.540708489014371] 
 #   r = stepchange(K,plot=True)
@@ -236,11 +236,11 @@ def runsim(controlpara,step=-10,plot=False):
     sys.stdout.flush()
     kap,kai,kad,kxp,kxi,kxd=controlpara
     s = System(M=0.5,m=0.2,l=0.3,g=9.8,kap=kap,kai=kai,kad=kad,kxp=kxp,kxi=kxi,kxd=kxd)
-    x0 = [1.,0.0,-0.1,0.,0.,0.,0.,0.]
+    x0 = [0.1,0.0,0.1,0.,0.,0.,0.,0.]
     O = integrate.ode(dZ).set_integrator('dopri5',atol=10**step,rtol=0.,verbosity=1,nsteps=10000)
     O.set_initial_value(x0,0.).set_f_params(s)
-    Tmax=50.
-    dt=0.25
+    Tmax=80.
+    dt=0.025
     n=int(Tmax/dt)
     X = np.empty([8,n+1]) 
     X[:,0]=x0
@@ -257,7 +257,7 @@ def runsim(controlpara,step=-10,plot=False):
         i+=1
     cost = X[7,-1]
     if not O.successful():
-        cost=10**20
+        cost=10**10
     print 'simresult={}'.format(cost)
     #print 'sqcost={} odetime={}'.format(cost,time.clock()-t0)
     if plot:
@@ -280,4 +280,4 @@ if __name__=="__main__":
     #sys.exit(spopt())
     #sys.exit(testfn())
     #sys.exit(runsim([100.,0.1,8.,25.,2.,11.],plot=True))
-    sys.exit(runsim([100.,0.1,8.,0.,0.,0.],plot=True))
+    sys.exit(runsim([1017.0344581161357, 3577.1169075731746, 65.698930381568232, 100.15805241836431, 6.5595255493927871, 0.10031635464239824],plot=True))
