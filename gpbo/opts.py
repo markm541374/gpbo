@@ -98,7 +98,7 @@ def plotquarts(a,data1,data2,col,lab):
     return
 
 
-def plotall(confs,nreps,path,trueopt=False):
+def plotall(confs,nreps,path,trueopt=False,logx=False):
     f=[]
     a=[]
     pmax=20
@@ -253,18 +253,24 @@ def plotall(confs,nreps,path,trueopt=False):
         a[10].set_xlabel('Evaluation+Acquisition Cost')
         a[10].set_ylabel('regret')
         a[10].set_yscale('log')
+        if logx:
+            a[10].set_xscale('log')
         f[10].savefig(os.path.join(path,'out10.png'))
 
         a[11].legend()
         a[11].set_xlabel('steps')
         a[11].set_ylabel('regret')
         a[11].set_yscale('log')
+        if logx:
+            a[11].set_xscale('log')
         f[11].savefig(os.path.join(path,'out11.png'))
 
         a[12].legend()
         a[12].set_xlabel('Evaluation Cost')
         a[12].set_ylabel('regret')
         a[12].set_yscale('log')
+        if logx:
+            a[12].set_xscale('log')
         f[12].savefig(os.path.join(path,'out12.png'))
 
         a[13].legend()

@@ -239,8 +239,8 @@ def runsim(controlpara,step=-6,plot=False):
     x0 = [0.1,0.0,0.1,0.,0.,0.,0.,0.]
     O = integrate.ode(dZ).set_integrator('dopri5',atol=10**step,rtol=0.,verbosity=1,nsteps=10000)
     O.set_initial_value(x0,0.).set_f_params(s)
-    Tmax=80.
-    dt=0.025
+    Tmax=10.1
+    dt=0.0025
     n=int(Tmax/dt)
     X = np.empty([8,n+1]) 
     X[:,0]=x0
@@ -259,6 +259,8 @@ def runsim(controlpara,step=-6,plot=False):
     if not O.successful():
         cost=10**10
     print 'simresult={}'.format(cost)
+    sys.stdout.flush()
+    sys.stderr.flush()
     #print 'sqcost={} odetime={}'.format(cost,time.clock()-t0)
     if plot:
         f,a = plt.subplots(6,sharex=True)
@@ -280,4 +282,4 @@ if __name__=="__main__":
     #sys.exit(spopt())
     #sys.exit(testfn())
     #sys.exit(runsim([100.,0.1,8.,25.,2.,11.],plot=True))
-    sys.exit(runsim([1017.0344581161357, 3577.1169075731746, 65.698930381568232, 100.15805241836431, 6.5595255493927871, 0.10031635464239824],plot=True))
+    sys.exit(runsim([1017.0344581161357, 3577.1169075731746, 6.698930381568232, 0*100.15805241836431, 0*6.5595255493927871, 0*0.10031635464239824],plot=True))

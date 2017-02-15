@@ -9,7 +9,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-from robo.fmin import fabolas
+#from robo.fmin import fabolas
 
 
 # Example script to optimize the C and gamma parameter of a

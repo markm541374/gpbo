@@ -14,10 +14,10 @@ mode=['run','plot'][0]
 #mode='plot'
 vers=[2,3][1]
 
-nreps=1
+nreps=4
 D=2
 
-s=1e-6
+s=1e-5
 lb = sp.array([-1.,-1.])
 ub = sp.array([1.,1.])
 
@@ -26,28 +26,36 @@ from objective import f
 #from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='results0'
+rpath='resultsQ'
 
 #eimle-------------------------------
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
-C.aqpara['nrandinit']=10
-C.stoppara = {'nmax': 80}
-C.stopfn = gpbo.core.optimize.nstopfn
+C.aqpara['nrandinit']=C.reccpara['onlyafter']=10
+C.stoppara = {'tmax': 60*60*10}
+C.stopfn = gpbo.core.optimize.totaltstopfn
 
-all2confs.append(['eimle',C])
+#all2confs.append(['eimle',C])
+#pesfs-------------------------------
+C=gpbo.core.config.pesfsdefault(f,D,12,s,rpath,'null.csv')
+C.stoppara = {'tmax': 60*60*10}
+C.stopfn = gpbo.core.optimize.totaltstopfn
+C.aqpara['nrandinit']=C.reccpara['onlyafter']=10
 
-#pesbs---------------------------------
+#all2confs.append(['pesfs',C])
+
+
+#pesfs---------------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
-C.stoppara = {'nmax': 140}
-C.stopfn = gpbo.core.optimize.nstopfn
-C.aqpara['overhead']='last'
-C.aqpara['nrandinit']=20
+C.stoppara = {'tmax': 60*60*10}
+C.stopfn = gpbo.core.optimize.totaltstopfn
+C.aqpara['overhead']='predict'
+C.aqpara['nrandinit']=C.reccpara['onlyafter']=20
 
 
-all2confs.append(['pesbs',C])
+#all2confs.append(['pesbs',C])
 
 #fabolas----------------------------------
-C={'ninit':20,
+C={'ninit':40,
    'nsteps':140}
 all3confs.append(['fabolas',C])
 
@@ -59,6 +67,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,8,rpath)
+    gpbo.plotall(all2confs+all3confs,4,rpath,trueopt=1e-99,logx=True)
 else:
     pass

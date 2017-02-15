@@ -57,7 +57,7 @@ def gpmaprecc(optstate,persist,**para):
     count=0
     def directwrap(xq,y):
         xq.resize([1,d])
-        a = G.infer_m(xq,[[sp.NaN]])
+        a = G.infer_m_post(xq,[[sp.NaN]])
         return (a[0,0],0)
 
     print('nevals={}\n\n'.format(count))
@@ -82,6 +82,45 @@ gpmapprior = {
 
 gpmap = gpmaprecc,gpmapprior
 
+def gpmap2upperrecc(optstate,persist,**para):
+    if para['onlyafter']>=len(optstate.y) :
+        print('{} <= {} : switch to argmin'.format(len(optstate.y),para['onlyafter']))
+        return argminrecc(optstate,persist,**para)
+        #return [sp.NaN for i in para['lb']],{'didnotrun':True}
+    logger.info('gpmapucb2 reccomender')
+    d=len(para['lb'])
+    x=sp.vstack(optstate.x)
+    y=sp.vstack(optstate.y)
+    s= sp.vstack([e['s'] for e in optstate.ev])
+    dx=[e['d'] for e in optstate.ev]
+    MAP = GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
+    logger.info('MAPHYP {}'.format(MAP))
+    G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(para['kindex'], d, MAP))
+    count=0
+    def directwrap(xq,y):
+        xq.resize([1,d])
+        a,v = G.infer_diag_post(xq,[[sp.NaN]])
+        return (a[0,0]+2.*sp.sqrt(v[0,0]),0)
+
+    #print('nevals={}\n\n'.format(count))
+    [xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
+    #try:
+    #    print(G.infer_diag(sp.array(xmin).resize([1,d]),[[sp.NaN]]))
+    #except e as e:
+    #    print( e)
+    #    raise
+    #print( 'mean {} std {} '.format(a,sp.sqrt(v)))
+    logger.info('DIRECT found post. min {} at {} {}'.format(ymin,xmin,ierror))
+    a,v= G.infer_diag_post(sp.array([[xmin]]),[[sp.NaN]])
+    print('mean {} std{} '.format(a[0,0],sp.sqrt(v[0,0])))
+
+    x,p,di = argminrecc(optstate,persist,**para)
+    a, v = G.infer_diag_post(sp.array([[x]]), [[sp.NaN]])
+    print('at argmin mean {} std {} wasactually {}'.format(a[0, 0], sp.sqrt(v[0, 0]),di['yinc']))
+    import sys
+    sys.stdout.flush()
+    return [i for i in xmin],persist,{'MAPHYP':MAP,'ymin':ymin}
+
 def gpmapasrecc(optstate,persist,**para):
     if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
         return argminrecc(optstate,persist, **para)
@@ -102,7 +141,7 @@ def gpmapasrecc(optstate,persist,**para):
         xq.resize([1,d])
         xe = sp.hstack([xq,sp.array([[0.]])])
         #print xe
-        a = G.infer_m(xe,[[sp.NaN]])
+        a = G.infer_m_post(xe,[[sp.NaN]])
         return (a[0,0],0)
     [xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
     logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))

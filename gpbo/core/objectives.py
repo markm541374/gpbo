@@ -83,11 +83,11 @@ def genmat52ojf(d,lb,ub,ls=0.3):
     logger.info('generated function xmin {} ymin {} globopt:{} locopt:{}'.format(xmin, ymin, ierror, y.status))
     return ojf,xmin,ymin
     
-def genbiasedmat52ojf(d,lb,ub,sls):
+def genbiasedmat52ojf(d,lb,ub,xls,sls):
     #s normalised to 0 exact, 1
     from ESutils import gen_dataset
-    nt=20
-    [X,Y,S,D] = gen_dataset(nt, d + 1, lb + [0], ub + [1], GPdc.MAT52, sp.array([1.5] + [0.30] * d + [sls]))
+    nt=30
+    [X,Y,S,D] = gen_dataset(nt, d + 1, lb + [0], ub + [1], GPdc.MAT52, sp.array([1.5] + [xls] * d + [sls]))
     
     G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.MAT52, d + 1, sp.array([1.5] + [0.30] * d + [sls])))
     def ojf(x,**ev):
@@ -119,7 +119,7 @@ def genbiasedmat52ojf(d,lb,ub,sls):
 
     if sp.isnan(ymin):
         logger.warning('generator got nan optimizing objective. retrying...')
-        return genbiasedmat52ojf(d,lb,ub,sls)
+        return genbiasedmat52ojf(d,lb,ub,xls,sls)
     logger.info('generated function xmin {} ymin {} globopt:{} locopt:{}'.format(xmin, ymin, ierror, y.status))
     return ojf, xmin, ymin
 
