@@ -75,7 +75,7 @@ C={'ninit':30,
    'nsteps':80,
    'switchkernel':True,
    'switchestimator':True}
-#all3confs.append(['fabmod',C])
+all3confs.append(['fabmod',C])
 
 #--------------
 

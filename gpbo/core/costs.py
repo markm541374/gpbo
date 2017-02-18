@@ -144,7 +144,7 @@ def traincfnfull(x,c):
     MAP = GPdc.searchMAPhyp(x, cl, sp.array([1e-6] * n), [[sp.NaN]] * n, sp.array([1.]+[-0.]*d ), sp.array([2.]*(d+1)), GPdc.MAT52)
     print( 'MAPhyp in costfn {}'.format(MAP))
     g = GPdc.GPcore(x, cl, sp.array([1e-3] * n), [[sp.NaN]] * n, GPdc.kernel(GPdc.MAT52,1,MAP))
-    if True:#gpbo.core.debugoutput and gpbo.core.debugoptions['cost1d']:
+    if False:#gpbo.core.debugoutput and gpbo.core.debugoptions['cost1d']:
         print( 'plotting cost...')
         from gpbo.core import debugpath
         import os
