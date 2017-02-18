@@ -10,7 +10,7 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 #mode='plot'
 vers=[2,3][1]
 
@@ -26,7 +26,7 @@ from objective import f
 #from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='resultsQ'
+rpath='results0'
 
 #eimle-------------------------------
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
@@ -34,14 +34,14 @@ C.aqpara['nrandinit']=C.reccpara['onlyafter']=10
 C.stoppara = {'tmax': 60*60*10}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 
-#all2confs.append(['eimle',C])
+all2confs.append(['eimle',C])
 #pesfs-------------------------------
 C=gpbo.core.config.pesfsdefault(f,D,12,s,rpath,'null.csv')
 C.stoppara = {'tmax': 60*60*10}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['nrandinit']=C.reccpara['onlyafter']=10
 
-#all2confs.append(['pesfs',C])
+all2confs.append(['pesfs',C])
 
 
 #pesfs---------------------------------
@@ -52,7 +52,7 @@ C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=C.reccpara['onlyafter']=20
 
 
-#all2confs.append(['pesbs',C])
+all2confs.append(['pesbs',C])
 
 #fabolas----------------------------------
 C={'ninit':40,

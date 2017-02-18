@@ -50,6 +50,11 @@ def optfabolas(fn,lb,ub,n,ninit,fname='results.csv',fpath='.',mod=False,switches
         ['n, '] + ['x' + str(i) + ', ' for i in xrange(D)] + ['xa,']+ [
             'y, c, '] + ['rx' + str(i) + ', ' for i in xrange(D)] + [
             'truey at xrecc, taq, tev, trc, realtime']) + '\n')
+    print( n)
+    inclast = -999
+    ylast = -9999
+    if not 'recctimes' in res.keys():
+        res['recctimes']=[0.]*n
     for i in xrange(n):
         st=''
         st+=str(i)+','
@@ -61,7 +66,15 @@ def optfabolas(fn,lb,ub,n,ninit,fname='results.csv',fpath='.',mod=False,switches
         st+=str(log[i]['c'])+','
         for j in xrange(D):
             st+=str(res['incumbents'][i+1][j])+','
-        st+=str(fn(res['incumbents'][i+1][:D],**{'xa':0,'cheattrue':True})[0])+','
+        if inclast!=list(res['incumbents'][i+1][:D]):
+            print('eval incumbent')
+            y = fn(res['incumbents'][i+1][:D],**{'xa':0,'cheattrue':True})[0]
+            ylast=y
+            inclast = list(res['incumbents'][i+1][:D])
+        else:
+            print('no change to incumbent')
+            y=ylast
+        st+=str(y)+','
         if i==0:
             st+=str(log[0]['t0']-tinit-res['recctimes'][0])+','
         else:

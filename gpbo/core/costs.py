@@ -42,13 +42,17 @@ class logcfnobj():
         return sp.exp(self.g.infer_m(sp.array([[xa]]),[[sp.NaN]])[0,0])
 
 class logcfnobjfull():
-    def __init__(self,g):
+    def __init__(self,g,offset=0.):
         self.g=g
+        self.offset=offset
         return
     def __call__(self,x,**ev):
+        print('aaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         x =  sp.hstack([x,ev['xa']])
-        return sp.exp(self.g.infer_m(x,[[sp.NaN]])[0,0])
-
+        print(x)
+        v=sp.exp(self.g.infer_m(x,[[sp.NaN]])[0,0])+self.offset
+        print('PREDICT {}'.format(v))
+        return v
 
 def traincfn1d(x,c):
     n = x.size
@@ -134,11 +138,13 @@ def traincfn1dll(x,c):
 def traincfnfull(x,c):
     #cost modeled in a latent space c=exp(cl)
     n,d = x.shape
-    cl=sp.log(c)
+    c_=sp.log(c)
+    off = sp.mean(c_)
+    cl = c_-off
     MAP = GPdc.searchMAPhyp(x, cl, sp.array([1e-6] * n), [[sp.NaN]] * n, sp.array([1.]+[-0.]*d ), sp.array([2.]*(d+1)), GPdc.MAT52)
     print( 'MAPhyp in costfn {}'.format(MAP))
     g = GPdc.GPcore(x, cl, sp.array([1e-3] * n), [[sp.NaN]] * n, GPdc.kernel(GPdc.MAT52,1,MAP))
-    if gpbo.core.debugoutput and gpbo.core.debugoptions['cost1d']:
+    if True:#gpbo.core.debugoutput and gpbo.core.debugoptions['cost1d']:
         print( 'plotting cost...')
         from gpbo.core import debugpath
         import os
@@ -160,8 +166,8 @@ def traincfnfull(x,c):
                     q[0,0]=xa[j]
                     q[0,D+1]=x[i]
                     m,v = g.infer_diag(q,[[sp.NaN]])
-                    z[i,j]=sp.exp(m[0,0])
-                    vz[i,j]=sp.sqrt(v[0,0])
+                    z[i,j]=m[0,0]
+                    vz[i,j]=v[0,0]
             try:
                 CS=a[D,0].contour(xa,x,z,30)
                 a[D, 0].clabel(CS, inline=1, fontsize=8)
@@ -176,19 +182,19 @@ def traincfnfull(x,c):
         for i in xrange(n):
             for j in xrange(n):
                 q = sp.zeros([1, d])
-                q[0,0] = 0.5
+                q[0,0] = 0.
                 q[0, 1] = x[j]
                 q[0, 2] = x[i]
                 m, v = g.infer_diag(q, [[sp.NaN]])
-                z[i, j] = sp.exp(m[0, 0])
-                vz[i, j] = sp.sqrt(v[0, 0])
+                z[i, j] = m[0, 0]
+                vz[i, j] = v[0, 0]
         try:
-            CS = a[d-1, 0].contour(xa, x, z, 30)
+            CS = a[d-1, 0].contour(x, x, z, 30)
             a[d-1, 0].clabel(CS, inline=1, fontsize=8)
         except ValueError:
             pass
         try:
-            CS = a[d-1, 1].contour(xa, x, vz, 30)
+            CS = a[d-1, 1].contour(x, x, vz, 30)
             a[d-1, 1].clabel(CS, inline=1, fontsize=8)
         except ValueError:
             pass
@@ -197,7 +203,7 @@ def traincfnfull(x,c):
         f.clf()
         plt.close(f)
         del(f)
-    return logcfnobjfull(g)
+    return logcfnobjfull(g,offset=off)
 
 
 def predictive1d(x,c,t,ofs,C):

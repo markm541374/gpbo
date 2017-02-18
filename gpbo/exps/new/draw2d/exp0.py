@@ -21,7 +21,7 @@ ub = sp.array([1.,1.])
 
 from objective import genf
 if mode==0:
-    f=genf(0.3,0.5,3.,300)
+    f=genf(0.3,0.6,3.,300)
 else:
     f=lambda x:sp.NaN
 from objective import truemin
@@ -81,12 +81,13 @@ C={'ninit':30,
 #all3confs.append(['fabmod',C])
 
 #--------------
+labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs':'EnvPES'}[x]
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,1,rpath,trueopt=truemin+1e-99)
+    gpbo.plotall(all2confs+all3confs,12,rpath,trueopt=truemin-1e-99,logx=True,labelfn=labelfn)
 else:
     pass

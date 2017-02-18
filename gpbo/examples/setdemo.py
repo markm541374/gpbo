@@ -106,12 +106,12 @@ C={'ninit':20,
    'nsteps':22,
    'switchkernel':True,
    'switchestimator':True}
-allconfs.append(['fabmod',C])
+#allconfs.append(['fabmod',C])
 #---------------
 #fabolas
 C={'ninit':20,
-   'nsteps':22}
-#allconfs.append(['fabolas',C])
+   'nsteps':20}
+allconfs.append(['fabolas',C])
 
 
 if mode=='run':

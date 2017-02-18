@@ -78,12 +78,14 @@ C={'ninit':30,
 #all3confs.append(['fabmod',C])
 
 #--------------
+
+labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs':'EnvPES'}[x]
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,20,rpath,trueopt=truemin)
+    gpbo.plotall(all2confs+all3confs,20,rpath,trueopt=truemin,labelfn=labelfn,logx=True)
 else:
     pass

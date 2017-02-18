@@ -90,6 +90,7 @@ class optimizer:
         lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara[0]['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, aqauxdata'])+'\n')
         self.state = optstate()
         stepn=0
+        rxlast=None
         while not self.stopfn(self.state,**self.stoppara):
             stepn+=1
             #print self.choosepara
@@ -110,18 +111,23 @@ class optimizer:
             logger.info("EV returned {} : {}     evaltime: {}".format(y,c,t2-t1))
             rx,self.reccpersist[mode],reaux = self.reccfn[mode](self.state,self.reccpersist[mode],**self.reccpara[mode])
             t3 = time.clock()
-            
+
             if self.reccpara[mode]['check']:
-                #logger.info("checkin {} : {}".format(rx,self.aqpara['ev']))
-                checkpara=copy.copy(self.aqpara[mode]['ev'])
-                checkpara['s']=1e-99
-                checkpara['cheattrue']=True
-                checky,checkc,checkojaux  = self.ojf(rx,**checkpara)
-                #logger.info("checkout {} : {} : {}".format(checky,checkc,checkojaux))
+                if rx==rxlast:
+                    print('reusing check')
+                    checky, checkc, checkojaux = checkylast,checkclast,checkojauxlast
+                else:
+                    print('checking rx')
+                    checkpara=copy.copy(self.aqpara[mode]['ev'])
+                    checkpara['s']=1e-99
+                    checkpara['cheattrue']=True
+                    checky,checkc,checkojaux  = self.ojf(rx,**checkpara)
+                    checkylast, checkclast, checkojauxlast = checky,checkc,checkojaux
+                    #logger.info("checkout {} : {} : {}".format(checky,checkc,checkojaux))
             else:
                 checky=sp.NaN
 
-            
+            rxlast=rx
             logger.info("RC returned {}     recctime: {}\n".format(rx,t3-t2))
             logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+','+''.join([str(k)+' '+str(aqaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in aqaux.keys()])[:-1]+'\n'
             lf.write(logstr)

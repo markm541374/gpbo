@@ -258,7 +258,10 @@ def PESbsaq(optstate,persist,**para):
     logger.debug([xmin,ymin,ierror])
     para['ev']['xa']=xmin[0]
     xout = [i for i in xmin[1:]]
-
+    try:
+        logger.debug('Predicted overhead {}'.format(cfn(xout,**{'xa':xmin[0]})))
+    except e as e:
+        print(e)
     lhyp = sp.log10([k.hyp for k in pesobj.G.kf])
     lhmean = sp.mean(lhyp, axis=0)
     lhstd = sp.sqrt(sp.var(lhyp, axis=0))

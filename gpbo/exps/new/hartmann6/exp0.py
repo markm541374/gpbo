@@ -83,12 +83,13 @@ C={'ninit':30,
 C={'ninit':30,
    'nsteps':80}
 #all3confs.append(['fabolas',C])
+labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs':'EnvPES'}[x]
 if mode=='run':
     #if vers==2:
     gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     #else:
     gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin)
+    gpbo.plotall(all2confs+all3confs,9,rpath,trueopt=truemin,logx=True,labelfn=labelfn)
 else:
     pass

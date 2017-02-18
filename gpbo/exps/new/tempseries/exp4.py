@@ -8,7 +8,7 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 
 args = parser.parse_args()
 #mode='run'
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 vers=[2,3][0]
 D=2
 nreps=1
@@ -18,7 +18,7 @@ ub = sp.array([1.,1.])
 
 from objective import f
 
-from objective import truemin
+#from objective import truemin
 all2confs=[]
 all3confs=[]
 rpath='results4'
@@ -26,12 +26,12 @@ rpath='results4'
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
-C.stoppara = {'tmax': 60 * 60 * 3}
+C.stoppara = {'tmax': 60 * 60 * 4}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=20
 
-#all2confs.append(['pesbs_flat',C])
+all2confs.append(['pesbs_flat',C])
 #----------------------#pesbs
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
 C.aqpara['traincfn']='llogfull'
@@ -49,8 +49,8 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confsindexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,4,rpath,trueopt=truemin)
+    gpbo.plotall(all2confs+all3confs,1,rpath)
 else:
     pass
-import tensorflow as tf
-tf.select
+#import tensorflow as tf
+#tf.select

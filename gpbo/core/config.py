@@ -258,7 +258,7 @@ class pesbsdefault():
             'mprior': self.aqpara['mprior'],
             'sprior': self.aqpara['sprior'],
             'kindex': self.aqpara['kindex'],
-            'maxf': 1000*D, #10**(-min(12,max(6.,3*D))),
+            'maxf': 500+100*D, #10**(-min(12,max(6.,3*D))),
             'onlyafter': self.aqpara['nrandinit'],
             'check': True,
             'everyn': 1
@@ -305,7 +305,7 @@ class pesbslearns():
             'mprior': self.aqpara['mprior'],
             'sprior': self.aqpara['sprior'],
             'kindex': self.aqpara['kindex'],
-            'maxf': 1000*D,
+            'maxf': 500+100*D,
             'onlyafter': self.aqpara['nrandinit'],
             'check': True,
             'everyn': 1
