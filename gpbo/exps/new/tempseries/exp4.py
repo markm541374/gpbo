@@ -8,7 +8,7 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 
 args = parser.parse_args()
 #mode='run'
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 vers=[2,3][0]
 D=2
 nreps=1
@@ -21,7 +21,7 @@ from objective import f
 #from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='results4'
+rpath='greysunday'
 
 
 #pesbs----------------------------
@@ -41,7 +41,7 @@ C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=20
 
 
-#all2confs.append(['pesbs_full',C])
+all2confs.append(['pesbs_full',C])
 
 if mode=='run':
     if vers==2:
@@ -49,7 +49,7 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confsindexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,1,rpath)
+    gpbo.plotall(all2confs+all3confs,8,rpath)
 else:
     pass
 #import tensorflow as tf

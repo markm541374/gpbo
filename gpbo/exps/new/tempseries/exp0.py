@@ -26,7 +26,7 @@ from objective import f
 #from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='results0'
+rpath='greymonday'
 
 #-----------------------
 #eimle
@@ -52,7 +52,7 @@ C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=C.reccpara['onlyafter']=20
 
-all2confs.append(['pesbs',C])
+all2confs.append(['pesbs_full',C])
 
 
 #-----------------
@@ -82,7 +82,7 @@ C={'lowtask':64,
 #fabolas
 C={'ninit':20,
    'nsteps':60}
-#all3confs.append(['fabolas',C])
+all3confs.append(['fabmod',C])
 
 
 
@@ -92,6 +92,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,1,rpath)
+    gpbo.plotall(all2confs+all3confs,3,rpath,logx=True)
 else:
     pass

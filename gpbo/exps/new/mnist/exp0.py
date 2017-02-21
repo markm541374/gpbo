@@ -26,7 +26,7 @@ from objective import f
 #from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='results0'
+rpath='greysunday'
 
 #eimle-------------------------------
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')

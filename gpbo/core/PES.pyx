@@ -29,10 +29,10 @@ import gpbo
 import os
 import time
 
-def makeG(X,Y,S,D,kindex,mprior,sprior,nh):
+def makeG(X,Y,S,D,kindex,mprior,sprior,nh,chains=1):
     #draw hyps based on plk
     #print "RRRRRRRRRRRRRR"+str([X,Y,S,D,kindex,mprior,sprior,nh])
-    H = ESutils.drawhyp_plk(X,Y,S,D,kindex,mprior,sprior,nh)
+    H = ESutils.drawhyp_plk(X,Y,S,D,kindex,mprior,sprior,nh,chains=chains)
     
     G = GPdc.GPcore(X, Y, S, D, [GPdc.kernel(kindex, X.shape[1], i) for i in H])
     
@@ -315,7 +315,7 @@ class PES:
 
 #augmented space PES
 class PES_inplane:
-    def __init__(self,X,Y,S,D,lb,ub,kindex,mprior,sprior,axis,value,DH_SAMPLES=8,DM_SAMPLES=8, DM_SUPPORT=400,DM_SLICELCBPARA=1.,AM_POLICY=NOMIN,mode=ESutils.SUPPORT_SLICELCB,noS=False):
+    def __init__(self,X,Y,S,D,lb,ub,kindex,mprior,sprior,axis,value,DH_SAMPLES=8,DM_SAMPLES=8, DM_SUPPORT=400,DM_SLICELCBPARA=1.,AM_POLICY=NOMIN,mode=ESutils.SUPPORT_SLICELCB,noS=False,DH_CHAINS=1):
         #print "PES init:"
         self.lb=lb
         self.ub=ub
@@ -324,7 +324,7 @@ class PES_inplane:
         if noS:
             S=sp.zeros(S.shape)
         #print [X.shape,Y.shape,mprior,sprior]
-        self.G = makeG(X,Y,S,D,kindex,mprior,sprior,DH_SAMPLES)
+        self.G = makeG(X,Y,S,D,kindex,mprior,sprior,DH_SAMPLES,chains=DH_CHAINS)
         HS = sp.vstack([k.hyp for k in self.G.kf])
 
         self.Z = drawmins_inplane(self.G,DM_SAMPLES,lb,ub,axis=axis,value=value,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode)

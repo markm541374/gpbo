@@ -368,7 +368,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
             else:
                 return -1e99
         print( "Drawing support using slice sample over EI:")
-        X = slice.slice_sample(f,0.5*(ub+lb),n,0.1*(ub-lb))
+        X = slice.slice_sample(f,0.5*(ub+lb),n,0.025*(ub-lb))
     
     elif method==SUPPORT_SLICEPM:
         def f(x):
@@ -502,7 +502,7 @@ def plot_gp(g,axis,x,d):
     return 0
 
 #draw hyperparameters given data from posterior likelihood
-def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5):
+def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1):
     ub = hm+1.8*hs
     lb = hm-1.8*hs
     def f(loghyp):
@@ -519,8 +519,14 @@ def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5):
             r=-1e99
         #print [loghyp, r]
         return r
-    X = slice.slice_sample(f,hm,n,0.05*hs,burn=burn,subsam=subsam)
-    return 10**X
+
+    starts = sp.vstack([hm]*chains)
+    print('using {} slice chains'.format(chains))
+    for i in range(chains):
+        starts[i,:]+=2*(sp.random.uniform(size=len(ub))-0.5)*hs
+    X = sp.vstack([slice.slice_sample(f,starts[j,:],n/chains+1,0.05*hs,burn=burn,subsam=subsam) for j in xrange(chains)])
+
+    return 10**X[:n,:]
 
 #take a random draw of X points and draw Y from the specified kernel
 def gen_dataset(nt,d,lb,ub,kindex,hyp,s=1e-9):

@@ -46,10 +46,10 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                     tmp['xa'] = 0
                     return f(x, **tmp)
                 C[1].ojf = wrap
-                try:
-                    out = gpbo.search(C[1])
-                except:
-                    pass
+                #try:
+                out = gpbo.search(C[1])
+                #except:
+                #    pass
 
             elif C[0][:5]=='pesbs':
                 C[1].path = path
@@ -60,20 +60,20 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                 C[1].reccpara['ub'] = [i for i in ub]
                 C[1].ojf=f
 
-                try:
-                    out = gpbo.search(C[1])
-                except:
-                    pass
+                #try:
+                out = gpbo.search(C[1])
+                #except:
+                #    pass
             elif C[0][:4]=='mtbo':
                 try:
                     optmtbo(f, lb, ub, 1.-(1./C[1]['lowtask']), C[1]['nsteps'], ninit=C[1]['ninit'],fpath=path,fname='{}_{}.csv'.format(C[0],ii),mod=C[1]['switchestimator'])
                 except:
                     pass
             elif C[0][:7]=='fabolas':
-                #try:
-                optfabolas(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path)
-                #except:
-                #    pass
+                try:
+                    optfabolas(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path)
+                except:
+                    pass
             elif C[0][:6]=='fabmod':
                 try:
                     optfabolas_mod(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path,switchestimator=C[1]['switchestimator'],switchkernel=C[1]['switchkernel'])
@@ -96,7 +96,9 @@ def plotquarts(a,data1,data2,col,lab):
 
     #        a.fill_between(xaxis, low0, upp0, facecolor='lightblue', edgecolor='lightblue', alpha=0.5)
     a.plot(xaxis, med0, color=col, label=lab)
+    a.fill_between(xaxis,upp0,low0,edgecolor=None,facecolor=col,alpha=0.1)
     return
+
 
 
 def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x):
@@ -185,11 +187,17 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x):
     a[1].legend()
     a[1].set_xlabel('Evaluation Cost')
     a[1].set_ylabel('result')
+    if logx:
+        a[1].set_xscale('log')
+    a[1].axis('tight')
     f[1].savefig(os.path.join(path,'out1.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[2].legend()
     a[2].set_xlabel('Evaluation+Acquisition Cost')
     a[2].set_ylabel('result')
+    if logx:
+        a[2].set_xscale('log')
+    a[2].axis('tight')
     f[2].savefig(os.path.join(path,'out2.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[3].legend()
@@ -205,11 +213,17 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x):
     a[5].legend()
     a[5].set_xlabel('Evaluation Cost')
     a[5].set_ylabel('result')
+    if logx:
+        a[5].set_xscale('log')
+    a[5].axis('tight')
     f[5].savefig(os.path.join(path,'out5.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[6].legend()
     a[6].set_xlabel('Evaluation+Acquisition Cost')
     a[6].set_ylabel('result')
+    if logx:
+        a[6].set_xscale('log')
+    a[6].axis('tight')
     f[6].savefig(os.path.join(path,'out6.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[7].legend()
@@ -238,19 +252,16 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x):
     f[17].savefig(os.path.join(path,'out17.png'),bbox_inches='tight', pad_inches=0.1)
 
     if trueopt:
-        a[8].legend()
         a[8].set_xlabel('steps')
         a[8].set_ylabel('regret')
         a[8].set_yscale('log')
         f[8].savefig(os.path.join(path,'out8.png'),bbox_inches='tight', pad_inches=0.1)
 
-        a[9].legend()
         a[9].set_xlabel('Evaluation Cost')
         a[9].set_ylabel('regret')
         a[9].set_yscale('log')
         f[9].savefig(os.path.join(path,'out9.png'),bbox_inches='tight', pad_inches=0.1)
 
-        a[10].legend()
         a[10].set_xlabel('Evaluation+Acquisition Cost')
         a[10].set_ylabel('regret')
         a[10].set_yscale('log')

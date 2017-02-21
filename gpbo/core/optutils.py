@@ -243,7 +243,10 @@ def mergelines(x,y):
 def silentdirect(f,l,u,*args,**kwargs):
     print( 'searching...')
     t0=time.clock()
-    fileno = sys.stdout.fileno()
+    try:
+        fileno = sys.stdout.fileno()
+    except:
+        fileno = sys.stdout
     with os.fdopen(os.dup(fileno), 'wb') as stdout:
         with os.fdopen(os.open(os.devnull, os.O_WRONLY), 'wb') as devnull:
             sys.stdout.flush();

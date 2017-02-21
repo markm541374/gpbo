@@ -1,8 +1,8 @@
 import gpbo
 import numpy as np
 import scipy as sp
-mode='run'
-#mode='plot'
+#mode='run'
+mode='plot'
 
 D=2
 
@@ -117,6 +117,6 @@ allconfs.append(['fabolas',C])
 if mode=='run':
     gpbo.runexp(f,lb,ub,'resultsX',1,allconfs)
 elif mode=='plot':
-    gpbo.plotall(allconfs,2,'results',trueopt=1.)
+    gpbo.plotall(allconfs,2,'results',trueopt=1.,logx=True)
 else:
     pass

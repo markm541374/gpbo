@@ -50,6 +50,8 @@ def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv',fpath='.',mod=False):
         ['n, '] + ['x' + str(i) + ', ' for i in xrange(D)] + ['xa,']+ [
             'y, c, '] + ['rx' + str(i) + ', ' for i in xrange(D)] + [
             'truey at xrecc, taq, tev, trc, realtime']) + '\n')
+    inclast = -999
+    ylast = -9999
     for i in xrange(n):
         st=''
         st+=str(i)+','
@@ -64,7 +66,15 @@ def optmtbo(fn,lb,ub,salt,n,ninit=10,fname='results.csv',fpath='.',mod=False):
         st+=str(log[i]['c'])+','
         for j in xrange(D):
             st+=str(res['trajectory'][i+1][j])+','
-        st+=str(fn(res['trajectory'][i+1][:D],**{'xa':0,'cheattrue':True})[0])+','
+        if inclast!=list(res['incumbents'][i+1][:D]):
+            print('eval incumbent')
+            y = fn(res['incumbents'][i+1][:D],**{'xa':0,'cheattrue':True})[0]
+            ylast=y
+            inclast = list(res['incumbents'][i+1][:D])
+        else:
+            print('no change to incumbent')
+            y=ylast
+        st+=str(y)+','
         if i==0:
             st+=str(log[0]['t0']-tinit-res['recctimes'][0])+','
         else:

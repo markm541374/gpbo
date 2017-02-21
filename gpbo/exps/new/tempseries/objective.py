@@ -16,13 +16,13 @@ days =364
 t0 = time.clock()
 df = pd.read_csv('data/DemandData_Historic-2015.csv')
 t1 = time.clock()
-print 'read time {0:e}'.format(t1 - t0)
+print( 'read time {0:e}'.format(t1 - t0))
 N = df.shape[0]
 n = min(N, days * 48)
 
 dlb = 0.
 dub = float(days)
-print '{0:d} datapoints'.format(n)
+print( '{0:d} datapoints'.format(n))
 X = sp.array([df.index.values[:n]]).T / 48.
 Y = sp.array([df.indo.values[:n]]).T / 1000.
 offs = sp.mean(Y)
@@ -45,18 +45,19 @@ def f(x, **ev):
 
     npts = max(1,int( (1-0.98*ev['xa'])*n ))
     if submode=='rand':
-        print "subsampling {} of {} at x={} aug={}".format(npts, n, x,ev['xa'])
+        print( "subsampling {} of {} at x={} aug={}".format(npts, n, x,ev['xa']))
         pts = npr.choice(range(n), size=npts, replace=False)
         Xd = sp.vstack([X[i] for i in pts])
         Yd = sp.vstack([Y[i] for i in pts])
         Sd = sp.vstack([S[i] for i in pts])
         Dd = [[sp.NaN]] * npts
     elif submode=='det':
-        print "first {} of {} at x={} aug={}".format(npts, n, x, ev['xa'])
+        print( "first {} of {} at x={} aug={}".format(npts, n, x, ev['xa']))
         #pts = npr.choice(range(n), size=npts, replace=False)
         #print pts
-        pts = map(int,sp.linspace(0,n-1,npts))
+        pts = list(map(int,sp.linspace(0,n-1,npts)))
         Xd = sp.vstack([X[i] for i in pts])
+	print(Y,pts)
         Yd = sp.vstack([Y[i] for i in pts])
         Sd = sp.vstack([S[i] for i in pts])
         Dd = [[sp.NaN]] * npts
@@ -68,7 +69,7 @@ def f(x, **ev):
     else:
         out = -llk
 
-    print "--->llk: {0} {1}    t: {2}".format(llk, out, t1 - t0)
+    print( "--->llk: {0} {1}    t: {2}".format(llk, out, t1 - t0))
     sys.stdout.flush()
     sys.stderr.flush()
     return out, t1-t0,dict()
