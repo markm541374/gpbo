@@ -27,7 +27,7 @@ X = sp.array([df.index.values[:n]]).T / 48.
 Y = sp.array([df.indo.values[:n]]).T / 1000.
 offs = sp.mean(Y)
 Y -= offs
-submode='det'
+submode='rand'
 #plt.show()
 S = sp.ones([n, 1]) * 1e-6
 D = [[sp.NaN]] * n
@@ -46,7 +46,7 @@ def f(x, **ev):
     npts = max(1,int( (1-0.98*ev['xa'])*n ))
     if submode=='rand':
         print( "subsampling {} of {} at x={} aug={}".format(npts, n, x,ev['xa']))
-        pts = npr.choice(range(n), size=npts, replace=False)
+        pts = list(npr.choice(range(n), size=npts, replace=False))
         Xd = sp.vstack([X[i] for i in pts])
         Yd = sp.vstack([Y[i] for i in pts])
         Sd = sp.vstack([S[i] for i in pts])
@@ -57,7 +57,7 @@ def f(x, **ev):
         #print pts
         pts = list(map(int,sp.linspace(0,n-1,npts)))
         Xd = sp.vstack([X[i] for i in pts])
-	print(Y,pts)
+	#print(Y,pts)
         Yd = sp.vstack([Y[i] for i in pts])
         Sd = sp.vstack([S[i] for i in pts])
         Dd = [[sp.NaN]] * npts

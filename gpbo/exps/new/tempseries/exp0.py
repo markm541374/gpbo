@@ -10,11 +10,11 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 
-mode=['run','plot'][1]
+mode=['run','plot'][0]
 #mode='plot'
 vers=[2,3][0]
 
-nreps=4
+nreps=2
 D=2
 
 s=1e-5
@@ -35,7 +35,7 @@ C.aqpara['nrandinit']=C.reccpara['onlyafter']=10
 C.stoppara = {'tmax': 60*60*10}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 
-all2confs.append(['eimle',C])
+#all2confs.append(['eimle',C])
 
 #pesfs
 C=gpbo.core.config.pesfsdefault(f,D,12,s,rpath,'null.csv')
@@ -43,16 +43,21 @@ C.aqpara['nrandinit']=C.reccpara['onlyafter']=10
 C.stoppara = {'tmax': 60*60*10}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 
-all2confs.append(['pesfs',C])
+#all2confs.append(['pesfs',C])
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
-C.stoppara = {'tmax': 60 * 60 * 10}
+C.stoppara = {'tmax': 60 * 60 * 6}
 C.stopfn = gpbo.core.optimize.totaltstopfn
+C.aqpara['traincfn']='llogfull'
 C.aqpara['overhead']='predict'
+C.aqpara['hyp_chains']=6
 C.aqpara['nrandinit']=C.reccpara['onlyafter']=20
+C.aqpara['mprior']=C.reccpara['mprior']= sp.array([1.]+[0.]*(D+1)+[-3])
+C.aqpara['sprior']=C.reccpara['sprior']= sp.array([1.]*(D+2)+[3])
+C.aqpara['kindex']=C.reccpara['kindex']=gpbo.core.GPdc.MAT52CS
 
-all2confs.append(['pesbs_full',C])
+all2confs.append(['pesbs_fullalt',C])
 
 
 #-----------------
@@ -84,6 +89,10 @@ C={'ninit':20,
    'nsteps':60}
 all3confs.append(['fabmod',C])
 
+#fabolas
+C={'ninit':20,
+   'nsteps':60}
+all3confs.append(['fabolas',C])
 
 
 if mode=='run':

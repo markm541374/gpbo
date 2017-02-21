@@ -235,7 +235,7 @@ class pesbsdefault():
             'kindex':GPdc.MAT52,
             'DH_SAMPLES':16,
             'DM_SAMPLES':32,
-            'hyp_chains':4,
+            'hyp_chains':1,
             'DM_SUPPORT':1000,
             'SUPPORT_MODE':[gpbo.core.ESutils.SUPPORT_LAPAPROT],
             'DM_SLICELCBPARA':16.,

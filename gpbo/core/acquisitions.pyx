@@ -201,7 +201,6 @@ def PESbsaq(optstate,persist,**para):
         para['ev']['xa'] = sp.random.uniform(para['xal'],para['xau'])
         return randomaq(optstate,persist,**para)
     elif n<para['nrandinit'] and para['startmode']=='inline':
-
         r=persist['n']%len(para['initpoints'])
         if r==0:
             _x,_par,_per,_d=randomaq(optstate, persist, **para)
@@ -216,7 +215,6 @@ def PESbsaq(optstate,persist,**para):
             _d = persist['_d']
 
         persist['n'] += 1
-
 
         _par['xa'] = para['initpoints'][r]
         return _x,_par,_per,_d
