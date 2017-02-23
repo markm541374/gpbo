@@ -46,10 +46,10 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                     tmp['xa'] = 0
                     return f(x, **tmp)
                 C[1].ojf = wrap
-                #try:
-                out = gpbo.search(C[1])
-                #except:
-                #    pass
+                try:
+                    out = gpbo.search(C[1])
+                except:
+                    pass
 
             elif C[0][:5]=='pesbs':
                 C[1].path = path
@@ -60,10 +60,10 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                 C[1].reccpara['ub'] = [i for i in ub]
                 C[1].ojf=f
 
-                #try:
-                out = gpbo.search(C[1])
-                #except:
-                #    pass
+                try:
+                    out = gpbo.search(C[1])
+                except:
+                    pass
             elif C[0][:4]=='mtbo':
                 try:
                     optmtbo(f, lb, ub, 1.-(1./C[1]['lowtask']), C[1]['nsteps'], ninit=C[1]['ninit'],fpath=path,fname='{}_{}.csv'.format(C[0],ii),mod=C[1]['switchestimator'])
@@ -192,7 +192,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x):
     a[1].axis('tight')
     f[1].savefig(os.path.join(path,'out1.png'),bbox_inches='tight', pad_inches=0.1)
 
-    a[2].legend()
+    #a[2].legend()
     a[2].set_xlabel('Evaluation+Acquisition Cost')
     a[2].set_ylabel('result')
     if logx:
@@ -219,7 +219,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x):
     f[5].savefig(os.path.join(path,'out5.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[6].legend()
-    a[6].set_xlabel('Evaluation+Acquisition Cost')
+    a[6].set_xlabel('Total Clock Time')
     a[6].set_ylabel('result')
     if logx:
         a[6].set_xscale('log')
@@ -279,7 +279,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x):
         a[11].axis('tight')
         f[11].savefig(os.path.join(path,'out11.png'),bbox_inches='tight', pad_inches=0.1)
 
-        a[12].legend()
+        #a[12].legend()
         a[12].set_xlabel('Evaluation Cost')
         a[12].set_ylabel('regret')
         a[12].set_yscale('log')
@@ -288,7 +288,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x):
         a[12].axis('tight')
         f[12].savefig(os.path.join(path,'out12.png'),bbox_inches='tight', pad_inches=0.1)
 
-        a[13].legend()
+        #a[13].legend()
         a[13].set_xlabel('Total Clock Time')
         a[13].set_ylabel('Median IR')
         a[13].set_yscale('log')

@@ -26,7 +26,7 @@ from objective import f
 #from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='greysunday'
+rpath='thursday'
 
 #eimle-------------------------------
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
@@ -59,14 +59,21 @@ C={'ninit':40,
    'nsteps':140}
 all3confs.append(['fabolas',C])
 
+#---------------
+#fabolas
+C={'ninit':30,
+   'nsteps':80,
+   'switchkernel':True,
+   'switchestimator':True}
+#all3confs.append(['fabmod',C])
 
-
+labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs':'EnvPES','fabolas':'Fabolas','fabmod':'FabolasM'}[x]
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,4,rpath,trueopt=1e-99,logx=True)
+    gpbo.plotall(all2confs+all3confs,7,rpath,trueopt=1e-99,logx=True,labelfn=labelfn)
 else:
     pass

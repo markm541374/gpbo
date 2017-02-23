@@ -359,6 +359,8 @@ def draw_support(g, lb, ub, n, method, para=1.):
             if all(x>lb) and all(x<ub):
                 try:
                     ei=g.infer_EI(sp.array(x),[[sp.NaN]])[0,0]
+                    if isnan(ei):
+                        return 1e-99
                     #print ei
                     return log(ei)
                 except:
@@ -368,7 +370,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
             else:
                 return -1e99
         print( "Drawing support using slice sample over EI:")
-        X = slice.slice_sample(f,0.5*(ub+lb),n,0.025*(ub-lb))
+        X = slice.slice_sample(f,0.5*(ub+lb),n,0.125*(ub-lb))
     
     elif method==SUPPORT_SLICEPM:
         def f(x):
