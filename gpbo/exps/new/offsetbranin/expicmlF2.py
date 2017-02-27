@@ -10,7 +10,7 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 #mode='plot'
 vers=[2,3][0]
 
@@ -26,24 +26,24 @@ from objective import f
 from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='restmp'
+rpath='icmlF2'
 
 
 
 #-----------------
 #pesbs
 C=gpbo.core.config.pesfsdefault(f,D,60,s,rpath,'null.csv')
-C.stoppara = {'nmax': 60 }
+C.stoppara = {'nmax': 80 }
 C.stopfn = gpbo.core.optimize.nstopfn
 C.aqpara['overhead']='none'
 C.aqpara['SUPPORT_MODE']=[gpbo.core.ESutils.SUPPORT_LAPAPROT]
 C.aqpara['DM_SLICELCBPARA']=20
-#all2confs.append(['pesfs_lap',C])
+all2confs.append(['pesfs_lap',C])
 
 #-----------------
 #pesbs
 C=gpbo.core.config.pesfsdefault(f,D,60,s,rpath,'null.csv')
-C.stoppara = {'nmax': 60 }
+C.stoppara = {'nmax': 80 }
 C.stopfn = gpbo.core.optimize.nstopfn
 C.aqpara['overhead']='none'
 C.aqpara['SUPPORT_MODE']=[gpbo.core.ESutils.SUPPORT_SLICEEI]
@@ -72,13 +72,15 @@ C.aqpara['DM_SLICELCBPARA']=2.
 #all2confs.append(['pesfs_pm',C])
 
 
+axisset={11:[0,60,1e-7,1e2],15:[0,60,0,90]}
+labelfn = lambda x: {'eimle':'EI','pesfs_lap':'Approx Draws','pesfs_ei':'EI Slice Sample','fabolas':'Fabolas','fabmod':'FabolasM'}[x]
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,2,rpath,trueopt=truemin)
+    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin,labelfn=labelfn,axisset=axisset)
 else:
     pass
 

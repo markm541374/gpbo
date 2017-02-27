@@ -21,25 +21,25 @@ ub = sp.array([1.,1.])
 
 from objective import genf
 if mode=='run':
-    f=genf(0.3,0.4,1.,90)
+    f=genf(0.3,1.5,3.,300)
 else:
     f=lambda x:sp.NaN
 from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='results1'
+rpath='icmlF4'
 #-----------------------
 #eimle
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
 C.aqpara['nrandinit']=10
-C.stoppara = {'tmax': 60*60*1}
+C.stoppara = {'tmax': 60*60*8}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.reccfn = gpbo.core.reccomenders.argminrecc
 all2confs.append(['eimle',C])
 
 #pesfs----------------------------
 C=gpbo.core.config.pesfsdefault(f,D,50,s,rpath,'null.csv')
-C.stoppara = {'tmax': 60 * 60 * 1}
+C.stoppara = {'tmax': 60 * 60 * 8}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='last'
 C.aqpara['nrandinit']=10
@@ -47,7 +47,7 @@ all2confs.append(['pesfs',C])
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
-C.stoppara = {'tmax': 60 * 60 * 1}
+C.stoppara = {'tmax': 60 * 60 * 8}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=20
@@ -82,12 +82,13 @@ C={'ninit':30,
 
 #--------------
 labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs':'EnvPES'}[x]
+axisset={12:[3*1e2,2*1e4,1e-6,1e1],13:[3*1e2,2*1e4,1e-6,1e1]}
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin-1e-99,logx=True,labelfn=labelfn)
+    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin-1e-99,logx=True,labelfn=labelfn,axisset=axisset)
 else:
     pass

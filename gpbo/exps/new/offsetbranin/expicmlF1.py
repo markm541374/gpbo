@@ -15,7 +15,7 @@ from objective import f
 from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='results3x'
+rpath='icmlF1'
 #pesbs----------------------------
 C=gpbo.core.config.pesfsdefault(f,D,50,s,rpath,'null.csv')
 C.stoppara = {'nmax': 100}
@@ -52,7 +52,8 @@ C.stopfn = gpbo.core.optimize.nstopfn
 C.reccfn=gpbo.core.reccomenders.argminrecc
 
 all2confs.append(['eimle_best',C])
-labelfn = lambda x: {'eimle_best':'EI-AM','pesfs_predmin':'PES_PM','pesfs_argmin':'PES_AM','eimle_pmin':'EI-PM','fabmod':'FabolasM'}[x]
+labelfn = lambda x: {'eimle_best':'EI-AM','pesfs_predmin':'PES-PM','pesfs_argmin':'PES-AM','eimle_pmin':'EI-PM','fabmod':'FabolasM'}[x]
+axisset={11:[0,100,1e-7,1e2]}
 
 if mode=='run':
     if vers==2:
@@ -60,6 +61,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin,labelfn=labelfn)
+    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin,labelfn=labelfn,axisset=axisset)
 else:
     pass

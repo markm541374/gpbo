@@ -4,8 +4,15 @@ xrange=range
 import gpbo
 import copy
 import os
+import matplotlib
+print( matplotlib.get_backend())
 from matplotlib import pyplot as plt
+plt.style.use('seaborn-paper')
 plt.rc('font',serif='Times')
+
+
+
+
 import matplotlib.patches as mpatches
 import scipy as sp
 try:
@@ -81,14 +88,17 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                     pass
             else:
                 print( "not an optimization method")
-def plotquarts(a,data1,data2,col,lab):
+def plotquarts(a,data1,data2,col,lab,log=False):
     n=len(data1)
     mx=-sp.Inf
     mn=sp.Inf
     for i in xrange(n):
         mn = min(mn,min(data1[i]))
         mx = max(mx,max(data1[i]))
-    xaxis = sp.linspace(mn,mx,200)
+    if not log:
+        xaxis = sp.linspace(mn,mx,200)
+    else:
+        xaxis = sp.logspace(sp.log10(mn),sp.log10(mx),200)
 ##    print( data1)
 #    print( data2)
 #    print( xaxis)
@@ -96,22 +106,30 @@ def plotquarts(a,data1,data2,col,lab):
 
     #        a.fill_between(xaxis, low0, upp0, facecolor='lightblue', edgecolor='lightblue', alpha=0.5)
     a.plot(xaxis, med0, color=col, label=lab)
-    a.fill_between(xaxis,upp0,low0,edgecolor=None,facecolor=col,alpha=0.1)
+    a.fill_between(xaxis,upp0,low0,edgecolor=col,facecolor=col,lw=0.0,alpha=0.1)
     return
 
 
 
-def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x):
+def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False):
     f=[]
     a=[]
     pmax=20
     for i in range(pmax):
         f_,a_ = plt.subplots(1)
+        for item in ([a_.title, a_.xaxis.label, a_.yaxis.label] + a_.get_xticklabels() + a_.get_yticklabels()):
+            item.set_fontsize(10)
         f.append(f_)
         a.append(a_)
     colorlist = ['b','r','g','purple','k','grey','orange','c','lightgreen','lightblue','pink']
     ci=-1
     for C in confs:
+        if  C[0][:5]=='pesbs' or C[0][:3]=='fab':
+            ninit=0
+        else:
+            ninit=0
+        if not skipinit:
+            ninit=0
         ci+=1
         col = colorlist[ci]
         #collect the data
@@ -176,12 +194,14 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x):
             for ii in range(nreps):
                 a[10].plot(data[ii]['accEA'],data[ii]['trueyatxrecc']-trueopt,color=col,label=labelfn(C[0]))
             #and averaged
-            plotquarts(a[13],[data[k]['accEA'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,labelfn(C[0]))
+            plotquarts(a[13],[data[k]['accEA'][ninit:] for k in range(nreps)],[data[k]['trueyatxrecc'][ninit:]-trueopt for k in range(nreps)],col,labelfn(C[0]),log=True)
 
 
     a[0].legend()
-    a[0].set_xlabel('steps')
+    a[0].set_xlabel('Steps')
     a[0].set_ylabel('result')
+    if 0 in axisset.keys():
+        a[0].axis(axisset[0])
     f[0].savefig(os.path.join(path,'out0.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[1].legend()
@@ -201,69 +221,78 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x):
     f[2].savefig(os.path.join(path,'out2.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[3].legend()
-    a[3].set_xlabel('steps')
+    a[3].set_xlabel('Steps')
     a[3].set_ylabel('EVcost')
     f[3].savefig(os.path.join(path,'out3.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[4].legend()
-    a[4].set_xlabel('steps')
+    a[4].set_xlabel('Steps')
     a[4].set_ylabel('result')
     f[4].savefig(os.path.join(path,'out4.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[5].legend()
-    a[5].set_xlabel('Evaluation Cost')
+    a[5].set_xlabel('Evaluation Cost (s)')
     a[5].set_ylabel('result')
     if logx:
         a[5].set_xscale('log')
     a[5].axis('tight')
+    if 5 in axisset.keys():
+        a[5].axis(axisset[5])
     f[5].savefig(os.path.join(path,'out5.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[6].legend()
-    a[6].set_xlabel('Total Clock Time')
-    a[6].set_ylabel('result')
+    a[6].set_xlabel('Total Clock Time (s)')
+    if sixylabel:
+        a[6].set_ylabel(sixylabel)
+    else:
+        a[6].set_ylabel('Result')
     if logx:
         a[6].set_xscale('log')
     a[6].axis('tight')
+    if 6 in axisset.keys():
+        a[6].axis(axisset[6])
     f[6].savefig(os.path.join(path,'out6.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[7].legend()
-    a[7].set_xlabel('steps')
+    a[7].set_xlabel('Steps')
     a[7].set_ylabel('EVcost')
     f[7].savefig(os.path.join(path,'out7.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[14].legend()
-    a[14].set_xlabel('steps')
-    a[14].set_ylabel('overhead clocktime')
+    a[14].set_xlabel('Steps')
+    a[14].set_ylabel('Overhead Clocktime')
     f[14].savefig(os.path.join(path,'out14.png'),bbox_inches='tight', pad_inches=0.1)
 
-    a[15].legend()
-    a[15].set_xlabel('steps')
-    a[15].set_ylabel('overhead clocktime')
+    #:a[15].legend()
+    a[15].set_xlabel('Steps')
+    a[15].set_ylabel('Overhead Clocktime')
+    if 15 in axisset.keys():
+        a[15].axis(axisset[15],'tight')
     f[15].savefig(os.path.join(path,'out15.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[16].legend()
-    a[16].set_xlabel('steps')
+    a[16].set_xlabel('Steps')
     a[16].set_ylabel('env Var')
     f[16].savefig(os.path.join(path,'out16.png'),bbox_inches='tight', pad_inches=0.1)
 
     a[17].legend()
-    a[17].set_xlabel('steps')
+    a[17].set_xlabel('Steps')
     a[17].set_ylabel('env Var')
     f[17].savefig(os.path.join(path,'out17.png'),bbox_inches='tight', pad_inches=0.1)
 
     if trueopt:
-        a[8].set_xlabel('steps')
+        a[8].set_xlabel('Steps')
         a[8].set_ylabel('regret')
         a[8].set_yscale('log')
         f[8].savefig(os.path.join(path,'out8.png'),bbox_inches='tight', pad_inches=0.1)
 
-        a[9].set_xlabel('Evaluation Cost')
+        a[9].set_xlabel('Evaluation Cost (s)')
         a[9].set_ylabel('regret')
         a[9].set_yscale('log')
         f[9].savefig(os.path.join(path,'out9.png'),bbox_inches='tight', pad_inches=0.1)
 
         a[10].set_xlabel('Evaluation+Acquisition Cost')
-        a[10].set_ylabel('regret')
+        a[10].set_ylabel('Median IR')
         a[10].set_yscale('log')
         if logx:
             a[10].set_xscale('log')
@@ -271,29 +300,38 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x):
         f[10].savefig(os.path.join(path,'out10.png'),bbox_inches='tight', pad_inches=0.1)
 
         a[11].legend()
-        a[11].set_xlabel('steps')
-        a[11].set_ylabel('regret')
+        a[11].set_xlabel('Steps')
+        a[11].set_ylabel('Median IR')
         a[11].set_yscale('log')
         if logx:
             a[11].set_xscale('log')
         a[11].axis('tight')
+        if 11 in axisset.keys():
+            a[11].axis(axisset[11],'tight')
         f[11].savefig(os.path.join(path,'out11.png'),bbox_inches='tight', pad_inches=0.1)
 
-        #a[12].legend()
+        a[12].legend()
         a[12].set_xlabel('Evaluation Cost')
-        a[12].set_ylabel('regret')
+        a[12].set_ylabel('Median IR')
         a[12].set_yscale('log')
         if logx:
             a[12].set_xscale('log')
         a[12].axis('tight')
+        if 12 in axisset.keys():
+            a[12].axis(axisset[12])
         f[12].savefig(os.path.join(path,'out12.png'),bbox_inches='tight', pad_inches=0.1)
 
-        #a[13].legend()
-        a[13].set_xlabel('Total Clock Time')
-        a[13].set_ylabel('Median IR')
+        a[13].legend()
+        a[13].set_xlabel('Total Clock Time (s)')
+        if thirteenylabel:
+            a[13].set_ylabel(thirteenylabel)
+        else:
+            a[13].set_ylabel('Median IR')
         a[13].set_yscale('log')
         if logx:
             a[13].set_xscale('log')
         a[13].axis('tight')
+        if 13 in axisset.keys():
+            a[13].axis(axisset[13],'tight')
         f[13].savefig(os.path.join(path,'out13.png'),bbox_inches='tight', pad_inches=0.1)
 
