@@ -94,7 +94,7 @@ class pesfsdefault():
             'ev': {'s': s, 'd': [sp.NaN]},
             'lb': [-1.]*D,
             'ub': [1.]*D,
-            'nrandinit': 8+2*D,
+            'nrandinit': 10,
             'maxf':500+100*D,
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
@@ -176,27 +176,29 @@ class pesfslearns():
         return
 
 class pesvsdefault():
-    def __init__(self,f,cfn,D,n,lsl,lsu,path,fname):
+    def __init__(self,f,D,n,lsl,lsu,path,fname):
         self.aqfn = gpbo.core.acquisitions.PESvsaq
         self.aqpara= {
             'ev': {'s': lsu, 'd': [sp.NaN]},
             'lb': [-1.]*D,
             'ub': [1.]*D,
             'nrandinit': 10,
-            'maxf': 1000*D,
+            'maxf': 500+100*D,
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
-            'DH_SAMPLES': 16,
-            'DM_SAMPLES': 32,
-            'DM_SUPPORT': 2000,
+            'DH_SAMPLES': 12+4*D,
+            'DM_SAMPLES': 20+8*D,
+            'DM_SUPPORT': 750+250*D,
             'SUPPORT_MODE': [gpbo.core.ESutils.SUPPORT_LAPAPROT],
-            'DM_SLICELCBPARA': 16.,
+            'DM_SLICELCBPARA': 12+4*D,
             'noS': False,
             'logsu': lsu,
             'logsl': lsl,
-            'overhead':'last',
-            'cfn': cfn
+            'sinitrand':True,
+            'overhead':'None',
+            'cfn': lambda x,ev :42.,
+            'traincfn':'llog1d'
         }
 
         self.stoppara = {'nmax': n}

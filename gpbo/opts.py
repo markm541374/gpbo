@@ -71,6 +71,18 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                     out = gpbo.search(C[1])
                 except:
                     pass
+            elif C[0][:5]=='pesvs':
+                C[1].path = path
+                C[1].fname = '{}_{}.csv'.format(C[0],ii)
+                C[1].aqpara['lb'] = [i for i in lb]
+                C[1].aqpara['ub'] = [i for i in ub]
+                C[1].reccpara['lb'] = [i for i in lb]
+                C[1].reccpara['ub'] = [i for i in ub]
+                C[1].ojf=f
+                #try:
+                out = gpbo.search(C[1])
+                #except:
+                #    pass
             elif C[0][:4]=='mtbo':
                 try:
                     optmtbo(f, lb, ub, 1.-(1./C[1]['lowtask']), C[1]['nsteps'], ninit=C[1]['ninit'],fpath=path,fname='{}_{}.csv'.format(C[0],ii),mod=C[1]['switchestimator'])
@@ -176,7 +188,12 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
                 #and averaged
                 plotquarts(a[17],[data[k]['index'] for k in range(nreps)],[data[k]['xa'] for k in range(nreps)],col,labelfn(C[0]))
             except:
-                pass
+                for ii in range(nreps):
+                    a[16].plot(data[ii]['index'],data[ii]['s'],color=col,label=labelfn(C[0]))
+                #and averaged
+                plotquarts(a[17],[data[k]['index'] for k in range(nreps)],[data[k]['s'] for k in range(nreps)],col,labelfn(C[0]))
+                a[16].set_yscale('log')
+                a[17].set_yscale('log')
         if trueopt:
             #first plot is all the opts per step
             for ii in range(nreps):

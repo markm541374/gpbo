@@ -300,6 +300,7 @@ class PES:
         return [xmin,ymin,ierror]
     
     def search_acq(self,cfn,logsl,logsu,maxf=1000,dv=[[sp.NaN]],over=0.):
+        print('over {}'.format(over))
         def directwrap(Q,extra):
             x = sp.array([Q[:-1]])
             s = 10**Q[-1]
@@ -311,6 +312,39 @@ class PES:
             return (R,0)
 
         [xmin, ymin, ierror] = direct(directwrap,sp.hstack([self.lb,logsl]),sp.hstack([self.ub,logsu]),user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
+
+        if gpbo.core.debugoutput and gpbo.core.debugoptions['acqfn1d']:
+            print( 'plotting acq1d...')
+            from gpbo.core import debugpath
+            import os
+            if not os.path.exists(debugpath):
+                os.mkdir(debugpath)
+            import time
+            from matplotlib import pyplot as plt
+            f,a=plt.subplots(3,figsize=[8,10],sharex=True)
+            nn = 100
+            cost = sp.empty(nn)
+            infgain = sp.empty(nn)
+            acqfn = sp.empty(nn)
+            srange = sp.linspace(logsl,logsu+4,nn)
+            for i in xrange(nn):
+                s=10**srange[i]
+                cost[i] = cfn(xmin,**{'s':s})+over
+                infgain[i] = PESgain(self.G,self.Ga,self.Z,sp.array([xmin[:-1]]),dv,[s])
+                acqfn[i] = infgain[i]/cost[i]
+
+            m,v = self.G.infer_diag_post(sp.array([xmin[:-1]]),[[sp.NaN]])
+            a[1].plot([sp.log10(v[0,0]),sp.log10(v[0,0])],[0.01,1.],'r')
+            a[0].plot(srange,cost)
+            a[1].plot(srange,infgain)
+            a[2].plot(srange,acqfn)
+            a[0].set_yscale('log')
+            a[1].set_yscale('log')
+            a[2].set_yscale('log')
+            f.savefig(os.path.join(debugpath, 'aq1d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+            plt.close(f)
+            del(f)
+
         return [xmin,ymin,ierror]
 
 #augmented space PES

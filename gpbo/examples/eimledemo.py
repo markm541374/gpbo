@@ -4,7 +4,7 @@ import scipy as sp
 
 D=2
 n=12
-s=1e-3
+s=0.
 
 def f(x, **ev):
     y = -sp.cos(x[0]) - sp.cos(x[1]) + 2
@@ -18,8 +18,7 @@ def f(x, **ev):
 
 
 C=gpbo.core.config.eimledefault(f,D,n,s,'results','eimle.csv')
-C.stoppara = {'tmax': 60*60*3,'includeaq':True}
-C.stopfn = gpbo.core.optimize.totaltstopfn
-C.aqpara['overhead']='predict'
+C.stoppara = {'nmax': 160}
+C.stopfn = gpbo.core.optimize.nstopfn
 out = gpbo.search(C)
 print out

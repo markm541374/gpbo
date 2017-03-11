@@ -2,10 +2,18 @@ import gpbo
 import numpy as np
 import scipy as sp
 #mode='run'
+
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,type=int)
+
+args = parser.parse_args()
+
 mode=['run','plot'][1]
 vers=[2,3][0]
 D=2
-nreps=10
+nreps=1
 s=1e-6
 lb = sp.array([-1.,-1.])
 ub = sp.array([1.,1.])
@@ -15,7 +23,7 @@ from objective import f
 from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='icmlF1'
+rpath='rerunF1'
 #pesbs----------------------------
 C=gpbo.core.config.pesfsdefault(f,D,50,s,rpath,'null.csv')
 C.stoppara = {'nmax': 100}
@@ -57,9 +65,9 @@ axisset={11:[0,100,1e-7,1e2]}
 
 if mode=='run':
     if vers==2:
-        gpbo.runexp(f,lb,ub,rpath,nreps,all2confs)
+        gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     else:
-        gpbo.runexp(f,lb,ub,rpath,nreps,all3confs)
+        gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
     gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin,labelfn=labelfn,axisset=axisset)
 else:

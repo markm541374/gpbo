@@ -154,7 +154,15 @@ def PESvsaq(optstate,persist,**para):
     if n<para['nrandinit']:
         persist['n']+=1
         para2=copy.deepcopy(para)
-        para2['ev']['s']=10**(para['logsu'])
+        if para['sinitrand']:
+            srel = sp.random.uniform()
+            switch = sp.random.uniform()
+            if srel>switch:
+                srel=1-srel
+            para2['ev']['s']=10**(para['logsu']+srel*(para['logsl']-para['logsu']))
+
+        else:
+            para2['ev']['s']=10**(para['logsu'])
         return randomaq(optstate,persist,**para2)
     logger.info('PESvsaq')
     #logger.debug(sp.vstack([e[0] for e in optstate.ev]))
@@ -165,12 +173,33 @@ def PESvsaq(optstate,persist,**para):
     dx=[e['d'] for e in optstate.ev]
     
     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'])
+    if para['traincfn']:#
+        #print "XXXXXXXXXXXXXXx"
+        cx=sp.vstack([sp.log10(e['s']) for e in optstate.ev])
+        cc=sp.vstack([e for e in optstate.c])
+        if para['traincfn']=='llog1d':
+            cfnlog = costs.traincfn1dll(cx,cc)
+        elif para['traincfn']=='llogfull':
+            cfnlog = costs.traincfnfull(x,cc)
+        elif para['traincfn']=='predictive1d':
+            cfnlog = costs.predictive1d(cx,cc,sp.array(optstate.aqtime),para['nrandinit'],para['cmax']-optstate.C)
+        else:
+            #default is 1d nieve gp
+            cfnlog = costs.traincfn1d(cx,cc)
+        def cfn(x,**ev):
+            #print(x)
+            #print(ev)
+            return cfnlog(x,**{'xa':sp.log10(ev['s'])})
+    else:
+        cfn = para['cfn']
 
     if para['overhead']=='last':
         over=persist['overhead']
+    elif para['overhead']=='predict':
+        over=geteffectiveoverhead(optstate,para['nrandinit'])
     else:
         over=0.
-    [xmin,ymin,ierror] = pesobj.search_acq(para['cfn'],para['logsl'],para['logsu'],maxf=para['maxf'],over=over)
+    [xmin,ymin,ierror] = pesobj.search_acq(cfn,para['logsl'],para['logsu'],maxf=para['maxf'],over=over)
     
     logger.debug([xmin,ymin,ierror])
     para['ev']['s']=10**xmin[-1]
@@ -185,7 +214,7 @@ def PESvsaq(optstate,persist,**para):
     logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean, lhstd, lhmin, lhmax))
 
     persist['overhead']=time.clock()-t0
-    return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
+    return xout,para['ev'],persist,{'overheadprediction':over,'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
 
 
 
