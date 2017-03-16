@@ -6,6 +6,7 @@ from collections import defaultdict
 from gpbo.core import PES
 from gpbo.core import ESutils
 import DIRECT
+from gpbo.core.optutils import silentdirect
 from sklearn import mixture
 import logging
 import tqdm
@@ -17,6 +18,7 @@ try:
     from matplotlib import pyplot as plt
     from matplotlib import patches
     plots=True
+    plt.style.use('seaborn-paper')
 except ImportError:
     plots=False
     plt=None
@@ -26,6 +28,67 @@ from copy import deepcopy
 
 
 def always0(optstate,persist,**para):
+    return 0,None,dict()
+
+def introspection(optstate,persist,**para):
+    logging.info('\n--------------------------------\nIntrospection\n')
+    if persist == None:
+        persist = defaultdict(list)
+    if optstate.n < para['onlyafter']:
+        return 0, persist, dict()
+
+    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(30, 30))
+    d = len(para['lb'])
+
+    #build a GP with slice-samples hypers
+    x = sp.vstack(optstate.x)
+    y = sp.vstack(optstate.y)
+    s = sp.vstack([e['s'] for e in optstate.ev])
+    dx = [e['d'] for e in optstate.ev]
+    G = PES.makeG(x, y, s, dx, para['kindex'], para['mprior'], para['sprior'], para['nhyp'])
+
+
+    # plot the current GP
+    gpbo.core.optutils.gpplot(ax[0,0],ax[0,1],G,para['lb'],para['ub'],ns=60)
+    ax[0,0].set_title('GP_post_mean')
+    ax[0,1].set_title('GP_post_var')
+
+    #find the pred. minimum
+    def directwrap(xq,y):
+        xq.resize([1,d])
+        a = G.infer_m_post(xq,[[sp.NaN]])
+        return (a[0,0],0)
+    [xmin,ymin,ierror] = silentdirect(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, maxf=8000, logfilename='/dev/null')
+    ax[0, 0].plot(xmin[0], xmin[1], 'ro')
+
+    #local probmin elipse at post min
+    # gradient inference
+    Gr, cG = G.infer_full_post(sp.vstack([xmin] * d), [[i] for i in xrange(d)])
+    divs = [[]] * (d * (d + 1) / 2)
+    # hessian inference
+    k = 0
+    for i in xrange(d):
+        for j in xrange(i + 1):
+            divs[k] = [i, j]
+            k += 1
+    vecH, cvecH = G.infer_full_post(sp.vstack([xmin] * (d * (d + 1) / 2)), divs)
+    # build hesian matrix
+    H = sp.empty(shape=[d, d])
+    k = 0
+    for i in xrange(d):
+        for j in xrange(i + 1):
+            H[i, j] = H[j, i] = vecH[0, k]
+            k += 1
+
+    print('grad\n{}\ngradcov\n{}\nhess\n{}'.format(Gr,cG,H))
+    try:
+        from gpbo.core import debugpath
+        fig.savefig(os.path.join(debugpath, 'lotsofplots' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+    except BaseException as e:
+        logger.error(str(e))
+    fig.clf()
+    plt.close(fig)
+    del (fig)
     return 0,None,dict()
 
 
@@ -160,9 +223,9 @@ def gpcommitment(optstate,persist,**para):
     from gpbo.core import debugoutput, debugoptions, debugpath
     if debugoutput and debugoptions['adaptive'] and plots:
         print( 'plotting choice...')
-        fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(40, 40))
+        fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(30, 30))
         #plot the current GP
-        n = 60
+        n = 50
         x_ = sp.linspace(-1, 1, n)
         y_ = sp.linspace(-1, 1, n)
         z_ = sp.empty([n, n])
@@ -185,22 +248,22 @@ def gpcommitment(optstate,persist,**para):
 
         #plot support points and draws
         print('3')
-        #for i in tqdm.tqdm(xrange(para['support'])):
-         #   symbol = ['r.','g.','bx'][Z_[i]]
-          #  ax[0,1].plot(W[i,0],W[i,1],symbol)
-            #if ER[0,i]>0.:
-            #    ax[2,2].plot(W[i,0],W[i,1],'b.')
-            #else:
-            #    ax[2,2].plot(W[i,0],W[i,1],'r.')
-        ax[0, 1].axis([-1, 1, -1, 1])
+#        for i in tqdm.tqdm(xrange(para['support'])):
+#            symbol = ['r.','g.','bx'][Z_[i]]
+#            ax[0,1].plot(W[i,0],W[i,1],symbol)
+#            if ER[0,i]>0.:
+#                ax[2,2].plot(W[i,0],W[i,1],'b.')
+#            else:
+#                ax[2,2].plot(W[i,0],W[i,1],'r.')
+#        ax[0, 1].axis([-1, 1, -1, 1])
 
-        print('5')
-        #for i in tqdm.tqdm(xrange(nd)):
-        #    symbol = ['r.', 'g.'][Y_[i]]
-        #    ax[1, 1].plot(R[i, 0], R[i, 1], symbol)
-        #for i in xrange(nd):
-        #    symbol = ['r.', 'g.'][Y_r[i]]
-        #    ax[1, 2].plot(R[i, 0], R[i, 1], symbol)
+#        print('5')
+#        for i in tqdm.tqdm(xrange(nd)):
+#            symbol = ['r.', 'g.'][Y_[i]]
+#            ax[1, 1].plot(R[i, 0], R[i, 1], symbol)
+#        for i in xrange(nd):
+#            symbol = ['r.', 'g.'][Y_r[i]]
+#            ax[1, 2].plot(R[i, 0], R[i, 1], symbol)
 
         Nselected = sorted([len(list(group)) for key, group in groupby(sorted(A))])
         Nselected.reverse()
@@ -219,15 +282,15 @@ def gpcommitment(optstate,persist,**para):
             ax[1, 1].add_artist(ell)
 
         #plot draw based regrets
-        ax[2,0].semilogy(persist['ERegret'],'k') #full regret
-        ax[2, 0].semilogy(persist['LRegret'], 'b') #local regret
-        ax[2, 0].semilogy(persist['GRegret'], 'm') #nonlocal regret
+        ax[2,0].plot(persist['ERegret'],'k') #full regret
+        ax[2, 0].plot(persist['LRegret'], 'b') #local regret
+        ax[2, 0].plot(persist['GRegret'], 'm') #nonlocal regret
 
 
         #plot support based regret bounds
-        ax[2, 0].semilogy(persist['EBound'], 'k--.')  # full regret
-        ax[2, 0].semilogy(persist['LBound'], 'b--.')  # local regret
-        ax[2, 0].semilogy(persist['GBound'], 'm--.')  # nonlocal regret
+        ax[2, 0].plot(persist['EBound'], 'k--.')  # full regret
+        ax[2, 0].plot(persist['LBound'], 'b--.')  # local regret
+        ax[2, 0].plot(persist['GBound'], 'm--.')  # nonlocal regret
 
 
         # display zeroER count for regret bounds
@@ -246,17 +309,21 @@ def gpcommitment(optstate,persist,**para):
         xaxis = sp.linspace(0,para['budget'],nq)
         Lp = map(Lpred.predict, xaxis)
         Gp = map(Gpred.predict, xaxis)
-        ax[2, 0].semilogy(xaxis,Lp, 'b:')  # local regret
-        ax[2, 0].semilogy(xaxis,Gp, 'm:')
+        ax[2, 0].plot(xaxis,Lp, 'b:')  # local regret
+        ax[2, 0].plot(xaxis,Gp, 'm:')
 
 
         #true regret if available:
         #try:
         Rtrue = para['cheatf'](xmin,**{'s':0.,'d':[sp.NaN]})[0]-para['cheatymin']
         persist['RTrue'].append(Rtrue)
-        ax[2,1].semilogy(persist['RTrue'],'g')
-        ax[2,1].semilogy(persist['ERegret'],'k') #prob not in local
+        ax[2,1].plot(persist['RTrue'],'g')
+        ax[2,1].plot(persist['ERegret'],'k') #prob not in local
 
+        try:
+            ax[2,0].set_yscale('log')
+        except:
+            pass
         #except:
         #    pass
         try:
