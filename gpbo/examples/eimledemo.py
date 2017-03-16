@@ -3,7 +3,7 @@ import scipy as sp
 
 
 D=2
-n=12
+n=10
 s=0.
 
 def f(x, **ev):
@@ -18,7 +18,8 @@ def f(x, **ev):
 
 
 C=gpbo.core.config.eimledefault(f,D,n,s,'results','eimle.csv')
-C.stoppara = {'nmax': 160}
+C.aqpara['smode']='dthenl'
+C.stoppara = {'nmax': 60}
 C.stopfn = gpbo.core.optimize.nstopfn
 out = gpbo.search(C)
 print out

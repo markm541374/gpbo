@@ -40,7 +40,9 @@ class conf():
             'mprior': sp.array([1.] + [0.] * D),
             'sprior': sp.array([1.] * (D + 1)),
             'kindex': GPdc.MAT52,
-            'volper': 1e-6
+            'overhead':'none',
+            'smode':'direct',
+            'maxf': 2000
         }
         """
         aq0 = gpbo.core.acquisitions.PESfsaq
@@ -107,8 +109,9 @@ class conf():
             'mprior': aq0para['mprior'],
             'sprior': aq0para['sprior'],
             'kindex': aq0para['kindex'],
-            'volper': 1e-6,
+            'maxf': 2000,
             'onlyafter': aq0para['nrandinit'],
+            'smode':'direct',
             'check': True,
             'everyn': 1
         }

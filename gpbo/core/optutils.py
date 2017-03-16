@@ -258,6 +258,38 @@ def silentdirect(f,l,u,*args,**kwargs):
     print('directtime {}'.format(time.clock()-t0))
     return xmin,ymin,ierror
 
+def silentdirectwrapped(f,l,u,*args,**kwargs):
+    def dwrap(x,aux):
+        return f(x),0
+    return silentdirect(dwrap,l,u,*args,**kwargs)
+
+def multilocal(f,l,u,*args,**kwargs):
+    print('searching multistart nmax={}'.format(kwargs['maxf']))
+    D = len(l)
+    start = sp.empty(D)
+    fevacc = 100
+    bounds=tuple([(l[j],u[j]) for j in range(D)])
+    minf = sp.Inf
+    Xinit = sp.empty([100,D])
+    Finit = sp.empty(100)
+    for i in xrange(100):
+        for j in xrange(D):
+            Xinit[i,j] = sp.random.uniform(l[j],u[j])
+        Finit[i] = f(Xinit[i,:])
+
+    while fevacc<kwargs['maxf']:
+        k = sp.argmin(Finit)
+        start = Xinit[k,:]
+        Finit[k]=sp.Inf
+        res = minimize(f ,start,method='L-BFGS-B',bounds=bounds,options={'ftol':0.0001,'maxfun':60+20*D})
+
+        #print('from {} found {} {} {} {}'.format(start,res.x,res.fun,res.message,res.nfev))
+        if res.fun<minf:
+            minf=res.fun
+            result = res.x
+            message = res.message
+        fevacc+=res.nfev
+    return result,minf,message
 def llk(X,Y,theta,pr_alpha, pr_beta):
     X=list(X)
     Y=list(Y)
@@ -315,3 +347,19 @@ def geteffectiveoverhead(optstate,nrandinit):
     print('under predi acq: {} ev: {}'.format(acc, Nr * cev))
     print('current overhead: {} predicted av overhead: {}'.format(lastover, acc / float(Nr)))
     return acc/float(Nr)
+
+def gpplot(meanaxis,varaxis,G,lb,ub,ns=50,nc=20):
+    x_ = sp.linspace(lb[0],ub[0], ns)
+    y_ = sp.linspace(lb[1],ub[1], ns)
+    z_ = sp.empty([ns, ns])
+    s_ = sp.empty([ns, ns])
+    for i in range(ns):
+        for j in range(ns):
+            m_, v_ = G.infer_diag_post(sp.array([y_[j], x_[i]]), [[sp.NaN]])
+            z_[i, j] = m_[0, 0]
+            s_[i, j] = sp.sqrt(v_[0, 0])
+    CS = meanaxis.contour(x_, y_, z_, nc)
+    meanaxis.clabel(CS, inline=1, fontsize=10)
+    CS = varaxis.contour(x_, y_, s_, nc)
+    varaxis.clabel(CS, inline=1, fontsize=10)
+    return

@@ -13,6 +13,7 @@ import numpy as np
 cimport numpy as np
 import scipy as sp
 import ctypes as ct
+import copy
 import os
 import sys
 from copy import deepcopy as dc
@@ -98,8 +99,8 @@ class GPcore:
         libGP.infer_m(self.s, cint(self.size), ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
         return R
     
-    def infer_m_partial(self,X_i,D_i,ki,hyp):
-        
+    def infer_m_partial(self,X_,D_i,ki,hyp):
+        X_i = copy.copy(X_)
         ns=X_i.shape[0]
         D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.vstack([sp.empty(ns)]*1)
@@ -109,15 +110,17 @@ class GPcore:
             
         
         return R
-    
-    def infer_m_post(self,X_i,D_i):
+
+    def infer_m_post(self,X_,D_i):
+        X_i = copy.copy(X_)
         ns=X_i.shape[0]
         R = self.infer_m(X_i,D_i)
         
         return sp.mean(R,axis=0).reshape([1,ns])
     
     
-    def infer_full(self,X_i,D_i):
+    def infer_full(self,X_,D_i):
+        X_i = copy.copy(X_)
         cdef int ns,j,i
         ns=X_i.shape[0]
         D = [0 if isnan(x[0]) else int(sum([8**j for j in x])) for x in D_i]
@@ -127,7 +130,8 @@ class GPcore:
         V = sp.vstack([R[(ns+1)*i+1:(ns+1)*(i+1),:] for i in range(self.size)])
         return [m,V]
     
-    def infer_full_post(self,X_i,D_i):
+    def infer_full_post(self,X_,D_i):
+        X_i = copy.copy(X_)
         class MJMError(Exception):
             pass
         [m,V] = self.infer_full(X_i,D_i)
@@ -147,7 +151,8 @@ class GPcore:
         #print cv
         return [sp.mean(m,axis=0).reshape([1,ns]),cv]
     
-    def infer_diag(self,X_i,D_i):
+    def infer_diag(self,X_,D_i):
+        X_i = copy.copy(X_)
         cdef int i,j,ns
         ns=X_i.shape[0]
         D = [0 if isnan(x[0]) else int(sum([8**j for j in x])) for x in D_i]
@@ -158,9 +163,9 @@ class GPcore:
         V = sp.vstack([R[i*2+1,:] for i in range(self.size)])
         return [m,V]
     
-    def infer_diag_post(self,X_ii,D_i):
+    def infer_diag_post(self,X_,D_i):
+        X_i = copy.copy(X_)
         cdef int ns
-        X_i = dc(X_ii)
         ns = len(D_i)
         
         X_i.resize([ns,self.D])
@@ -210,7 +215,8 @@ class GPcore:
         libGP.llk(self.s, cint(self.size), R.ctypes.data_as(ctpd))
         return R
     
-    def infer_LCB(self,X_i,D_i, p):
+    def infer_LCB(self,X_,D_i, p):
+        X_i = copy.copy(X_)
         cdef int ns,i
         ns=X_i.shape[0]
         D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
@@ -219,7 +225,8 @@ class GPcore:
         
         return R
     
-    def infer_LCB_post(self,X_i,D_i,p):
+    def infer_LCB_post(self,X_,D_i,p):
+        X_i = copy.copy(X_)
         [m,v] = self.infer_diag_post(X_i,D_i)
         if sp.amin(v)<0.:
             print( "negateive vriance: ")
@@ -230,7 +237,8 @@ class GPcore:
             raise MJMError()
         return m-p*sp.sqrt(v)
     
-    def infer_EI(self,X_i,D_i):
+    def infer_EI(self,X_,D_i):
+        X_i = copy.copy(X_)
         ns=X_i.shape[0]
         D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.empty([self.size,ns])
@@ -238,7 +246,8 @@ class GPcore:
         libGP.infer_EI(self.s, cint(self.size),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D), R.ctypes.data_as(ctpd))
         return R
     
-    def infer_EI_post(self,X_i,D_i,wrt=False):
+    def infer_EI_post(self,X_,D_i,wrt=False):
+        X_i = copy.copy(X_)
         [m,v] = self.infer_diag_post(X_i,D_i)
         #print m,v
         cdef int ns=len(D_i)
@@ -251,7 +260,8 @@ class GPcore:
         
         return R
     
-    def infer_lEI(self,X_i,D_i):
+    def infer_lEI(self,X_,D_i):
+        X_i = copy.copy(X_)
         ns=X_i.shape[0]
         D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.empty([self.size,ns])

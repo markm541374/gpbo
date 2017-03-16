@@ -14,6 +14,7 @@ import logging
 import copy
 from gpbo.core import GPdc
 from gpbo.core import PES
+from gpbo.core.optutils import multilocal
 import ESutils
 #start with random
 import objectives
@@ -89,16 +90,42 @@ def EIMAPaq(optstate,persist,**para):
     logger.info('found MAPHYP {}'.format(MAP))
 
     G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(kindex, d, MAP))
-    def directwrap(xq,y):
-        xq.resize([1,d])
-        a = G.infer_lEI(xq,[ev['d']])
-        return (-a[0,0],0)
+    if para['smode']=='direct':
+        def directwrap(xq,y):
+            xq.resize([1,d])
+            a = G.infer_lEI(xq,[ev['d']])
+            return (-a[0,0],0)
 
+        [xmin,ymin,ierror] = direct(directwrap,lb,ub,user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
+        logger.info('DIRECT found max EI at {} {} {}'.format(xmin,ymin,ierror))
+    elif para['smode']=='multi':
+        def multiwrap(x):
+            xq = copy.copy(x)
+            xq.resize([1,d])
+            a = G.infer_lEI(xq,[ev['d']])
+            return -a[0,0]
+        [xmin,ymin,ierror] = multilocal(multiwrap, lb,ub,maxf=maxf)
 
+        logger.info('multilocal found max EI at {} {} {}'.format(xmin,ymin,ierror))
+    elif para['smode']=='dthenl':
+        def directwrap(xq,y):
+            xq.resize([1,d])
+            a = G.infer_lEI(xq,[ev['d']])
+            return (-a[0,0],0)
 
-    [xmin,ymin,ierror] = direct(directwrap,lb,ub,user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
+        [dxmin,dymin,ierror] = direct(directwrap,lb,ub,user_data=[], algmethod=1, maxf=maxf-150, logfilename='/dev/null')
+        logger.info('DIRECT found max EI at {} {} {}'.format(dxmin,dymin,ierror))
+        def localwrap(x):
+            xq = copy.copy(x)
+            xq.resize([1,d])
+            a = G.infer_lEI(xq,[ev['d']])
+            return -a[0,0]
+        res = minimize(localwrap ,dxmin,method='L-BFGS-B',bounds=tuple([(lb[j],ub[j]) for j in range(d)]),options={'ftol':0.00001,'maxfun':150})
+        xmin,ymin,ierror = res.x,res.fun,res.message
+        logger.info('localrefine found max EI at {} {} {}'.format(xmin,ymin,ierror))
 
-    logger.info('DIRECT found max EI at {} {}'.format(xmin,ierror))
+    else:
+        raise KeyError('not a search mode')
     #logger.debug([xmin,ymin,ierror])
     persist['n']+=1
     return [i for i in xmin],ev,persist,{'MAPHYP':MAP,'logEImin':ymin,'DIRECTmessage':ierror}

@@ -1,12 +1,13 @@
 from __future__ import print_function
 import scipy as sp
 from scipy import linalg as spl
+from scipy.optimize import minimize
 from itertools import groupby
 from collections import defaultdict
 from gpbo.core import PES
 from gpbo.core import ESutils
 import DIRECT
-from gpbo.core.optutils import silentdirect
+from gpbo.core.optutils import silentdirectwrapped as direct
 from sklearn import mixture
 import logging
 import tqdm
@@ -54,11 +55,11 @@ def introspection(optstate,persist,**para):
     ax[0,1].set_title('GP_post_var')
 
     #find the pred. minimum
-    def directwrap(xq,y):
-        xq.resize([1,d])
-        a = G.infer_m_post(xq,[[sp.NaN]])
-        return (a[0,0],0)
-    [xmin,ymin,ierror] = silentdirect(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, maxf=8000, logfilename='/dev/null')
+    [dxmin,dymin,dierror] = direct(lambda x:G.infer_m_post(x,[[sp.NaN]])[0,0],para['lb'],para['ub'],user_data=[], algmethod=1, maxf=8000, logfilename='/dev/null')
+    import copy
+    res = minimize( lambda x:G.infer_m_post(x,[[sp.NaN]])[0,0],dxmin,method='L-BFGS-B',bounds=tuple([(para['lb'][j],para['ub'][j]) for j in range(d)]),options={'gtol':0.00001,'maxfun':250})
+    xmin,ymin,ierror = res.x,res.fun,res.message
+    print('direct {} {} {}\nrefine {} {} {} '.format(dxmin,dymin,dierror,xmin,ymin,ierror))
     ax[0, 0].plot(xmin[0], xmin[1], 'ro')
 
     #local probmin elipse at post min
@@ -72,7 +73,7 @@ def introspection(optstate,persist,**para):
             divs[k] = [i, j]
             k += 1
     vecH, cvecH = G.infer_full_post(sp.vstack([xmin] * (d * (d + 1) / 2)), divs)
-    # build hesian matrix
+    # build hessian matrix
     H = sp.empty(shape=[d, d])
     k = 0
     for i in xrange(d):
@@ -81,6 +82,24 @@ def introspection(optstate,persist,**para):
             k += 1
 
     print('grad\n{}\ngradcov\n{}\nhess\n{}'.format(Gr,cG,H))
+
+    # svd on cov of grad
+    Ucg, Ecg, Vcg = spl.svd(cG)
+    # new rotated covariance
+    C0 = spl.solve(H, Ucg)
+    varP = C0.dot(sp.diag(Ecg).dot(C0.T))
+    # svd of new cov
+    Uvp, Evp, Vvp = spl.svd(varP)
+    print(Uvp,Evp)
+    circ = sp.empty([2,100])
+    ax[1,0].plot(xmin[0], xmin[1], 'ro')
+    for i in xrange(100):
+        theta = 2. * sp.pi * i / 99.
+        circ[:, i] = Uvp.dot(sp.array([sp.sin(theta) * sp.sqrt(Evp[0]), sp.cos(theta) * sp.sqrt(Evp[1])])) + sp.array([[j for j in xmin]])
+    ax[1,0].plot(circ[0, :], circ[1, :], 'r')
+    ax[1,0].text(xmin[0],xmin[1],'{}\n{}'.format(sp.sqrt(Evp[0]),sp.sqrt(Evp[1])))
+    ax[1,0].set_title('local pmin ellipse')
+
     try:
         from gpbo.core import debugpath
         fig.savefig(os.path.join(debugpath, 'lotsofplots' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))

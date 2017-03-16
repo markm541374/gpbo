@@ -15,11 +15,12 @@ class eimledefault():
             'ev': {'s': s, 'd': [sp.NaN]},
             'lb': [-1.]*D,
             'ub': [1.]*D,
-            'nrandinit': 8+2*D,
+            'nrandinit': n,
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
             'maxf':500+100*D,
+            'smode':'direct',
             'overhead':None
         }
 
@@ -37,6 +38,7 @@ class eimledefault():
                 'maxf':500+100*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
+                'smode':'direct',
                 'everyn':1
                 }
         self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}

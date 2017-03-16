@@ -8,6 +8,9 @@ from scipy import linalg as spl
 from scipy import stats as sps
 import os
 import sys
+import copy
+from scipy.optimize import minimize
+from gpbo.core.optutils import multilocal
 import time
 
 from gpbo.core.optutils import silentdirect as direct
@@ -47,6 +50,9 @@ def gpmaprecc(optstate,persist,**para):
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
     logger.info('gpmap reccomender')
     d=len(para['lb'])
+    lb = para['lb']
+    ub = para['ub']
+    maxf = para['maxf']
     x=sp.vstack(optstate.x)
     y=sp.vstack(optstate.y)
     s= sp.vstack([e['s'] for e in optstate.ev])
@@ -54,17 +60,48 @@ def gpmaprecc(optstate,persist,**para):
     MAP = GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
     logger.info('MAPHYP {}'.format(MAP))
     G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(para['kindex'], d, MAP))
-    count=0
-    def directwrap(xq,y):
-        xq.resize([1,d])
-        a = G.infer_m_post(xq,[[sp.NaN]])
-        return (a[0,0],0)
 
-    print('nevals={}\n\n'.format(count))
-    [xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
+    if para['smode'] == 'direct':
+        def directwrap(xq, y):
+            xq.resize([1, d])
+            a = G.infer_m_post(xq,[[sp.NaN]])
+            return (a[0, 0], 0)
 
+        [xmin, ymin, ierror] = direct(directwrap, lb, ub, user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
+        logger.info('DIRECT found min post at {} {} {}'.format(xmin, ymin, ierror))
+    elif para['smode'] == 'multi':
+        def multiwrap(x):
+            xq = copy.copy(x)
+            xq.resize([1, d])
+            a = G.infer_m_post(xq,[[sp.NaN]])
+            return a[0, 0]
 
-    logger.info('DIRECT found post. min {} at {} {}'.format(ymin,xmin,ierror))
+        [xmin, ymin, ierror] = multilocal(multiwrap, lb, ub, maxf=maxf)
+
+        logger.info('multilocal found min post at {} {} {}'.format(xmin, ymin, ierror))
+    elif para['smode'] == 'dthenl':
+        def directwrap(xq, y):
+            xq.resize([1, d])
+            a = G.infer_m_post(xq,[[sp.NaN]])
+            return (a[0, 0], 0)
+
+        [dxmin, dymin, ierror] = direct(directwrap, lb, ub, user_data=[], algmethod=1, maxf=maxf - 150,
+                                        logfilename='/dev/null')
+        logger.info('DIRECT found min post at {} {} {}'.format(dxmin, dymin, ierror))
+
+        def localwrap(x):
+            xq = copy.copy(x)
+            xq.resize([1, d])
+            a = G.infer_m_post(xq,[[sp.NaN]])
+            return a[0, 0]
+
+        res = minimize(localwrap, dxmin, method='L-BFGS-B', bounds=tuple([(lb[j], ub[j]) for j in range(d)]),
+                       options={'ftol': 0.00001, 'maxfun': 150})
+        xmin, ymin, ierror = res.x, res.fun, res.message
+        logger.info('localrefine found min post at {} {} {}'.format(xmin, ymin, ierror))
+
+    else:
+        raise KeyError('not a search mode')
     return [i for i in xmin],persist,{'MAPHYP':MAP,'ymin':ymin}
 
 gpmapprior = {

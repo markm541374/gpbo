@@ -11,7 +11,7 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 
 args = parser.parse_args()
 
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 vers=[2,3][0]
 D=2
 nreps=8
@@ -59,6 +59,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,1,rpath,trueopt=truemin,logx=True)
+    gpbo.plotall(all2confs+all3confs,8,rpath,trueopt=truemin,logx=True)
 else:
     pass
