@@ -263,6 +263,23 @@ def silentdirectwrapped(f,l,u,*args,**kwargs):
         return f(x),0
     return silentdirect(dwrap,l,u,*args,**kwargs)
 
+def boundedlocal(f,l,u,x0,*args,**kwargs):
+    d = len(u)
+    res = minimize( f,x0,method='L-BFGS-B',bounds=tuple([(l[j],u[j]) for j in range(d)]),options=kwargs)
+    xmin,ymin,ierror = res.x,res.fun,res.message
+    return xmin,ymin,ierror
+
+def twopartopt(f,l,u,dargs,largs):
+    dxmin,dymin,dierror = silentdirectwrapped(f,l,u,**dargs)
+    xmin,ymin,ierror = boundedlocal(f,l,u,dxmin,**largs)
+    print('direct {} {} {}\nrefine {} {} {} '.format(dxmin, dymin, dierror, xmin, ymin, ierror))
+    return xmin,ymin,ierror
+
+
+
+
+
+
 def multilocal(f,l,u,*args,**kwargs):
     print('searching multistart nmax={}'.format(kwargs['maxf']))
     D = len(l)
