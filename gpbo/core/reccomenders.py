@@ -354,7 +354,7 @@ gpashin = gphinasrecc,gphinasprior
 
 
 def gphinrecc(optstate,persist,**para):
-    print( [para['onlyafter'],len(optstate.y)])
+    #print( [para['onlyafter'],len(optstate.y)])
     if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
         return argminrecc(optstate, persist,**para)

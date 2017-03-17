@@ -380,3 +380,83 @@ def gpplot(meanaxis,varaxis,G,lb,ub,ns=50,nc=20):
     CS = varaxis.contour(x_, y_, s_, nc)
     varaxis.clabel(CS, inline=1, fontsize=10)
     return
+
+def Hvec2H(Hvec,d):
+    if len(Hvec.shape)==1:
+        Hvec = sp.expand_dims(Hvec,axis=0)
+    H = sp.empty(shape=[d,d])
+    k = 0
+    for i in xrange(d):
+        for j in xrange(i + 1):
+            H[i, j] = H[j, i] = Hvec[0, k]
+            k += 1
+    return H
+
+def gpGH(G,x):
+    """
+    get the mean and joint covariance of gradient and hessian of a GP returns vectorized H after G
+    :param G: a GP
+    :param x: location X
+    :return:
+    """
+    d = G.D
+
+    divs = [[]] * ((d * (d + 1) / 2)+d)
+    k = d
+    for i in xrange(d):
+        divs[i]=[i]
+        for j in xrange(i + 1):
+            divs[k] = [i, j]
+            k += 1
+    X = sp.vstack([x] * ((d*(d + 1)/2)+d) )
+
+    M,varM = G.infer_full_post(X,divs)
+    G = M[:,:d]
+    varG = varM[:d,:d]
+    Hvec = M[:,d:]
+    varHvec = varM[d:,d:]
+    H = Hvec2H(Hvec,d)
+    return G,varG,H,Hvec,varHvec,M,varM
+
+def drawconditionH(G,varG,H,Hvec,varHvec,M,varM):
+    d=G.size
+    Hdist = sp.stats.multivariate_normal(Hvec.flatten(), varHvec)
+    Khg = varM[:d,d:]
+    H = Hdist.rvs()
+    choH = sp.linalg.cho_factor(varHvec)
+    Gm = G + Khg.dot(spl.cho_solve(choH,H))
+    Gv = varG - Khg.dot(spl.cho_solve(choH,Khg.T))
+    Hd = Hvec2H(H,d)
+    return Gm,Gv,Hd
+
+def plotprobstatellipse(cG,H,x,ax):
+    # svd on cov of grad
+    Ucg, Ecg, Vcg = spl.svd(cG)
+    # new rotated covariance
+    C0 = spl.solve(H, Ucg)
+    varP = C0.dot(sp.diag(Ecg).dot(C0.T))
+    # svd of new cov
+    Uvp, Evp, Vvp = spl.svd(varP)
+    circ = sp.empty([2, 100])
+    for i in xrange(100):
+        theta = 2. * sp.pi * i / 99.
+        circ[:, i] = Uvp.dot(sp.array([sp.sin(theta) * sp.sqrt(Evp[0]), sp.cos(theta) * sp.sqrt(Evp[1])])) + sp.array(
+            [[j for j in x]])
+    ax.plot(circ[0, :], circ[1, :], 'r')
+    return
+
+def probgppve(G,x):
+    Gr, varG, H, Hvec, varHvec, M, varM = gpGH(G,x)
+
+    d=G.D
+    Hdist = sp.stats.multivariate_normal(Hvec.flatten(), varHvec)
+    pvecount = 0
+    for i in xrange(500):
+        Hdraw = Hvec2H(Hdist.rvs(), d)
+        try:
+            sp.linalg.cholesky(Hdraw)
+            pvecount += 1
+        except sp.linalg.LinAlgError:
+            pass
+    pvecount /= 500.
+    return pvecount

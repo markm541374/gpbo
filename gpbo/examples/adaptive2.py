@@ -13,7 +13,7 @@ gpbo.core.debugoptions={'datavis':True,'drawlap':False,'cost1d':False,'ctaq':Fal
 
 D=2
 n=50
-s=0.
+s=1e-12
 
 lb=[-1.,-1.]
 ub = [1.,1.]

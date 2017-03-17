@@ -40,7 +40,8 @@ def introspection(optstate,persist,**para):
 
     fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(30, 30))
     d = len(para['lb'])
-
+    lb = para['lb']
+    ub = para['ub']
     #build a GP with slice-samples hypers
     x = sp.vstack(optstate.x)
     y = sp.vstack(optstate.y)
@@ -55,51 +56,67 @@ def introspection(optstate,persist,**para):
     ax[0,1].set_title('GP_post_var')
 
     #find the pred. minimum
-    [dxmin,dymin,dierror] = direct(lambda x:G.infer_m_post(x,[[sp.NaN]])[0,0],para['lb'],para['ub'],user_data=[], algmethod=1, maxf=8000, logfilename='/dev/null')
-    import copy
-    res = minimize( lambda x:G.infer_m_post(x,[[sp.NaN]])[0,0],dxmin,method='L-BFGS-B',bounds=tuple([(para['lb'][j],para['ub'][j]) for j in range(d)]),options={'gtol':0.00001,'maxfun':250})
-    xmin,ymin,ierror = res.x,res.fun,res.message
-    print('direct {} {} {}\nrefine {} {} {} '.format(dxmin,dymin,dierror,xmin,ymin,ierror))
+    #[dxmin,dymin,dierror] = direct(lambda x:G.infer_m_post(x,[[sp.NaN]])[0,0],para['lb'],para['ub'],user_data=[], algmethod=1, maxf=8000, logfilename='/dev/null')
+    #xmin,ymin,ierror= gpbo.core.optutils.boundedlocal(lambda x:G.infer_m_post(x,[[sp.NaN]])[0,0],para['lb'],para['ub'],dxmin,**{'gtol':0.00001,'maxfun':250})
+    dpara = {'user_data':[],
+             'algmethod':1,
+             'maxf':8000,
+             'logfilename':'/dev/null'}
+    lpara = {'gtol':0.00001,
+             'maxfun':300}
+
+    xmin,ymin,ierror = gpbo.core.optutils.twopartopt(lambda x:G.infer_m_post(x,[[sp.NaN]])[0,0],para['lb'],para['ub'],dpara,lpara)
     ax[0, 0].plot(xmin[0], xmin[1], 'ro')
 
     #local probmin elipse at post min
-    # gradient inference
-    Gr, cG = G.infer_full_post(sp.vstack([xmin] * d), [[i] for i in xrange(d)])
-    divs = [[]] * (d * (d + 1) / 2)
-    # hessian inference
-    k = 0
-    for i in xrange(d):
-        for j in xrange(i + 1):
-            divs[k] = [i, j]
-            k += 1
-    vecH, cvecH = G.infer_full_post(sp.vstack([xmin] * (d * (d + 1) / 2)), divs)
-    # build hessian matrix
-    H = sp.empty(shape=[d, d])
-    k = 0
-    for i in xrange(d):
-        for j in xrange(i + 1):
-            H[i, j] = H[j, i] = vecH[0, k]
-            k += 1
+    GH = gpbo.core.optutils.gpGH(G,xmin)
+    Gr,cG,H,Hvec,varHvec,_,_ = GH
+    #print('grad\n{}\ngradcov\n{}\nhess\n{}\nvarH\n{}'.format(Gr,cG,H,varHvec))
+    Hdist = sp.stats.multivariate_normal(Hvec.flatten(),varHvec)
+    pvecount=0
+    for i in xrange(2000):
+        Hdraw=gpbo.core.optutils.Hvec2H(Hdist.rvs(),d)
+        try:
+            sp.linalg.cholesky(Hdraw)
+            pvecount+=1
+        except sp.linalg.LinAlgError:
+            pass
+    pvecount/=2000.
 
-    print('grad\n{}\ngradcov\n{}\nhess\n{}'.format(Gr,cG,H))
+    for i in xrange(20):
+        Gm,Gv,Hd = gpbo.core.drawconditionH(*GH)
+        try:
+            sp.linalg.cholesky(Hd)
+            gpbo.core.optutils.plotprobstatellipse(Gv,Hd,xmin,ax[1,0])
+        except sp.linalg.LinAlgError:
+            pass
 
-    # svd on cov of grad
-    Ucg, Ecg, Vcg = spl.svd(cG)
-    # new rotated covariance
-    C0 = spl.solve(H, Ucg)
-    varP = C0.dot(sp.diag(Ecg).dot(C0.T))
-    # svd of new cov
-    Uvp, Evp, Vvp = spl.svd(varP)
-    print(Uvp,Evp)
-    circ = sp.empty([2,100])
-    ax[1,0].plot(xmin[0], xmin[1], 'ro')
-    for i in xrange(100):
-        theta = 2. * sp.pi * i / 99.
-        circ[:, i] = Uvp.dot(sp.array([sp.sin(theta) * sp.sqrt(Evp[0]), sp.cos(theta) * sp.sqrt(Evp[1])])) + sp.array([[j for j in xmin]])
-    ax[1,0].plot(circ[0, :], circ[1, :], 'r')
-    ax[1,0].text(xmin[0],xmin[1],'{}\n{}'.format(sp.sqrt(Evp[0]),sp.sqrt(Evp[1])))
+    #ax[1,0].text(xmin[0],xmin[1],'{}'.format(pvecount,))
     ax[1,0].set_title('local pmin ellipse')
 
+    ns = 30
+    #x_ = sp.linspace(xmin[0]-0.1, xmin[0]+0.1, ns)
+    #y_ = sp.linspace(xmin[1]-0.1, xmin[1]+0.1, ns)
+    #x_ = sp.linspace(lb[0], ub[0], ns)
+    #y_ = sp.linspace(lb[1], ub[1], ns)
+    #p_ = sp.empty([ns, ns])
+    #for i in tqdm.tqdm(range(ns)):
+    #    for j in range(ns):
+    #        p_[i,j] =gpbo.core.optutils.probgppve(G,sp.array([y_[j], x_[i]]))
+    #CS = ax[1,1].contour(x_, y_, p_, 10)
+    #ax[1,1].clabel(CS, inline=1, fontsize=10)
+
+    #ax[1,1].plot(xmin[0],xmin[1],'ro')
+    ax[1,0].text(xmin[0],xmin[1],gpbo.core.optutils.probgppve(G,xmin))
+    for r in sp.logspace(-1.7,-1,3):
+        theta = sp.random.uniform(0,2.*sp.pi)
+        for i in xrange(int(r*300)):
+            theta+=sp.pi*2/int(r*300)
+            x0 = xmin[0]+sp.sin(theta)*r
+            x1 = xmin[1]+sp.cos(theta)*r
+            ax[1,0].plot(x0,x1,'k.')
+            ax[1,0].text(x0,x1,str(gpbo.core.optutils.probgppve(G,sp.array([x0,x1]))))
+    #ax[1,1].axis([xmin[0]-0.12,xmin[0]+0.12,xmin[1]-0.12,xmin[1]+0.12])
     try:
         from gpbo.core import debugpath
         fig.savefig(os.path.join(debugpath, 'lotsofplots' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
