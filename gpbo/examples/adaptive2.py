@@ -9,7 +9,7 @@ import scipy as sp
 import time
 
 gpbo.core.debugoutput=True
-gpbo.core.debugoptions={'datavis':True,'drawlap':False,'cost1d':False,'ctaq':False,'support':False,'adaptive':True}
+gpbo.core.debugoptions={'datavis':True,'drawlap':False,'cost1d':False,'ctaq':False,'support':False,'adaptive':True,'logstate':True}
 
 D=2
 n=50
@@ -17,12 +17,13 @@ s=1e-12
 
 lb=[-1.,-1.]
 ub = [1.,1.]
-f, xmin, ymin = objectives.genmat52ojf(D,lb,ub,ls=0.4)
 
-with open('results/adaptive.txt','w') as o:
-    o.write('reported truemin x {} ; y {}'.format(xmin,ymin))
+f, xmin, ymin = objectives.genmat52ojf(D,lb,ub,ls=0.20,fixs=-1)
+if True:
+    with open('results/adaptive.txt','w') as o:
+        o.write('reported truemin x {} ; y {}'.format(xmin,ymin))
 
-gpbo.core.ESutils.plot2dFtofile(f,os.path.join('dbout', 'truegeneratedobjective' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'),xmin=xmin)
+    gpbo.core.ESutils.plot2dFtofile(f,os.path.join('dbout', 'truegeneratedobjective' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'),xmin=xmin)
 
 class conf():
     """
@@ -33,9 +34,18 @@ class conf():
     def __init__(self, f, D, n, s, path, fname):
 
 
-        C = gpbo.core.config.pesfsdefault(f, D, n, s, 'results', 'introspection.csv')
+        C = gpbo.core.config.pesfsdefault(f, D, 10, s, 'results', 'introspection.csv')
+        #C = gpbo.core.config.eimledefault(f,D,10,s,'results','introspection.csv')
         aq0 = C.aqfn
         aq0para = C.aqpara
+
+        aq1 = gpbo.core.acquisitions.splocalaq
+        aq1para = {
+            'ev': {'s': s, 'd': [sp.NaN]},
+            'lb': [-1.] * D,
+            'ub': [1.] * D,
+            'start': [0.] * D
+        }
 
         self.chooser = gpbo.core.choosers.introspection
         self.choosepara = {
@@ -55,10 +65,13 @@ class conf():
             'starts': 20,
             'cheatymin': ymin,
             'cheatf': f,
+            'regretswitch':1e-4,
             'budget': n
         }
-        self.aqfn = [aq0]
-        self.aqpara = [aq0para]
+        #self.chooser = gpbo.core.choosers.aftern
+        #self.choosepara = {'n':12}
+        self.aqfn = [aq0,aq1]
+        self.aqpara = [aq0para,aq1para]
         self.multimode = True
 
         self.stoppara = {'nmax': n}
@@ -66,9 +79,12 @@ class conf():
 
         reccfn0 = C.reccfn
         reccpara0 = C.reccpara
+        reccpara0['smode']='dthenl'
+        reccfn1 = gpbo.core.reccomenders.argminrecc
+        reccpara1 = {'check': True}
 
-        self.reccfn = [reccfn0]
-        self.reccpara = [reccpara0]
+        self.reccfn = [reccfn0,reccfn1]
+        self.reccpara = [reccpara0,reccpara1]
 
         self.ojfchar = {'dx': len(aq0para['lb']), 'dev': len(aq0para['ev'])}
         self.ojf = f
@@ -76,8 +92,7 @@ class conf():
         self.path = path
         self.fname = fname
         return
+C = conf(f,D,341,s,'results','adaptive.csv')
 
-C = conf(f,D,50,s,'results','adaptive.csv')
-
-out = gpbo.search(C)
+out = gpbo.search(C,initdata=False)
 

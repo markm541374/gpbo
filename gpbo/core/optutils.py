@@ -429,7 +429,7 @@ def drawconditionH(G,varG,H,Hvec,varHvec,M,varM):
     Hd = Hvec2H(H,d)
     return Gm,Gv,Hd
 
-def plotprobstatellipse(cG,H,x,ax):
+def plotprobstatellipse(cG,H,x,ax,logr=False):
     # svd on cov of grad
     Ucg, Ecg, Vcg = spl.svd(cG)
     # new rotated covariance
@@ -437,12 +437,15 @@ def plotprobstatellipse(cG,H,x,ax):
     varP = C0.dot(sp.diag(Ecg).dot(C0.T))
     # svd of new cov
     Uvp, Evp, Vvp = spl.svd(varP)
-    circ = sp.empty([2, 100])
-    for i in xrange(100):
-        theta = 2. * sp.pi * i / 99.
+    circ = sp.empty([2, 200])
+    for i in xrange(200):
+        theta = 2. * sp.pi * i / 199.-sp.pi
         circ[:, i] = Uvp.dot(sp.array([sp.sin(theta) * sp.sqrt(Evp[0]), sp.cos(theta) * sp.sqrt(Evp[1])])) + sp.array(
             [[j for j in x]])
-    ax.plot(circ[0, :], circ[1, :], 'r')
+    if logr:
+        plotaslogrtheta(circ[0,:],circ[1,:],x[0],x[1],ax,'g')
+    else:
+        ax.plot(circ[0, :], circ[1, :], 'g')
     return
 
 def probgppve(G,x):
@@ -460,3 +463,28 @@ def probgppve(G,x):
             pass
     pvecount /= 500.
     return pvecount
+
+def plotaslogrtheta(X,Y,x0,x1,ax,*args,**kwargs):
+    R = sp.log10(sp.sqrt((X-x0)**2+(Y-x1)**2))
+    T = sp.mod(sp.arctan((Y-x1)/(X-x0))+0.5*(1-sp.sign(X-x0))*sp.pi,2*sp.pi)
+    p = T.argsort()
+    return ax.plot(R[p],T[p],*args,**kwargs)
+
+def drawpartitionmin(G,S,xm,rm,n):
+    #distance to xmin
+    xm = sp.array(xm)
+    ns,d = S.shape
+    R = sp.empty(ns)
+    for i in xrange(ns):
+        R[i] = sp.linalg.norm(S[i,:]-xm)
+    O = sp.argsort(R)
+    split = sp.searchsorted(R[O],rm)+1
+    S_ = sp.vstack([xm,S[O,:]])
+    Z = G.draw_post(S_, [[sp.NaN]] *(ns+1),  n)
+    Res = sp.empty([n,5])
+    Res[:,1] = Z[:,:split].min(axis=1)
+    Res[:,2] = Z[:,split:].min(axis=1)
+    Res[:,3] = Z[:,0]
+    Res[:,0] = Res[:,1:3].min(axis=1)
+    Res[:,4] = Res[:,1:3].argmin(axis=1)
+    return Res

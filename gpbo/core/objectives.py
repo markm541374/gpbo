@@ -54,19 +54,25 @@ def rosenojf(x,**ev):
 rosenxmin=[0.2,0.2]
 rosenymin=0.
 
-def genmat52ojf(d,lb,ub,ls=0.3):
+def genmat52ojf(d,lb,ub,ls=0.3,fixs=-1):
     from ESutils import gen_dataset
-    nt=18
+    nt=48
     [X,Y,S,D] = gen_dataset(nt, d, lb, ub, GPdc.MAT52, sp.array([1.5] + [ls] * d))
     G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.MAT52, d, sp.array([1.5] + [ls] * d)))
     def ojf(x,**ev):
         dx=ev['d']
         s=ev['s']
-        if ev['s']>0:
-            noise = sp.random.normal(scale=sp.sqrt(ev['s']))
+        if not fixs<0:
+            if ev['s']>0:
+                noise = sp.random.normal(scale=sp.sqrt(ev['s']))
+            else:
+                noise=0
         else:
-            noise=0
-        return G.infer_m(sp.array(x),[dx])[0,0]+noise,1.,dict()
+            noise = sp.random.normal(scale=sp.sqrt(fixs))
+
+        y= G.infer_m(sp.array(x),[dx])[0,0]+noise
+        print('ojf at {} returned {} noise {}'.format([i for i in x],y,noise))
+        return y,1.,dict()
     def dirwrap(x,y):
         z = G.infer_m(x,[[sp.NaN]])[0,0]
         #z = obj(x,0.,[sp.NaN])

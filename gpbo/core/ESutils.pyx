@@ -213,7 +213,9 @@ def draw_support(g, lb, ub, n, method, para=1.):
         for i in range(para):
             retries=5
             for j in xrange(retries):
-                res = spomin(f,Xst[i,:]+sp.random.uniform(-0.01,0.01),method='Nelder-Mead',options={'xtol':0.0002,'maxfev':4000})
+                res = spomin(f,Xst[i,:]+sp.random.uniform(-0.01,0.01),method='Nelder-Mead',options={'xtol':0.00001,'maxfev':4000})
+                #bounds=tuple([(lb[j],ub[j]) for j in range(d)])
+                #res = spomin(f ,Xst[i,:]+sp.random.uniform(-0.01,0.01),method='L-BFGS-B',bounds=bounds,options={'gtol':0.00001,'maxfun':300})
                 if not res.success:
                     logger.warning('failed to find local mean {}'.format(res))
                 else:

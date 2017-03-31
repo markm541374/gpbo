@@ -71,7 +71,7 @@ def EIMAPaq(optstate,persist,**para):
     #para = copy.deepcopy(para)
     if persist==None:
         persist = {'n':0,'d':len(ub)}
-    n = persist['n']
+    n = optstate.n
     d = persist['d']
     if n<nrandinit:
         persist['n']+=1
@@ -137,7 +137,7 @@ def PESfsaq(optstate,persist,**para):
     para = copy.deepcopy(para)
     if persist==None:
         persist = {'n':0,'d':len(para['ub']),'overhead':0.}
-    n = persist['n']
+    n = optstate.n
     d = persist['d']
     if n<para['nrandinit']:
         persist['n']+=1
@@ -338,39 +338,44 @@ def choiceaq(optstate,persist,**para):
     return x,ev,persist,aux
 
 def splocalaq(optstate,persist,**para):
-
+    logger.error( str(persist))
     if persist==None:
-        persist={'n':0,'y':[],'x':[],'done':False}
+        persist={'n':0,'y':[],'z':[],'done':False}
+        for k in para['choosereturn'].keys():
+            persist[k]=para['choosereturn'][k]
+
+        if 'H' in persist.keys():
+            R = sp.linalg.cholesky(persist['H']).T
+            persist['R']=R
+        else:
+            logger.debug('no precondition provided')
+            persist['R']=sp.eye(len(persist['start']))
     else:
         persist['y'].append(optstate.y[-1])
 
     global count
     count=0
-
-    if not 'start' in persist.keys():
-        try:
-            persist['start']=optstate.startlocal
-        except:
-            persist['start']=para['start']
-    logger.info('splocalaq from {} step {}'.format(persist['start'],persist['n']))
-    def fwrap(x):
+    logger.info('splocalaq from {} ({}) step {}'.format(persist['start'],persist['R'].dot(persist['start']),persist['n']))
+    def fwrap(z):
         global count
 
         if count>=persist['n']:
-            raise KeyError([i for i in x])
+            raise KeyError([i for i in z])
         else:
-            assert sp.all(x==persist['x'][count])
+            assert sp.all(z==persist['z'][count])
             #print 'fwrap {} count {} y {}'.format(x,count,persist['y'][count])
             count+=1
             return persist['y'][count-1]
     try:
-        minimize(fwrap,persist['start'],method='l-bfgs-b',bounds=[(para['lb'][i],para['ub'][i])for i in range(len(para['ub']))])
+        R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs')
         persist['done']=True
         optstate.localdone=True
-        return persist['x'][-1],para['ev'],persist,{'msg':'localopt is complete'}
+        logger.info('localopt finished with z: {} (x: {}) y: {} {}'.format(R.x,sp.linalg.solve(persist['R'],persist['z'][-1]),R.fun,R.message))
+        return list(sp.linalg.solve(persist['R'],persist['z'][-1])),para['ev'],persist,{'msg':'localopt is complete'}
     except KeyError as k:
-        x=k.args[0]
-    persist['x'].append(x)
+        z=k.args[0]
+    persist['z'].append(z)
     persist['n']+=1
     #print 'xtoev {}'.format(x)
-    return x,para['ev'],persist,{'msg':'localopt' }
+    x = sp.linalg.solve(persist['R'],z)
+    return list(x),para['ev'],persist,{'msg':'localopt' }

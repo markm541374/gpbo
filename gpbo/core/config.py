@@ -96,7 +96,7 @@ class pesfsdefault():
             'ev': {'s': s, 'd': [sp.NaN]},
             'lb': [-1.]*D,
             'ub': [1.]*D,
-            'nrandinit': 10,
+            'nrandinit': n,
             'maxf':500+100*D,
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),

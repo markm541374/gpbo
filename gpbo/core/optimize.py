@@ -43,7 +43,7 @@ class optstate:
 
 
 class optimizer:
-    def __init__(self,dirpath,name,aqpara,aqfn,stoppara,stopfn,reccpara,reccfn,ojf,ojfchar,choosefn,choosepara):
+    def __init__(self,dirpath,name,aqpara,aqfn,stoppara,stopfn,reccpara,reccfn,ojf,ojfchar,choosefn,choosepara,initdata=False):
         self.dirpath = dirpath
         self.name = name
         self.setaq(aqpara,aqfn)
@@ -54,6 +54,10 @@ class optimizer:
         self.ojfchar = ojfchar
         self.dx = ojfchar['dx']
         self.dev = ojfchar['dev']
+        if initdata:
+            self.state=pickle.load(open(initdata))
+        else:
+            self.state=optstate()
         return
     
     def setaq(self,aqpara,aqfn):
@@ -88,7 +92,7 @@ class optimizer:
         self.stoppara['t0']=time.clock()
         lf = open(os.path.join(self.dirpath,self.name),'w')
         lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara[0]['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, aqauxdata'])+'\n')
-        self.state = optstate()
+#        self.state = optstate()
         stepn=0
         rxlast=None
         while not self.stopfn(self.state,**self.stoppara):
@@ -98,7 +102,8 @@ class optimizer:
             mode,self.choosepersist,chooseaux = self.choosefn(self.state,self.choosepersist,**self.choosepara)
 
             logger.info("---------------------\nstep {}:".format(stepn))
-            
+
+            self.aqpara[mode]['choosereturn']=chooseaux
             t0 = time.clock()
             x,ev,self.aqpersist[mode],aqaux = self.aqfn[mode](self.state,self.aqpersist[mode],**self.aqpara[mode])
             t1 = time.clock()
@@ -113,7 +118,8 @@ class optimizer:
             t3 = time.clock()
 
             if self.reccpara[mode]['check']:
-                if rx==rxlast:
+                #print(rx,rxlast)
+                if list(rx)==rxlast:
                     print('reusing check')
                     checky, checkc, checkojaux = checkylast,checkclast,checkojauxlast
                 else:
@@ -127,12 +133,15 @@ class optimizer:
             else:
                 checky=sp.NaN
 
-            rxlast=rx
+            rxlast=list(rx)
             logger.info("RC returned {}     recctime: {}\n".format(rx,t3-t2))
             aqaux['host'] = os.uname()[1]
             logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+','+''.join([str(k)+' '+str(aqaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in aqaux.keys()])[:-1]+'\n'
             lf.write(logstr)
             lf.flush()
+            if gpbo.core.debugoutput:
+                if gpbo.core.debugoptions['logstate']:
+                    pickle.dump(self.state,open(os.path.join(gpbo.core.debugpath,'{}.p'.format(self.state.n)),'wb'))
         #import pickle
         #obj = [self.reccpersist, self.aqpersist]
         #pickle.dump(obj, open('dbout/persists.p', 'wb'))
@@ -175,7 +184,7 @@ def totaltstopfn(optstate,**para):
         return False
 
 
-def search(optconfig):
+def search(optconfig,initdata=False):
     if not hasattr(optconfig,'fname'):
         optconfig.fname='traces.csv'
     multi=False
@@ -185,11 +194,11 @@ def search(optconfig):
     if not multi:
         O = optimizer(optconfig.path, optconfig.fname, [optconfig.aqpara], [optconfig.aqfn], optconfig.stoppara,
                                      optconfig.stopfn, [optconfig.reccpara], [optconfig.reccfn], optconfig.ojf,
-                                     optconfig.ojfchar,gpbo.core.choosers.always0,dict())
+                                     optconfig.ojfchar,gpbo.core.choosers.always0,dict(),initdata=initdata)
     else:
         O = optimizer(optconfig.path, optconfig.fname, optconfig.aqpara, optconfig.aqfn, optconfig.stoppara,
                                      optconfig.stopfn, optconfig.reccpara, optconfig.reccfn, optconfig.ojf,
-                                     optconfig.ojfchar,optconfig.chooser,optconfig.choosepara)
+                                     optconfig.ojfchar,optconfig.chooser,optconfig.choosepara,initdata=initdata)
 
     return O.run()
 
