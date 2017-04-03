@@ -56,7 +56,7 @@ rosenymin=0.
 
 def genmat52ojf(d,lb,ub,ls=0.3,fixs=-1):
     from ESutils import gen_dataset
-    nt=48
+    nt=58
     [X,Y,S,D] = gen_dataset(nt, d, lb, ub, GPdc.MAT52, sp.array([1.5] + [ls] * d))
     G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.MAT52, d, sp.array([1.5] + [ls] * d)))
     def ojf(x,**ev):

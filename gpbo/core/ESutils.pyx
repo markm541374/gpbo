@@ -558,7 +558,7 @@ def plot2dFtofile(f,fname,xmin=[False],atxa=0.):
             m_ = f(sp.array([y_[j], x_[i]]), **ev)
             z_[i, j] = m_[0]
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
-    CS = ax.contour(x_, y_, z_, 30)
+    CS = ax.contour(x_, y_, z_, 50)
     ax.clabel(CS, inline=1, fontsize=8)
     if any(xmin):
         ax.plot(xmin[0], xmin[1], 'ro')

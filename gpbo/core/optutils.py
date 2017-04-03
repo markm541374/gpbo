@@ -440,7 +440,7 @@ def plotprobstatellipse(cG,H,x,ax,logr=False):
     circ = sp.empty([2, 200])
     for i in xrange(200):
         theta = 2. * sp.pi * i / 199.-sp.pi
-        circ[:, i] = Uvp.dot(sp.array([sp.sin(theta) * sp.sqrt(Evp[0]), sp.cos(theta) * sp.sqrt(Evp[1])])) + sp.array(
+        circ[:, i] = Uvp.dot(sp.array([sp.sin(theta) * 3*sp.sqrt(Evp[0]), sp.cos(theta) * sp.sqrt(Evp[1])])) + sp.array(
             [[j for j in x]])
     if logr:
         plotaslogrtheta(circ[0,:],circ[1,:],x[0],x[1],ax,'g')
@@ -448,21 +448,20 @@ def plotprobstatellipse(cG,H,x,ax,logr=False):
         ax.plot(circ[0, :], circ[1, :], 'g')
     return
 
-def probgppve(G,x):
+def probgppve(G,x,nsam=500):
     Gr, varG, H, Hvec, varHvec, M, varM = gpGH(G,x)
 
     d=G.D
     Hdist = sp.stats.multivariate_normal(Hvec.flatten(), varHvec)
     pvecount = 0
-    for i in xrange(500):
+    for i in xrange(nsam):
         Hdraw = Hvec2H(Hdist.rvs(), d)
         try:
             sp.linalg.cholesky(Hdraw)
             pvecount += 1
         except sp.linalg.LinAlgError:
             pass
-    pvecount /= 500.
-    return pvecount
+    return (pvecount+1) / float(nsam+2)
 
 def plotaslogrtheta(X,Y,x0,x1,ax,*args,**kwargs):
     R = sp.log10(sp.sqrt((X-x0)**2+(Y-x1)**2))

@@ -18,6 +18,19 @@ s=1e-12
 lb=[-1.,-1.]
 ub = [1.,1.]
 
+
+def braninojf(x, **ev):
+    if 'd' in ev.keys():
+        assert (ev['d'] == [sp.NaN])
+
+    u = x[0] * 7.5 + 2.5
+    v = x[1] * 7.5 + 2.5
+
+    f = (-1.275 * (u / sp.pi) ** 2 + 5 * u / sp.pi + v - 6) ** 2 + (10. - 5. / (4 * sp.pi)) * sp.cos(u) + 10.
+
+    return f, 1., dict()
+
+#f,xmin,ymin = braninojf,[0.,0.],0.39788735772973816
 f, xmin, ymin = objectives.genmat52ojf(D,lb,ub,ls=0.20,fixs=-1)
 if True:
     with open('results/adaptive.txt','w') as o:
@@ -34,7 +47,7 @@ class conf():
     def __init__(self, f, D, n, s, path, fname):
 
 
-        C = gpbo.core.config.pesfsdefault(f, D, 10, s, 'results', 'introspection.csv')
+        C = gpbo.core.config.pesfsdefault(f, D, 30, s, 'results', 'introspection.csv')
         #C = gpbo.core.config.eimledefault(f,D,10,s,'results','introspection.csv')
         aq0 = C.aqfn
         aq0para = C.aqpara
@@ -47,7 +60,7 @@ class conf():
             'start': [0.] * D
         }
 
-        self.chooser = gpbo.core.choosers.introspection
+        self.chooser = gpbo.core.choosers.globallocalregret
         self.choosepara = {
             'ev': aq0para['ev'],
             'lb': aq0para['lb'],
@@ -60,13 +73,22 @@ class conf():
             'onlyafter': aq0para['nrandinit'],
             'check': True,
             'everyn': 1,
-            'support': 1500,
+            'support': 2500,
             'draws': 8000,
             'starts': 20,
             'cheatymin': ymin,
             'cheatf': f,
             'regretswitch':1e-4,
-            'budget': n
+            'budget': n,
+            'dpara': {'user_data': [],
+                      'algmethod': 1,
+                      'maxf': 8000,
+                      'logfilename': '/dev/null'},
+            'lpara': {'gtol': 0.00001,
+                      'maxfun': 300},
+            'pveballrrange': (-4,0),
+            'pveballrsteps': 200,
+            'pvetol':1e-3
         }
         #self.chooser = gpbo.core.choosers.aftern
         #self.choosepara = {'n':12}
