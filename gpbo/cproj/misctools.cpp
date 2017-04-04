@@ -80,13 +80,23 @@ extern "C" int drawcov(double* K, int n, double* R, int m){
 }
 
 //as drawcov but for the original covariance matrix. K is overwritten.
-extern "C" int drawk(double* K, int n, double* R, int m){
-    int j = -9;
-    printf("adding 10e%d diagonal to covariance in drawk\n",j);
-    for (int i=0; i<n; i++){
-        K[i*n+i]+=pow(10,j);
+extern "C" int drawk(double* K_in, int n, double* R, int m){
+    int j = -19;
+    int info = 1;
+    std::vector<double>K = std::vector<double>(n*n);
+    while (info != 0){
+        printf("adding 10e%d diagonal to covariance in drawk\n",j);
+        for (int i=0; i<n; i++){
+            for (int j=0; j<n; j++){
+                K[i*n+j]=K_in[i*n+j];
+            }
+            K[i*n+i]+=pow(10,j);
+        }
+
+        info = LAPACKE_dpotrf(LAPACK_ROW_MAJOR,'L',n,&K[0],n);
+        printf("info%d\n",info);
+        j+=1;
     }
-    LAPACKE_dpotrf(LAPACK_ROW_MAJOR,'L',n,&K[0],n);
     drawcov(&K[0],n, &R[0], m);
     return 0;
 }
