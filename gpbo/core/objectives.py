@@ -18,21 +18,50 @@ def trivialojf(x,**ev):
 
 trivialymin = 0.
 
-def braninojf(x,**ev):
+braninymin = 0.39788735772973816
+def shiftbraninojf(x,**ev):
     if 'd' in ev.keys():
         assert(ev['d']==[sp.NaN])
-    if 's' in ev.keys():
-        noise = sp.random.normal(scale=sp.sqrt(ev['s']))
-    else:
-        noise=0.
     u = x[0]*7.5 + 2.5
     v = x[1]*7.5 + 2.5
         
     f = (-1.275*(u/sp.pi)**2+5*u/sp.pi+v-6)**2 +(10.-5./(4*sp.pi))*sp.cos(u) + 10.
     
-    return f+noise,1.,dict()
+    return f-braninymin,1.,dict()
 
-braninymin = 0.39788735772973816
+
+hart3min = -3.86278
+def shifthart3(z, **ev):
+    #hartmann4 with a linear offset agains quadratic cost
+
+    al = sp.array([1.,1.2,3.,3.2]).T
+    A = sp.array([[3.,   10., 30.],
+                  [0.1,  10., 35.],
+                  [3.,   10., 30.],
+                  [0.1,  10., 35.]])
+    P = 0.0001*sp.array([[3689, 1170, 2673],
+                         [4699, 4387, 7470],
+                         [1091, 8732, 5547],
+                         [381, 5743, 8828]])
+
+    outer = 0
+    for ii in range(4):
+        inner = 0
+        for jj in range(3):
+            xj = z[jj]
+            Aij = A[ii, jj]
+            Pij = P[ii, jj]
+            inner += Aij * (xj - Pij)**2
+
+
+
+        new = al[ii] * sp.exp(-inner)
+        outer = outer + new
+    f = -outer
+
+    print( 'f inputs x:{} ev:{} outputs y:{}'.format(z, ev, f))
+    return f-hart3min, 1., dict()
+
 
 def rosenojf(x,**ev):
     if 'd' in ev.keys():
@@ -59,20 +88,7 @@ def genmat52ojf(d,lb,ub,ls=0.3,fixs=-1):
     nt=58
     [X,Y,S,D] = gen_dataset(nt, d, lb, ub, GPdc.MAT52, sp.array([1.5] + [ls] * d))
     G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.MAT52, d, sp.array([1.5] + [ls] * d)))
-    def ojf(x,**ev):
-        dx=ev['d']
-        s=ev['s']
-        if not fixs<0:
-            if ev['s']>0:
-                noise = sp.random.normal(scale=sp.sqrt(ev['s']))
-            else:
-                noise=0
-        else:
-            noise = sp.random.normal(scale=sp.sqrt(fixs))
 
-        y= G.infer_m(sp.array(x),[dx])[0,0]+noise
-        print('ojf at {} returned {} noise {}'.format([i for i in x],y,noise))
-        return y,1.,dict()
     def dirwrap(x,y):
         z = G.infer_m(x,[[sp.NaN]])[0,0]
         #z = obj(x,0.,[sp.NaN])
@@ -86,8 +102,22 @@ def genmat52ojf(d,lb,ub,ls=0.3,fixs=-1):
     y = spm(spowrap, xmin,  method='l-bfgs-b',bounds=[(-1,1),(-1,1)],options={'ftol':1e-15})
     xmin = y.x
     ymin = spowrap(y.x)
-    logger.info('generated function xmin {} ymin {} globopt:{} locopt:{}'.format(xmin, ymin, ierror, y.status))
-    return ojf,xmin,ymin
+    def ojf(x,**ev):
+        dx=ev['d']
+        s=ev['s']
+        if not fixs<0:
+            if ev['s']>0:
+                noise = sp.random.normal(scale=sp.sqrt(ev['s']))
+            else:
+                noise=0
+        else:
+            noise = sp.random.normal(scale=sp.sqrt(fixs))
+
+        y= G.infer_m(sp.array(x),[dx])[0,0]+noise
+        print('ojf at {} returned {} noise {}'.format([i for i in x],y,noise))
+        return y-ymin,1.,dict()
+    logger.info('generated function xmin {} ymin {}(shifted to 0.) globopt:{} locopt:{}'.format(xmin, ymin, ierror, y.status))
+    return ojf,xmin,0.
     
 def genbiasedmat52ojf(d,lb,ub,xls,sls):
     #s normalised to 0 exact, 1

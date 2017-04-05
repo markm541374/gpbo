@@ -49,29 +49,40 @@ def globallocalregret(optstate,persist,**para):
     y = sp.vstack(optstate.y)
     s = sp.vstack([e['s'] for e in optstate.ev])
     dx = [e['d'] for e in optstate.ev]
+    logger.info('building GP')
     G = PES.makeG(x, y, s, dx, para['kindex'], para['mprior'], para['sprior'], para['nhyp'])
 
 
     #find the pred. minimum
 
-    logger.info('find posterior mean minmum')
     xmin,ymin,ierror = gpbo.core.optutils.twopartopt(lambda x:G.infer_m_post(x,[[sp.NaN]])[0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
     logger.info('post min {} at {} ({})'.format(xmin,ymin,ierror))
-    logger.info('find posterior variance maximum')
     xvmax,vmax,ierror = gpbo.core.optutils.twopartopt(lambda x:-G.infer_diag_post(x,[[sp.NaN]])[1][0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
     mvmax,vvmax = [j[0,0] for j in G.infer_diag_post(xvmax,[[sp.NaN]])]
-    logger.info('post var max {} at {} with mean {} ({})'.format(vmax,xvmax,mvmax,ierror))
+    logger.info('post var max {} at {} with mean {} ({})'.format(vvmax,xvmax,mvmax,ierror))
 
     #get hessian/grad posterior
     #local probmin elipse at post min
     GH = gpbo.core.optutils.gpGH(G,xmin)
-    Gr,cG,H,Hvec,varHvec,_,_ = GH
+    Gr,cG,H,Hvec,varHvec,M,varM = GH
+
+    #est the local regret
+    dist = sp.stats.multivariate_normal(mean=M[0,:],cov=varM)
+    lrest=0.
+    for i in xrange(200):
+        sM = dist.rvs()
+        sG = sM[:d]
+        sH = gpbo.core.optutils.Hvec2H(sM[d:],d)
+        sR = 0.5*sG.dot(sp.linalg.solve(sH,sG))
+        #print('localregretsample {} xminsam {} xmin{}'.format(sR,-sp.linalg.solve(sH,sG),xmin))
+        lrest+= max(0.,sR)
+    lrest/=200.
+    logger.info('localregretest {}'.format(lrest))
 
     #step out to check +ve defininteness
     rmax=0
-    done=False
     Rad = sp.logspace(para['pveballrrange'][0],para['pveballrrange'][1],para['pveballrsteps'])
-    PP = sp.empty(Rad.size)
+    PP = -sp.ones(Rad.size)
     logger.info('checking for +ve definite ball')
     for j,r in enumerate(tqdm.tqdm(Rad)):
         x_un = sp.stats.norm.rvs(sp.zeros(d))
@@ -79,12 +90,12 @@ def globallocalregret(optstate,persist,**para):
         #print(x_un,sp.linalg.norm(x_un),x,sp.linalg.norm(x))
         p = gpbo.core.optutils.probgppve(G,sp.array(x),int(1./para['pvetol'])+10)
         PP[j]=p
-        if p<1-para['pvetol'] and not done:
+        if p<1-para['pvetol']:
             if j>0:
                 rmax=Rad[j-1]
             else:
                 rmax=0
-            done=True
+            break
     logger.info('+ve region radius {}'.format(rmax))
     if gpbo.core.debugoptions['adaptive']:
         fig, ax = plt.subplots(nrows=3, ncols=4, figsize=(85, 85))
@@ -132,7 +143,7 @@ def globallocalregret(optstate,persist,**para):
             plt.close(fig)
             del (fig)
         logger.info('no +ve def region, choosereturns 0')
-        return 0,persist,dict()
+        return 0,persist,{'reuseH':[k.hyp for k in G.kf]}
     #draw support points
     W = sp.vstack(ESutils.draw_support(G, lb, ub, para['support'], ESutils.SUPPORT_LAPAPROT, para=20))
 
@@ -154,10 +165,11 @@ def globallocalregret(optstate,persist,**para):
     Yout,Cout = data2cdf(Q[:,2])
 
     #normal dist with var same as max in gp model and passing through estimated prob of min sample
-    ymin=Yout[0]
+    ydrawmin=Yout[0]
     cdfymin=Cout[0]
-    mu = ymin-sp.sqrt(vvmax*2)*sp.special.erfinv(2*cdfymin-1.)
-    logger.info('upper norm at y{} c{} has mu{},var{}'.format(ymin,cdfymin,mu,vvmax))
+    mu = ydrawmin-sp.sqrt(vvmax*2)*sp.special.erfinv(2*cdfymin-1.)
+    logger.info('upper norm at y {} c {} has mu {},var {}'.format(ymin,cdfymin,mu,vvmax))
+    logger.info('lower norm at x {} has mu {},var {}'.format(xvmax,mvmax,vvmax))
 
     #interpolator for cdf
     def splicecdf(y):
@@ -176,17 +188,20 @@ def globallocalregret(optstate,persist,**para):
     racc = 0.
     m,v=normin
     n=len(Cout)
+    nstd=para['tailnstd'] # number of std dev below min sample to integrate over
+    tailsupport = para['tailsupport']
     #regret from samples after the min
     for i in xrange(1,n):
         racc+= gpbo.core.GPdc.EI(-Yout[i],-m,sp.sqrt(v))[0,0]/float(n)
+    tmp=racc
     #regret from the tail bound
-    for i,y in enumerate(sp.linspace(Yout[0]-3*sp.sqrt(vvmax),Yout[0],100)):
-        racc+= gpbo.core.GPdc.EI(-y,-m,sp.sqrt(v))[0,0]*sp.stats.norm.pdf(y,mu,sp.sqrt(vvmax))*(3*sp.sqrt(vvmax)/100.)
-
+    for i,y in enumerate(sp.linspace(Yout[0]-nstd*sp.sqrt(vvmax),Yout[0],tailsupport)):
+        racc+= gpbo.core.GPdc.EI(-y,-m,sp.sqrt(v))[0,0]*sp.stats.norm.pdf(y,mu,sp.sqrt(vvmax))*(nstd*sp.sqrt(vvmax)/float(tailsupport))
+    logger.info('outer regret {}  (due to samples: {} due to tail: {}'.format(racc,tmp,racc-tmp))
     #regret lower bound
     rlow=0.
-    for i,y in enumerate(sp.linspace(Yout[0]-3*sp.sqrt(vvmax),mvmax,200)):
-        rlow+= gpbo.core.GPdc.EI(-y,-m,sp.sqrt(v))[0,0]*sp.stats.norm.pdf(y,mvmax,sp.sqrt(vvmax))*((mvmax-Yout[0]+3*sp.sqrt(vvmax))/200.)
+    for i,y in enumerate(sp.linspace(Yout[0]-nstd*sp.sqrt(vvmax),mvmax,tailsupport)):
+        rlow+= gpbo.core.GPdc.EI(-y,-m,sp.sqrt(v))[0,0]*sp.stats.norm.pdf(y,mvmax,sp.sqrt(vvmax))*((mvmax-Yout[0]+nstd*sp.sqrt(vvmax))/float(tailsupport))
 
     #regret from samples
     rsam=0.
@@ -252,11 +267,14 @@ def globallocalregret(optstate,persist,**para):
         ax[1,2].text(0,0.15,'regretsam{}'.format(rsam))
         ax[1,2].text(0,0.3,'localrsam{}'.format(rloc))
         ax[1,2].text(0,0.1,'regretlow {} '.format(rlow))
+        ax[1,2].text(0,0.4,'localrest {} '.format(lrest))
         persist['Rexists'].append(optstate.n)
         persist['sampleregret'].append(rsam)
         persist['expectedregret'].append(racc)
         persist['localrsam'].append(rloc)
         persist['regretlower'].append(rlow)
+        persist['localrest'].append(lrest)
+        ax[0,3].plot(persist['Rexists'],persist['localrest'],'k')
         ax[0,3].plot(persist['Rexists'],persist['sampleregret'],'b')
         ax[0,3].plot(persist['Rexists'],persist['expectedregret'],'g')
         ax[0,3].plot(persist['Rexists'],persist['localrsam'],'r')
@@ -288,7 +306,7 @@ def globallocalregret(optstate,persist,**para):
         R=minimize(fn2,C.T.dot(xmin),method='bfgs')
         logger.warn('cheat testopt result with precondition {}:\n{}'.format(H,R))
 
-    return rval,persist,{'start':xmin,'H':H}
+    return rval,persist,{'start':xmin,'H':H,'reuseH':[k.hyp for k in G.kf]}
 
 def introspection(optstate,persist,**para):
     logging.info('\n--------------------------------\nIntrospection\n')

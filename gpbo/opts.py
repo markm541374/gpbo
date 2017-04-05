@@ -71,6 +71,14 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                     out = gpbo.search(C[1])
                 except:
                     pass
+            elif C[0][:9]=='switching':
+                C[1].path = path
+                C[1].fname = '{}_{}.csv'.format(C[0],ii)
+                C[1].ojf=f
+                #try:
+                out = gpbo.search(C[1])
+                #except:
+                #    pass
             elif C[0][:5]=='pesvs':
                 C[1].path = path
                 C[1].fname = '{}_{}.csv'.format(C[0],ii)
@@ -79,10 +87,10 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                 C[1].reccpara['lb'] = [i for i in lb]
                 C[1].reccpara['ub'] = [i for i in ub]
                 C[1].ojf=f
-                #try:
-                out = gpbo.search(C[1])
-                #except:
-                #    pass
+                try:
+                    out = gpbo.search(C[1])
+                except:
+                    pass
             elif C[0][:4]=='mtbo':
                 try:
                     optmtbo(f, lb, ub, 1.-(1./C[1]['lowtask']), C[1]['nsteps'], ninit=C[1]['ninit'],fpath=path,fname='{}_{}.csv'.format(C[0],ii),mod=C[1]['switchestimator'])

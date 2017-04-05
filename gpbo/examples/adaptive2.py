@@ -13,7 +13,7 @@ gpbo.core.debugoptions={'datavis':True,'drawlap':False,'cost1d':False,'ctaq':Fal
 
 D=2
 n=50
-s=1e-12
+s=0.
 
 lb=[-1.,-1.]
 ub = [1.,1.]
@@ -47,8 +47,7 @@ class conf():
     def __init__(self, f, D, n, s, path, fname):
 
 
-        C = gpbo.core.config.pesfsdefault(f, D, 30, s, 'results', 'introspection.csv')
-        #C = gpbo.core.config.eimledefault(f,D,10,s,'results','introspection.csv')
+        C = gpbo.core.config.pesfsdefault(f, D, 10, s, 'results', 'introspection.csv')
         aq0 = C.aqfn
         aq0para = C.aqpara
 
@@ -88,10 +87,11 @@ class conf():
                       'maxfun': 300},
             'pveballrrange': (-4,0),
             'pveballrsteps': 200,
-            'pvetol':1e-3
+            'pvetol':1e-3,
+            'tailsupport':200,
+            'tailnstd':4
         }
-        #self.chooser = gpbo.core.choosers.aftern
-        #self.choosepara = {'n':12}
+
         self.aqfn = [aq0,aq1]
         self.aqpara = [aq0para,aq1para]
         self.multimode = True

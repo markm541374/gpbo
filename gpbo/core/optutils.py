@@ -254,7 +254,7 @@ def silentdirect(f,l,u,*args,**kwargs):
             [xmin, ymin, ierror] = DIRECT.solve(f,l,u,*args,**kwargs)
         sys.stdout.flush();
         os.dup2(stdout.fileno(), fileno)
-    print( 'direct found {} at {} {}'.format(ymin,xmin,ierror))
+    #print( 'direct found {} at {} {}'.format(ymin,xmin,ierror))
     print('directtime {}'.format(time.clock()-t0))
     return xmin,ymin,ierror
 

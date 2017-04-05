@@ -97,7 +97,7 @@ class pesfsdefault():
             'lb': [-1.]*D,
             'ub': [1.]*D,
             'nrandinit': n,
-            'maxf':500+100*D,
+            #'maxf':500+100*D,
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
@@ -109,6 +109,12 @@ class pesfsdefault():
             'drop':True,
             'overhead':'none',
             'noS': False,
+            'dpara': {'user_data': [],
+                      'algmethod': 1,
+                      'maxf': 500+100*D,
+                      'logfilename': '/dev/null'},
+            'lpara': {'gtol': 0.00001,
+                      'maxfun': 200}
         }
 
         self.stoppara = {'nmax': n}
@@ -317,6 +323,78 @@ class pesbslearns():
         }
         self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
         self.ojf=f
+        self.path = path
+        self.fname = fname
+        return
+
+class switchdefault():
+    """
+        fixed s, space is [-1,1]^D
+
+        """
+
+    def __init__(self, f, D, ninit,nstop, s, path, fname):
+
+
+        C = gpbo.core.config.pesfsdefault(f, D, ninit, s, 'results', 'introspection.csv')
+        aq0 = C.aqfn
+        aq0para = C.aqpara
+
+        aq1 = gpbo.core.acquisitions.splocalaq
+        aq1para = {
+            'ev': {'s': s, 'd': [sp.NaN]},
+            'lb': [-1.] * D,
+            'ub': [1.] * D,
+            'start': [0.] * D
+        }
+
+        self.chooser = gpbo.core.choosers.globallocalregret
+        self.choosepara = {
+            'ev': aq0para['ev'],
+            'lb': aq0para['lb'],
+            'ub': aq0para['ub'],
+            'mprior': aq0para['mprior'],
+            'sprior': aq0para['sprior'],
+            'kindex': aq0para['kindex'],
+            'nhyp' : aq0para['DH_SAMPLES'],
+            'onlyafter': aq0para['nrandinit'],
+            'check': True,
+            'everyn': 1,
+            'support': 2500,
+            'draws': 8000,
+            'regretswitch':1e-4,
+            'dpara': {'user_data': [],
+                      'algmethod': 1,
+                      'maxf': 2000,
+                      'logfilename': '/dev/null'},
+            'lpara': {'gtol': 0.00001,
+                      'maxfun': 400},
+            'pveballrrange': (-4,0),
+            'pveballrsteps': 100,
+            'pvetol':1e-3,
+            'tailsupport':200,
+            'tailnstd':4
+        }
+
+        self.aqfn = [aq0,aq1]
+        self.aqpara = [aq0para,aq1para]
+        self.multimode = True
+
+        self.stoppara = {'nmax': nstop}
+        self.stopfn = gpbo.core.optimize.norlocalstopfn
+
+        reccfn0 = C.reccfn
+        reccpara0 = C.reccpara
+        reccpara0['smode']='dthenl'
+        reccfn1 = gpbo.core.reccomenders.argminrecc
+        reccpara1 = {'check': True}
+
+        self.reccfn = [reccfn0,reccfn1]
+        self.reccpara = [reccpara0,reccpara1]
+
+        self.ojfchar = {'dx': len(aq0para['lb']), 'dev': len(aq0para['ev'])}
+        self.ojf = f
+
         self.path = path
         self.fname = fname
         return
