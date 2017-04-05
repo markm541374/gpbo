@@ -248,14 +248,18 @@ def Vadj(m,V):
 
 #basic PES class if search_pes is used. variable noise if search_acq is used
 class PES:
-    def __init__(self,X,Y,S,D,lb,ub,kindex,mprior,sprior,DH_SAMPLES=8,DM_SAMPLES=8, DM_SUPPORT=400,DM_SLICELCBPARA=1.,mode=ESutils.SUPPORT_SLICELCB,noS=False,DM_DROP=True):
+    def __init__(self,X,Y,S,D,lb,ub,kindex,mprior,sprior,DH_SAMPLES=8,DM_SAMPLES=8, DM_SUPPORT=400,DM_SLICELCBPARA=1.,mode=ESutils.SUPPORT_SLICELCB,noS=False,DM_DROP=True,preselectH=False):
         print( "PES init:")
         self.lb=lb
         self.ub=ub
         self.noS=noS
         if noS:
             S=sp.zeros(S.shape)
-        self.G = makeG(X,Y,S,D,kindex,mprior,sprior,DH_SAMPLES)
+        if not preselectH:
+            self.G = makeG(X,Y,S,D,kindex,mprior,sprior,DH_SAMPLES)
+        else:
+            logger.info('reusing preselected hyperparameters')
+            self.G =  GPdc.GPcore(X,Y,S,D, [GPdc.kernel(kindex, X.shape[1], h) for h in preselectH])
         HS = sp.vstack([k.hyp for k in self.G.kf])
         self.Z = drawmins(self.G,DM_SAMPLES,lb,ub,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode)
         #print "mindraws: "+str(self.Z)
@@ -282,9 +286,9 @@ class PES:
         return a
 
 
-    def search_pes(self,s,maxf=1000,dv=[[sp.NaN]]):
+    def search_pes(self,s,spara,dv=[[sp.NaN]],):
         self.stmp = s
-        def directwrap(Q,extra):
+        def wrap(Q):
             x = sp.array([Q])
             if self.noS:
                 alls = [k(x,x,dv,dv,gets=True)[1] for k in self.G.kf]
@@ -293,9 +297,10 @@ class PES:
                 s= self.stmp
             acq = PESgain(self.G,self.Ga,self.Z,x,dv,[s])
             R = -acq
-            return (R,0)
-
-        [xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
+            return R
+        #logger.critical('aaaa')
+        xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,self.lb,self.ub,spara['dpara'],spara['lpara'])
+        #[xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
 
         return [xmin,ymin,ierror]
     
