@@ -23,6 +23,8 @@ from libc.math cimport log10, log, isnan
 from . import __file__ as fl
 from scipy import linalg as spl
 
+class MJMError(Exception):
+    pass
 libGP = ct.cdll.LoadLibrary(os.path.join(os.path.split(fl)[0],'../cproj/libcproj.so')) #path to c-shared library
 #print libGP
 libGP.k.restype = ct.c_double
@@ -132,8 +134,6 @@ class GPcore:
     
     def infer_full_post(self,X_,D_i):
         X_i = copy.copy(X_)
-        class MJMError(Exception):
-            pass
         [m,V] = self.infer_full(X_i,D_i)
         cdef int i,ns
         ns=X_i.shape[0]
@@ -171,16 +171,12 @@ class GPcore:
         X_i.resize([ns,self.D])
         [m,V] = self.infer_diag(X_i,D_i)
         if sp.amin(V)<=-0.:
-            class MJMError(Exception):
-                pass
             print( "negative/eq variance")
             print( [m,V,X_i,D_i])
             print( "_______________")
             #self.printc()
             raise(MJMError)
         if sp.amin(sp.var(m,axis=0))<-0.:
-            class MJMError(Exception):
-                pass
             print( "negativevar of mean")
             print( X_i.shape)
             print( [m,V,sp.var(m,axis=0),X_i,D_i])
