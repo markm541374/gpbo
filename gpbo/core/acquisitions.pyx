@@ -136,7 +136,7 @@ def PESfsaq(optstate,persist,**para):
     t0=time.clock()
     para = copy.deepcopy(para)
     if persist==None:
-        persist = {'n':0,'d':len(para['ub']),'overhead':0.}
+        persist = {'n':0,'d':len(para['ub']),'overhead':0.,'raiseS':False}
     n = optstate.n
     d = persist['d']
     if n<para['nrandinit']:
@@ -148,13 +148,26 @@ def PESfsaq(optstate,persist,**para):
     #raise
     x=sp.vstack(optstate.x)
     y=sp.vstack(optstate.y)
-    s= sp.vstack([e['s'] for e in optstate.ev])
+    if persist['raiseS']:
+        s= sp.vstack([e['s']+10**persist['raiseS'] for e in optstate.ev])
+        logger.info('inflating diagonal in aqfn by 10**{}'.format(persist['raiseS']))
+    else:
+        s= sp.vstack([e['s'] for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
-    
-    pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'])
-
-
-    [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],maxf=para['maxf'])
+    presetH=False
+    if 'choosereturn' in para.keys():
+        if 'reuseH' in para['choosereturn'].keys():
+            presetH = para['choosereturn']['reuseH']
+    try:
+        pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH)
+        [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],para)
+    except GPdc.MJMError as e:
+        if not persist['raiseS']:
+            persist['raiseS']=-19
+        else:
+            persist['raiseS']+=1
+        logger.error('numerical error in acq fn Raising noise to {}\n\n {}'.format(persist['raiseS'],e))
+        return PESfsaq(optstate,persist,**para)
 
 
     logger.info('DIRECT found max PES at {} {}'.format(xmin,ierror))
@@ -367,11 +380,11 @@ def splocalaq(optstate,persist,**para):
             count+=1
             return persist['y'][count-1]
     try:
-        R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs')
+        R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.00001})
         persist['done']=True
         optstate.localdone=True
         logger.info('localopt finished with z: {} (x: {}) y: {} {}'.format(R.x,sp.linalg.solve(persist['R'],persist['z'][-1]),R.fun,R.message))
-        return list(sp.linalg.solve(persist['R'],persist['z'][-1])),para['ev'],persist,{'msg':'localopt is complete'}
+        return list(sp.linalg.solve(persist['R'],persist['z'][-1])),para['ev'],persist,{'msg':'localopt is complete {}'.format(str(R))}
     except KeyError as k:
         z=k.args[0]
     persist['z'].append(z)
