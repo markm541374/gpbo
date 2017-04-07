@@ -21,6 +21,8 @@ from gpbo.core import GPdc
 from matplotlib import pyplot as plt
 import DIRECT
 from gpbo.core import ESutils
+import logging
+logger = logging.getLogger(__name__)
 def cosines(x,s,d):
     x.resize([1,x.size])
     assert(d==[sp.NaN])
@@ -382,13 +384,12 @@ def gpplot(meanaxis,varaxis,G,lb,ub,ns=50,nc=20):
     return
 
 def Hvec2H(Hvec,d):
-    if len(Hvec.shape)==1:
-        Hvec = sp.expand_dims(Hvec,axis=0)
+    Hvec=Hvec.flatten()
     H = sp.empty(shape=[d,d])
     k = 0
     for i in xrange(d):
         for j in xrange(i + 1):
-            H[i, j] = H[j, i] = Hvec[0, k]
+            H[i, j] = H[j, i] = Hvec[k]
             k += 1
     return H
 
@@ -420,9 +421,10 @@ def gpGH(G,x):
 
 def drawconditionH(G,varG,H,Hvec,varHvec,M,varM):
     d=G.size
-    Hdist = sp.stats.multivariate_normal(Hvec.flatten(), varHvec)
+    #Hdist = sp.stats.multivariate_normal(Hvec.flatten(), varHvec)
+    H = GPdc.draw(Hvec.flatten(),varHvec,1).flatten()
     Khg = varM[:d,d:]
-    H = Hdist.rvs()
+    #H = Hdist.rvs()
     choH = sp.linalg.cho_factor(varHvec)
     Gm = G + Khg.dot(spl.cho_solve(choH,H))
     Gv = varG - Khg.dot(spl.cho_solve(choH,Khg.T))
@@ -452,10 +454,12 @@ def probgppve(G,x,nsam=500):
     Gr, varG, H, Hvec, varHvec, M, varM = gpGH(G,x)
 
     d=G.D
-    Hdist = sp.stats.multivariate_normal(Hvec.flatten(), varHvec)
+    #Hdist = sp.stats.multivariate_normal(Hvec.flatten(), varHvec)
+    vHdraws = GPdc.draw(Hvec.flatten(),varHvec,nsam)
     pvecount = 0
     for i in xrange(nsam):
-        Hdraw = Hvec2H(Hdist.rvs(), d)
+        Hdraw = Hvec2H(vHdraws[i,:], d)
+        #Hdraw = Hvec2H(Hdist.rvs(), d)
         try:
             sp.linalg.cholesky(Hdraw)
             pvecount += 1
@@ -487,3 +491,4 @@ def drawpartitionmin(G,S,xm,rm,n):
     Res[:,0] = Res[:,1:3].min(axis=1)
     Res[:,4] = Res[:,1:3].argmin(axis=1)
     return Res
+

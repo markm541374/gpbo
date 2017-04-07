@@ -33,7 +33,7 @@ def fn(x,**ev):
     return y,c
 C=gpbo.core.config.eimledefault(fn,D,12,1.,rpath,'null.csv')
 C.aqpara['nrandinit']=10
-C.stoppara = {'nmax': 100}
+C.stoppara = {'nmax': 120}
 C.stopfn = gpbo.core.optimize.nstopfn
 
 all2confs.append(['eimle_0',C])
@@ -58,7 +58,7 @@ def fn(x,**ev):
 
 C=gpbo.core.config.eimledefault(fn,D,12,1e-4,rpath,'null.csv')
 C.aqpara['nrandinit']=10
-C.stoppara = {'nmax': 100}
+C.stoppara = {'nmax': 120}
 C.stopfn = gpbo.core.optimize.nstopfn
 
 #all2confs.append(['eimle_4',C])
@@ -72,7 +72,7 @@ def fn(x,**ev):
 
 C=gpbo.core.config.eimledefault(fn,D,12,1e-6,rpath,'null.csv')
 C.aqpara['nrandinit']=10
-C.stoppara = {'nmax': 100}
+C.stoppara = {'nmax': 120}
 C.stopfn = gpbo.core.optimize.nstopfn
 
 #all2confs.append(['eimle_6',C])
@@ -85,7 +85,7 @@ def fn(x,**ev):
     return y,c
 C=gpbo.core.config.eimledefault(fn,D,12,1e-8,rpath,'null.csv')
 C.aqpara['nrandinit']=10
-C.stoppara = {'nmax': 100}
+C.stoppara = {'nmax': 120}
 C.stopfn = gpbo.core.optimize.nstopfn
 
 #all2confs.append(['eimle_8',C])
@@ -97,7 +97,7 @@ def fn(x,**ev):
     return y,c
 C=gpbo.core.config.eimledefault(fn,D,12,1e-10,rpath,'null.csv')
 C.aqpara['nrandinit']=10
-C.stoppara = {'nmax': 100}
+C.stoppara = {'nmax': 120}
 C.stopfn = gpbo.core.optimize.nstopfn
 
 #all2confs.append(['eimle_10',C])

@@ -380,7 +380,7 @@ def splocalaq(optstate,persist,**para):
             count+=1
             return persist['y'][count-1]
     try:
-        R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.00001})
+        R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.0000001})
         persist['done']=True
         optstate.localdone=True
         logger.info('localopt finished with z: {} (x: {}) y: {} {}'.format(R.x,sp.linalg.solve(persist['R'],persist['z'][-1]),R.fun,R.message))

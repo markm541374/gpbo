@@ -392,3 +392,14 @@ def EI(ER,mu,sigma):
             return sp.matrix(ei)
         else:
             return sp.matrix(0.0)
+
+def draw(m_,V_,z):
+        cdef int ns
+        ns = V_.shape[0]
+        m = sp.array([[i for i in (m_)]])
+        V = copy.copy(V_)
+        R = sp.empty([ns,z])
+        libGP.drawk(V.ctypes.data_as(ctpd),cint(ns),R.ctypes.data_as(ctpd),cint(z))
+        R+=sp.hstack([m.T]*z)
+     #R=sp.random.multivariate_normal(m.flatten(),V,z)
+        return copy.copy(R).T

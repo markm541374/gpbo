@@ -1,0 +1,17 @@
+mv ~/Desktop/figs ~/Desktop/$(date +%s)
+mkdir ~/Desktop/figs
+
+cp ./draw2d/results0/out13.png ~/Desktop/figs/goodev.png
+cp ./draw2d/results1/out13.png ~/Desktop/figs/badev.png
+cp ./hartmann3/greysunday/out13.png ~/Desktop/figs/hart3.png
+cp ./hartmann3/greysunday/out12.png ~/Desktop/figs/hart3cost.png
+cp ./hartmann6/friday/out13.png ~/Desktop/figs/hart6.png
+cp ./hartmann6/friday/out12.png ~/Desktop/figs/hart6cost.png
+cp ./mnist/thursday/out13.png ~/Desktop/figs/mnist.png
+cp ./offsetbranin/greysunday/out13.png ~/Desktop/figs/branin.png
+cp ./offsetbranin/greysunday/out12.png ~/Desktop/figs/branincost.png
+cp ./offsetbranin/results2/out15.png ~/Desktop/figs/ofbcost1.png
+cp ./offsetbranin/results2/out11.png ~/Desktop/figs/ofbcost0.png
+cp ./offsetbranin/results3x/out11.png ~/Desktop/figs/argpost.png
+cp ./tempseries/friday/out13.png ~/Desktop/figs/powerfit.png
+

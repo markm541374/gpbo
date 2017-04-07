@@ -7,7 +7,7 @@ import scipy as sp
 gpbo.core.debugoutput=True
 gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':False,'ctaq':False,'support':False,'adaptive':True,'logstate':False}
 mode=['run','plot'][0]
-nreps=4
+nreps=1
 import argparse
 
 parser = argparse.ArgumentParser()

@@ -1565,6 +1565,7 @@ static PyObject *__pyx_tp_new_4gpbo_4core_12acquisitions___pyx_scope_struct_2_PE
 static PyObject *__pyx_tp_new_4gpbo_4core_12acquisitions___pyx_scope_struct_3_splocalaq(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_float_0_;
 static PyObject *__pyx_float_0_00001;
+static PyObject *__pyx_float_0_0000001;
 static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_1;
 static PyObject *__pyx_int_2;
@@ -13705,7 +13706,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_9splocalaq_fwrap(PyObject *
  *             count+=1
  *             return persist['y'][count-1]             # <<<<<<<<<<<<<<
  *     try:
- *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.00001})
+ *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.0000001})
  */
     __Pyx_XDECREF(__pyx_r);
     if (unlikely(!__pyx_cur_scope->__pyx_v_persist)) { __Pyx_RaiseClosureNameError("persist"); __PYX_ERR(0, 381, __pyx_L1_error) }
@@ -14312,7 +14313,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14splocalaq(CYTHON_UNUSED P
  *             count+=1
  *             return persist['y'][count-1]
  *     try:             # <<<<<<<<<<<<<<
- *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.00001})
+ *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.0000001})
  *         persist['done']=True
  */
   {
@@ -14327,7 +14328,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14splocalaq(CYTHON_UNUSED P
       /* "gpbo/core/acquisitions.pyx":383
  *             return persist['y'][count-1]
  *     try:
- *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.00001})             # <<<<<<<<<<<<<<
+ *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.0000001})             # <<<<<<<<<<<<<<
  *         persist['done']=True
  *         optstate.localdone=True
  */
@@ -14379,7 +14380,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14splocalaq(CYTHON_UNUSED P
       if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_method, __pyx_n_s_bfgs) < 0) __PYX_ERR(0, 383, __pyx_L7_error)
       __pyx_t_13 = PyDict_New(); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 383, __pyx_L7_error)
       __Pyx_GOTREF(__pyx_t_13);
-      if (PyDict_SetItem(__pyx_t_13, __pyx_n_s_gtol, __pyx_float_0_00001) < 0) __PYX_ERR(0, 383, __pyx_L7_error)
+      if (PyDict_SetItem(__pyx_t_13, __pyx_n_s_gtol, __pyx_float_0_0000001) < 0) __PYX_ERR(0, 383, __pyx_L7_error)
       if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_options, __pyx_t_13) < 0) __PYX_ERR(0, 383, __pyx_L7_error)
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
       __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 383, __pyx_L7_error)
@@ -14392,7 +14393,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14splocalaq(CYTHON_UNUSED P
 
       /* "gpbo/core/acquisitions.pyx":384
  *     try:
- *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.00001})
+ *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.0000001})
  *         persist['done']=True             # <<<<<<<<<<<<<<
  *         optstate.localdone=True
  *         logger.info('localopt finished with z: {} (x: {}) y: {} {}'.format(R.x,sp.linalg.solve(persist['R'],persist['z'][-1]),R.fun,R.message))
@@ -14400,7 +14401,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14splocalaq(CYTHON_UNUSED P
       if (unlikely(PyObject_SetItem(__pyx_cur_scope->__pyx_v_persist, __pyx_n_s_done, Py_True) < 0)) __PYX_ERR(0, 384, __pyx_L7_error)
 
       /* "gpbo/core/acquisitions.pyx":385
- *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.00001})
+ *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.0000001})
  *         persist['done']=True
  *         optstate.localdone=True             # <<<<<<<<<<<<<<
  *         logger.info('localopt finished with z: {} (x: {}) y: {} {}'.format(R.x,sp.linalg.solve(persist['R'],persist['z'][-1]),R.fun,R.message))
@@ -14648,7 +14649,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14splocalaq(CYTHON_UNUSED P
  *             count+=1
  *             return persist['y'][count-1]
  *     try:             # <<<<<<<<<<<<<<
- *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.00001})
+ *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.0000001})
  *         persist['done']=True
  */
     }
@@ -14709,7 +14710,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14splocalaq(CYTHON_UNUSED P
  *             count+=1
  *             return persist['y'][count-1]
  *     try:             # <<<<<<<<<<<<<<
- *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.00001})
+ *         R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.0000001})
  *         persist['done']=True
  */
     __Pyx_PyThreadState_assign
@@ -15915,6 +15916,7 @@ static int __Pyx_InitGlobals(void) {
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   __pyx_float_0_ = PyFloat_FromDouble(0.); if (unlikely(!__pyx_float_0_)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_float_0_00001 = PyFloat_FromDouble(0.00001); if (unlikely(!__pyx_float_0_00001)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_float_0_0000001 = PyFloat_FromDouble(0.0000001); if (unlikely(!__pyx_float_0_0000001)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_0 = PyInt_FromLong(0); if (unlikely(!__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_2 = PyInt_FromLong(2); if (unlikely(!__pyx_int_2)) __PYX_ERR(0, 1, __pyx_L1_error)
