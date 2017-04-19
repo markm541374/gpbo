@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-mode=['run','plot'][1]
+mode=['run','plot'][0]
 nreps=1
 import argparse
 
@@ -24,13 +24,13 @@ from objective import f
 from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='icmlF5c'
+rpath='tmp'
 #-----------------------
 #eimle
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
 C.stoppara = {'tmax': 60*60*50}
 C.stopfn = gpbo.core.optimize.totaltstopfn
-all2confs.append(['eimle',C])
+#all2confs.append(['eimle',C])
 
 #pesfs----------------------------
 C=gpbo.core.config.pesfsdefault(f,D,50,s,rpath,'null.csv')
@@ -38,7 +38,7 @@ C.stoppara = {'tmax': 60 * 60 * 50}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 C.aqpara['drop']=True
-all2confs.append(['pesfs',C])
+#all2confs.append(['pesfs',C])
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
@@ -79,7 +79,7 @@ C={'ninit':30,
    'nsteps':80}
 all3confs.append(['fabmod',C])
 #---------------
-#fabolas
+#fabolas()
 C={'ninit':30,
    'nsteps':80}
 #all3confs.append(['fabolas',C])

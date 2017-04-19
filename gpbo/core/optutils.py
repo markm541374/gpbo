@@ -14,9 +14,7 @@ import sys
 import os
 from scipy import linalg as spl
 import time
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.linear_model import LinearRegression
-from sklearn.pipeline import Pipeline
+import tqdm
 from gpbo.core import GPdc
 from matplotlib import pyplot as plt
 import DIRECT
@@ -251,6 +249,7 @@ def silentdirect(f,l,u,*args,**kwargs):
         fileno = sys.stdout
     with os.fdopen(os.dup(fileno), 'wb') as stdout:
         with os.fdopen(os.open(os.devnull, os.O_WRONLY), 'wb') as devnull:
+        #with os.fdopen(os.dup(fileno), 'wb') as devnull:
             sys.stdout.flush();
             os.dup2(devnull.fileno(), fileno)  # redirect
             [xmin, ymin, ierror] = DIRECT.solve(f,l,u,*args,**kwargs)
@@ -274,7 +273,7 @@ def boundedlocal(f,l,u,x0,*args,**kwargs):
 def twopartopt(f,l,u,dargs,largs):
     dxmin,dymin,dierror = silentdirectwrapped(f,l,u,**dargs)
     xmin,ymin,ierror = boundedlocal(f,l,u,dxmin,**largs)
-    print('direct {} {} {}\nrefine {} {} {} '.format(dxmin, dymin, dierror, xmin, ymin, ierror))
+    logger.debug('optresult {} at {} (refine Dx {} Dy {}) message {}'.format(ymin, xmin, sp.linalg.norm(xmin-dxmin), dymin-ymin,dierror+ierror))
     return xmin,ymin,ierror
 
 
@@ -492,3 +491,35 @@ def drawpartitionmin(G,S,xm,rm,n):
     Res[:,4] = Res[:,1:3].argmin(axis=1)
     return Res
 
+def rline(unitvec,rmax,condition,nmax=20):
+    """
+    :param unitvec: direction from origin for the linesearch
+    :param rmax: outer limit
+    :param condition: boolean fn of x
+    :param nmax: max evals
+    :return: maximum radius where condition is True, numevals made
+    """
+    if condition(unitvec*rmax):
+        return rmax,1
+    left=0
+    right=rmax
+    for i in xrange(nmax-1):
+        r = 0.5*(left+right)
+        c = int(condition(unitvec*r))
+        left = (1-c)*left + c*r
+        right = (1-c)*r + c*right
+    return left,nmax
+
+def ballradsearch(d,rmax,condition,neval=100,lineSmax=20):
+    evcount=0
+    R=rmax
+    with tqdm.tqdm(total=neval) as pbar:
+        while evcount<neval:
+            x = sp.stats.norm.rvs(sp.zeros(d)) #draw an unnormalized vec
+            xunit = x/sp.linalg.norm(x) # normalize
+            r,n = rline(xunit,R,condition,nmax=lineSmax) # linesearch up to current max
+            R = min(R,r) #drop max to new result
+            pbar.update(n)
+            evcount+=n
+        pbar.close()
+    return R

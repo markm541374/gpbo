@@ -31,9 +31,10 @@ def shiftbraninojf(x,**ev):
 
 
 hart3min = -3.86278
-def shifthart3(z, **ev):
+def shifthart3(x, **ev):
     #hartmann4 with a linear offset agains quadratic cost
 
+    z = [0.5*xi +0.5 for xi in x]
     al = sp.array([1.,1.2,3.,3.2]).T
     A = sp.array([[3.,   10., 30.],
                   [0.1,  10., 35.],
@@ -62,6 +63,38 @@ def shifthart3(z, **ev):
     print( 'f inputs x:{} ev:{} outputs y:{}'.format(z, ev, f))
     return f-hart3min, 1., dict()
 
+hart6min = -3.32237
+hart6xmin = [0.20169,0.150011,0.476874,0.275332,0.311652,0.6573]
+def shifthart6(x, **ev):
+    #hartmann4 with a linear offset agains quadratic cost
+    z = [0.5*xi +0.5 for xi in x]
+    al = sp.array([1.,1.2,3.,3.2]).T
+    A = sp.array([[10., 3., 17., 3.5, 1.7, 8.],
+                  [0.05, 10., 17., 0.1, 8, 14.],
+                  [3., 3.5, 1.7, 10., 17., 8.],
+                  [17., 8., 0.05, 10., 0.1, 14.]])
+    P = 0.0001 * sp.array([[1312., 1696., 5569., 124., 8283., 5886.],
+                           [2329., 4135., 8307., 3736., 1004., 9991.],
+                           [2348., 1451., 3522., 2883., 3047., 6650.],
+                           [4047., 8828., 8732., 5743., 1091., 381.]])
+
+    outer = 0
+    for ii in range(4):
+        inner = 0
+        for jj in range(6):
+            xj = z[jj]
+            Aij = A[ii, jj]
+            Pij = P[ii, jj]
+            inner += Aij * (xj - Pij)**2
+
+
+
+        new = al[ii] * sp.exp(-inner)
+        outer = outer + new
+    f = -outer
+
+    print( 'f inputs x:{} ev:{} outputs y:{}  '.format(z, ev, f))
+    return f-hart6min, 1., dict()
 
 def rosenojf(x,**ev):
     if 'd' in ev.keys():
@@ -99,7 +132,7 @@ def genmat52ojf(d,lb,ub,ls=0.3,fixs=-1):
         z = G.infer_m(x,[[sp.NaN]])[0,0]
         #z = obj(x,0.,[sp.NaN])
         return z
-    y = spm(spowrap, xmin,  method='l-bfgs-b',bounds=[(-1,1),(-1,1)],options={'ftol':1e-15})
+    y = spm(spowrap, xmin,  method='l-bfgs-b',bounds=[(-1,1)]*d,options={'ftol':1e-15})
     xmin = y.x
     ymin = spowrap(y.x)
     def ojf(x,**ev):
@@ -148,7 +181,7 @@ def genbiasedmat52ojf(d,lb,ub,xls,sls):
     def spowrap(x):
         z = G.infer_m(sp.hstack(sp.array(x) + [0.]), [[sp.NaN]])[0, 0]
         return z
-    y = spm(spowrap, xmin, method='l-bfgs-b',bounds=[(-1,1),(-1,1)],options={'ftol':1e-15})
+    y = spm(spowrap, xmin, method='l-bfgs-b',bounds=[(-1,1)]*d,options={'ftol':1e-15})
     xmin = y.x
     ymin = spowrap(y.x)
     #print [xmin,ymin]

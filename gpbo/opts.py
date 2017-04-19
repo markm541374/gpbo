@@ -67,10 +67,10 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                 C[1].reccpara['ub'] = [i for i in ub]
                 C[1].ojf=f
 
-                try:
-                    out = gpbo.search(C[1])
-                except:
-                    pass
+                #try:
+                out = gpbo.search(C[1])
+                #except:
+                 #   pass
             elif C[0][:9]=='switching':
                 C[1].path = path
                 C[1].fname = '{}_{}.csv'.format(C[0],ii)
@@ -108,7 +108,7 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                     pass
             else:
                 print( "not an optimization method")
-def plotquarts(a,data1,data2,col,lab,log=False):
+def plotquarts2(a,data1,data2,col,lab,log=False):
     n=len(data1)
     mx=-sp.Inf
     mn=sp.Inf
@@ -130,6 +130,45 @@ def plotquarts(a,data1,data2,col,lab,log=False):
     return
 
 
+def plotquarts(a,xdata_, ydata_,col,lab,log=False):
+    xdata = [sp.array(i) for i in xdata_]
+    ydata = [sp.array(i) for i in ydata_]
+    n = len(xdata)
+    ints = []
+    starts = sp.empty(n)
+    ends = sp.empty(n)
+    yends = sp.empty(n)
+    for i in xrange(n):
+        starts[i] = xdata[i][0]
+        ends[i] = xdata[i][-1]
+        yends[i] = ydata[i][-1]
+    yendorder = sp.argsort(yends)
+
+    Ydata = [sp.hstack([y[0], y, y[-1]]) for y in ydata]
+    #the pad values are slightly outside the true range to so that exp(log(value)) stays in the interpolation range
+    Xdata = [sp.hstack([0.999*min(starts), x, max(ends)*1.001]) for x in xdata]
+    #print(min(starts),max(ends))
+    for i in xrange(n):
+        #print(Xdata[i][0],Xdata[i][-1])
+        ints.append(sp.interpolate.interp1d(Xdata[i], Ydata[i]))
+       # a.plot(Xdata[i], Ydata[i], 'lightblue')
+
+    if log:
+        x = sp.logspace(sp.log10(min(starts)), sp.log10(max(ends)), 200)
+    else:
+        x = sp.linspace(min(starts), max(ends), 200)
+
+    #print(x)
+    a.plot(x, map(lambda x: sp.percentile([i(x) for i in ints], 50), x), color=col,label=lab)
+
+    y25 = map(lambda x: sp.percentile([i(x) for i in ints], 25), x)
+    y75 = map(lambda x: sp.percentile([i(x) for i in ints], 75), x)
+    a.fill_between(x,y25,y75,edgecolor=col,facecolor=col,lw=0.0,alpha=0.1)
+    a.plot(ends[yendorder], yends[yendorder], '.',color=col)
+    a2 = a.twinx()
+    a2.plot(ends[sp.argsort(ends)],sp.linspace(1,0,n),color=col,linestyle='--',linewidth=0.2)
+    a2.set_ylabel('fraction of optimizations still running')
+    return
 
 def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False):
     f=[]
@@ -159,7 +198,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
 
         if True:
             #first plot is all the opts per step
-
+            termregret = sp.mean([list(d['trueyatxrecc'])[-1] for d in data])
             for ii in range(nreps):
                 a[0].plot(data[ii]['index'],data[ii]['trueyatxrecc'],color=col,label=labelfn(C[0]))
             #and averaged
@@ -169,7 +208,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             for ii in range(nreps):
                 a[1].plot(data[ii]['accE'],data[ii]['trueyatxrecc'],color=col,label=labelfn(C[0]))
             #and averaged
-            plotquarts(a[5],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,labelfn(C[0]))
+            plotquarts(a[5],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,labelfn(C[0]+' '+str(termregret)))
 
             #third is all the opts per evaluation + acquisition cost
             for ii in range(nreps):

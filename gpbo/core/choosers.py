@@ -43,6 +43,9 @@ def globallocalregret(optstate,persist,**para):
         return globallocalregret_(optstate,persist,**para)
 
 def globallocalregret_(optstate,persist,**para):
+    #randonlinesearch
+    #doublenormdist
+    #norprior
     if persist == None:
         persist = defaultdict(list)
         persist['raiseS']=False
@@ -82,7 +85,6 @@ def globallocalregret_(optstate,persist,**para):
     Gr,cG,H,Hvec,varHvec,M,varM = GH
 
     #est the local regret
-    #dist = sp.stats.multivariate_normal(mean=M[0,:],cov=varM)
     Mdraws = gpbo.core.GPdc.draw(M[0,:],varM,200)
     lrest=0.
     for i in xrange(200):
@@ -95,21 +97,16 @@ def globallocalregret_(optstate,persist,**para):
     logger.info('localregretest {}'.format(lrest))
 
     #step out to check +ve defininteness
-    rmax=0
     Rad = sp.logspace(para['pveballrrange'][0],para['pveballrrange'][1],para['pveballrsteps'])
     PP = -sp.ones(Rad.size)
     logger.info('checking for +ve definite ball')
-    for j,r in enumerate(tqdm.tqdm(Rad)):
-        x_un = sp.stats.norm.rvs(sp.zeros(d))
-        x = r*x_un/sp.linalg.norm(x_un)+sp.array(xmin)
-        p = gpbo.core.optutils.probgppve(G,sp.array(x),int(1./para['pvetol'])+10)
-        PP[j]=p
-        if p<1-para['pvetol']:
-            if j>0:
-                rmax=Rad[j-1]
-            else:
-                rmax=0
-            break
+    pc = gpbo.core.optutils.probgppve(G,sp.array(xmin),int(1./para['pvetol'])+10)
+    logger.info('prob pvedef at xmin {}'.format(pc))
+
+    PDcondition = lambda x:gpbo.core.optutils.probgppve(G,sp.array(x)+sp.array(xmin),int(1./para['pvetol'])+1)>1-para['pvetol']
+
+    rmax = gpbo.core.optutils.ballradsearch(d,1.,PDcondition,neval=100,lineSmax=20)
+
     logger.info('+ve region radius {}'.format(rmax))
     if gpbo.core.debugoptions['adaptive']:
         fig, ax = plt.subplots(nrows=3, ncols=4, figsize=(85, 85))

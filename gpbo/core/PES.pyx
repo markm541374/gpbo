@@ -394,6 +394,8 @@ class PES_inplane:
     def search_acq(self,cfn,sfn,maxf=1000,dv=[[sp.NaN]],over=0.):
         print( 'overhead={}'.format(over))
         def directwrap(Q,extra):
+            #print('dwrap {} \n'.format(Q))
+            sys.stdout.flush()
             x = sp.array([Q])
             if self.noS:
                 alls = [k(x,x,dv,dv,gets=True)[1] for k in self.G.kf]
@@ -407,8 +409,10 @@ class PES_inplane:
             except TypeError:
                 R = -acq/(cfn(x,s)+over)
             return (R,0)
-        #print self.lb
+        print(directwrap(self.lb,0.))
+        print(directwrap(self.ub,0.))
         #print self.ub
+
         [xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=0, maxf=maxf, logfilename='/dev/null')
         
         

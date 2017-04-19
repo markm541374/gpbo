@@ -39,7 +39,7 @@ C.stoppara = {'tmax': 60 * 60 * 20}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['nrandinit']=C.reccpara['onlyafter']=20
 
-all2confs.append(['pesfs',C])
+#all2confs.append(['pesfs',C])
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
@@ -48,7 +48,7 @@ C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=20
 
-#all2confs.append(['pesbs_postmin',C])
+all2confs.append(['pesbs_postmin',C])
 
 #-----------------
 #mtbo
@@ -89,6 +89,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,12,rpath)
+    gpbo.plotall(all2confs+all3confs,1,rpath)
 else:
     pass

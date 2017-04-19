@@ -239,7 +239,7 @@ class pesbsdefault():
             'ev':{'s':s,'d':[sp.NaN],'xa':0.},
             'lb':[-1.] * D,
             'ub':[ 1.] * D,
-            'maxf':500*+250*(D+1),
+            'maxf':500+250*(D+1),
             'mprior': sp.array([1.]+[0.]*(D+1)),
             'sprior': sp.array([1.]*(D+2)),
             'kindex':GPdc.MAT52,
