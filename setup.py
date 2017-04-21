@@ -42,6 +42,11 @@ extensions = [
               sources = ["gpbo/core/acquisitions.c"],
               include_dirs = ['.','core',get_include()],
               extra_compile_args=compile_flags
+    ),
+    Extension(name ="gpbo/core/optutils",
+              sources = ["gpbo/core/optutils.c"],
+              include_dirs = ['.','core',get_include()],
+              extra_compile_args=compile_flags
     )
 ]
 

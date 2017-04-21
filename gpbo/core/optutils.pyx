@@ -1,15 +1,16 @@
 # To change this license header, choose License Headers in Project Properties.
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
-#import pyximport
-#from numpy import get_include
-#pyximport.install(setup_args={'include_dirs': get_include()})
+
+#cython: profile=True
 from __future__ import print_function
 xrange=range
 import numpy as np
 import scipy as sp
 from scipy.optimize import minimize
 from scipy.stats import gamma
+from scipy import stats as sps
+from scipy import integrate as spi
 import sys
 import os
 from scipy import linalg as spl
@@ -19,6 +20,9 @@ from gpbo.core import GPdc
 from matplotlib import pyplot as plt
 import DIRECT
 from gpbo.core import ESutils
+from libc.math cimport exp, sqrt, M_SQRT2, M_PI,erf,log
+
+
 import logging
 logger = logging.getLogger(__name__)
 def cosines(x,s,d):
@@ -449,22 +453,21 @@ def plotprobstatellipse(cG,H,x,ax,logr=False):
         ax.plot(circ[0, :], circ[1, :], 'g')
     return
 
-def probgppve(G,x,nsam=500):
-    Gr, varG, H, Hvec, varHvec, M, varM = gpGH(G,x)
 
+def probgppve(G,x,tol=1e-3):
+    nsam = int(1./tol)+1
+    Gr, varG, H, Hvec, varHvec, M, varM = gpGH(G,x)
     d=G.D
-    #Hdist = sp.stats.multivariate_normal(Hvec.flatten(), varHvec)
     vHdraws = GPdc.draw(Hvec.flatten(),varHvec,nsam)
     pvecount = 0
     for i in xrange(nsam):
         Hdraw = Hvec2H(vHdraws[i,:], d)
-        #Hdraw = Hvec2H(Hdist.rvs(), d)
         try:
             sp.linalg.cholesky(Hdraw)
             pvecount += 1
         except sp.linalg.LinAlgError:
             pass
-    return (pvecount+1) / float(nsam+2)
+    return (pvecount+1)/ float(nsam+2)
 
 def plotaslogrtheta(X,Y,x0,x1,ax,*args,**kwargs):
     R = sp.log10(sp.sqrt((X-x0)**2+(Y-x1)**2))
@@ -523,3 +526,76 @@ def ballradsearch(d,rmax,condition,neval=100,lineSmax=20):
             evcount+=n
         pbar.close()
     return R
+
+cdef double NP(double x, double mu=0., double sigma=1.):
+    return (1./(sqrt(2*M_PI)*sigma))*exp(-0.5*((x-mu)/sigma)**2)
+
+cdef double NC(double x, double mu=0., double sigma=1.):
+    return 0.5*(1+erf((x-mu)/(sigma*M_SQRT2)))
+
+cdef class bigaussmin(object):
+    """
+    min of two gaussians as described by
+    https://www.gwern.net/docs/conscientiousness/2008-nadarajah.pdf
+    """
+    cdef double x1, x2,std1,std2,rho,alpha,cdftol,startx
+    cdef object doubledist
+
+    def __init__(self,x1=1.,std1=1.,x2=1.,std2=1.,rho=0.):
+        self.x1 = x1
+        self.x2 = x2
+        self.std1 = std1
+        self.std2 = std2
+        self.rho = rho
+        cov=self.std1*self.std2*rho
+        self.alpha  = 1./sqrt(1-self.rho**2)
+        #print [[std1**2,cov],[cov,std2**2]]
+        self.doubledist = sps.multivariate_normal(mean = [x1,x2],cov= [[std1**2,cov],[cov,std2**2]])
+
+        self.cdftol=1e-9
+        startx = min(self.x1,self.x2)
+        while NC(startx,x1,std1)+NC(startx,x2,std2)>0.5*self.cdftol:
+            startx-=max(std1,std2)
+        self.startx= startx
+        return
+
+    cdef double f1(self,double y):
+        cdef double t0 = NP((y-self.x1)/self.std1)/self.std1
+        cdef double a = self.rho*(y-self.x1)*self.alpha/self.std1
+        cdef double b = (y-self.x2)*self.alpha/self.std2
+        cdef double t1 = NC(a-b)
+        return t0*t1
+    cdef double f2(self,double y):
+        cdef double t0 = NP((y-self.x2)/self.std2)/self.std2
+        cdef double a = self.rho*(y-self.x2)*self.alpha/self.std2
+        cdef double b = (y-self.x1)*self.alpha/self.std1
+        cdef double t1 = NC(a-b)
+        return t0*t1
+
+    cpdef double pdf(self,double x):
+        return self.f1(x)+self.f2(x)
+    cpdef double cdf(self,double x):
+        if x<self.startx:
+            raise ValueError('cdf requested from below integral start value')
+        I,err = spi.quad(self.pdf,self.startx,x,epsabs=self.cdftol*0.5)
+        return I
+    def rvs(self,n):
+        return self.doubledist.rvs(n).min(axis=1)
+
+    def fit(self,X):
+        def lk(h):
+            v = [h[0],h[1]**2,h[2],h[3]**2,2*sp.arctan(h[4])/sp.pi]
+            dist = bigaussmin(*v)
+            cdef double l=0.
+            cdef int i
+            for i in range(X.size):
+                l+=log(dist.pdf(X[i]))
+            #print '\r'+str(v)+str(l),
+            return -l
+        R = sp.optimize.minimize(lk,[0.1,1.,0.1,1.1,0.],method='BFGS',options={'maxiter':500})
+
+        h=R.x
+        v = [h[0],h[1]**2,h[2],h[3]**2,2*sp.arctan(h[4])/sp.pi]
+        #print v
+        return v
+

@@ -43,7 +43,6 @@ def globallocalregret(optstate,persist,**para):
         return globallocalregret_(optstate,persist,**para)
 
 def globallocalregret_(optstate,persist,**para):
-    #randonlinesearch
     #doublenormdist
     #norprior
     if persist == None:
@@ -100,10 +99,10 @@ def globallocalregret_(optstate,persist,**para):
     Rad = sp.logspace(para['pveballrrange'][0],para['pveballrrange'][1],para['pveballrsteps'])
     PP = -sp.ones(Rad.size)
     logger.info('checking for +ve definite ball')
-    pc = gpbo.core.optutils.probgppve(G,sp.array(xmin),int(1./para['pvetol'])+10)
+    pc = gpbo.core.optutils.probgppve(G,sp.array(xmin),tol=para['pvetol'])
     logger.info('prob pvedef at xmin {}'.format(pc))
 
-    PDcondition = lambda x:gpbo.core.optutils.probgppve(G,sp.array(x)+sp.array(xmin),int(1./para['pvetol'])+1)>1-para['pvetol']
+    PDcondition = lambda x:gpbo.core.optutils.probgppve(G,sp.array(x)+sp.array(xmin),tol=para['pvetol'])>1-para['pvetol']
 
     rmax = gpbo.core.optutils.ballradsearch(d,1.,PDcondition,neval=100,lineSmax=20)
 
@@ -196,6 +195,9 @@ def globallocalregret_(optstate,persist,**para):
         return
 
 
+    binormdist = gpbo.core.optutils.bigaussmin(sp.mean(Yout),sp.sqrt(sp.var(Yout)),mvmax,sp.sqrt(vvmax),0.)
+    binormdistF = gpbo.core.optutils.bigaussmin(*gpbo.core.optutils.bigaussmin().fit(sp.array(Yout)))
+
     racc = 0.
     m,v=normin
     n=len(Cout)
@@ -273,7 +275,8 @@ def globallocalregret_(optstate,persist,**para):
         ax[1,0].plot(ro,map(lambda x:sp.stats.norm.cdf(x,loc=mvmax,scale=sp.sqrt(vvmax)),ro),'g')
 
         ax[1,0].plot(ro,map(lambda x:sp.stats.norm.cdf(x,loc=mu,scale=sp.sqrt(vvmax)),ro),'b',alpha=0.5)
-
+        ax[1,0].plot(ro,map(binormdist.cdf,ro),'k')
+        ax[1,0].plot(ro,map(binormdistF.cdf,ro),'purple')
         ax[1,2].text(0,0.2,'regretest{}'.format(racc))
         ax[1,2].text(0,0.15,'regretsam{}'.format(rsam))
         ax[1,2].text(0,0.3,'localrsam{}'.format(rloc))
