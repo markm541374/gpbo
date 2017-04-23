@@ -584,7 +584,7 @@ cdef class bigaussmin(object):
 
     def fit(self,X):
         def lk(h):
-            v = [h[0],h[1]**2,h[2],h[3]**2,2*sp.arctan(h[4])/sp.pi]
+            v = [h[0],h[1]**2,h[2],h[3]**2,(1.-1e-8)*2*sp.arctan(h[4])/sp.pi]
             dist = bigaussmin(*v)
             cdef double l=0.
             cdef int i
@@ -595,7 +595,7 @@ cdef class bigaussmin(object):
         R = sp.optimize.minimize(lk,[0.1,1.,0.1,1.1,0.],method='BFGS',options={'maxiter':500})
 
         h=R.x
-        v = [h[0],h[1]**2,h[2],h[3]**2,2*sp.arctan(h[4])/sp.pi]
+        v = [h[0],h[1]**2,h[2],h[3]**2,(1.-1e-8)*2*sp.arctan(h[4])/sp.pi]
         #print v
         return v
 

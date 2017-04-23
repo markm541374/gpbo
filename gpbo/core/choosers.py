@@ -96,8 +96,6 @@ def globallocalregret_(optstate,persist,**para):
     logger.info('localregretest {}'.format(lrest))
 
     #step out to check +ve defininteness
-    Rad = sp.logspace(para['pveballrrange'][0],para['pveballrrange'][1],para['pveballrsteps'])
-    PP = -sp.ones(Rad.size)
     logger.info('checking for +ve definite ball')
     pc = gpbo.core.optutils.probgppve(G,sp.array(xmin),tol=para['pvetol'])
     logger.info('prob pvedef at xmin {}'.format(pc))
@@ -111,18 +109,21 @@ def globallocalregret_(optstate,persist,**para):
         fig, ax = plt.subplots(nrows=3, ncols=4, figsize=(85, 85))
         # plot the current GP
         if d==2:
-            gpbo.core.optutils.gpplot(ax[0,0],ax[0,1],G,para['lb'],para['ub'],ns=60)
-            ax[0,0].set_title('GP_post_mean')
-            ax[0,1].set_title('GP_post_var')
-            ax[0, 0].plot(xmin[0], xmin[1], 'ro')
-            #plot some draws from H
-            for i in xrange(20):
-                Gm,Gv,Hd = gpbo.core.drawconditionH(*GH)
-                try:
-                    sp.linalg.cholesky(Hd)
-                    gpbo.core.optutils.plotprobstatellipse(Gv,Hd,xmin,ax[1,1],logr=True)
-                except sp.linalg.LinAlgError:
-                    pass
+            try:
+                gpbo.core.optutils.gpplot(ax[0,0],ax[0,1],G,para['lb'],para['ub'],ns=60)
+                ax[0,0].set_title('GP_post_mean')
+                ax[0,1].set_title('GP_post_var')
+                ax[0, 0].plot(xmin[0], xmin[1], 'ro')
+                #plot some draws from H
+                for i in xrange(20):
+                    Gm,Gv,Hd = gpbo.core.drawconditionH(*GH)
+                    try:
+                        sp.linalg.cholesky(Hd)
+                        gpbo.core.optutils.plotprobstatellipse(Gv,Hd,xmin,ax[1,1],logr=True)
+                    except sp.linalg.LinAlgError:
+                        pass
+            except:
+                pass
         if rmax>0:
             ax[1,1].plot([sp.log10(rmax)]*2,[0.,2*sp.pi],'purple')
         else:
@@ -139,7 +140,7 @@ def globallocalregret_(optstate,persist,**para):
                 #plot mindraws
                 gpbo.core.optutils.plotaslogrtheta(R[:,0],R[:,1],xmin[0],xmin[1],ax[1,1],'r.')
                 ax[0,2].plot(R[:,0],R[:,1],'r.')
-        ax[1,3].semilogx(Rad,PP)
+        ax[1,3].text(0,0,'prob +ve at min {}\nR+ve{}'.format(pc,rmax))
     if rmax==0:
         if gpbo.core.debugoptions['adaptive']:
             try:
@@ -196,8 +197,10 @@ def globallocalregret_(optstate,persist,**para):
 
 
     binormdist = gpbo.core.optutils.bigaussmin(sp.mean(Yout),sp.sqrt(sp.var(Yout)),mvmax,sp.sqrt(vvmax),0.)
-    binormdistF = gpbo.core.optutils.bigaussmin(*gpbo.core.optutils.bigaussmin().fit(sp.array(Yout)))
-
+    try:
+        binormdistF = gpbo.core.optutils.bigaussmin(*gpbo.core.optutils.bigaussmin().fit(sp.array(Yout)))
+    except:
+        binormdistF = binormdist
     racc = 0.
     m,v=normin
     n=len(Cout)

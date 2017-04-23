@@ -351,7 +351,7 @@ def choiceaq(optstate,persist,**para):
     return x,ev,persist,aux
 
 def splocalaq(optstate,persist,**para):
-    logger.error( str(persist))
+    #logger.error( str(persist))
     if persist==None:
         persist={'n':0,'y':[],'z':[],'done':False}
         for k in para['choosereturn'].keys():

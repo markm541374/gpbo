@@ -26,7 +26,7 @@ from objective import f
 from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='icmlF2'
+rpath='F2new'
 
 
 
@@ -72,7 +72,7 @@ C.aqpara['DM_SLICELCBPARA']=2.
 #all2confs.append(['pesfs_pm',C])
 
 
-axisset={11:[0,60,1e-7,1e2],15:[0,60,0,90]}
+axisset={11:[0,200,1e-7,1e2],15:[0,200,0,200]}
 labelfn = lambda x: {'eimle':'EI','pesfs_lap':'Approx Draws','pesfs_ei':'EI Slice Sample','fabolas':'Fabolas','fabmod':'FabolasM'}[x]
 if mode=='run':
     if vers==2:
@@ -80,7 +80,7 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin,labelfn=labelfn,axisset=axisset)
+    gpbo.plotall(all2confs+all3confs,40,rpath,trueopt=truemin,labelfn=labelfn,axisset=axisset)
 else:
     pass
 

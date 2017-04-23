@@ -24,7 +24,7 @@ from objective import f
 from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='icmlF5b'
+rpath='F5bnew'
 #-----------------------
 #eimle
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
@@ -81,20 +81,20 @@ C={'ninit':20,
    'nsteps':100,
    'switchkernel':True,
    'switchestimator':True}
-all3confs.append(['fabmod',C])
+#all3confs.append(['fabmod',C])
 #---------------
 #fabolas
 C={'ninit':20,
    'nsteps':140}
 #all3confs.append(['fabolas',C])
 labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs':'EnvPES','fabmod':'FabolasM'}[x]
-axisset={12:[1000,70000,1e-6,10],13:[2000,70000,1e-6,10]}
+axisset={12:[1000,70000,1e-6,10],13:[2000,24*60*60,1e-6,10]}
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,8,rpath,trueopt=truemin,logx=True,labelfn=labelfn,axisset=axisset)
+    gpbo.plotall(all2confs+all3confs,30,rpath,trueopt=truemin,logx=True,labelfn=labelfn,axisset=axisset)
 else:
     pass

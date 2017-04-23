@@ -108,7 +108,7 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                     pass
             else:
                 print( "not an optimization method")
-def plotquarts2(a,data1,data2,col,lab,log=False):
+def plotquarts(a,data1,data2,col,lab,log=False):
     n=len(data1)
     mx=-sp.Inf
     mn=sp.Inf
@@ -130,7 +130,7 @@ def plotquarts2(a,data1,data2,col,lab,log=False):
     return
 
 
-def plotquarts(a,xdata_, ydata_,col,lab,log=False):
+def plotquarts2(a,xdata_, ydata_,col,lab,log=False):
     xdata = [sp.array(i) for i in xdata_]
     ydata = [sp.array(i) for i in ydata_]
     n = len(xdata)
@@ -208,7 +208,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             for ii in range(nreps):
                 a[1].plot(data[ii]['accE'],data[ii]['trueyatxrecc'],color=col,label=labelfn(C[0]))
             #and averaged
-            plotquarts(a[5],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,labelfn(C[0]+' '+str(termregret)))
+            plotquarts(a[5],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,labelfn(C[0]))
 
             #third is all the opts per evaluation + acquisition cost
             for ii in range(nreps):

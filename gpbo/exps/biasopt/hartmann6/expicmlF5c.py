@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 nreps=1
 import argparse
 
@@ -24,13 +24,13 @@ from objective import f
 from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='tmp'
+rpath='F5cnew'
 #-----------------------
 #eimle
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
 C.stoppara = {'tmax': 60*60*50}
 C.stopfn = gpbo.core.optimize.totaltstopfn
-#all2confs.append(['eimle',C])
+all2confs.append(['eimle',C])
 
 #pesfs----------------------------
 C=gpbo.core.config.pesfsdefault(f,D,50,s,rpath,'null.csv')
@@ -38,7 +38,7 @@ C.stoppara = {'tmax': 60 * 60 * 50}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 C.aqpara['drop']=True
-#all2confs.append(['pesfs',C])
+all2confs.append(['pesfs',C])
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
@@ -77,20 +77,20 @@ C={'lowtask':64,
 #fabolas
 C={'ninit':30,
    'nsteps':80}
-all3confs.append(['fabmod',C])
+#all3confs.append(['fabmod',C])
 #---------------
 #fabolas()
 C={'ninit':30,
    'nsteps':80}
 #all3confs.append(['fabolas',C])
 labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs':'EnvPES','fabmod':'FabolasM'}[x]
-axisset={12:[1e3,1e5,1e-4,1e1],13:[1e3,1e5,1e-4,1e1]}
+axisset={12:[1e3,1e5,1e-4,1e1],13:[1e3,48*60*60,1e-4,1e1]}
 if mode=='run':
     #if vers==2:
     gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     #else:
     gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,8,rpath,trueopt=truemin,logx=True,labelfn=labelfn,axisset=axisset)
+    gpbo.plotall(all2confs+all3confs,28,rpath,trueopt=truemin,logx=True,labelfn=labelfn,axisset=axisset)
 else:
     pass

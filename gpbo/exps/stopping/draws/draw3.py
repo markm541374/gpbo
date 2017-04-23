@@ -4,8 +4,8 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-gpbo.core.debugoutput=True
-gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':False,'ctaq':False,'support':False,'adaptive':True,'logstate':True}
+gpbo.core.debugoutput=False
+gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':False,'ctaq':False,'support':False,'adaptive':False,'logstate':False}
 mode=['run','plot'][0]
 nreps=5
 import argparse

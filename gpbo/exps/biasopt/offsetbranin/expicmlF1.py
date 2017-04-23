@@ -23,7 +23,7 @@ from objective import f
 from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='rerunF1'
+rpath='F1new'
 #pesbs----------------------------
 C=gpbo.core.config.pesfsdefault(f,D,50,s,rpath,'null.csv')
 C.stoppara = {'nmax': 100}
@@ -48,7 +48,7 @@ C.aqpara['nrandinit']=10
 C.stoppara = {'nmax': 100}
 C.stopfn = gpbo.core.optimize.nstopfn
 
-all2confs.append(['eimle_pmin',C])
+all2confs.append(['eimle_predmin',C])
 
 #----------------------
 
@@ -59,9 +59,9 @@ C.stoppara = {'nmax': 100}
 C.stopfn = gpbo.core.optimize.nstopfn
 C.reccfn=gpbo.core.reccomenders.argminrecc
 
-all2confs.append(['eimle_best',C])
-labelfn = lambda x: {'eimle_best':'EI-AM','pesfs_predmin':'PES-PM','pesfs_argmin':'PES-AM','eimle_pmin':'EI-PM','fabmod':'FabolasM'}[x]
-axisset={11:[0,100,1e-7,1e2]}
+all2confs.append(['eimle_argmin',C])
+labelfn = lambda x: {'eimle_argmin':'EI-AM','pesfs_predmin':'PES-PM','pesfs_argmin':'PES-AM','eimle_predmin':'EI-PM','fabmod':'FabolasM'}[x]
+axisset={11:[0,200,1e-8,1e2]}
 
 if mode=='run':
     if vers==2:
@@ -69,6 +69,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin,labelfn=labelfn,axisset=axisset)
+    gpbo.plotall(all2confs+all3confs,25,rpath,trueopt=truemin,labelfn=labelfn,axisset=axisset)
 else:
     pass
