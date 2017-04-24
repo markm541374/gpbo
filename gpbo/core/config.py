@@ -371,9 +371,7 @@ class switchdefault():
                       'maxfun': 400},
             'pveballrrange': (-4,0),
             'pveballrsteps': 100,
-            'pvetol':1e-3,
-            'tailsupport':200,
-            'tailnstd':4
+            'pvetol':1e-3
         }
 
         self.aqfn = [aq0,aq1]

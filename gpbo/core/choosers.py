@@ -13,6 +13,7 @@ import logging
 import tqdm
 import gpbo
 from scipy.stats import norm as norms
+from scipy import integrate as spi
 from gpbo.core import GPdc as GP
 logger = logging.getLogger(__name__)
 try:
@@ -35,12 +36,16 @@ def globallocalregret(optstate,persist,**para):
     try:
         return globallocalregret_(optstate,persist,**para)
     except gpbo.core.GPdc.MJMError as e:
+        plt.close('all')
+        if persist==None:
+            persist = defaultdict(list)
+            persist['raiseS']=-12
         if persist['raiseS']:
             persist['raiseS']+=1
         else:
             persist['raiseS']=-20
         logger.error('error in globallocalregret, inflating noise to {}\n{}'.format(persist['raiseS'],e))
-        return globallocalregret_(optstate,persist,**para)
+        return globallocalregret(optstate,persist,**para)
 
 def globallocalregret_(optstate,persist,**para):
     #doublenormdist
@@ -109,21 +114,18 @@ def globallocalregret_(optstate,persist,**para):
         fig, ax = plt.subplots(nrows=3, ncols=4, figsize=(85, 85))
         # plot the current GP
         if d==2:
-            try:
-                gpbo.core.optutils.gpplot(ax[0,0],ax[0,1],G,para['lb'],para['ub'],ns=60)
-                ax[0,0].set_title('GP_post_mean')
-                ax[0,1].set_title('GP_post_var')
-                ax[0, 0].plot(xmin[0], xmin[1], 'ro')
-                #plot some draws from H
-                for i in xrange(20):
-                    Gm,Gv,Hd = gpbo.core.drawconditionH(*GH)
-                    try:
-                        sp.linalg.cholesky(Hd)
-                        gpbo.core.optutils.plotprobstatellipse(Gv,Hd,xmin,ax[1,1],logr=True)
-                    except sp.linalg.LinAlgError:
-                        pass
-            except:
-                pass
+            gpbo.core.optutils.gpplot(ax[0,0],ax[0,1],G,para['lb'],para['ub'],ns=60)
+            ax[0,0].set_title('GP_post_mean')
+            ax[0,1].set_title('GP_post_var')
+            ax[0, 0].plot(xmin[0], xmin[1], 'ro')
+            #plot some draws from H
+            for i in xrange(20):
+                Gm,Gv,Hd = gpbo.core.drawconditionH(*GH)
+                try:
+                    sp.linalg.cholesky(Hd)
+                    gpbo.core.optutils.plotprobstatellipse(Gv,Hd,xmin,ax[1,1],logr=True)
+                except sp.linalg.LinAlgError:
+                    pass
         if rmax>0:
             ax[1,1].plot([sp.log10(rmax)]*2,[0.,2*sp.pi],'purple')
         else:
@@ -140,7 +142,7 @@ def globallocalregret_(optstate,persist,**para):
                 #plot mindraws
                 gpbo.core.optutils.plotaslogrtheta(R[:,0],R[:,1],xmin[0],xmin[1],ax[1,1],'r.')
                 ax[0,2].plot(R[:,0],R[:,1],'r.')
-        ax[1,3].text(0,0,'prob +ve at min {}\nR+ve{}'.format(pc,rmax))
+        ax[1,3].text(0,0,'prob +ve at min {}\nR+ve {}'.format(pc,rmax))
     if rmax==0:
         if gpbo.core.debugoptions['adaptive']:
             try:
@@ -195,31 +197,32 @@ def globallocalregret_(optstate,persist,**para):
             return Cout[i]
         return
 
-
-    binormdist = gpbo.core.optutils.bigaussmin(sp.mean(Yout),sp.sqrt(sp.var(Yout)),mvmax,sp.sqrt(vvmax),0.)
-    try:
-        binormdistF = gpbo.core.optutils.bigaussmin(*gpbo.core.optutils.bigaussmin().fit(sp.array(Yout)))
-    except:
-        binormdistF = binormdist
-    racc = 0.
     m,v=normin
+
+    binormdist = gpbo.core.optutils.bigaussmin().fit(sp.array(Yout))
+    logger.info('Fitresult {}'.format(binormdist))
+    #rbin = 0
+    #for y in Yin:
+    #    rbin += binormdist.ERleft(y)
+    #rbin /= len(Yin)
+
+    rbin,err = spi.quad(lambda y: gpbo.core.GPdc.EI(-y, -m, v)[0, 0] * binormdist.pdf(y), -sp.inf,max(Yin))
+
+    racc = 0.
     n=len(Cout)
-    nstd=para['tailnstd'] # number of std dev below min sample to integrate over
-    tailsupport = para['tailsupport']
     #regret from samples after the min
     for i in xrange(1,n):
         racc+= gpbo.core.GPdc.EI(-Yout[i],-m,v)[0,0]/float(n)
     tmp=racc
     #regret from the tail bound
-    for i,y in enumerate(sp.linspace(Yout[0]-nstd*sp.sqrt(vvmax),Yout[0],tailsupport)):
-        racc+= gpbo.core.GPdc.EI(-y,-m,v)[0,0]*sp.stats.norm.pdf(y,mu,sp.sqrt(vvmax))*(nstd*sp.sqrt(vvmax)/float(tailsupport))
+    I,err = spi.quad(lambda y:gpbo.core.GPdc.EI(-y,-m,v)[0,0]*sp.stats.norm.pdf(y,mu,sp.sqrt(vvmax)),-sp.inf,Yout[0])
+    racc+=I
     logger.info('outer regret {}  (due to samples: {} due to tail: {}'.format(racc,tmp,racc-tmp))
-    #regret lower bound
-    rlow=0.
-    for i,y in enumerate(sp.linspace(Yout[0]-nstd*sp.sqrt(vvmax),mvmax,tailsupport)):
-        rlow+= gpbo.core.GPdc.EI(-y,-m,v)[0,0]*sp.stats.norm.pdf(y,mvmax,sp.sqrt(vvmax))*((mvmax-Yout[0]+nstd*sp.sqrt(vvmax))/float(tailsupport))
 
+    #regret lower bound
+    rlow,err = spi.quad(lambda y:gpbo.core.GPdc.EI(-y,-m,v)[0,0]*sp.stats.norm.pdf(y,mvmax,sp.sqrt(vvmax)),-sp.inf,mvmax)
     #regret from samples
+
     rsam=0.
     for i in xrange(Q.shape[0]):
         rsam+=max(0.,Q[i,1]-Q[i,2])
@@ -275,23 +278,27 @@ def globallocalregret_(optstate,persist,**para):
         mno=Yout[0]
         ro = sp.linspace(min(mno-0.05*(mxo-mno),ymin),mxo+0.05*(mxo-mno),200)
 
-        ax[1,0].plot(ro,map(lambda x:sp.stats.norm.cdf(x,loc=mvmax,scale=sp.sqrt(vvmax)),ro),'g')
+        #ax[1,0].plot(ro,map(lambda x:sp.stats.norm.cdf(x,loc=mvmax,scale=sp.sqrt(vvmax)),ro),'g')
 
-        ax[1,0].plot(ro,map(lambda x:sp.stats.norm.cdf(x,loc=mu,scale=sp.sqrt(vvmax)),ro),'b',alpha=0.5)
-        ax[1,0].plot(ro,map(binormdist.cdf,ro),'k')
-        ax[1,0].plot(ro,map(binormdistF.cdf,ro),'purple')
-        ax[1,2].text(0,0.2,'regretest{}'.format(racc))
-        ax[1,2].text(0,0.15,'regretsam{}'.format(rsam))
-        ax[1,2].text(0,0.3,'localrsam{}'.format(rloc))
-        ax[1,2].text(0,0.1,'regretlow {} '.format(rlow))
-        ax[1,2].text(0,0.4,'localrest {} '.format(lrest))
+        #ax[1,0].plot(ro,map(lambda x:sp.stats.norm.cdf(x,loc=mu,scale=sp.sqrt(vvmax)),ro),'b',alpha=0.5)
+        ax[1,0].plot(ro,map(binormdist.cdf,ro),'purple')
+
+        ax[1,2].text(0,0.34, 'regretg sample      {}'.format(rsam))
+        ax[1,2].text(0,0.24, 'regretg tailest     {}'.format(racc))
+        ax[1,2].text(0,0.18, 'regretg binormest   {}'.format(rbin))
+        ax[1,2].text(0,0.08, 'regretg lowerb      {} '.format(rlow))
+
+        ax[1,2].text(0,0.74,'localr sample     {}'.format(rloc))
+        ax[1,2].text(0,0.8, 'localr Taylor est {} '.format(lrest))
         persist['Rexists'].append(optstate.n)
         persist['sampleregret'].append(rsam)
         persist['expectedregret'].append(racc)
+        persist['expectedRbinorm'].append(rbin)
         persist['localrsam'].append(rloc)
         persist['regretlower'].append(rlow)
         persist['localrest'].append(lrest)
         ax[0,3].plot(persist['Rexists'],persist['localrest'],'k')
+        ax[0,3].plot(persist['Rexists'],persist['expectedRbinorm'],'purple')
         ax[0,3].plot(persist['Rexists'],persist['sampleregret'],'b')
         ax[0,3].plot(persist['Rexists'],persist['expectedregret'],'g')
         ax[0,3].plot(persist['Rexists'],persist['localrsam'],'r')

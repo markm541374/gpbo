@@ -4,10 +4,10 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-gpbo.core.debugoutput=False
-gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':False,'ctaq':False,'support':False,'adaptive':False,'logstate':False}
+gpbo.core.debugoutput=True
+gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':False,'ctaq':False,'support':False,'adaptive':True,'logstate':True}
 mode=['run','plot'][0]
-nreps=3
+nreps=1
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -35,20 +35,22 @@ C.chooser=gpbo.core.choosers.always0
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'null.csv')
 C.choosepara['regretswitch']=1e-4
-#all2confs.append(['switching_4',C])
+#C.stopfn=gpbo.core.nstopfn
+#C.stoppara['n']=35
+#out = gpbo.search(C,initdata='dbout/34.p')
+all2confs.append(['switching_4',C])
 
 
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'null.csv')
 C.choosepara['regretswitch']=1e-3
-C.stopfn=gpbo.core.nstopfn
-C.stoppara['n']=160
-all2confs.append(['switching_3',C])
+#all2confs.append(['switching_3',C])
 
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'null.csv')
 C.choosepara['regretswitch']=1e-2
 #all2confs.append(['switching_2',C])
+
 
 if mode=='run':
     if vers==2:

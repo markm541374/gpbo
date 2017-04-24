@@ -538,7 +538,7 @@ cdef class bigaussmin(object):
     min of two gaussians as described by
     https://www.gwern.net/docs/conscientiousness/2008-nadarajah.pdf
     """
-    cdef double x1, x2,std1,std2,rho,alpha,cdftol,startx
+    cdef double x1, x2,std1,std2,rho,alpha,integraltol
     cdef object doubledist
 
     def __init__(self,x1=1.,std1=1.,x2=1.,std2=1.,rho=0.):
@@ -549,15 +549,12 @@ cdef class bigaussmin(object):
         self.rho = rho
         cov=self.std1*self.std2*rho
         self.alpha  = 1./sqrt(1-self.rho**2)
-        #print [[std1**2,cov],[cov,std2**2]]
         self.doubledist = sps.multivariate_normal(mean = [x1,x2],cov= [[std1**2,cov],[cov,std2**2]])
+        self.integraltol=1e-9
 
-        self.cdftol=1e-9
-        startx = min(self.x1,self.x2)
-        while NC(startx,x1,std1)+NC(startx,x2,std2)>0.5*self.cdftol:
-            startx-=max(std1,std2)
-        self.startx= startx
         return
+    def __repr__(self):
+        return 'bigaussian minimum with means {} {} vars {} {} and corr {}'.format(self.x1,self.x2,self.std1,self.std2,self.rho)
 
     cdef double f1(self,double y):
         cdef double t0 = NP((y-self.x1)/self.std1)/self.std1
@@ -574,28 +571,28 @@ cdef class bigaussmin(object):
 
     cpdef double pdf(self,double x):
         return self.f1(x)+self.f2(x)
+
     cpdef double cdf(self,double x):
-        if x<self.startx:
-            raise ValueError('cdf requested from below integral start value')
-        I,err = spi.quad(self.pdf,self.startx,x,epsabs=self.cdftol*0.5)
+        I,err = spi.quad(self.pdf,-sp.inf,x,epsabs=self.integraltol)
         return I
+
     def rvs(self,n):
         return self.doubledist.rvs(n).min(axis=1)
 
     def fit(self,X):
+        opt2para = lambda h:[h[0],h[1]**2,h[2],h[3]**2,(1.-1e-6)*2*sp.arctan(h[4])/sp.pi]
         def lk(h):
-            v = [h[0],h[1]**2,h[2],h[3]**2,(1.-1e-8)*2*sp.arctan(h[4])/sp.pi]
-            dist = bigaussmin(*v)
+            dist = bigaussmin(*opt2para(h))
             cdef double l=0.
             cdef int i
             for i in range(X.size):
                 l+=log(dist.pdf(X[i]))
-            #print '\r'+str(v)+str(l),
             return -l
         R = sp.optimize.minimize(lk,[0.1,1.,0.1,1.1,0.],method='BFGS',options={'maxiter':500})
+        self.__init__(*opt2para(R.x))
+        return self
 
-        h=R.x
-        v = [h[0],h[1]**2,h[2],h[3]**2,(1.-1e-8)*2*sp.arctan(h[4])/sp.pi]
-        #print v
-        return v
+    def ERleft(self,x):
+        I, err = spi.quad(lambda y:self.pdf(y)*(x-y),-sp.inf,x,epsabs=self.integraltol)
+        return I
 
