@@ -33,6 +33,7 @@ SUPPORT_SLICEEI = 2
 SUPPORT_SLICEPM = 3
 SUPPORT_LAPAPR = 4
 SUPPORT_LAPAPROT = 5
+SUPPORT_VARREJ = 6
 #drawing points between lb and ub using specified method
 def draw_support(g, lb, ub, n, method, para=1.):
     
@@ -49,6 +50,21 @@ def draw_support(g, lb, ub, n, method, para=1.):
         for i in range(d):
             X[:,i] *= ub[i]-lb[i]
             X[:,i] += lb[i]
+    elif method==SUPPORT_VARREJ:
+        print( "Drawing support using varreject:")
+        batch=500
+        out=[]
+        while len(out)<n:
+            X=sp.random.uniform(size=[batch,d])
+            for i in range(d):
+                X[:,i] *= ub[i]-lb[i]
+                X[:,i] += lb[i]
+            pa = sp.random.uniform(size=batch)
+            m,v = g.infer_diag_post(X,[[sp.NaN]]*batch)
+            for j in range(batch):
+                if para*pa[j]<v[0,j]:
+                    out.append(X[j,:])
+        X=sp.vstack(out[:n])
     elif method==SUPPORT_LAPAPR:
 
         print( "Drawing support using lapapr:")

@@ -21,9 +21,12 @@ D=2
 s=0.
 lb = sp.array([-1.]*D)
 ub = sp.array([1.]*D)
+def nullfn(*args,**kwargs):
+    print('exitnullfn')
+    raise NotImplementedError
 
 
-f, xm, truemin = objectives.genmat52ojf(D,lb,ub,ls=0.2,fixs=-1)
+f, xm, truemin = objectives.genmat52ojf(D,lb,ub,ls=0.35,fixs=-1)
 all2confs=[]
 all3confs=[]
 rpath='2d'
@@ -34,10 +37,11 @@ C.chooser=gpbo.core.choosers.always0
 
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'null.csv')
-C.choosepara['regretswitch']=1e-4
+C.choosepara['regretswitch']=1e-6
+#C.aqfn = [nullfn]*2
 #C.stopfn=gpbo.core.nstopfn
-#C.stoppara['n']=35
-#out = gpbo.search(C,initdata='dbout/34.p')
+#C.stoppara['n']=44
+#out = gpbo.search(C,initdata='dbout/43.p')
 all2confs.append(['switching_4',C])
 
 

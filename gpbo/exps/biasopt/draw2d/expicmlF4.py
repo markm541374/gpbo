@@ -82,7 +82,7 @@ C={'ninit':30,
 
 #--------------
 labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs':'EnvPES'}[x]
-axisset={12:[3*1e2,2*1e4,1e-6,1e1],13:[3*1e2,4*1e4,1e-6,1e1]}
+axisset={12:[3*1e2,2*1e4,1e-6,1e1],13:[3*1e2,2*1e4,1e-6,1e1]}
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)

@@ -61,7 +61,7 @@ C.reccfn=gpbo.core.reccomenders.argminrecc
 
 all2confs.append(['eimle_argmin',C])
 labelfn = lambda x: {'eimle_argmin':'EI-AM','pesfs_predmin':'PES-PM','pesfs_argmin':'PES-AM','eimle_predmin':'EI-PM','fabmod':'FabolasM'}[x]
-axisset={11:[0,200,1e-8,1e2]}
+axisset={11:[0,150,1e-8,1e2]}
 
 if mode=='run':
     if vers==2:

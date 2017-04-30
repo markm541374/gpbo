@@ -142,6 +142,7 @@ class optimizer:
             if gpbo.core.debugoutput:
                 if gpbo.core.debugoptions['logstate']:
                     pickle.dump(self.state,open(os.path.join(gpbo.core.debugpath,'{}.p'.format(self.state.n)),'wb'))
+
         #import pickle
         #obj = [self.reccpersist, self.aqpersist]
         #pickle.dump(obj, open('dbout/persists.p', 'wb'))

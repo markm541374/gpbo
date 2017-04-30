@@ -12,13 +12,19 @@ from gpbo.core.optutils import silentdirect as direct
 from gpbo.core.optutils import geteffectiveoverhead
 import logging
 import copy
+import gpbo
 from gpbo.core import GPdc
 from gpbo.core import PES
 from gpbo.core.optutils import multilocal
-import ESutils
-#start with random
-import objectives
 
+try:
+    from matplotlib import pyplot as plt
+    from matplotlib import patches
+    plots=True
+    plt.style.use('seaborn-paper')
+except ImportError:
+    plots=False
+    plt=None
 import costs
 logger = logging.getLogger(__name__)
 
@@ -183,7 +189,75 @@ def PESfsaq(optstate,persist,**para):
 
 
 
+def vmaxaq(optstate,persist,**para):
+    t0=time.clock()
+    para = copy.deepcopy(para)
+    if persist==None:
+        persist = {'n':0,'d':len(para['ub']),'overhead':0.,'raiseS':False}
+    n = optstate.n
+    d = persist['d']
+    if n<para['nrandinit']:
+        persist['n']+=1
+
+        return randomaq(optstate,persist,**para)
+    logger.info('vmaxaq')
+    #logger.debug(sp.vstack([e[0] for e in optstate.ev]))
+    #raise
+    x=sp.vstack(optstate.x)
+    y=sp.vstack(optstate.y)
+    if persist['raiseS']:
+        s= sp.vstack([e['s']+10**persist['raiseS'] for e in optstate.ev])
+        logger.info('inflating diagonal in aqfn by 10**{}'.format(persist['raiseS']))
+    else:
+        s= sp.vstack([e['s'] for e in optstate.ev])
+    dx=[e['d'] for e in optstate.ev]
+    presetH=False
+    if 'choosereturn' in para.keys():
+        if 'reuseH' in para['choosereturn'].keys():
+            presetH = para['choosereturn']['reuseH']
+    try:
+        pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH)
+        [xmin,ymin,ierror] = pesobj.search_vmax(para['ev']['s'],para)
+    except GPdc.MJMError as e:
+        if not persist['raiseS']:
+            persist['raiseS']=-19
+        else:
+            persist['raiseS']+=1
+        logger.error('numerical error in acq fn Raising noise to {}\n\n {}'.format(persist['raiseS'],e))
+        return PESfsaq(optstate,persist,**para)
+
+
+    logger.info('DIRECT found max PES at {} {}'.format(xmin,ierror))
+    lhyp = sp.log10([k.hyp for k in pesobj.G.kf])
+    lhmean = sp.mean(lhyp, axis=0)
+    lhstd = sp.sqrt(sp.var(lhyp, axis=0))
+    lhmin = lhyp.min(axis=0)
+    lhmax = lhyp.max(axis=0)
+    logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean,lhstd,lhmin,lhmax))
+
+    persist['overhead']=time.clock()-t0
+    if gpbo.core.debugoutput:
+        if gpbo.core.debugoptions['datavis']:
+            fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(45, 45))
+            # plot the current GP
+            if d==2:
+                gpbo.core.optutils.gpplot(ax[0,0],ax[0,1],pesobj.G,para['lb'],para['ub'],ns=60)
+                ax[0,0].set_title('GP_post_mean')
+                ax[0,1].set_title('GP_post_var')
+                ax[1, 1].plot(x[:,0], x[:,1], 'ro')
+
+            try:
+                from gpbo.core import debugpath
+                fname = 'vmaxaqplot' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'
+                print('saving as {}'.format(fname))
+                fig.savefig(os.path.join(debugpath, fname))
+            except BaseException as e:
+                logger.error(str(e))
+            fig.clf()
+            plt.close(fig)
+    return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],}
 #PES with variable s ev give costfunction
+
 def PESvsaq(optstate,persist,**para):
     t0=time.clock()
     para = copy.deepcopy(para)

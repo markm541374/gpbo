@@ -12,7 +12,7 @@ import copy
 from scipy.optimize import minimize
 from gpbo.core.optutils import multilocal
 import time
-
+import gpbo
 from gpbo.core.optutils import silentdirect as direct
 import itertools
 import logging
@@ -376,48 +376,14 @@ def gphinrecc(optstate,persist,**para):
     ub = para['ub']
 
 
-    if para['smode'] == 'direct':
-        def directwrap(xq, y):
-            xq.resize([1, d])
-            a = G.infer_m_post(xq,[[sp.NaN]])
-            return (a[0, 0], 0)
+    def wrap(x):
+        xq = copy.copy(x)
+        xq.resize([1, d])
+        a = G.infer_m_post(xq,[[sp.NaN]])
+        return a[0, 0]
 
-        [xmin, ymin, ierror] = direct(directwrap, lb, ub, user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
-        logger.info('DIRECT found min post at {} {} {}'.format(xmin, ymin, ierror))
-    elif para['smode'] == 'multi':
-        def multiwrap(x):
-            xq = copy.copy(x)
-            xq.resize([1, d])
-            a = G.infer_m_post(xq,[[sp.NaN]])
-            return a[0, 0]
 
-        [xmin, ymin, ierror] = multilocal(multiwrap, lb, ub, maxf=para['maxf'])
-
-        logger.info('multilocal found min post at {} {} {}'.format(xmin, ymin, ierror))
-    elif para['smode'] == 'dthenl':
-        def directwrap(xq, y):
-            xq.resize([1, d])
-            a = G.infer_m_post(xq,[[sp.NaN]])
-            return (a[0, 0], 0)
-
-        [dxmin, dymin, ierror] = direct(directwrap, lb, ub, user_data=[], algmethod=1, maxf=para['maxf'] - 150,
-                                        logfilename='/dev/null')
-        logger.info('DIRECT found min post at {} {} {}'.format(dxmin, dymin, ierror))
-
-        def localwrap(x):
-            xq = copy.copy(x)
-            xq.resize([1, d])
-            a = G.infer_m_post(xq,[[sp.NaN]])
-            return a[0, 0]
-
-        res = minimize(localwrap, dxmin, method='L-BFGS-B', bounds=tuple([(lb[j], ub[j]) for j in range(d)]),
-                       options={'ftol': 0.00001, 'maxfun': 150})
-        xmin, ymin, ierror = res.x, res.fun, res.message
-        logger.info('localrefine found min post at {} {} {}'.format(xmin, ymin, ierror))
-
-    else:
-        raise KeyError('not a search mode')
-
+    xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,lb,ub,para['dpara'],para['lpara'])
     return [i for i in xmin],persist,{'ymin':ymin}
 
 gphinprior = {

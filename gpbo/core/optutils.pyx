@@ -549,7 +549,7 @@ cdef class bigaussmin(object):
         self.rho = rho
         cov=self.std1*self.std2*rho
         self.alpha  = 1./sqrt(1-self.rho**2)
-        self.doubledist = sps.multivariate_normal(mean = [x1,x2],cov= [[std1**2,cov],[cov,std2**2]])
+        self.doubledist = spl.cholesky([[std1**2,cov],[cov,std2**2]]).T
         self.integraltol=1e-9
 
         return
@@ -577,9 +577,11 @@ cdef class bigaussmin(object):
         return I
 
     def rvs(self,n):
-        return self.doubledist.rvs(n).min(axis=1)
+        return (self.doubledist.dot(sp.random.normal(size=[2,n]))+sp.array([[self.x1],[self.x2]])).min(axis=0)
 
-    def fit(self,X):
+    def fit(self,X,startx=[0.1,1.,0.1,1.1,0.]):
+        startx[1]=sqrt(startx[1])
+        startx[3]=sqrt(startx[3])
         opt2para = lambda h:[h[0],h[1]**2,h[2],h[3]**2,(1.-1e-6)*2*sp.arctan(h[4])/sp.pi]
         def lk(h):
             dist = bigaussmin(*opt2para(h))
@@ -588,11 +590,12 @@ cdef class bigaussmin(object):
             for i in range(X.size):
                 l+=log(dist.pdf(X[i]))
             return -l
-        R = sp.optimize.minimize(lk,[0.1,1.,0.1,1.1,0.],method='BFGS',options={'maxiter':500})
+        R = sp.optimize.minimize(lk,startx,method='BFGS',options={'maxiter':500})
         self.__init__(*opt2para(R.x))
+        print(self)
+        print(R.x)
         return self
 
     def ERleft(self,x):
         I, err = spi.quad(lambda y:self.pdf(y)*(x-y),-sp.inf,x,epsabs=self.integraltol)
         return I
-

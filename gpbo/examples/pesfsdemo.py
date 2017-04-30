@@ -2,6 +2,9 @@ import gpbo
 import scipy as sp
 
 
+gpbo.core.debugoutput=True
+gpbo.core.debugoptions={'datavis':True,'drawlap':False,'cost1d':False,'ctaq':False,'support':False,'adaptive':False,'logstate':False}
+
 D=2
 n=50
 s=1e-6
@@ -18,6 +21,6 @@ def f(x,**ev):
 
 
 C=gpbo.core.config.pesfsdefault(f,D,n,s,'results','pesfs.csv')
-
+C.aqfn = gpbo.core.acquisitions.vmaxaq
 out = gpbo.search(C)
 print out

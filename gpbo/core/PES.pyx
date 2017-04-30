@@ -286,6 +286,19 @@ class PES:
         return a
 
 
+
+    def search_vmax(self,s,spara,dv=[[sp.NaN]],):
+        self.stmp = s
+        def wrap(Q):
+            x = sp.array([Q])
+            v = self.G.infer_diag(x,[[sp.NaN]])[1][0,0]
+            return -v
+        #logger.critical('aaaa')
+        xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,self.lb,self.ub,spara['dpara'],spara['lpara'])
+        #[xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
+
+        return [xmin,-ymin,ierror]
+
     def search_pes(self,s,spara,dv=[[sp.NaN]],):
         self.stmp = s
         def wrap(Q):

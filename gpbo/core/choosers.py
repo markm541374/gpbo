@@ -39,7 +39,7 @@ def globallocalregret(optstate,persist,**para):
         plt.close('all')
         if persist==None:
             persist = defaultdict(list)
-            persist['raiseS']=-12
+            persist['raiseS']=-11
         if persist['raiseS']:
             persist['raiseS']+=1
         else:
@@ -78,6 +78,7 @@ def globallocalregret_(optstate,persist,**para):
     #find the pred. minimum
 
     xmin,ymin,ierror = gpbo.core.optutils.twopartopt(lambda x:G.infer_m_post(x,[[sp.NaN]])[0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
+    mxmin,vxmin = [j[0,0] for j in G.infer_diag_post(xmin,[[sp.NaN]])]
     logger.info('post min {} at {} ({})'.format(xmin,ymin,ierror))
     xvmax,vmax,ierror = gpbo.core.optutils.twopartopt(lambda x:-G.infer_diag_post(x,[[sp.NaN]])[1][0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
     mvmax,vvmax = [j[0,0] for j in G.infer_diag_post(xvmax,[[sp.NaN]])]
@@ -131,7 +132,8 @@ def globallocalregret_(optstate,persist,**para):
         else:
             logger.debug('plotting some draws...')
             #draw support points
-            W = sp.vstack(ESutils.draw_support(G, lb, ub, 2000, ESutils.SUPPORT_LAPAPROT, para=20))
+
+            W = sp.vstack([ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_LAPAPROT, para=20),ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_VARREJ, para=vvmax)])
             nd = 1500
             #draw mins and value of g at xmin as pair
             R, Y, A = ESutils.draw_min_xypairgrad(G, W, nd, xmin)
@@ -158,7 +160,7 @@ def globallocalregret_(optstate,persist,**para):
         logger.info('no +ve def region, choosereturns 0')
         return 0,persist,{'reuseH':[k.hyp for k in G.kf]}
     #draw support points
-    W = sp.vstack(ESutils.draw_support(G, lb, ub, para['support'], ESutils.SUPPORT_LAPAPROT, para=20))
+    W = sp.vstack([ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_LAPAPROT, para=20),ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_VARREJ, para=vvmax)])
 
     Q = gpbo.core.optutils.drawpartitionmin(G,W,xmin,rmax,para['draws'])
 
@@ -199,7 +201,7 @@ def globallocalregret_(optstate,persist,**para):
 
     m,v=normin
 
-    binormdist = gpbo.core.optutils.bigaussmin().fit(sp.array(Yout))
+    binormdist = gpbo.core.optutils.bigaussmin().fit(sp.array(Yout),startx=[sp.mean(Yout),0.1,mvmax,sp.sqrt(vvmax),0.])
     logger.info('Fitresult {}'.format(binormdist))
     #rbin = 0
     #for y in Yin:
@@ -278,10 +280,11 @@ def globallocalregret_(optstate,persist,**para):
         mno=Yout[0]
         ro = sp.linspace(min(mno-0.05*(mxo-mno),ymin),mxo+0.05*(mxo-mno),200)
 
-        #ax[1,0].plot(ro,map(lambda x:sp.stats.norm.cdf(x,loc=mvmax,scale=sp.sqrt(vvmax)),ro),'g')
-
-        #ax[1,0].plot(ro,map(lambda x:sp.stats.norm.cdf(x,loc=mu,scale=sp.sqrt(vvmax)),ro),'b',alpha=0.5)
-        ax[1,0].plot(ro,map(binormdist.cdf,ro),'purple')
+        for i in xrange(2):
+            Q = gpbo.core.optutils.drawpartitionmin(G,W,xmin,rmax,para['draws'])
+            Yout, Cout = data2cdf(Q[:, 2])
+            pltcdf(Yout, Cout, ax[1, 0], 'r')
+            ax[1,0].plot(ro,map(gpbo.core.optutils.bigaussmin().fit(sp.array(Yout),startx=[sp.mean(Yout),0.1,mvmax,sp.sqrt(vvmax),0.]).cdf,ro),'purple')
 
         ax[1,2].text(0,0.34, 'regretg sample      {}'.format(rsam))
         ax[1,2].text(0,0.24, 'regretg tailest     {}'.format(racc))
@@ -304,7 +307,9 @@ def globallocalregret_(optstate,persist,**para):
         ax[0,3].plot(persist['Rexists'],persist['localrsam'],'r')
         #ax[0,3].plot(persist['Rexists'],persist['regretlower'],'purple')
         ax[0,3].set_yscale('log')
-        ax[2,3].set_yscale('log')
+
+
+        #ax[2,3].plot(K[:,0],K[:,1],'b.')
         try:
             from gpbo.core import debugpath
             fname = 'lotsofplots' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'

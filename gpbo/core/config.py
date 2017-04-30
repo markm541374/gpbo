@@ -96,7 +96,7 @@ class pesfsdefault():
             'ev': {'s': s, 'd': [sp.NaN]},
             'lb': [-1.]*D,
             'ub': [1.]*D,
-            'nrandinit': n,
+            'nrandinit': 10,
             #'maxf':500+100*D,
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
@@ -131,6 +131,8 @@ class pesfsdefault():
                 'maxf':500+100*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
+                'dpara':self.aqpara['dpara'],
+                'lpara':self.aqpara['lpara'],
                 'everyn':1
                 }
         self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
@@ -361,7 +363,7 @@ class switchdefault():
             'check': True,
             'everyn': 1,
             'support': 2500,
-            'draws': 8000,
+            'draws': 20000,
             'regretswitch':1e-4,
             'dpara': {'user_data': [],
                       'algmethod': 1,
