@@ -30,7 +30,7 @@ extern "C" int EI_gp(GP* g, int n, double* X, int* D, double* R){
     double ymin = 1e99;
     for (int i=0; i<g->N; i++){
         //printf("%f_",g->Yd[i]);
-        if(g->Yd[i]<ymin){ymin = g->Yd[i];}
+        if(g->Yd[i]<ymin and g->Dx[i]==0){ymin = g->Yd[i];}
     }
     
     EI(&U[0], &U[n], ymin, n, &R[0]);
@@ -50,7 +50,7 @@ extern "C" int lEI_gp(GP* g, int n, double* X, int* D, double* R){
     double ymin = 1e99;
     for (int i=0; i<g->N; i++){
         //printf("%f_",g->Yd[i]);
-        if(g->Yd[i]<ymin){ymin = g->Yd[i];}
+        if(g->Yd[i]<ymin and g->Dx[i]==0){ymin = g->Yd[i];}
     }
     
     lEI(&U[0], &U[n], ymin, n, &R[0]);
