@@ -18,7 +18,7 @@ import os
 import sys
 from copy import deepcopy as dc
 from scipy.stats import norm as norms
-from libc.math cimport log10, log, isnan
+from libc.math cimport log10, log, isnan, exp
 #print os.path.join(os.path.split(__file__)[0],'../../dist/Release/GNU-Linux/libGPshared.so')
 from . import __file__ as fl
 from scipy import linalg as spl
@@ -243,19 +243,11 @@ class GPcore:
         return R
     
     def infer_EI_post(self,X_,D_i,wrt=False):
-        X_i = copy.copy(X_)
-        [m,v] = self.infer_diag_post(X_i,D_i)
-        #print m,v
-        cdef int ns=len(D_i)
-        R=sp.empty([1,ns])
-        cdef int i
-        if wrt:
-            wrt=sp.amin(self.Y_s)
-        for i in range(ns):
-            R[0,i] = EI(wrt,m[0,i],v[0,i])
-        
-        return R
-    
+        E = self.infer_EI(X_,D_i)
+        ns=X_.shape[0]
+
+        return sp.mean(E,axis=0).reshape([1,ns])
+
     def infer_lEI(self,X_,D_i):
         X_i = copy.copy(X_)
         ns=X_i.shape[0]
@@ -263,7 +255,15 @@ class GPcore:
         R=sp.empty([self.size,ns])
         libGP.infer_lEI(self.s, cint(self.size),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D), R.ctypes.data_as(ctpd))
         return R
-#kf = gen_sqexp_k_d([1.,0.3])
+
+    def infer_lEI_post(self,X_,D_i,wrt=False):
+        E = self.infer_lEI(X_,D_i)
+        ns=X_.shape[0]
+        #print(E)
+        #print(sp.log(sp.nanmean(sp.exp(E),axis=0)))
+        return sp.log(sp.nanmean(sp.exp(E),axis=0)).reshape([1,ns])
+
+
 
 
 SQUEXP = 0
