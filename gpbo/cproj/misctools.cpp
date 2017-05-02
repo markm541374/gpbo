@@ -47,8 +47,8 @@ extern "C" int lEI(double* m, double* s, double y, int N, double* R){
     double S;
     double c;
     double p;
+    EI(m,s,y,N,R);
     for (int i=0; i<N; i++){
-        EI(m,s,y,1,&R[i]);
         //TODO this switch to log puts a kink in the curve
         if (R[i]<=0.){
             
