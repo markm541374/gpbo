@@ -9,15 +9,16 @@ def main():
 
     from gpbo.core import GPdc
 
-    f,a = plt.subplots(3)
+    f,a = plt.subplots(4)
+    plt.show()
     ns = 200
     sup = sp.linspace(-1,1,ns)
 
     #points are a high noise obs, a low noise obs, a derivative obs and a second derivative obs
-    X = sp.array([[0.],[0.]])
-    Y = sp.array([[1.],[-1.]])
-    S = sp.array([[1e-6],[1e-6]])
-    D = [[sp.NaN],[0]]
+    X = sp.array([[0.],[0.],[0.5]])
+    Y = sp.array([[1.],[-5.],[5.]])
+    S = sp.array([[1e-6],[1e-6],[1e-6]])
+    D = [[sp.NaN],[0],[0]]
     nn=2
 #    X = sp.array([sp.linspace(-1,1,nn)]).T
 #    Y = sp.array([map(lambda x:sp.sin(6*x), sp.linspace(-1,1,nn))]).T
@@ -47,6 +48,10 @@ def main():
 #    C= g.get_cho()
     #print C
 
+    e = g.infer_EI_post(sup,[[sp.NaN]]*ns,fixI=True, I=-12.)
+    a[0].twinx().plot(sup,e.flatten(),'purple')
+    e = g.infer_lEI_post(sup,[[sp.NaN]]*ns,fixI=True, I=-12.)
+    a[3].plot(sup,sp.exp(e).flatten(),'r')
     #print spl.cho_solve((C,True),sp.eye(4)).dot(K)
     for i,d in enumerate([[sp.NaN],[0],[0,0]]):
         m,v = g.infer_diag(sup,[d]*ns)
@@ -62,8 +67,8 @@ def main():
 
         dr = g.draw_post(sup,[d]*ns,5)
 
-        #for j in range(5):
-        #    a[i].plot(sup,dr[j,:],'lightpink')
+        for j in range(5):
+            a[i].plot(sup,dr[j,:],'lightpink')
     plt.show()
     f.savefig('tmp.png')
     return
