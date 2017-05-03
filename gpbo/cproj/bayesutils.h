@@ -17,8 +17,8 @@
 #include "GPsimple.h"
 
 extern "C" int LCB(GP* g, int n, double* X, int* D, double p, double* R);
-extern "C" int EI_gp(GP* g, int n, double* X, int* D, double* R);
-extern "C" int lEI_gp(GP* g, int n, double* X, int* D, double* R);
+extern "C" int EI_gp(GP* g, int n, double* X, int* D, double* R, bool fixI, double II);
+extern "C" int lEI_gp(GP* g, int n, double* X, int* D, double* R, bool fixI, double II);
 
 #endif /* BAYESUTILS_H */
 

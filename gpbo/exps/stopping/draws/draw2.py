@@ -7,7 +7,7 @@ import scipy as sp
 gpbo.core.debugoutput=True
 gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':False,'ctaq':False,'support':False,'adaptive':True,'logstate':True}
 mode=['run','plot'][0]
-nreps=1
+nreps=5
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -26,7 +26,7 @@ def nullfn(*args,**kwargs):
     raise NotImplementedError
 
 
-f, xm, truemin = objectives.genmat52ojf(D,lb,ub,ls=0.35,fixs=-1)
+f, xm, truemin = objectives.genmat52ojf(D,lb,ub,ls=0.25,fixs=-1)
 all2confs=[]
 all3confs=[]
 rpath='2d'
@@ -37,23 +37,23 @@ C.chooser=gpbo.core.choosers.always0
 
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'null.csv')
-C.choosepara['regretswitch']=1e-6
+C.choosepara['regretswitch']=1e-5
 #C.aqfn = [nullfn]*2
 #C.stopfn=gpbo.core.nstopfn
-#C.stoppara['n']=44
-#out = gpbo.search(C,initdata='dbout/43.p')
-all2confs.append(['switching_4',C])
+#C.stoppara['n']=32
+#out = gpbo.search(C,initdata='dbout/31.p')
+all2confs.append(['switching_5',C])
 
 
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'null.csv')
 C.choosepara['regretswitch']=1e-3
-#all2confs.append(['switching_3',C])
+all2confs.append(['switching_3',C])
 
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'null.csv')
 C.choosepara['regretswitch']=1e-2
-#all2confs.append(['switching_2',C])
+all2confs.append(['switching_2',C])
 
 
 if mode=='run':

@@ -26,7 +26,7 @@ ub = sp.array([1.]*D)
 f, xm, truemin = objectives.genmat52ojf(D,lb,ub,ls=0.2,fixs=-1)
 all2confs=[]
 all3confs=[]
-rpath='tmp'
+rpath='3d'
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'null.csv')
 C.chooser=gpbo.core.choosers.always0
@@ -34,8 +34,8 @@ C.chooser=gpbo.core.choosers.always0
 
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'null.csv')
-C.choosepara['regretswitch']=1e-4
-#all2confs.append(['switching_4',C])
+C.choosepara['regretswitch']=1e-5
+all2confs.append(['switching_5',C])
 
 
 #-----------------------
@@ -50,7 +50,7 @@ all2confs.append(['switching_3',C])
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'null.csv')
 C.choosepara['regretswitch']=1e-2
-#all2confs.append(['switching_2',C])
+all2confs.append(['switching_2',C])
 
 
 if mode=='run':

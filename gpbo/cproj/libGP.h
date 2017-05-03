@@ -30,8 +30,8 @@ int newGP_LKonly(int D, int N, double* Xin, double* Yin, double* Sin, int* Din, 
 int newGP(int D, int N, int kindex, double* X, double* Y, double* Sx, int* Dx, double* h);
 extern "C" int newGP_hypset(int D, int N, int kindex, double* X, double* Y, double* Sx, int* Dx, double* h, int s);
 int infer_LCB(int k, int s, int n, double* X, int* D, double p, double* R);
-int infer_EI(int k, int s, int n, double* X, int* D, double* R);
-int infer_lEI(int k, int s, int n, double* X, int* D, double* R);
+int infer_EI(int k, int s, int n, double* X, int* D, double* R, bool fixI, double II);
+int infer_lEI(int k, int s, int n, double* X, int* D, double* R, bool fixI, double II);
 int infer_m_partial(int k, int kp, double* h, int Ns,double* Xs, int* Ds, double* R);
 int get_cho(int k,int s,double* C);
 

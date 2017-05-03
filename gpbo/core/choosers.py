@@ -162,7 +162,7 @@ def globallocalregret_(optstate,persist,**para):
     #draw support points
     W = sp.vstack([ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_LAPAPROT, para=20),ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_VARREJ, para=vvmax)])
 
-    Q = gpbo.core.optutils.drawpartitionmin(G,W,xmin,rmax,para['draws'])
+    Q, maxRin = gpbo.core.optutils.drawpartitionmin(G,W,xmin,rmax,para['draws'])
 
     #pcurves from Q
     def data2cdf(X):
@@ -235,13 +235,18 @@ def globallocalregret_(optstate,persist,**para):
     for i in xrange(Q.shape[0]):
         rloc+=max(0.,Q[i,3]-Q[i,1])
     rloc/=Q.shape[0]
-
+    persist['localsampleregret'].append(rloc)
     #set switch to local if condition achieved
-    rval=0
     if racc<para['regretswitch']:
-            rval=1
-            persist['flip']=True
-            optstate.startlocal=xmin
+        rval=1
+        persist['flip']=True
+        optstate.startlocal=xmin
+    elif maxRin<0.2*rmax:
+        rval=2
+
+    else:
+        rval=0
+        persist['flip']=False
     if gpbo.core.debugoptions['adaptive']:
         if d==2:
             gpbo.core.optutils.plotaslogrtheta(W[:,0],W[:,1],xmin[0],xmin[1],ax[1,1],'b.')
@@ -274,22 +279,20 @@ def globallocalregret_(optstate,persist,**para):
         ax[2,0].set_yscale('logit')
 
         pltcdf(Yout,Cout,ax[1,0],'r')
-        ax[1,0].set_yscale('logit')
+        ax[1,0].set_yscale('log')
 
         mxo=Yout[-1]
         mno=Yout[0]
         ro = sp.linspace(min(mno-0.05*(mxo-mno),ymin),mxo+0.05*(mxo-mno),200)
 
-        for i in xrange(2):
-            Q = gpbo.core.optutils.drawpartitionmin(G,W,xmin,rmax,para['draws'])
-            Yout, Cout = data2cdf(Q[:, 2])
-            pltcdf(Yout, Cout, ax[1, 0], 'r')
-            ax[1,0].plot(ro,map(gpbo.core.optutils.bigaussmin().fit(sp.array(Yout),startx=[sp.mean(Yout),0.1,mvmax,sp.sqrt(vvmax),0.]).cdf,ro),'purple')
 
         ax[1,2].text(0,0.34, 'regretg sample      {}'.format(rsam))
         ax[1,2].text(0,0.24, 'regretg tailest     {}'.format(racc))
         ax[1,2].text(0,0.18, 'regretg binormest   {}'.format(rbin))
         ax[1,2].text(0,0.08, 'regretg lowerb      {} '.format(rlow))
+
+        ax[1,2].text(0,0.5,'maxRin  {} / {}'.format(maxRin,rmax))
+        ax[1,2].text(0,0.6,'mode  {}'.format(rval))
 
         ax[1,2].text(0,0.74,'localr sample     {}'.format(rloc))
         ax[1,2].text(0,0.8, 'localr Taylor est {} '.format(lrest))
@@ -335,7 +338,7 @@ def globallocalregret_(optstate,persist,**para):
         R=minimize(fn2,C.T.dot(xmin),method='bfgs')
         logger.warn('cheat testopt result with precondition {}:\n{}'.format(H,R))
 
-    return rval,persist,{'start':xmin,'H':H,'reuseH':[k.hyp for k in G.kf]}
+    return rval,persist,{'start':xmin,'H':H,'reuseH':[k.hyp for k in G.kf],'offsetEI':m}
 
 
 def alternate(optstate,persist,**para):

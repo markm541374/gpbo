@@ -479,9 +479,11 @@ def drawpartitionmin(G,S,xm,rm,n):
     #distance to xmin
     xm = sp.array(xm)
     ns,d = S.shape
+    #R is distance from xm for each S
     R = sp.empty(ns)
     for i in xrange(ns):
         R[i] = sp.linalg.norm(S[i,:]-xm)
+    #O is indicies by distance from xm
     O = sp.argsort(R)
     split = sp.searchsorted(R[O],rm)+1
     S_ = sp.vstack([xm,S[O,:]])
@@ -492,7 +494,14 @@ def drawpartitionmin(G,S,xm,rm,n):
     Res[:,3] = Z[:,0]
     Res[:,0] = Res[:,1:3].min(axis=1)
     Res[:,4] = Res[:,1:3].argmin(axis=1)
-    return Res
+
+    argminin = Z[:,:split].argmin(axis=1)
+    argminmax = argminin.max()
+
+    maxRin = R[O[argminmax-1]]
+    #print(str(argminin)+'\n'+str(argminmax)+'\n'+str(maxRin)+' ' +str(rm)+'\n'+str(R[O[argminin]]))
+    return Res, maxRin
+
 
 def rline(unitvec,rmax,condition,nmax=20):
     """

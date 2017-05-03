@@ -215,26 +215,26 @@ int infer_LCB(int k, int s, int n, double* X, int* D, double p, double* R){
     return 0;
 }
 
-int infer_EI(int k, int s, int n, double* X, int* D, double* R){
+int infer_EI(int k, int s, int n, double* X, int* D, double* R, bool fixI, double II){
     if (SS[k]==0){
 	printf("trying to use deleted GP\n");
 	return -1;
     };
     //#pragma omp parallel for
     for (int i=0; i<s; i++){
-        EI_gp(SS[k+i], n, X, D, &R[n*i]);
+        EI_gp(SS[k+i], n, X, D, &R[n*i],fixI,II);
     }
     return 0;
 }
 
-int infer_lEI(int k, int s, int n, double* X, int* D, double* R){
+int infer_lEI(int k, int s, int n, double* X, int* D, double* R, bool fixI, double II){
     if (SS[k]==0){
 	printf("trying to use deleted GP\n");
 	return -1;
     };
     //#pragma omp parallel for
     for (int i=0; i<s; i++){
-        lEI_gp(SS[k+i], n, X, D, &R[n*i]);
+        lEI_gp(SS[k+i], n, X, D, &R[n*i],fixI,II);
     }
     return 0;
 }

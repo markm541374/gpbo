@@ -31,6 +31,8 @@ libGP.k.restype = ct.c_double
 
 ctpd = ct.POINTER(ct.c_double)
 cint = ct.c_int
+cdbl = ct.c_double
+cbool = ct.c_bool
 
 
 
@@ -233,31 +235,31 @@ class GPcore:
             raise MJMError()
         return m-p*sp.sqrt(v)
     
-    def infer_EI(self,X_,D_i):
+    def infer_EI(self,X_,D_i,fixI=False,I=0.):
         X_i = copy.copy(X_)
         ns=X_i.shape[0]
         D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.empty([self.size,ns])
 
-        libGP.infer_EI(self.s, cint(self.size),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D), R.ctypes.data_as(ctpd))
+        libGP.infer_EI(self.s, cint(self.size),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D), R.ctypes.data_as(ctpd),cbool(fixI),cdbl(I))
         return R
     
-    def infer_EI_post(self,X_,D_i,wrt=False):
-        E = self.infer_EI(X_,D_i)
+    def infer_EI_post(self,X_,D_i,fixI=False,I=0.):
+        E = self.infer_EI(X_,D_i,fixI=fixI,I=I)
         ns=X_.shape[0]
 
         return sp.mean(E,axis=0).reshape([1,ns])
 
-    def infer_lEI(self,X_,D_i):
+    def infer_lEI(self,X_,D_i,fixI=False,I=0.):
         X_i = copy.copy(X_)
         ns=X_i.shape[0]
         D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.empty([self.size,ns])
-        libGP.infer_lEI(self.s, cint(self.size),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D), R.ctypes.data_as(ctpd))
+        libGP.infer_lEI(self.s, cint(self.size),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D), R.ctypes.data_as(ctpd),cbool(fixI),cdbl(I))
         return R
 
-    def infer_lEI_post(self,X_,D_i,wrt=False):
-        E = self.infer_lEI(X_,D_i)
+    def infer_lEI_post(self,X_,D_i,fixI=False,I=0.):
+        E = self.infer_lEI(X_,D_i,fixI=fixI,I=I)
         ns=X_.shape[0]
         #print(E)
         #print(sp.log(sp.nanmean(sp.exp(E),axis=0)))

@@ -74,7 +74,6 @@ def EIMAPaq(optstate,persist,**para):
     kindex = para['kindex']
     maxf = para['maxf']
 
-    #para = copy.deepcopy(para)
     if persist==None:
         persist = {'n':0,'d':len(ub)}
     n = optstate.n
@@ -86,8 +85,6 @@ def EIMAPaq(optstate,persist,**para):
 
     if para['overhead']=='predict':
        overhead = geteffectiveoverhead(optstate,nrandinit)
-    #logger.debug(sp.vstack([e[0] for e in optstate.ev]))
-    #raise
     x=sp.vstack(optstate.x)
     y=sp.vstack(optstate.y)
     s= sp.vstack([e['s'] for e in optstate.ev])
@@ -96,46 +93,81 @@ def EIMAPaq(optstate,persist,**para):
     logger.info('found MAPHYP {}'.format(MAP))
 
     G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(kindex, d, MAP))
-    if para['smode']=='direct':
-        def directwrap(xq,y):
-            xq.resize([1,d])
-            a = G.infer_lEI(xq,[ev['d']])
-            return (-a[0,0],0)
+    def wrap(x):
+        xq = copy.copy(x)
+        xq.resize([1,d])
+        a = G.infer_lEI(xq,[ev['d']])
+        return -a[0,0]
 
-        [xmin,ymin,ierror] = direct(directwrap,lb,ub,user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
-        logger.info('DIRECT found max EI at {} {} {}'.format(xmin,ymin,ierror))
-    elif para['smode']=='multi':
-        def multiwrap(x):
-            xq = copy.copy(x)
-            xq.resize([1,d])
-            a = G.infer_lEI(xq,[ev['d']])
-            return -a[0,0]
-        [xmin,ymin,ierror] = multilocal(multiwrap, lb,ub,maxf=maxf)
-
-        logger.info('multilocal found max EI at {} {} {}'.format(xmin,ymin,ierror))
-    elif para['smode']=='dthenl':
-        def directwrap(xq,y):
-            xq.resize([1,d])
-            a = G.infer_lEI(xq,[ev['d']])
-            return (-a[0,0],0)
-
-        [dxmin,dymin,ierror] = direct(directwrap,lb,ub,user_data=[], algmethod=1, maxf=maxf-150, logfilename='/dev/null')
-        logger.info('DIRECT found max EI at {} {} {}'.format(dxmin,dymin,ierror))
-        def localwrap(x):
-            xq = copy.copy(x)
-            xq.resize([1,d])
-            a = G.infer_lEI(xq,[ev['d']])
-            return -a[0,0]
-        res = minimize(localwrap ,dxmin,method='L-BFGS-B',bounds=tuple([(lb[j],ub[j]) for j in range(d)]),options={'ftol':0.00001,'maxfun':150})
-        xmin,ymin,ierror = res.x,res.fun,res.message
-        logger.info('localrefine found max EI at {} {} {}'.format(xmin,ymin,ierror))
-
-    else:
-        raise KeyError('not a search mode')
+    xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
     #logger.debug([xmin,ymin,ierror])
+    logger.info('localrefine found max EI at {} {} {}'.format(xmin,sp.exp(ymin),ierror))
     persist['n']+=1
     return [i for i in xmin],ev,persist,{'MAPHYP':MAP,'logEImin':ymin,'DIRECTmessage':ierror}
 
+
+def eihypaq(optstate,persist,**para):
+    t0=time.clock()
+    para = copy.deepcopy(para)
+    if persist==None:
+        persist = {'n':0,'d':len(para['ub']),'overhead':0.,'raiseS':False}
+    n = optstate.n
+    d = persist['d']
+    if n<para['nrandinit']:
+        persist['n']+=1
+
+        return randomaq(optstate,persist,**para)
+    logger.info('EIHYPaq')
+    x=sp.vstack(optstate.x)
+    y=sp.vstack(optstate.y)
+    if persist['raiseS']:
+        s= sp.vstack([e['s']+10**persist['raiseS'] for e in optstate.ev])
+        logger.info('inflating diagonal in aqfn by 10**{}'.format(persist['raiseS']))
+    else:
+        s= sp.vstack([e['s'] for e in optstate.ev])
+    dx=[e['d'] for e in optstate.ev]
+    presetH=False
+    if 'choosereturn' in para.keys():
+        if 'reuseH' in para['choosereturn'].keys():
+            presetH = para['choosereturn']['reuseH']
+    try:
+        if not presetH:
+            G = PES.makeG(x,y,s,dx,para['kindex'],para['mprior'],para['sprior'],para['DH_SAMPLES'])
+        else:
+            logger.info('reusing preselected hyperparameters')
+            G =  GPdc.GPcore(x,y,s,dx, [GPdc.kernel(para['kindex'], x.shape[1], h) for h in presetH])
+        fixEI=False
+        fixVal=0.
+        if 'choosereturn' in para.keys():
+            if 'offsetEI' in para['choosereturn'].keys():
+                fixEI=True
+                fixVal = para['choosereturn']['offsetEI']
+                logger.info('EIoffset by {}'.format(fixVal))
+        def wrap(Q):
+            x = sp.array([Q])
+            v = G.infer_lEI_post(x,[[sp.NaN]],fixI=fixEI,I=fixVal)[0,0]
+            return -v
+
+        xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
+    except GPdc.MJMError as e:
+        if not persist['raiseS']:
+            persist['raiseS']=-19
+        else:
+            persist['raiseS']+=1
+        logger.error('numerical error in acq fn Raising noise to {}\n\n {}'.format(persist['raiseS'],e))
+        return eihypaq(optstate,persist,**para)
+
+
+    logger.info('DIRECT found max EI at {} {}'.format(xmin,ierror))
+    lhyp = sp.log10([k.hyp for k in G.kf])
+    lhmean = sp.mean(lhyp, axis=0)
+    lhstd = sp.sqrt(sp.var(lhyp, axis=0))
+    lhmin = lhyp.min(axis=0)
+    lhmax = lhyp.max(axis=0)
+    logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean,lhstd,lhmin,lhmax))
+
+    persist['overhead']=time.clock()-t0
+    return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in G.kf],'DIRECTmessage':ierror,'EImax':-ymin,'kindex':para['kindex'],}
 
 #PES with fixed s ev
 def PESfsaq(optstate,persist,**para):
@@ -216,19 +248,29 @@ def vmaxaq(optstate,persist,**para):
         if 'reuseH' in para['choosereturn'].keys():
             presetH = para['choosereturn']['reuseH']
     try:
-        pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH)
-        [xmin,ymin,ierror] = pesobj.search_vmax(para['ev']['s'],para)
+        if not presetH:
+            G = PES.makeG(x,y,s,dx,para['kindex'],para['mprior'],para['sprior'],para['DH_SAMPLES'])
+        else:
+            logger.info('reusing preselected hyperparameters')
+            G =  GPdc.GPcore(x,y,s,dx, [GPdc.kernel(para['kindex'], x.shape[1], h) for h in presetH])
+        def wrap(Q):
+            x = sp.array([Q])
+            v = G.infer_diag_post(x,[[sp.NaN]])[1][0,0]
+            return -v
+
+        xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
+        vmax = -ymin
     except GPdc.MJMError as e:
         if not persist['raiseS']:
             persist['raiseS']=-19
         else:
             persist['raiseS']+=1
         logger.error('numerical error in acq fn Raising noise to {}\n\n {}'.format(persist['raiseS'],e))
-        return PESfsaq(optstate,persist,**para)
+        return vmaxaq(optstate,persist,**para)
 
 
     logger.info('DIRECT found max PES at {} {}'.format(xmin,ierror))
-    lhyp = sp.log10([k.hyp for k in pesobj.G.kf])
+    lhyp = sp.log10([k.hyp for k in G.kf])
     lhmean = sp.mean(lhyp, axis=0)
     lhstd = sp.sqrt(sp.var(lhyp, axis=0))
     lhmin = lhyp.min(axis=0)
@@ -241,7 +283,7 @@ def vmaxaq(optstate,persist,**para):
             fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(45, 45))
             # plot the current GP
             if d==2:
-                gpbo.core.optutils.gpplot(ax[0,0],ax[0,1],pesobj.G,para['lb'],para['ub'],ns=60)
+                gpbo.core.optutils.gpplot(ax[0,0],ax[0,1],G,para['lb'],para['ub'],ns=60)
                 ax[0,0].set_title('GP_post_mean')
                 ax[0,1].set_title('GP_post_var')
                 ax[1, 1].plot(x[:,0], x[:,1], 'ro')
@@ -255,8 +297,7 @@ def vmaxaq(optstate,persist,**para):
                 logger.error(str(e))
             fig.clf()
             plt.close(fig)
-    return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],}
-#PES with variable s ev give costfunction
+    return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in G.kf],'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],}
 
 def PESvsaq(optstate,persist,**para):
     t0=time.clock()
@@ -454,7 +495,7 @@ def splocalaq(optstate,persist,**para):
             count+=1
             return persist['y'][count-1]
     try:
-        R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.0000001})
+        R=minimize(fwrap,persist['R'].dot(persist['start']),method='bfgs',options={'gtol':0.00001})
         persist['done']=True
         optstate.localdone=True
         logger.info('localopt finished with z: {} (x: {}) y: {} {}'.format(R.x,sp.linalg.solve(persist['R'],persist['z'][-1]),R.fun,R.message))

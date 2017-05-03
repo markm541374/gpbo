@@ -20,8 +20,13 @@ class eimledefault():
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
             'maxf':500+100*D,
-            'smode':'direct',
-            'overhead':None
+            'overhead':None,
+            'dpara': {'user_data': [],
+                      'algmethod': 1,
+                      'maxf': 500+100*D,
+                      'logfilename': '/dev/null'},
+            'lpara': {'gtol': 0.00001,
+                      'maxfun': 200}
         }
 
         self.stoppara = {'nmax': n}
@@ -89,6 +94,53 @@ class eimlelearns():
         self.fname = fname
         return
 
+class eihypdefault():
+    def __init__(self,f,D,n,s,path,fname):
+        self.aqfn = gpbo.core.acquisitions.eihypaq
+        self.aqpara= {
+            'ev': {'s': s, 'd': [sp.NaN]},
+            'lb': [-1.]*D,
+            'ub': [1.]*D,
+            'nrandinit': 10,
+            #'maxf':500+100*D,
+            'mprior': sp.array([1.]+[0.]*D),
+            'sprior': sp.array([1.]*(D+1)),
+            'kindex': GPdc.MAT52,
+            'DH_SAMPLES': 16+6*D,
+            'drop':True,
+            'noS': False,
+            'dpara': {'user_data': [],
+                      'algmethod': 1,
+                      'maxf': 500+100*D,
+                      'logfilename': '/dev/null'},
+            'lpara': {'gtol': 0.00001,
+                      'maxfun': 200}
+        }
+
+        self.stoppara = {'nmax': n}
+        self.stopfn = gpbo.core.optimize.nstopfn
+
+        self.reccfn = gpbo.core.reccomenders.gphinrecc
+        self.reccpara = {
+            'ev':self.aqpara['ev'],
+            'lb':self.aqpara['lb'],
+            'ub':self.aqpara['ub'],
+            'mprior':self.aqpara['mprior'],
+            'sprior':self.aqpara['sprior'],
+            'kindex':self.aqpara['kindex'],
+            'maxf':500+100*D,
+            'onlyafter':self.aqpara['nrandinit'],
+            'check':True,
+            'dpara':self.aqpara['dpara'],
+            'lpara':self.aqpara['lpara'],
+            'everyn':1
+        }
+        self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
+        self.ojf=f
+
+        self.path = path
+        self.fname = fname
+        return
 class pesfsdefault():
     def __init__(self,f,D,n,s,path,fname):
         self.aqfn = gpbo.core.acquisitions.PESfsaq
@@ -133,49 +185,6 @@ class pesfsdefault():
                 'check':True,
                 'dpara':self.aqpara['dpara'],
                 'lpara':self.aqpara['lpara'],
-                'everyn':1
-                }
-        self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
-        self.ojf=f
-
-        self.path = path
-        self.fname = fname
-        return
-
-class pesfslearns():
-    def __init__(self,f,D,n,s,path,fname):
-        self.aqfn = gpbo.core.acquisitions.PESfsaq
-        self.aqpara= {
-            'ev': {'s': s, 'd': [sp.NaN]},
-            'lb': [-1.]*D,
-            'ub': [1.]*D,
-            'nrandinit': 10,
-            'maxf': 1000*D,
-            'mprior': sp.array([1.]+[0.]*D+[-2]),
-            'sprior': sp.array([1.]*(D+1)+[3]),
-            'kindex': GPdc.MAT52CS,
-            'DH_SAMPLES': 16+16*D,
-            'DM_SAMPLES': 32,
-            'DM_SUPPORT': 800,
-            'SUPPORT_MODE': [gpbo.core.ESutils.SUPPORT_LAPAPROT],
-            'DM_SLICELCBPARA': 16,
-            'noS': False,
-        }
-
-        self.stoppara = {'nmax': n}
-        self.stopfn = gpbo.core.optimize.nstopfn
-
-        self.reccfn = gpbo.core.reccomenders.gphinrecc
-        self.reccpara = {
-                'ev':self.aqpara['ev'],
-                'lb':self.aqpara['lb'],
-                'ub':self.aqpara['ub'],
-                'mprior':self.aqpara['mprior'],
-                'sprior':self.aqpara['sprior'],
-                'kindex':self.aqpara['kindex'],
-                'maxf':500+100*D,
-                'onlyafter':self.aqpara['nrandinit'],
-                'check':True,
                 'everyn':1
                 }
         self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
@@ -349,6 +358,9 @@ class switchdefault():
             'ub': [1.] * D,
             'start': [0.] * D
         }
+        C2 = gpbo.core.config.eihypdefault(f, D, ninit, s, 'results', 'introspection.csv')
+        aq2 = C2.aqfn
+        aq2para = C2.aqpara
 
         self.chooser = gpbo.core.choosers.globallocalregret
         self.choosepara = {
@@ -363,7 +375,7 @@ class switchdefault():
             'check': True,
             'everyn': 1,
             'support': 2500,
-            'draws': 20000,
+            'draws': 50000,
             'regretswitch':1e-4,
             'dpara': {'user_data': [],
                       'algmethod': 1,
@@ -376,8 +388,8 @@ class switchdefault():
             'pvetol':1e-3
         }
 
-        self.aqfn = [aq0,aq1]
-        self.aqpara = [aq0para,aq1para]
+        self.aqfn = [aq0,aq1,aq2]
+        self.aqpara = [aq0para,aq1para,aq2para]
         self.multimode = True
 
         self.stoppara = {'nmax': nstop}
@@ -389,8 +401,8 @@ class switchdefault():
         reccfn1 = gpbo.core.reccomenders.argminrecc
         reccpara1 = {'check': True}
 
-        self.reccfn = [reccfn0,reccfn1]
-        self.reccpara = [reccpara0,reccpara1]
+        self.reccfn = [reccfn0,reccfn1,reccfn0]
+        self.reccpara = [reccpara0,reccpara1,reccpara0]
 
         self.ojfchar = {'dx': len(aq0para['lb']), 'dev': len(aq0para['ev'])}
         self.ojf = f
