@@ -44,6 +44,8 @@ class eimledefault():
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
                 'smode':'direct',
+                'dpara':self.aqpara['dpara'],
+                'lpara':self.aqpara['lpara'],
                 'everyn':1
                 }
         self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
@@ -68,7 +70,13 @@ class eimlelearns():
             'mprior': sp.array([1.]+[0.]*D+[-2]),
             'sprior': sp.array([1.]*(D+1)+[5]),
             'kindex': GPdc.SQUEXPCS,
-            'maxf':500+100*D
+            'maxf':500+100*D,
+            'dpara': {'user_data': [],
+                      'algmethod': 1,
+                      'maxf': 500+100*D,
+                      'logfilename': '/dev/null'},
+            'lpara': {'gtol': 0.00001,
+                      'maxfun': 200}
         }
 
         self.stoppara = {'nmax': n}
@@ -85,6 +93,8 @@ class eimlelearns():
                 'maxf':500+100*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
+                'dpara':self.aqpara['dpara'],
+                'lpara':self.aqpara['lpara'],
                 'everyn':1
                 }
         self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
@@ -195,7 +205,7 @@ class pesfsdefault():
         return
 
 class pesvsdefault():
-    def __init__(self,f,D,n,lsl,lsu,path,fname):
+    def __init__(self,f,cfn,D,n,lsl,lsu,path,fname):
         self.aqfn = gpbo.core.acquisitions.PESvsaq
         self.aqpara= {
             'ev': {'s': lsu, 'd': [sp.NaN]},
@@ -216,8 +226,14 @@ class pesvsdefault():
             'logsl': lsl,
             'sinitrand':True,
             'overhead':'None',
-            'cfn': lambda x,ev :42.,
-            'traincfn':'llog1d'
+            'cfn': cfn,
+            'traincfn':'llog1d',
+            'dpara': {'user_data': [],
+                      'algmethod': 1,
+                      'maxf': 500+100*D,
+                      'logfilename': '/dev/null'},
+            'lpara': {'gtol': 0.00001,
+                      'maxfun': 200}
         }
 
         self.stoppara = {'nmax': n}
@@ -234,6 +250,8 @@ class pesvsdefault():
                 'maxf':500+100*D,
                 'onlyafter':self.aqpara['nrandinit'],
                 'check':True,
+                'dpara':self.aqpara['dpara'],
+                'lpara':self.aqpara['lpara'],
                 'everyn':1
                 }
         self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
@@ -267,7 +285,13 @@ class pesbsdefault():
             'xau':1.,
             'xal':0.,
             'startmode':'inline',
-            'initpoints':[0.5,0.75,0.875]
+            'initpoints':[0.5,0.75,0.875],
+            'dpara': {'user_data': [],
+                      'algmethod': 1,
+                      'maxf': 500+100*D,
+                      'logfilename': '/dev/null'},
+            'lpara': {'gtol': 0.00001,
+                      'maxfun': 200}
             }
 
         self.stoppara = {'nmax': n}
@@ -283,6 +307,8 @@ class pesbsdefault():
             'maxf': 500+100*D, #10**(-min(12,max(6.,3*D))),
             'onlyafter': self.aqpara['nrandinit'],
             'check': True,
+            'dpara':self.aqpara['dpara'],
+            'lpara':self.aqpara['lpara'],
             'everyn': 1
         }
         self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
@@ -314,7 +340,13 @@ class pesbslearns():
             'xau':1.,
             'xal':0.,
             'startmode':'inline',
-            'initpoints':[0.5,0.75,0.875]
+            'initpoints':[0.5,0.75,0.875],
+            'dpara': {'user_data': [],
+                      'algmethod': 1,
+                      'maxf': 500+100*D,
+                      'logfilename': '/dev/null'},
+            'lpara': {'gtol': 0.00001,
+                      'maxfun': 200}
             }
 
         self.stoppara = {'nmax': n}
@@ -330,6 +362,8 @@ class pesbslearns():
             'maxf': 500+100*D,
             'onlyafter': self.aqpara['nrandinit'],
             'check': True,
+            'dpara':self.aqpara['dpara'],
+            'lpara':self.aqpara['lpara'],
             'everyn': 1
         }
         self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}

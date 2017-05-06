@@ -11981,7 +11981,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_12PESvsaq(CYTHON_UNUSED PyO
  *         over=geteffectiveoverhead(optstate,para['nrandinit'])
  *     else:
  *         over=0.             # <<<<<<<<<<<<<<
- *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,para['logsl'],para['logsu'],maxf=para['maxf'],over=over)
+ *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,para['logsl'],para['logsu'],para,over=over)
  * 
  */
     __Pyx_INCREF(__pyx_float_0_);
@@ -11992,7 +11992,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_12PESvsaq(CYTHON_UNUSED PyO
   /* "gpbo/core/acquisitions.pyx":321
  *     else:
  *         over=0.
- *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,para['logsl'],para['logsu'],maxf=para['maxf'],over=over)             # <<<<<<<<<<<<<<
+ *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,para['logsl'],para['logsu'],para,over=over)             # <<<<<<<<<<<<<<
  * 
  *     logger.debug([xmin,ymin,ierror])
  */
@@ -12002,7 +12002,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_12PESvsaq(CYTHON_UNUSED PyO
   __Pyx_GOTREF(__pyx_t_13);
   __pyx_t_8 = PyObject_GetItem(__pyx_v_para, __pyx_n_s_logsu); if (unlikely(__pyx_t_8 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_4 = PyTuple_New(3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyTuple_New(4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_v_cfn);
   __Pyx_GIVEREF(__pyx_v_cfn);
@@ -12011,14 +12011,13 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_12PESvsaq(CYTHON_UNUSED PyO
   PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_13);
   __Pyx_GIVEREF(__pyx_t_8);
   PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_t_8);
+  __Pyx_INCREF(__pyx_v_para);
+  __Pyx_GIVEREF(__pyx_v_para);
+  PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_v_para);
   __pyx_t_13 = 0;
   __pyx_t_8 = 0;
   __pyx_t_8 = PyDict_New(); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_13 = PyObject_GetItem(__pyx_v_para, __pyx_n_s_maxf); if (unlikely(__pyx_t_13 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
-  __Pyx_GOTREF(__pyx_t_13);
-  if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_maxf, __pyx_t_13) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
   if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_over, __pyx_v_over) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_4, __pyx_t_8); if (unlikely(!__pyx_t_13)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_13);
@@ -12090,7 +12089,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_12PESvsaq(CYTHON_UNUSED PyO
   __pyx_t_1 = 0;
 
   /* "gpbo/core/acquisitions.pyx":323
- *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,para['logsl'],para['logsu'],maxf=para['maxf'],over=over)
+ *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,para['logsl'],para['logsu'],para,over=over)
  * 
  *     logger.debug([xmin,ymin,ierror])             # <<<<<<<<<<<<<<
  *     para['ev']['s']=10**xmin[-1]
@@ -12791,7 +12790,7 @@ static PyObject *__pyx_pw_4gpbo_4core_12acquisitions_15PESbsaq(PyObject *__pyx_s
 /* "gpbo/core/acquisitions.pyx":403
  *     else:
  *         over=0.
- *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],maxf=para['maxf'],over=over)             # <<<<<<<<<<<<<<
+ *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],para,over=over)             # <<<<<<<<<<<<<<
  *     logger.debug([xmin,ymin,ierror])
  *     para['ev']['xa']=xmin[0]
  */
@@ -14604,7 +14603,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14PESbsaq(CYTHON_UNUSED PyO
  *         over=geteffectiveoverhead(optstate,para['nrandinit'])
  *     else:
  *         over=0.             # <<<<<<<<<<<<<<
- *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],maxf=para['maxf'],over=over)
+ *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],para,over=over)
  *     logger.debug([xmin,ymin,ierror])
  */
     __Pyx_INCREF(__pyx_float_0_);
@@ -14615,7 +14614,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14PESbsaq(CYTHON_UNUSED PyO
   /* "gpbo/core/acquisitions.pyx":403
  *     else:
  *         over=0.
- *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],maxf=para['maxf'],over=over)             # <<<<<<<<<<<<<<
+ *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],para,over=over)             # <<<<<<<<<<<<<<
  *     logger.debug([xmin,ymin,ierror])
  *     para['ev']['xa']=xmin[0]
  */
@@ -14623,20 +14622,19 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14PESbsaq(CYTHON_UNUSED PyO
   __Pyx_GOTREF(__pyx_t_10);
   __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4gpbo_4core_12acquisitions_7PESbsaq_lambda1, 0, __pyx_n_s_PESbsaq_locals_lambda, ((PyObject*)__pyx_cur_scope), __pyx_n_s_gpbo_core_acquisitions, __pyx_d, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyTuple_New(3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_v_cfn);
   __Pyx_GIVEREF(__pyx_v_cfn);
   PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_cfn);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_1);
+  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_para);
+  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_para);
+  PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_cur_scope->__pyx_v_para);
   __pyx_t_1 = 0;
   __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyObject_GetItem(__pyx_cur_scope->__pyx_v_para, __pyx_n_s_maxf); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
-  __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_maxf, __pyx_t_3) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_over, __pyx_v_over) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
@@ -14709,7 +14707,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14PESbsaq(CYTHON_UNUSED PyO
 
   /* "gpbo/core/acquisitions.pyx":404
  *         over=0.
- *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],maxf=para['maxf'],over=over)
+ *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],para,over=over)
  *     logger.debug([xmin,ymin,ierror])             # <<<<<<<<<<<<<<
  *     para['ev']['xa']=xmin[0]
  *     xout = [i for i in xmin[1:]]
@@ -14759,7 +14757,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14PESbsaq(CYTHON_UNUSED PyO
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "gpbo/core/acquisitions.pyx":405
- *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],maxf=para['maxf'],over=over)
+ *     [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],para,over=over)
  *     logger.debug([xmin,ymin,ierror])
  *     para['ev']['xa']=xmin[0]             # <<<<<<<<<<<<<<
  *     xout = [i for i in xmin[1:]]

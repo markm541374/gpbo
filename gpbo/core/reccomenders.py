@@ -56,48 +56,54 @@ def gpmaprecc(optstate,persist,**para):
     MAP = GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
     logger.info('MAPHYP {}'.format(MAP))
     G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(para['kindex'], d, MAP))
-
-    if para['smode'] == 'direct':
-        def directwrap(xq, y):
-            xq.resize([1, d])
-            a = G.infer_m_post(xq,[[sp.NaN]])
-            return (a[0, 0], 0)
-
-        [xmin, ymin, ierror] = direct(directwrap, lb, ub, user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
-        logger.info('DIRECT found min post at {} {} {}'.format(xmin, ymin, ierror))
-    elif para['smode'] == 'multi':
-        def multiwrap(x):
-            xq = copy.copy(x)
-            xq.resize([1, d])
-            a = G.infer_m_post(xq,[[sp.NaN]])
-            return a[0, 0]
-
-        [xmin, ymin, ierror] = multilocal(multiwrap, lb, ub, maxf=maxf)
-
-        logger.info('multilocal found min post at {} {} {}'.format(xmin, ymin, ierror))
-    elif para['smode'] == 'dthenl':
-        def directwrap(xq, y):
-            xq.resize([1, d])
-            a = G.infer_m_post(xq,[[sp.NaN]])
-            return (a[0, 0], 0)
-
-        [dxmin, dymin, ierror] = direct(directwrap, lb, ub, user_data=[], algmethod=1, maxf=maxf - 150,
-                                        logfilename='/dev/null')
-        logger.info('DIRECT found min post at {} {} {}'.format(dxmin, dymin, ierror))
-
-        def localwrap(x):
-            xq = copy.copy(x)
-            xq.resize([1, d])
-            a = G.infer_m_post(xq,[[sp.NaN]])
-            return a[0, 0]
-
-        res = minimize(localwrap, dxmin, method='L-BFGS-B', bounds=tuple([(lb[j], ub[j]) for j in range(d)]),
-                       options={'ftol': 0.00001, 'maxfun': 150})
-        xmin, ymin, ierror = res.x, res.fun, res.message
-        logger.info('localrefine found min post at {} {} {}'.format(xmin, ymin, ierror))
-
-    else:
-        raise KeyError('not a search mode')
+#
+#    if para['smode'] == 'direct':
+#        def directwrap(xq, y):
+#            xq.resize([1, d])
+#            a = G.infer_m_post(xq,[[sp.NaN]])
+#            return (a[0, 0], 0)
+#
+#        [xmin, ymin, ierror] = direct(directwrap, lb, ub, user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
+#        logger.info('DIRECT found min post at {} {} {}'.format(xmin, ymin, ierror))
+#    elif para['smode'] == 'multi':
+#        def multiwrap(x):
+#            xq = copy.copy(x)
+#            xq.resize([1, d])
+#            a = G.infer_m_post(xq,[[sp.NaN]])
+#            return a[0, 0]
+#
+#        [xmin, ymin, ierror] = multilocal(multiwrap, lb, ub, maxf=maxf)
+#
+#        logger.info('multilocal found min post at {} {} {}'.format(xmin, ymin, ierror))
+#    elif para['smode'] == 'dthenl':
+#        def directwrap(xq, y):
+#            xq.resize([1, d])
+#            a = G.infer_m_post(xq,[[sp.NaN]])
+#            return (a[0, 0], 0)
+#
+#        [dxmin, dymin, ierror] = direct(directwrap, lb, ub, user_data=[], algmethod=1, maxf=maxf - 150,
+#                                        logfilename='/dev/null')
+#        logger.info('DIRECT found min post at {} {} {}'.format(dxmin, dymin, ierror))
+#
+#        def localwrap(x):
+#            xq = copy.copy(x)
+#            xq.resize([1, d])
+#            a = G.infer_m_post(xq,[[sp.NaN]])
+#            return a[0, 0]
+#
+#        res = minimize(localwrap, dxmin, method='L-BFGS-B', bounds=tuple([(lb[j], ub[j]) for j in range(d)]),
+#                       options={'ftol': 0.00001, 'maxfun': 150})
+#        xmin, ymin, ierror = res.x, res.fun, res.message
+#        logger.info('localrefine found min post at {} {} {}'.format(xmin, ymin, ierror))
+#
+#    else:
+#        raise KeyError('not a search mode')
+    def wrap(x):
+        xq = copy.copy(x)
+        xq.resize([1, d])
+        a = G.infer_m_post(xq,[[sp.NaN]])
+        return a[0, 0]
+    xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
     return [i for i in xmin],persist,{'MAPHYP':MAP,'ymin':ymin}
 
 def gpmap2upperrecc(optstate,persist,**para):
@@ -115,13 +121,14 @@ def gpmap2upperrecc(optstate,persist,**para):
     logger.info('MAPHYP {}'.format(MAP))
     G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(para['kindex'], d, MAP))
     count=0
-    def directwrap(xq,y):
+    def wrap(xq):
         xq.resize([1,d])
         a,v = G.infer_diag_post(xq,[[sp.NaN]])
-        return (a[0,0]+2.*sp.sqrt(v[0,0]),0)
+        return a[0,0]+2.*sp.sqrt(v[0,0])
 
     #print('nevals={}\n\n'.format(count))
-    [xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
+    #[xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
+    xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
     logger.info('DIRECT found post. min {} at {} {}'.format(ymin,xmin,ierror))
     a,v= G.infer_diag_post(sp.array([[xmin]]),[[sp.NaN]])
     print('mean {} std{} '.format(a[0,0],sp.sqrt(v[0,0])))
@@ -149,13 +156,13 @@ def gpmapasrecc(optstate,persist,**para):
     MAP = GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
     logger.info('MAPHYP {}'.format(MAP))
     G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(para['kindex'], d + 1, MAP))
-    def directwrap(xq,y):
+    def wrap(xq):
         xq.resize([1,d])
         xe = sp.hstack([xq,sp.array([[0.]])])
-        #print xe
         a = G.infer_m_post(xe,[[sp.NaN]])
-        return (a[0,0],0)
-    [xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
+        return a[0,0]
+    #[xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
+    xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
     logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
 
 
@@ -241,15 +248,23 @@ def gphinasrecc(optstate,persist,**para):
     dx=[e['d'] for e in optstate.ev]
     
     G = GPdc.GPcore(x, y, s, dx, [GPdc.kernel(optstate.aux['kindex'], d + 1, h) for h in optstate.aux['HYPdraws']])
-    def directwrap(xq,y):
-        xq.resize([1,d])
-        xe = sp.hstack([sp.array([[0.]]),xq])
-        #print xe
-        a = G.infer_m_post(xe,[[sp.NaN]])
-        return (a[0,0],0)
-    [xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
-    logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
+#    def directwrap(xq,y):
+#        xq.resize([1,d])
+#        xe = sp.hstack([sp.array([[0.]]),xq])
+#        #print xe
+#        a = G.infer_m_post(xe,[[sp.NaN]])
+#        return (a[0,0],0)
+#    [xmin,ymin,ierror] = direct(directwrap,para['lb'],para['ub'],user_data=[], algmethod=1, maxf=para['maxf'], logfilename='/dev/null')
 
+    def wrap(x):
+        xq = copy.copy(x)
+        xq.resize([1, d])
+        xe = sp.hstack([sp.array([[0.]]),xq])
+        a = G.infer_m_post(xe,[[sp.NaN]])
+        return a[0, 0]
+
+    xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
+    logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
     from gpbo.core import debugoutput, debugoptions
     if debugoutput and debugoptions['datavis']:
         from gpbo.core import debugpath

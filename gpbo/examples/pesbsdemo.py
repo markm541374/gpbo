@@ -2,7 +2,7 @@
 
 import gpbo
 import gpbo.core.objectives as objectives
-gpbo.core.debugoutput=True
+gpbo.core.debugoutput=False
 gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':False,'taq':False}
 import scipy as sp
 import copy

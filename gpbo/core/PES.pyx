@@ -317,9 +317,9 @@ class PES:
 
         return [xmin,ymin,ierror]
     
-    def search_acq(self,cfn,logsl,logsu,maxf=1000,dv=[[sp.NaN]],over=0.):
+    def search_acq(self,cfn,logsl,logsu,spara,dv=[[sp.NaN]],over=0.):
         print('over {}'.format(over))
-        def directwrap(Q,extra):
+        def wrap(Q):
             x = sp.array([Q[:-1]])
             s = 10**Q[-1]
             acq = PESgain(self.G,self.Ga,self.Z,x,dv,[s])
@@ -327,9 +327,10 @@ class PES:
                 R = -acq/(cfn(x,**{'s':s})+over)
             except TypeError:
                 R = -acq/(cfn(x,s)+over)
-            return (R,0)
+            return R
 
-        [xmin, ymin, ierror] = direct(directwrap,sp.hstack([self.lb,logsl]),sp.hstack([self.ub,logsu]),user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
+        #[xmin, ymin, ierror] = direct(directwrap,sp.hstack([self.lb,logsl]),sp.hstack([self.ub,logsu]),user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
+        xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,sp.hstack([self.lb,logsl]),sp.hstack([self.ub,logsu]),spara['dpara'],spara['lpara'])
 
         if gpbo.core.debugoutput and gpbo.core.debugoptions['acqfn1d']:
             print( 'plotting acq1d...')
@@ -404,10 +405,9 @@ class PES_inplane:
             a[i] = a[i]/costfn(Xq[i,:].flatten())
         return a
     
-    def search_acq(self,cfn,sfn,maxf=1000,dv=[[sp.NaN]],over=0.):
+    def search_acq(self,cfn,sfn,spara,dv=[[sp.NaN]],over=0.):
         print( 'overhead={}'.format(over))
-        def directwrap(Q,extra):
-            #print('dwrap {} \n'.format(Q))
+        def wrap(Q):
             sys.stdout.flush()
             x = sp.array([Q])
             if self.noS:
@@ -417,16 +417,14 @@ class PES_inplane:
                 s = sfn(x)
             acq = PESgain(self.G,self.Ga,self.Z,x,dv,[s])
             try:
-                #print x[0,1:],x[0,0]
                 R = -acq/(cfn(x[0,1:],**{'xa':x[0,0]})+over)
             except TypeError:
                 R = -acq/(cfn(x,s)+over)
-            return (R,0)
-        print(directwrap(self.lb,0.))
-        print(directwrap(self.ub,0.))
+            return R
         #print self.ub
 
-        [xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=0, maxf=maxf, logfilename='/dev/null')
+        xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,self.lb,self.ub,spara['dpara'],spara['lpara'])
+        #[xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=0, maxf=maxf, logfilename='/dev/null')
         
         
         if False and plots:

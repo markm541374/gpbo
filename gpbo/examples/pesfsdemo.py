@@ -21,6 +21,6 @@ def f(x,**ev):
 
 
 C=gpbo.core.config.pesfsdefault(f,D,n,s,'results','pesfs.csv')
-C.aqfn = gpbo.core.acquisitions.vmaxaq
+#C.aqfn = gpbo.core.acquisitions.vmaxaq
 out = gpbo.search(C)
 print out

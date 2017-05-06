@@ -318,7 +318,7 @@ def PESvsaq(optstate,persist,**para):
         over=geteffectiveoverhead(optstate,para['nrandinit'])
     else:
         over=0.
-    [xmin,ymin,ierror] = pesobj.search_acq(cfn,para['logsl'],para['logsu'],maxf=para['maxf'],over=over)
+    [xmin,ymin,ierror] = pesobj.search_acq(cfn,para['logsl'],para['logsu'],para,over=over)
     
     logger.debug([xmin,ymin,ierror])
     para['ev']['s']=10**xmin[-1]
@@ -400,7 +400,7 @@ def PESbsaq(optstate,persist,**para):
         over=geteffectiveoverhead(optstate,para['nrandinit'])
     else:
         over=0.
-    [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],maxf=para['maxf'],over=over)
+    [xmin,ymin,ierror] = pesobj.search_acq(cfn,lambda s:para['ev']['s'],para,over=over)
     logger.debug([xmin,ymin,ierror])
     para['ev']['xa']=xmin[0]
     xout = [i for i in xmin[1:]]
