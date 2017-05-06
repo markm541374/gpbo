@@ -93,7 +93,7 @@ def globallocalregret(optstate,persist,**para):
     rmax = gpbo.core.optutils.ballradsearch(d,1.,PDcondition,neval=100,lineSmax=20)
 
     logger.info('+ve region radius {}'.format(rmax))
-    if gpbo.core.debugoptions['adaptive']:
+    if gpbo.core.debugoutput['adaptive']:
         fig, ax = plt.subplots(nrows=3, ncols=4, figsize=(85, 85))
         # plot the current GP
         if d==2:
@@ -128,12 +128,11 @@ def globallocalregret(optstate,persist,**para):
                 ax[0,2].plot(R[:,0],R[:,1],'r.')
         ax[1,3].text(0,0,'prob +ve at min {}\nR+ve {}'.format(pc,rmax))
     if rmax==0:
-        if gpbo.core.debugoptions['adaptive']:
+        if gpbo.core.debugoutput['adaptive']:
             try:
-                from gpbo.core import debugpath
                 fname = 'lotsofplots' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'
                 print('saving as {}'.format(fname))
-                fig.savefig(os.path.join(debugpath, fname))
+                fig.savefig(os.path.join(gpbo.core.debugoutput['path'], fname))
             except BaseException as e:
                 logger.error(str(e))
             fig.clf()
@@ -229,7 +228,7 @@ def globallocalregret(optstate,persist,**para):
     else:
         rval=0
         persist['flip']=False
-    if gpbo.core.debugoptions['adaptive']:
+    if gpbo.core.debugoutput['adaptive']:
         if d==2:
             gpbo.core.optutils.plotaslogrtheta(W[:,0],W[:,1],xmin[0],xmin[1],ax[1,1],'b.')
             ax[0,2].plot(W[:,0],W[:,1],'b.')
@@ -296,10 +295,9 @@ def globallocalregret(optstate,persist,**para):
 
         #ax[2,3].plot(K[:,0],K[:,1],'b.')
         try:
-            from gpbo.core import debugpath
             fname = 'lotsofplots' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'
             print('saving as {}'.format(fname))
-            fig.savefig(os.path.join(debugpath, fname))
+            fig.savefig(os.path.join(gpbo.core.debugoutput['path'], fname))
         except BaseException as e:
             logger.error(str(e))
         fig.clf()

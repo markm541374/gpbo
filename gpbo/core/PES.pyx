@@ -48,8 +48,7 @@ def drawmins(G,n,lb,ub,SUPPORT=300,mode = [ESutils.SUPPORT_SLICELCB],SLICELCB_PA
     print( "drawing mins from support")
 
     from gpbo.core import debugoutput
-    from gpbo.core import debugoptions
-    if debugoutput and  debugoptions['support'] and plots:
+    if debugoutput['support'] and plots:
         fig, ax = plt.subplots(1)
         ax.plot(W[:,0],W[:,1],'bx')
         ax.plot(R[:,0],R[:,1],'r.')
@@ -332,12 +331,8 @@ class PES:
         #[xmin, ymin, ierror] = direct(directwrap,sp.hstack([self.lb,logsl]),sp.hstack([self.ub,logsu]),user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
         xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,sp.hstack([self.lb,logsl]),sp.hstack([self.ub,logsu]),spara['dpara'],spara['lpara'])
 
-        if gpbo.core.debugoutput and gpbo.core.debugoptions['acqfn1d']:
+        if gpbo.core.debugoutput['acqfn1d']:
             print( 'plotting acq1d...')
-            from gpbo.core import debugpath
-            import os
-            if not os.path.exists(debugpath):
-                os.mkdir(debugpath)
             import time
             from matplotlib import pyplot as plt
             f,a=plt.subplots(3,figsize=[8,10],sharex=True)
@@ -360,7 +355,7 @@ class PES:
             a[0].set_yscale('log')
             a[1].set_yscale('log')
             a[2].set_yscale('log')
-            f.savefig(os.path.join(debugpath, 'aq1d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+            f.savefig(os.path.join(gpbo.core.debugoutput['path'], 'aq1d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
             plt.close(f)
             del(f)
 

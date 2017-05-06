@@ -58,12 +58,8 @@ def traincfn1d(x,c):
     n = x.size
     g = GPdc.GPcore(x, c, sp.array([1e-1] * n), [[sp.NaN]] * n, GPdc.kernel(GPdc.MAT52, 1, [1., 0.2]))
 
-    if gpbo.core.debugoutput and gpbo.core.debugoptions['cost1d']:
+    if gpbo.core.debugoutput['cost1d']:
         print( 'plotting cost1d...')
-        from gpbo.core import debugpath
-        import os
-        if not os.path.exists(debugpath):
-            os.mkdir(debugpath)
         import time
         from matplotlib import pyplot as plt
         f,a=plt.subplots(1)
@@ -83,7 +79,7 @@ def traincfn1d(x,c):
         a.fill_between(xaxis,l,u,facecolor='lightblue',edgecolor='lightblue',alpha=0.5)
         for i in xrange(n):
             a.plot(x[i],c[i],'r.')
-        f.savefig(os.path.join(debugpath, 'cost1d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+        f.savefig(os.path.join(gpbo.core.debugoutput['path'], 'cost1d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
         del(f)
     return cfnobj(g)
 
@@ -95,12 +91,8 @@ def traincfn1dll(x,c):
     print( 'MAPhyp in costfn {}'.format(MAP))
     g = GPdc.GPcore(x, cl, sp.array([1e-3] * n), [[sp.NaN]] * n, GPdc.kernel(GPdc.MAT52CS,1,MAP))
 
-    if gpbo.core.debugoutput and gpbo.core.debugoptions['cost1d']:
+    if gpbo.core.debugoutput['cost1d']:
         print( 'plotting cost1d...')
-        from gpbo.core import debugpath
-        import os
-        if not os.path.exists(debugpath):
-            os.mkdir(debugpath)
         import time
         from matplotlib import pyplot as plt
         f,a=plt.subplots(2)
@@ -129,7 +121,7 @@ def traincfn1dll(x,c):
             a[1].plot(x[i], c[i], 'r.')
         a[1].set_ylabel('out')
 
-        f.savefig(os.path.join(debugpath, 'cost1d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+        f.savefig(os.path.join(gpbo.core.debugoutput['path'], 'cost1d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
         f.clf()
         plt.close(f)
         del(f)
@@ -144,12 +136,8 @@ def traincfnfull(x,c):
     MAP = GPdc.searchMAPhyp(x, cl, sp.array([1e-6] * n), [[sp.NaN]] * n, sp.array([1.]+[-0.]*d ), sp.array([2.]*(d+1)), GPdc.MAT52)
     print( 'MAPhyp in costfn {}'.format(MAP))
     g = GPdc.GPcore(x, cl, sp.array([1e-3] * n), [[sp.NaN]] * n, GPdc.kernel(GPdc.MAT52,1,MAP))
-    if False:#gpbo.core.debugoutput and gpbo.core.debugoptions['cost1d']:
+    if gpbo.core.debugoutput['cost1d']:
         print( 'plotting cost...')
-        from gpbo.core import debugpath
-        import os
-        if not os.path.exists(debugpath):
-            os.mkdir(debugpath)
         import time
         from matplotlib import pyplot as plt
         f,a=plt.subplots(d,2)
@@ -199,7 +187,7 @@ def traincfnfull(x,c):
         except ValueError:
             pass
 
-        f.savefig(os.path.join(debugpath, 'cost1d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+        f.savefig(os.path.join(debugoutput['path'], 'cost1d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
         f.clf()
         plt.close(f)
         del(f)
@@ -248,8 +236,7 @@ def predictive1d(x,c,t,ofs,C):
         ecaq = npred(cev)[1]
         return cev+ecaq
 
-    if gpbo.core.debugoutput and gpbo.core.debugoptions['taq']:
-        from gpbo.core import debugpath
+    if gpbo.core.debugoutput['taq']:
         from matplotlib import pyplot as plt
         print( 'plotting taq...')
         f, a = plt.subplots(3)
@@ -272,7 +259,7 @@ def predictive1d(x,c,t,ofs,C):
         cadj = map(lambda x:cfout(None,**{'xa':x}),xaxis)
         a[2].plot(xaxis,cbase,'b')
         a[2].plot(xaxis,cadj,'g')
-        f.savefig(os.path.join(debugpath, 'taq' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+        f.savefig(os.path.join(gpbo.core.debugoutput['path'], 'taq' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
         f.clf()
         plt.close(f)
         del (f)

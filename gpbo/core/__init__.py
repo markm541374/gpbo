@@ -1,7 +1,6 @@
-debugoutput=False
-debugpath='dbout'
-debugoptions={'datavis':True,'drawlap':True,'cost1d':True,'ctaq':True}
-
+from collections import defaultdict
+debugoutput=defaultdict(lambda :False)
+debugoutput['path']='dbout'
 from .optimize import *
 from .optutils import *
 from .acquisitions import *

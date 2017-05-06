@@ -140,9 +140,8 @@ class optimizer:
             logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+','+''.join([str(k)+' '+str(aqaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in aqaux.keys()])[:-1]+'\n'
             lf.write(logstr)
             lf.flush()
-            if gpbo.core.debugoutput:
-                if gpbo.core.debugoptions['logstate']:
-                    pickle.dump(self.state,open(os.path.join(gpbo.core.debugpath,'{}.p'.format(self.state.n)),'wb'))
+            if gpbo.core.debugoutput['logstate']:
+                pickle.dump(self.state,open(os.path.join(gpbo.core.debugoutput['path'],'{}.p'.format(self.state.n)),'wb'))
 
         #import pickle
         #obj = [self.reccpersist, self.aqpersist]

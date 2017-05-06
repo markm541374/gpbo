@@ -1,8 +1,5 @@
 import gpbo
 import scipy as sp
-from gpbo.core import GPdc as GPdc
-gpbo.core.debugoutput=False
-#gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':False,'ctaq':False,'support':False,'adaptive':False}
 braninymin = 0.39788735772973816
 
 def cfn(x,s):

@@ -242,25 +242,23 @@ def vmaxaq(optstate,persist,**para):
     logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean,lhstd,lhmin,lhmax))
 
     persist['overhead']=time.clock()-t0
-    if gpbo.core.debugoutput:
-        if gpbo.core.debugoptions['datavis']:
-            fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(45, 45))
-            # plot the current GP
-            if d==2:
-                gpbo.core.optutils.gpplot(ax[0,0],ax[0,1],G,para['lb'],para['ub'],ns=60)
-                ax[0,0].set_title('GP_post_mean')
-                ax[0,1].set_title('GP_post_var')
-                ax[1, 1].plot(x[:,0], x[:,1], 'ro')
+    if gpbo.core.debugoutput['datavis']:
+        fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(45, 45))
+        # plot the current GP
+        if d==2:
+            gpbo.core.optutils.gpplot(ax[0,0],ax[0,1],G,para['lb'],para['ub'],ns=60)
+            ax[0,0].set_title('GP_post_mean')
+            ax[0,1].set_title('GP_post_var')
+            ax[1, 1].plot(x[:,0], x[:,1], 'ro')
 
-            try:
-                from gpbo.core import debugpath
-                fname = 'vmaxaqplot' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'
-                print('saving as {}'.format(fname))
-                fig.savefig(os.path.join(debugpath, fname))
-            except BaseException as e:
-                logger.error(str(e))
-            fig.clf()
-            plt.close(fig)
+        try:
+            fname = 'vmaxaqplot' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'
+            print('saving as {}'.format(fname))
+            fig.savefig(os.path.join(gpbo.core.debugoutput['path'], fname))
+        except BaseException as e:
+            logger.error(str(e))
+        fig.clf()
+        plt.close(fig)
     return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in G.kf],'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],}
 
 def PESvsaq(optstate,persist,**para):

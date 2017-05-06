@@ -166,8 +166,8 @@ def gpmapasrecc(optstate,persist,**para):
     logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
 
 
-    from gpbo.core import debugoutput, debugoptions
-    if debugoutput and debugoptions['datavis']:
+    from gpbo.core import debugoutput
+    if debugoutput['datavis']:
         A2 = MAP[0]
         l = MAP[3]
         from matplotlib import pyplot as plt
@@ -265,11 +265,10 @@ def gphinasrecc(optstate,persist,**para):
 
     xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
     logger.info('reccsearchresult: {}'.format([xmin,ymin,ierror]))
-    from gpbo.core import debugoutput, debugoptions
-    if debugoutput and debugoptions['datavis']:
-        from gpbo.core import debugpath
-        if not os.path.exists(debugpath):
-            os.mkdir(debugpath)
+    from gpbo.core import debugoutput
+    if debugoutput['datavis']:
+        if not os.path.exists(debugoutput['path']):
+            os.mkdir(debugoutput['path'])
 
         l = sp.mean([h[3] for h in optstate.aux['HYPdraws']])
         from matplotlib import pyplot as plt
@@ -299,7 +298,7 @@ def gphinasrecc(optstate,persist,**para):
         ax[0].add_patch(circle)
         ax[0].axis([-1.,1.,-1.,1.])
         ax[1].plot(xmin[0],xmin[1],'ro')
-        fig.savefig(os.path.join(debugpath, 'datavis' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+        fig.savefig(os.path.join(debugoutput['path'], 'datavis' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
         fig.clf()
         plt.close(fig)
         del(fig)

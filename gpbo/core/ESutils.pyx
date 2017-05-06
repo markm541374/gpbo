@@ -153,12 +153,8 @@ def draw_support(g, lb, ub, n, method, para=1.):
         sp.clip(X,-1,1,out=X)
         from gpbo.core import debugoutput
 
-        if debugoutput and  gpbo.core.debugoptions['drawlap'] and plots:
+        if debugoutput['drawlap'] and plots:
             print( "plotting draw_support...",)
-            from gpbo.core import debugpath
-            if not os.path.exists(debugpath):
-                os.mkdir(debugpath)
-
             np = para
             #print 'para{}'.format(para)
             #print Xst.shape
@@ -188,7 +184,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 ax[0].plot(xp,yp,'r-')
 
 
-            fig.savefig(os.path.join(debugpath,'drawlapapr'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+            fig.savefig(os.path.join(debugoutput['path'],'drawlapapr'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
             fig.clf()
             plt.close(fig)
             del(fig)
@@ -309,11 +305,8 @@ def draw_support(g, lb, ub, n, method, para=1.):
 
         from gpbo.core import debugoutput
 
-        if debugoutput and gpbo.core.debugoptions['drawlap'] and plots:
+        if debugoutput['drawlap'] and plots:
             print( "plotting draw_support...",)
-            from gpbo.core import debugpath
-            if not os.path.exists(debugpath):
-                os.mkdir(debugpath)
 
             np = para
             #print 'para{}'.format(para)
@@ -351,7 +344,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
 
                 #ax[0].plot([x[0],x[0]+(svd[j][2][0,0])*0.1],[x[1],x[1]+(svd[j][2][1,0])*0.1],'g')
                 #ax[0].plot([x[0],x[0]+(svd[j][2][0,1])*0.1],[x[1],x[1]+(svd[j][2][1,1])*0.1],'g')
-            fig.savefig(os.path.join(debugpath,'drawlapaprot'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+            fig.savefig(os.path.join(debugoutput['path'],'drawlapaprot'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
             fig.clf()
             plt.close(fig)
             del(fig)

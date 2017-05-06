@@ -2,8 +2,8 @@ import gpbo
 import scipy as sp
 
 
-gpbo.core.debugoutput=True
-gpbo.core.debugoptions={'datavis':True,'drawlap':False,'cost1d':False,'ctaq':False,'support':False,'adaptive':False,'logstate':False}
+gpbo.core.debugoutput['datavis']=True
+
 
 D=2
 n=50
