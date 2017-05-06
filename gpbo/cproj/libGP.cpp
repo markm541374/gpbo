@@ -115,10 +115,11 @@ extern "C" int presolv(int k, int s){
 		return -1;
 	};
         //#pragma omp parallel for
+        int c=0;
         for (int i=0; i<s; i++){
-            SS[k+i]->presolv();
+            c+=SS[k+i]->presolv();
         }
-	return 0;
+	return c;
 }
 int infer_diag(int k, int s, int Ns,double* Xs, int* Ds, double* R){
 	if (SS[k]==0){

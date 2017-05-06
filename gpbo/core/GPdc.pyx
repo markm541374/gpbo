@@ -78,8 +78,9 @@ class GPcore:
         
         D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]
         #print self.get_cho()
-        libGP.presolv(self.s,cint(self.size))
-        
+        c = libGP.presolv(self.s,cint(self.size))
+        if c!= 0:
+            raise MJMError('failed to presolve!{}'.format(c))
         return
     
     def __del__(self):

@@ -33,21 +33,6 @@ def always0(optstate,persist,**para):
     return 0,None,dict()
 
 def globallocalregret(optstate,persist,**para):
-    try:
-        return globallocalregret_(optstate,persist,**para)
-    except gpbo.core.GPdc.MJMError as e:
-        plt.close('all')
-        if persist==None:
-            persist = defaultdict(list)
-            persist['raiseS']=-11
-        if persist['raiseS']:
-            persist['raiseS']+=1
-        else:
-            persist['raiseS']=-20
-        logger.error('error in globallocalregret, inflating noise to {}\n{}'.format(persist['raiseS'],e))
-        return globallocalregret(optstate,persist,**para)
-
-def globallocalregret_(optstate,persist,**para):
     #doublenormdist
     #norprior
     if persist == None:
@@ -66,10 +51,7 @@ def globallocalregret_(optstate,persist,**para):
     #build a GP with slice-samples hypers
     x = sp.vstack(optstate.x)
     y = sp.vstack(optstate.y)
-    if persist['raiseS']:
-        s = sp.vstack([e['s']+10**persist['raiseS'] for e in optstate.ev])
-    else:
-        s = sp.vstack([e['s'] for e in optstate.ev])
+    s = sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx = [e['d'] for e in optstate.ev]
     logger.info('building GP')
     G = PES.makeG(x, y, s, dx, para['kindex'], para['mprior'], para['sprior'], para['nhyp'])

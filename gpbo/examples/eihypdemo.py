@@ -4,7 +4,7 @@ import scipy as sp
 
 D=2
 n=10
-s=1e-6
+s=0.
 
 def f(x, **ev):
     y = -sp.cos(x[0]) - sp.cos(x[1]) + 2

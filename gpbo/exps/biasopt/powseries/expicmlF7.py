@@ -10,7 +10,7 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 
-mode=['run','plot'][1]
+mode=['run','plot'][0]
 #mode='plot'
 vers=[2,3][0]
 
@@ -26,7 +26,7 @@ from objective import f
 #from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='icmlF7'
+rpath='tmp'
 
 #-----------------------
 #eimle
@@ -35,7 +35,7 @@ C.aqpara['nrandinit']=C.reccpara['onlyafter']=10
 C.stoppara = {'tmax': 60*60*8}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 
-all2confs.append(['eimle',C])
+#all2confs.append(['eimle',C])
 
 #pesfs
 C=gpbo.core.config.pesfsdefault(f,D,12,s,rpath,'null.csv')
@@ -43,7 +43,7 @@ C.aqpara['nrandinit']=C.reccpara['onlyafter']=10
 C.stoppara = {'tmax': 60*60*8}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 
-all2confs.append(['pesfs',C])
+#all2confs.append(['pesfs',C])
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')

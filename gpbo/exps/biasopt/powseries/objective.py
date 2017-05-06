@@ -63,6 +63,8 @@ def f(x, **ev):
         Dd = [[sp.NaN]] * npts
 
     llk = GPdc.GP_LKonly(Xd, Yd, Sd, Dd, GPdc.kernel(GPdc.MAT52, 2, sp.array(hyp))).plk(pm, ps)
+    llknorm = llk*n/float(npts)
+    llk=llknorm
     t1 = time.clock()
     if llk < -1.:
         out = sp.log(-llk) + 1.

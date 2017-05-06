@@ -28,6 +28,7 @@ except ImportError:
 import costs
 logger = logging.getLogger(__name__)
 
+
 def randomaq(optstate,persist,**para):
     logger.info('randomaq')
     q = sp.random.uniform(size=len(para['lb']))
@@ -87,7 +88,7 @@ def EIMAPaq(optstate,persist,**para):
        overhead = geteffectiveoverhead(optstate,nrandinit)
     x=sp.vstack(optstate.x)
     y=sp.vstack(optstate.y)
-    s= sp.vstack([e['s'] for e in optstate.ev])
+    s= sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
     MAP = GPdc.searchMAPhyp(x, y, s, dx, mprior, sprior, kindex)
     logger.info('found MAPHYP {}'.format(MAP))
@@ -120,42 +121,30 @@ def eihypaq(optstate,persist,**para):
     logger.info('EIHYPaq')
     x=sp.vstack(optstate.x)
     y=sp.vstack(optstate.y)
-    if persist['raiseS']:
-        s= sp.vstack([e['s']+10**persist['raiseS'] for e in optstate.ev])
-        logger.info('inflating diagonal in aqfn by 10**{}'.format(persist['raiseS']))
-    else:
-        s= sp.vstack([e['s'] for e in optstate.ev])
+    s= sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
     presetH=False
     if 'choosereturn' in para.keys():
         if 'reuseH' in para['choosereturn'].keys():
             presetH = para['choosereturn']['reuseH']
-    try:
-        if not presetH:
-            G = PES.makeG(x,y,s,dx,para['kindex'],para['mprior'],para['sprior'],para['DH_SAMPLES'])
-        else:
-            logger.info('reusing preselected hyperparameters')
-            G =  GPdc.GPcore(x,y,s,dx, [GPdc.kernel(para['kindex'], x.shape[1], h) for h in presetH])
-        fixEI=False
-        fixVal=0.
-        if 'choosereturn' in para.keys():
-            if 'offsetEI' in para['choosereturn'].keys():
-                fixEI=True
-                fixVal = para['choosereturn']['offsetEI']
-                logger.info('EIoffset by {}'.format(fixVal))
-        def wrap(Q):
-            x = sp.array([Q])
-            v = G.infer_lEI_post(x,[[sp.NaN]],fixI=fixEI,I=fixVal)[0,0]
-            return -v
+    if not presetH:
+        G = PES.makeG(x,y,s,dx,para['kindex'],para['mprior'],para['sprior'],para['DH_SAMPLES'])
+    else:
+        logger.info('reusing preselected hyperparameters')
+        G =  GPdc.GPcore(x,y,s,dx, [GPdc.kernel(para['kindex'], x.shape[1], h) for h in presetH])
+    fixEI=False
+    fixVal=0.
+    if 'choosereturn' in para.keys():
+        if 'offsetEI' in para['choosereturn'].keys():
+            fixEI=True
+            fixVal = para['choosereturn']['offsetEI']
+            logger.info('EIoffset by {}'.format(fixVal))
+    def wrap(Q):
+        x = sp.array([Q])
+        v = G.infer_lEI_post(x,[[sp.NaN]],fixI=fixEI,I=fixVal)[0,0]
+        return -v
 
-        xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
-    except GPdc.MJMError as e:
-        if not persist['raiseS']:
-            persist['raiseS']=-19
-        else:
-            persist['raiseS']+=1
-        logger.error('numerical error in acq fn Raising noise to {}\n\n {}'.format(persist['raiseS'],e))
-        return eihypaq(optstate,persist,**para)
+    xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
 
 
     logger.info('DIRECT found max EI at {} {}'.format(xmin,ierror))
@@ -186,27 +175,14 @@ def PESfsaq(optstate,persist,**para):
     #raise
     x=sp.vstack(optstate.x)
     y=sp.vstack(optstate.y)
-    if persist['raiseS']:
-        s= sp.vstack([e['s']+10**persist['raiseS'] for e in optstate.ev])
-        logger.info('inflating diagonal in aqfn by 10**{}'.format(persist['raiseS']))
-    else:
-        s= sp.vstack([e['s'] for e in optstate.ev])
+    s= sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
     presetH=False
     if 'choosereturn' in para.keys():
         if 'reuseH' in para['choosereturn'].keys():
             presetH = para['choosereturn']['reuseH']
-    try:
-        pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH)
-        [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],para)
-    except GPdc.MJMError as e:
-        if not persist['raiseS']:
-            persist['raiseS']=-19
-        else:
-            persist['raiseS']+=1
-        logger.error('numerical error in acq fn Raising noise to {}\n\n {}'.format(persist['raiseS'],e))
-        return PESfsaq(optstate,persist,**para)
-
+    pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH)
+    [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],para)
 
     logger.info('DIRECT found max PES at {} {}'.format(xmin,ierror))
     lhyp = sp.log10([k.hyp for k in pesobj.G.kf])
@@ -237,36 +213,24 @@ def vmaxaq(optstate,persist,**para):
     #raise
     x=sp.vstack(optstate.x)
     y=sp.vstack(optstate.y)
-    if persist['raiseS']:
-        s= sp.vstack([e['s']+10**persist['raiseS'] for e in optstate.ev])
-        logger.info('inflating diagonal in aqfn by 10**{}'.format(persist['raiseS']))
-    else:
-        s= sp.vstack([e['s'] for e in optstate.ev])
+    s= sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
     presetH=False
     if 'choosereturn' in para.keys():
         if 'reuseH' in para['choosereturn'].keys():
             presetH = para['choosereturn']['reuseH']
-    try:
-        if not presetH:
-            G = PES.makeG(x,y,s,dx,para['kindex'],para['mprior'],para['sprior'],para['DH_SAMPLES'])
-        else:
-            logger.info('reusing preselected hyperparameters')
-            G =  GPdc.GPcore(x,y,s,dx, [GPdc.kernel(para['kindex'], x.shape[1], h) for h in presetH])
-        def wrap(Q):
-            x = sp.array([Q])
-            v = G.infer_diag_post(x,[[sp.NaN]])[1][0,0]
-            return -v
+    if not presetH:
+        G = PES.makeG(x,y,s,dx,para['kindex'],para['mprior'],para['sprior'],para['DH_SAMPLES'])
+    else:
+        logger.info('reusing preselected hyperparameters')
+        G =  GPdc.GPcore(x,y,s,dx, [GPdc.kernel(para['kindex'], x.shape[1], h) for h in presetH])
+    def wrap(Q):
+        x = sp.array([Q])
+        v = G.infer_diag_post(x,[[sp.NaN]])[1][0,0]
+        return -v
 
-        xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
-        vmax = -ymin
-    except GPdc.MJMError as e:
-        if not persist['raiseS']:
-            persist['raiseS']=-19
-        else:
-            persist['raiseS']+=1
-        logger.error('numerical error in acq fn Raising noise to {}\n\n {}'.format(persist['raiseS'],e))
-        return vmaxaq(optstate,persist,**para)
+    xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
+    vmax = -ymin
 
 
     logger.info('DIRECT found max PES at {} {}'.format(xmin,ierror))
@@ -324,7 +288,7 @@ def PESvsaq(optstate,persist,**para):
     #raise
     x=sp.vstack(optstate.x)
     y=sp.vstack(optstate.y)
-    s= sp.vstack([e['s'] for e in optstate.ev])
+    s= sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
     
     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'])
@@ -411,7 +375,7 @@ def PESbsaq(optstate,persist,**para):
     x=sp.hstack([sp.vstack([e['xa'] for e in optstate.ev]),sp.vstack(optstate.x)])
     
     y=sp.vstack(optstate.y)
-    s= sp.vstack([e['s'] for e in optstate.ev])
+    s= sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
     #print "\n at pesinplane x {} axis 0".format(x)
     pesobj = PES.PES_inplane(x,y,s,dx,[para['xal']]+para['lb'],[para['xau']]+para['ub'],para['kindex'],para['mprior'],para['sprior'],0,0,DH_SAMPLES=para['DH_SAMPLES'], DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],DH_CHAINS=para['hyp_chains'])

@@ -324,12 +324,12 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
 
     a[14].legend()
     a[14].set_xlabel('Steps')
-    a[14].set_ylabel('Overhead Clocktime')
+    a[14].set_ylabel('Overhead Clocktime (s)')
     f[14].savefig(os.path.join(path,'out14.png'),bbox_inches='tight', pad_inches=0.1)
 
     #:a[15].legend()
     a[15].set_xlabel('Steps')
-    a[15].set_ylabel('Overhead Clocktime')
+    a[15].set_ylabel('Overhead Clocktime (s)')
     if 15 in axisset.keys():
         a[15].axis(axisset[15],'tight')
     f[15].savefig(os.path.join(path,'out15.png'),bbox_inches='tight', pad_inches=0.1)

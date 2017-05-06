@@ -28,6 +28,7 @@ class optstate:
         self.localdone=False
         self.startlocal= None
         self.remaining = sp.Inf
+        self.condition = -999.
         return
     
     def update(self,x,ev,y,c,taq):
@@ -99,13 +100,13 @@ class optimizer:
             stepn+=1
             #print self.choosepara
             #print self.choosefn
-            mode,self.choosepersist,chooseaux = self.choosefn(self.state,self.choosepersist,**self.choosepara)
+            mode,self.choosepersist,chooseaux = wrap(self.choosefn,self.state,self.choosepersist,**self.choosepara)
 
             logger.info("---------------------\nstep {}:".format(stepn))
 
             self.aqpara[mode]['choosereturn']=chooseaux
             t0 = time.clock()
-            x,ev,self.aqpersist[mode],aqaux = self.aqfn[mode](self.state,self.aqpersist[mode],**self.aqpara[mode])
+            x,ev,self.aqpersist[mode],aqaux = wrap(self.aqfn[mode],self.state,self.aqpersist[mode],**self.aqpara[mode])
             t1 = time.clock()
             self.state.aux = aqaux
             logger.info("AQ returned {} : {}    aqtime: {}\nevaluate:".format(x,ev,t1-t0))
@@ -114,7 +115,7 @@ class optimizer:
             t2 = time.clock()
             self.state.update(x,ev,y,c,t1-t0)
             logger.info("EV returned {} : {}     evaltime: {}".format(y,c,t2-t1))
-            rx,self.reccpersist[mode],reaux = self.reccfn[mode](self.state,self.reccpersist[mode],**self.reccpara[mode])
+            rx,self.reccpersist[mode],reaux = wrap(self.reccfn[mode],self.state,self.reccpersist[mode],**self.reccpara[mode])
             t3 = time.clock()
 
             if self.reccpara[mode]['check']:
@@ -184,6 +185,17 @@ def totaltstopfn(optstate,**para):
         optstate.remaining = para['tmax'] - tused
         return False
 
+def wrap(fn,optstate,persist,**para):
+    try:
+        if optstate.condition>-20:
+            logger.info('using raised noise floor {} in {}'.format(optstate.condition,fn))
+        return fn(optstate,persist,**para)
+    except gpbo.core.GPdc.MJMError as e:
+        optstate.condition=max(optstate.condition+1.,-19.)
+        print(str(fn))
+        print('{}'.format(fn))
+        logger.error('numerical error in {} fn Raising noise to {}\n\n {}'.format(str(fn),optstate.condition,e))
+        return wrap(fn,optstate,persist,**para)
 
 def search(optconfig,initdata=False):
     if not hasattr(optconfig,'fname'):

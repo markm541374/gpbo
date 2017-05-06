@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-mode=['run','plot'][1]
+mode=['run','plot'][0]
 nreps=1
 import argparse
 
@@ -15,7 +15,7 @@ args = parser.parse_args()
 vers=[2,3][0]
 D=2
 
-s=1e-6
+s=1e-3
 lb = sp.array([-1.,-1.])
 ub = sp.array([1.,1.])
 
@@ -24,7 +24,7 @@ from objective import f
 from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='F5anew'
+rpath='tmp'
 #-----------------------
 #eimle
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
@@ -32,7 +32,7 @@ C.aqpara['nrandinit']=10
 C.stoppara = {'tmax': 60*60*15}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.reccfn = gpbo.core.reccomenders.argminrecc
-all2confs.append(['eimle',C])
+#all2confs.append(['eimle',C])
 
 #pesfs----------------------------
 C=gpbo.core.config.pesfsdefault(f,D,50,s,rpath,'null.csv')
@@ -49,7 +49,7 @@ C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=20
 
-all2confs.append(['pesbs',C])
+#all2confs.append(['pesbs',C])
 
 #-----------------
 #mtbo

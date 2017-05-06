@@ -55,7 +55,7 @@ def gpmaprecc(optstate,persist,**para):
     maxf = para['maxf']
     x=sp.vstack(optstate.x)
     y=sp.vstack(optstate.y)
-    s= sp.vstack([e['s'] for e in optstate.ev])
+    s= sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
     MAP = GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
     logger.info('MAPHYP {}'.format(MAP))
@@ -128,7 +128,7 @@ def gpmap2upperrecc(optstate,persist,**para):
     d=len(para['lb'])
     x=sp.vstack(optstate.x)
     y=sp.vstack(optstate.y)
-    s= sp.vstack([e['s'] for e in optstate.ev])
+    s= sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
     MAP = GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
     logger.info('MAPHYP {}'.format(MAP))
@@ -169,7 +169,7 @@ def gpmapasrecc(optstate,persist,**para):
     
     
     y=sp.vstack(optstate.y)
-    s= sp.vstack([e['s'] for e in optstate.ev])
+    s= sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
     MAP = GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
     logger.info('MAPHYP {}'.format(MAP))
@@ -245,7 +245,7 @@ def gphinasargminrecc(optstate, persist, **para):
     x = sp.hstack([sp.vstack([e['xa'] for e in optstate.ev]), sp.vstack(optstate.x)])
 
     y = sp.vstack(optstate.y)
-    s = sp.vstack([e['s'] for e in optstate.ev])
+    s = sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx = [e['d'] for e in optstate.ev]
 
     G = GPdc.GPcore(x, y, s, dx, [GPdc.kernel(optstate.aux['kindex'], d + 1, h) for h in optstate.aux['HYPdraws']])
@@ -283,7 +283,7 @@ def gphinasrecc(optstate,persist,**para):
 
     
     y=sp.vstack(optstate.y)
-    s= sp.vstack([e['s'] for e in optstate.ev])
+    s= sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
     
     G = GPdc.GPcore(x, y, s, dx, [GPdc.kernel(optstate.aux['kindex'], d + 1, h) for h in optstate.aux['HYPdraws']])
@@ -368,7 +368,7 @@ def gphinrecc(optstate,persist,**para):
 
     
     y=sp.vstack(optstate.y)
-    s= sp.vstack([e['s'] for e in optstate.ev])
+    s= sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
    # print optstate.aux
     G = GPdc.GPcore(x, y, s, dx, [GPdc.kernel(optstate.aux['kindex'], d, h) for h in optstate.aux['HYPdraws']])
@@ -414,7 +414,7 @@ def adaptiverecc(optstate,persist,**para):
     d=len(para['lb'])
     x=sp.vstack(optstate.x)
     y=sp.vstack(optstate.y)
-    s= sp.vstack([e['s'] for e in optstate.ev])
+    s= sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx=[e['d'] for e in optstate.ev]
     MAP = GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
     logger.info('MAPHYP {}'.format(MAP))
