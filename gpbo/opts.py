@@ -25,7 +25,7 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
     for i_ in range(nreps):
         ii=i_+indexoffset
         for C in confs:
-            if C[0][:5]=='eimle':
+            if C[0][:2]=='ei':
                 C[1].path=path
                 C[1].fname='{}_{}.csv'.format(C[0],ii)
                 C[1].aqpara['lb']=lb
@@ -108,7 +108,7 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                     pass
             else:
                 print( "not an optimization method")
-def plotquarts(a,data1,data2,col,lab,log=False):
+def plotquarts(a,data1,data2,col,line,lab,log=False):
     n=len(data1)
     mx=-sp.Inf
     mn=sp.Inf
@@ -125,12 +125,12 @@ def plotquarts(a,data1,data2,col,lab,log=False):
     low0, med0, upp0 = gpbo.core.ESutils.quartsirregular(data1,data2,xaxis)
 
     #        a.fill_between(xaxis, low0, upp0, facecolor='lightblue', edgecolor='lightblue', alpha=0.5)
-    a.plot(xaxis, med0, color=col, label=lab)
-    a.fill_between(xaxis,upp0,low0,edgecolor=col,facecolor=col,lw=0.0,alpha=0.1)
+    a.plot(xaxis, med0, color=col, linestyle=line, label=lab)
+    a.fill_between(xaxis,upp0,low0,edgecolor=col, linestyle=line,facecolor=col,lw=0.0,alpha=0.1)
     return
 
 
-def plotquarts2(a,xdata_, ydata_,col,lab,log=False):
+def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False):
     xdata = [sp.array(i) for i in xdata_]
     ydata = [sp.array(i) for i in ydata_]
     n = len(xdata)
@@ -163,14 +163,18 @@ def plotquarts2(a,xdata_, ydata_,col,lab,log=False):
 
     y25 = map(lambda x: sp.percentile([i(x) for i in ints], 25), x)
     y75 = map(lambda x: sp.percentile([i(x) for i in ints], 75), x)
-    a.fill_between(x,y25,y75,edgecolor=col,facecolor=col,lw=0.0,alpha=0.1)
-    a.plot(ends[yendorder], yends[yendorder], '.',color=col)
+    a.fill_between(x,y25,y75,edgecolor=col, facecolor=col,lw=0.0,alpha=0.1)
+    a.plot(ends[yendorder], yends[yendorder], '.',color=col ,linestyle=line)
     a2 = a.twinx()
-    a2.plot(ends[sp.argsort(ends)],sp.linspace(1,0,n),color=col,linestyle='--',linewidth=0.2)
+    a2.plot(ends[sp.argsort(ends)],sp.linspace(1,0,n),color=col, linestyle='--',linewidth=0.2)
     a2.set_ylabel('fraction of optimizations still running')
     return
 
-def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False):
+def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False,showends=False):
+    if showends:
+        pq=plotquartsends
+    else:
+        pq=plotquarts
     f=[]
     a=[]
     pmax=20
@@ -181,6 +185,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
         f.append(f_)
         a.append(a_)
     colorlist = ['b','r','g','purple','k','grey','orange','c','lightgreen','lightblue','pink']
+    lslist = ['solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted']
     ci=-1
     for C in confs:
         if  C[0][:5]=='pesbs' or C[0][:3]=='fab':
@@ -191,6 +196,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             ninit=0
         ci+=1
         col = colorlist[ci]
+        line = lslist[ci] 
         #collect the data
         data=[]
         for ii in range(nreps):
@@ -200,65 +206,74 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             #first plot is all the opts per step
             termregret = sp.mean([list(d['trueyatxrecc'])[-1] for d in data])
             for ii in range(nreps):
-                a[0].plot(data[ii]['index'],data[ii]['trueyatxrecc'],color=col,label=labelfn(C[0]))
+                a[0].plot(data[ii]['index'],data[ii]['trueyatxrecc'],color=col, linestyle=line,label=labelfn(C[0]))
             #and averaged
-            plotquarts(a[4],[data[k]['index'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,labelfn(C[0]))
+            pq(a[4],[data[k]['index'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,line,labelfn(C[0]))
 
             #second is all the opts per evaluation cost
             for ii in range(nreps):
-                a[1].plot(data[ii]['accE'],data[ii]['trueyatxrecc'],color=col,label=labelfn(C[0]))
+                a[1].plot(data[ii]['accE'],data[ii]['trueyatxrecc'],color=col, linestyle=line,label=labelfn(C[0]))
             #and averaged
-            plotquarts(a[5],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,labelfn(C[0]))
+            pq(a[5],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,line,labelfn(C[0]))
 
             #third is all the opts per evaluation + acquisition cost
             for ii in range(nreps):
-                a[2].plot(data[ii]['accEA'],data[ii]['trueyatxrecc'],color=col,label=labelfn(C[0]))
+                a[2].plot(data[ii]['accEA'],data[ii]['trueyatxrecc'],color=col, linestyle=line,label=labelfn(C[0]))
             #and averaged
-            plotquarts(a[6],[data[k]['accEA'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,labelfn(C[0]))
+            pq(a[6],[data[k]['accEA'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,line,labelfn(C[0]))
 
             #fourth is evcost per step
             for ii in range(nreps):
-                a[3].plot(data[ii]['index'],data[ii]['c'],color=col,label=labelfn(C[0]))
+                a[3].plot(data[ii]['index'],data[ii]['c'],color=col, linestyle=line,label=labelfn(C[0]))
             #and averaged
-            plotquarts(a[7],[data[k]['index'] for k in range(nreps)],[data[k]['c'] for k in range(nreps)],col,labelfn(C[0]))
+            pq(a[7],[data[k]['index'] for k in range(nreps)],[data[k]['c'] for k in range(nreps)],col,line,labelfn(C[0]))
 
              #fiifth is overhead clock time
             for ii in range(nreps):
-                a[14].plot(data[ii]['index'],data[ii]['taq'],color=col,label=labelfn(C[0]))
+                a[14].plot(data[ii]['index'],data[ii]['taq'],color=col, linestyle=line,label=labelfn(C[0]))
             #and averaged
-            plotquarts(a[15],[data[k]['index'] for k in range(nreps)],[data[k]['taq'] for k in range(nreps)],col,labelfn(C[0]))
+            pq(a[15],[data[k]['index'] for k in range(nreps)],[data[k]['taq'] for k in range(nreps)],col,line,labelfn(C[0]))
 
             #fiifth is overhead clock time
             try:
                 for ii in range(nreps):
-                    a[16].plot(data[ii]['index'],data[ii]['xa'],color=col,label=labelfn(C[0]))
+                    a[16].plot(data[ii]['index'],data[ii]['xa'],color=col, linestyle=line,label=labelfn(C[0]))
                 #and averaged
-                plotquarts(a[17],[data[k]['index'] for k in range(nreps)],[data[k]['xa'] for k in range(nreps)],col,labelfn(C[0]))
+                pq(a[17],[data[k]['index'] for k in range(nreps)],[data[k]['xa'] for k in range(nreps)],col,line,labelfn(C[0]))
             except:
                 for ii in range(nreps):
-                    a[16].plot(data[ii]['index'],data[ii]['s'],color=col,label=labelfn(C[0]))
+                    a[16].plot(data[ii]['index'],data[ii]['s'],color=col, linestyle=line,label=labelfn(C[0]))
                 #and averaged
-                plotquarts(a[17],[data[k]['index'] for k in range(nreps)],[data[k]['s'] for k in range(nreps)],col,labelfn(C[0]))
+                pq(a[17],[data[k]['index'] for k in range(nreps)],[data[k]['s'] for k in range(nreps)],col,line,labelfn(C[0]))
                 a[16].set_yscale('log')
                 a[17].set_yscale('log')
+            try:
+                for ii in range(nreps):
+                    a[18].plot(data[ii]['index'],data[ii]['condition'],color=col, linestyle=line,label=labelfn(C[0]))
+                #and averaged
+                pq(a[19],[data[k]['index'] for k in range(nreps)],[data[k]['condition'] for k in range(nreps)],col,line,labelfn(C[0]))
+                a[18].set_yscale('log')
+                a[19].set_yscale('log')
+            except:
+                pass
         if trueopt:
             #first plot is all the opts per step
             for ii in range(nreps):
-                a[8].plot(data[ii]['index'],data[ii]['trueyatxrecc']-trueopt,color=col,label=labelfn(C[0]))
+                a[8].plot(data[ii]['index'],data[ii]['trueyatxrecc']-trueopt,color=col, linestyle=line,label=labelfn(C[0]))
             #and averaged
-            plotquarts(a[11],[data[k]['index'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,labelfn(C[0]))
+            pq(a[11],[data[k]['index'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,line,labelfn(C[0]))
 
             #second is all the opts per evaluation cost
             for ii in range(nreps):
-                a[9].plot(data[ii]['accE'],data[ii]['trueyatxrecc']-trueopt,color=col,label=labelfn(C[0]))
+                a[9].plot(data[ii]['accE'],data[ii]['trueyatxrecc']-trueopt,color=col, linestyle=line,label=labelfn(C[0]))
             #and averaged
-            plotquarts(a[12],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,labelfn(C[0]))
+            pq(a[12],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,line,labelfn(C[0]))
 
             #third is all the opts per evaluation + acquisition cost
             for ii in range(nreps):
-                a[10].plot(data[ii]['accEA'],data[ii]['trueyatxrecc']-trueopt,color=col,label=labelfn(C[0]))
+                a[10].plot(data[ii]['accEA'],data[ii]['trueyatxrecc']-trueopt,color=col, linestyle=line,label=labelfn(C[0]))
             #and averaged
-            plotquarts(a[13],[data[k]['accEA'][ninit:] for k in range(nreps)],[data[k]['trueyatxrecc'][ninit:]-trueopt for k in range(nreps)],col,labelfn(C[0]),log=True)
+            pq(a[13],[data[k]['accEA'][ninit:] for k in range(nreps)],[data[k]['trueyatxrecc'][ninit:]-trueopt for k in range(nreps)],col,line,labelfn(C[0]),log=True)
 
 
     a[0].legend()
@@ -343,6 +358,16 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
     a[17].set_xlabel('Steps')
     a[17].set_ylabel('env Var')
     f[17].savefig(os.path.join(path,'out17.png'),bbox_inches='tight', pad_inches=0.1)
+
+    a[18].legend()
+    a[18].set_xlabel('Steps')
+    a[18].set_ylabel('condition magnitude')
+    f[18].savefig(os.path.join(path,'out18.png'),bbox_inches='tight', pad_inches=0.1)
+
+    a[19].legend()
+    a[19].set_xlabel('Steps')
+    a[19].set_ylabel('condition magnitude')
+    f[19].savefig(os.path.join(path,'out19.png'),bbox_inches='tight', pad_inches=0.1)
 
     if trueopt:
         a[8].set_xlabel('Steps')

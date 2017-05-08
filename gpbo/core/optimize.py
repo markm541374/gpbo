@@ -29,6 +29,7 @@ class optstate:
         self.startlocal= None
         self.remaining = sp.Inf
         self.condition = -999.
+        self.conditionV = 0.
         return
     
     def update(self,x,ev,y,c,taq):
@@ -92,7 +93,7 @@ class optimizer:
         print( self.aqpara)
         self.stoppara['t0']=time.clock()
         lf = open(os.path.join(self.dirpath,self.name),'w')
-        lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara[0]['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, aqauxdata'])+'\n')
+        lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara[0]['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, condition, aqauxdata'])+'\n')
 #        self.state = optstate()
         stepn=0
         rxlast=None
@@ -137,7 +138,7 @@ class optimizer:
             rxlast=list(rx)
             logger.info("RC returned {}     recctime: {}\n".format(rx,t3-t2))
             aqaux['host'] = os.uname()[1]
-            logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+','+''.join([str(k)+' '+str(aqaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in aqaux.keys()])[:-1]+'\n'
+            logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+',{},'.format(self.state.conditionV)+''.join([str(k)+' '+str(aqaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in aqaux.keys()])[:-1]+'\n'
             lf.write(logstr)
             lf.flush()
             if gpbo.core.debugoutput['logstate']:
@@ -191,6 +192,7 @@ def wrap(fn,optstate,persist,**para):
         return fn(optstate,persist,**para)
     except gpbo.core.GPdc.MJMError as e:
         optstate.condition=max(optstate.condition+1.,-19.)
+        optstate.conditionV=10**optstate.condition
         print(str(fn))
         print('{}'.format(fn))
         logger.error('numerical error in {} fn Raising noise to {}\n\n {}'.format(str(fn),optstate.condition,e))

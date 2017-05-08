@@ -26,7 +26,7 @@ from objective import f
 #from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='tmp'
+rpath='rerun'
 
 #-----------------------
 #eimle
@@ -45,6 +45,8 @@ C.stopfn = gpbo.core.optimize.totaltstopfn
 
 all2confs.append(['pesfs',C])
 
+
+
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
 C.stoppara = {'tmax': 60 * 60 * 8}
@@ -53,13 +55,8 @@ C.aqpara['traincfn']='llogfull'
 C.aqpara['overhead']='predict'
 C.aqpara['hyp_chains']=6
 C.aqpara['nrandinit']=C.reccpara['onlyafter']=20
-C.aqpara['mprior']=C.reccpara['mprior']= sp.array([1.]+[0.]*(D+1)+[-3])
-C.aqpara['sprior']=C.reccpara['sprior']= sp.array([1.]*(D+2)+[3])
-C.aqpara['kindex']=C.reccpara['kindex']=gpbo.core.GPdc.MAT52CS
 
-all2confs.append(['pesbs_ls',C])
-
-
+all2confs.append(['pesbs',C])
 #-----------------
 #mtbo
 C={'lowtask':4,
@@ -95,7 +92,7 @@ C={'ninit':20,
 #all3confs.append(['fabolas',C])
 
 
-labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs_ls':'EnvPES','fabmod':'FabolasM'}[x]
+labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs_ls':'EnvPES2','pesbs':'EnvPES','fabmod':'FabolasM'}[x]
 axisset={6:[1e3,4*1e4,10.5,14]}
 if mode=='run':
     if vers==2:
@@ -103,6 +100,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,8,rpath,logx=True,labelfn=labelfn,axisset=axisset,sixylabel='GP Negative Log-Likelihood')
+    gpbo.plotall(all2confs+all3confs,16,rpath,logx=True,labelfn=labelfn,axisset=axisset,sixylabel='GP Negative Log-Likelihood')
 else:
     pass
