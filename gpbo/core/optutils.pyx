@@ -503,37 +503,36 @@ def drawpartitionmin(G,S,xm,rm,n):
     return Res, maxRin
 
 
-def rline(unitvec,rmax,condition,nmax=20):
+def rline(unitvec,rmax,condition,htarget=1e-6):
     """
     :param unitvec: direction from origin for the linesearch
     :param rmax: outer limit
     :param condition: boolean fn of x
-    :param nmax: max evals
+    :param htarget: resolution for binary search
     :return: maximum radius where condition is True, numevals made
     """
     if condition(unitvec*rmax):
         return rmax,1
     left=0
     right=rmax
-    for i in xrange(nmax-1):
+    n=0
+    while (right-left)>htarget:
         r = 0.5*(left+right)
         c = int(condition(unitvec*r))
+        n+=1
         left = (1-c)*left + c*r
         right = (1-c)*r + c*right
-    return left,nmax
+    return left,n
 
-def ballradsearch(d,rmax,condition,neval=100,lineSmax=20):
+def ballradsearch(d,rmax,condition,ndirs=200,lineSh=1e-6):
     evcount=0
     R=rmax
-    with tqdm.tqdm(total=neval) as pbar:
-        while evcount<neval:
-            x = sp.stats.norm.rvs(sp.zeros(d)) #draw an unnormalized vec
-            xunit = x/sp.linalg.norm(x) # normalize
-            r,n = rline(xunit,R,condition,nmax=lineSmax) # linesearch up to current max
-            R = min(R,r) #drop max to new result
-            pbar.update(n)
-            evcount+=n
-        pbar.close()
+    for i in tqdm.tqdm(range(ndirs)):
+        x = sp.stats.norm.rvs(sp.zeros(d)) #draw an unnormalized vec
+        xunit = x/sp.linalg.norm(x) # normalize
+        r,n = rline(xunit,R,condition,htarget=lineSh) # linesearch up to current max
+        R = min(R,r) #drop max to new result
+        evcount+=n
     return R
 
 cdef double NP(double x, double mu=0., double sigma=1.):
