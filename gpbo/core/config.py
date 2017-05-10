@@ -271,7 +271,7 @@ class pesbsdefault():
             'maxf':500+250*(D+1),
             'mprior': sp.array([1.]+[0.]*(D+1)),
             'sprior': sp.array([1.]*(D+2)),
-            'kindex':GPdc.MAT52,
+            'kindex':GPdc.MAT52CS,
             'DH_SAMPLES':16+6*D,
             'DM_SAMPLES':20+8*D,
             'hyp_chains':1,

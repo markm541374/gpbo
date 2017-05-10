@@ -23,7 +23,7 @@ from libc.math cimport log10, log, isnan, exp
 from . import __file__ as fl
 from scipy import linalg as spl
 
-class MJMError(Exception):
+class GPdcError(Exception):
     pass
 libGP = ct.cdll.LoadLibrary(os.path.join(os.path.split(fl)[0],'../cproj/libcproj.so')) #path to c-shared library
 #print libGP
@@ -80,7 +80,7 @@ class GPcore:
         #print self.get_cho()
         c = libGP.presolv(self.s,cint(self.size))
         if c!= 0:
-            raise MJMError('failed to presolve!{}'.format(c))
+            raise GPdcError('failed to presolve!{}'.format(c))
         return
     
     def __del__(self):
@@ -133,6 +133,13 @@ class GPcore:
         libGP.infer_full(self.s, cint(self.size), ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
         m = sp.vstack([R[i*(ns+1),:] for i in range(self.size)])
         V = sp.vstack([R[(ns+1)*i+1:(ns+1)*(i+1),:] for i in range(self.size)])
+
+        if sp.amin(V)<=-0.:
+            print( "negative/eq variance")
+            print( [m,V,X_i,D_i])
+            print( "_______________")
+            #self.printc()
+            raise(GPdcError)
         return [m,V]
     
     def infer_full_post(self,X_,D_i):
@@ -178,14 +185,14 @@ class GPcore:
             print( [m,V,X_i,D_i])
             print( "_______________")
             #self.printc()
-            raise(MJMError)
+            raise(GPdcError)
         if sp.amin(sp.var(m,axis=0))<-0.:
             print( "negativevar of mean")
             print( X_i.shape)
             print( [m,V,sp.var(m,axis=0),X_i,D_i])
             print( "_______________")
             #self.printc()
-            raise(MJMError)
+            raise(GPdcError)
         
         return [sp.mean(m,axis=0).reshape([1,ns]),(sp.mean(V,axis=0)+sp.var(m,axis=0)).reshape([1,ns])]
         
@@ -231,9 +238,9 @@ class GPcore:
             print( "negateive vriance: ")
             print( [m,v,X_i])
             #self.printc()
-            class MJMError(Exception):
+            class GPdcError(Exception):
                 pass
-            raise MJMError()
+            raise GPdcError()
         return m-p*sp.sqrt(v)
     
     def infer_EI(self,X_,D_i,fixI=False,I=0.):

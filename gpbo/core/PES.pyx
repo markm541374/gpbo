@@ -9,7 +9,7 @@ from gpbo.core import GPdc
 from gpbo.core import eprop
 import scipy as sp
 from scipy import stats as sps
-from gpbo.core.optutils import silentdirect as direct
+#from gpbo.core.optutils import silentdirect as direct
 
 try:
     from matplotlib import pyplot as plt

@@ -20,5 +20,7 @@ def f(x, **ev):
 C=gpbo.core.config.eihypdefault(f,D,n,s,'results','eihyp.csv')
 C.stoppara = {'nmax': 60}
 C.stopfn = gpbo.core.optimize.nstopfn
+C.aqpara['mprior']= sp.array([2.,1.,2.])
+
 out = gpbo.search(C)
 print out

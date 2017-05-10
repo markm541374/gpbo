@@ -11,7 +11,7 @@ from scipy.optimize import minimize
 from gpbo.core.optutils import multilocal
 import time
 import gpbo
-from gpbo.core.optutils import silentdirect as direct
+#from gpbo.core.optutils import silentdirect as direct
 import logging
 logger = logging.getLogger(__name__)
 try:

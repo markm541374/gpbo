@@ -8,7 +8,7 @@ from scipy.optimize import minimize
 import os
 import sys
 import time
-from gpbo.core.optutils import silentdirect as direct
+#from gpbo.core.optutils import silentdirect as direct
 from gpbo.core.optutils import geteffectiveoverhead
 import logging
 import copy

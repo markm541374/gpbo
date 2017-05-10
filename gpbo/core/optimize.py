@@ -190,7 +190,7 @@ def wrap(fn,optstate,persist,**para):
         if optstate.condition>-20:
             logger.info('using raised noise floor {} in {}'.format(optstate.condition,fn))
         return fn(optstate,persist,**para)
-    except gpbo.core.GPdc.MJMError as e:
+    except gpbo.core.GPdc.GPdcError as e:
         optstate.condition=max(optstate.condition+1.,-19.)
         optstate.conditionV=10**optstate.condition
         print(str(fn))

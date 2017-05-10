@@ -89,7 +89,7 @@ def globallocalregret(optstate,persist,**para):
     logger.info('prob pvedef at xmin {}'.format(pc))
 
     PDcondition = lambda x:gpbo.core.optutils.probgppve(G,sp.array(x)+sp.array(xmin),tol=para['pvetol'])>1-para['pvetol']
-
+    #todo rmax to boundary not 1, steps to fixed size
     rmax = gpbo.core.optutils.ballradsearch(d,1.,PDcondition,neval=100,lineSmax=20)
 
     logger.info('+ve region radius {}'.format(rmax))
