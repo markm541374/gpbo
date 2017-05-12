@@ -1,6 +1,7 @@
 from collections import defaultdict
 debugoutput=defaultdict(lambda :False)
 debugoutput['path']='dbout'
+
 from .optimize import *
 from .optutils import *
 from .acquisitions import *
