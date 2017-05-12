@@ -4,6 +4,7 @@ xrange=range
 import gpbo
 import copy
 import os
+import scipy as sp
 import matplotlib
 print( matplotlib.get_backend())
 from matplotlib import pyplot as plt
@@ -13,14 +14,7 @@ plt.rc('font',serif='Times')
 
 
 
-import matplotlib.patches as mpatches
-import scipy as sp
-try:
-    from gpbo.exps.thirdwrap.mtbowrap import optmtbo
-    from gpbo.exps.thirdwrap.fabwrap import optfabolas
-    from gpbo.exps.thirdwrap.fabwrap import optfabolas_mod
-except:
-    print('\n\ndidnt import robo!!!!!!\n\n')
+
 def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
     for i_ in range(nreps):
         ii=i_+indexoffset
@@ -91,23 +85,9 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                     out = gpbo.search(C[1])
                 except:
                     pass
-            elif C[0][:4]=='mtbo':
-                try:
-                    optmtbo(f, lb, ub, 1.-(1./C[1]['lowtask']), C[1]['nsteps'], ninit=C[1]['ninit'],fpath=path,fname='{}_{}.csv'.format(C[0],ii),mod=C[1]['switchestimator'])
-                except:
-                    pass
-            elif C[0][:7]=='fabolas':
-                try:
-                    optfabolas(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path)
-                except:
-                    pass
-            elif C[0][:6]=='fabmod':
-                try:
-                    optfabolas_mod(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path,switchestimator=C[1]['switchestimator'],switchkernel=C[1]['switchkernel'])
-                except:
-                    pass
             else:
                 print( "not an optimization method")
+    return
 def plotquarts(a,data1,data2,col,line,lab,log=False):
     n=len(data1)
     mx=-sp.Inf
