@@ -101,12 +101,12 @@ class optimizer:
             stepn+=1
             #print self.choosepara
             #print self.choosefn
-            mode,self.choosepersist,chooseaux = wrap(self.choosefn,self.state,self.choosepersist,**self.choosepara)
 
             logger.info("---------------------\nstep {}:".format(stepn))
 
-            self.aqpara[mode]['choosereturn']=chooseaux
             t0 = time.clock()
+            mode,self.choosepersist,chooseaux = wrap(self.choosefn,self.state,self.choosepersist,**self.choosepara)
+            self.aqpara[mode]['choosereturn']=chooseaux
             x,ev,self.aqpersist[mode],aqaux = wrap(self.aqfn[mode],self.state,self.aqpersist[mode],**self.aqpara[mode])
             t1 = time.clock()
             self.state.aux = aqaux
@@ -193,8 +193,6 @@ def wrap(fn,optstate,persist,**para):
     except gpbo.core.GPdc.GPdcError as e:
         optstate.condition=max(optstate.condition+1.,-19.)
         optstate.conditionV=10**optstate.condition
-        print(str(fn))
-        print('{}'.format(fn))
         logger.error('numerical error in {} fn Raising noise to {}\n\n {}'.format(str(fn),optstate.condition,e))
         return wrap(fn,optstate,persist,**para)
 

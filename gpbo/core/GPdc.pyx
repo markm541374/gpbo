@@ -134,9 +134,9 @@ class GPcore:
         m = sp.vstack([R[i*(ns+1),:] for i in range(self.size)])
         V = sp.vstack([R[(ns+1)*i+1:(ns+1)*(i+1),:] for i in range(self.size)])
 
-        if sp.amin(V)<=-0.:
-            print( "negative/eq variance")
-            print( [m,V,X_i,D_i])
+        if sp.amin(sp.diag(V))<=-0.:
+            print( "negative/eq diagvariance in full")
+            #print( [m,V,X_i,D_i])
             print( "_______________")
             #self.printc()
             raise(GPdcError)
@@ -182,14 +182,13 @@ class GPcore:
         [m,V] = self.infer_diag(X_i,D_i)
         if sp.amin(V)<=-0.:
             print( "negative/eq variance")
-            print( [m,V,X_i,D_i])
+            #print( [m,V,X_i,D_i])
             print( "_______________")
             #self.printc()
             raise(GPdcError)
         if sp.amin(sp.var(m,axis=0))<-0.:
             print( "negativevar of mean")
-            print( X_i.shape)
-            print( [m,V,sp.var(m,axis=0),X_i,D_i])
+            #print( [m,V,sp.var(m,axis=0),X_i,D_i])
             print( "_______________")
             #self.printc()
             raise(GPdcError)
@@ -236,7 +235,7 @@ class GPcore:
         [m,v] = self.infer_diag_post(X_i,D_i)
         if sp.amin(v)<0.:
             print( "negateive vriance: ")
-            print( [m,v,X_i])
+            #print( [m,v,X_i])
             #self.printc()
             class GPdcError(Exception):
                 pass

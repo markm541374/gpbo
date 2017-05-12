@@ -417,9 +417,9 @@ class switchdefault():
                       'logfilename': '/dev/null'},
             'lpara': {'gtol': 0.00001,
                       'maxfun': 400},
-            'pveballrrange': (-4,0),
-            'pveballrsteps': 100,
-            'pvetol':1e-3
+            'pvetol':1e-3,
+            'lineSh':1e-6,
+            'nlineS':200
         }
 
         self.aqfn = [aq0,aq1,aq2]
