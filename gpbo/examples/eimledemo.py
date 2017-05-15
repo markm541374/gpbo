@@ -2,14 +2,19 @@ import gpbo
 import scipy as sp
 
 
+#dimension
 D=2
-n=10
-s=0.
+#random initialization
+ninit=10
+#const diagonal noise variance
+s=1e-6
+
 
 def f(x, **ev):
     y = -sp.cos(x[0]) - sp.cos(x[1]) + 2
     c = 1.
     n = sp.random.normal() * sp.sqrt(s)
+    #this is used to check the true value at the imcumbent if available for plotting. Not counted in the optimization
     if 'cheattrue' in ev.keys():
         if ev['cheattrue']:
             n=0
@@ -17,8 +22,9 @@ def f(x, **ev):
     return y + n, c, dict()
 
 
-C=gpbo.core.config.eimledefault(f,D,n,s,'results','eimle.csv')
-C.aqpara['smode']='dthenl'
+#expected improvement with max likelihood hyperparameters
+C=gpbo.core.config.eimledefault(f,D,ninit,s,'results','eimle.csv')
+#60 steps
 C.stoppara = {'nmax': 60}
 C.stopfn = gpbo.core.optimize.nstopfn
 out = gpbo.search(C)
