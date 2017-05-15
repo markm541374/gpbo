@@ -26,7 +26,7 @@ from objective import f
 #from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='rerun'
+rpath='f7/resultsnolog'
 
 #-----------------------
 #eimle
@@ -100,6 +100,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,16,rpath,logx=True,labelfn=labelfn,axisset=axisset,sixylabel='GP Negative Log-Likelihood')
+    gpbo.plotall(all2confs+all3confs,4,rpath,logx=True,labelfn=labelfn,axisset=axisset,sixylabel='GP Negative Log-Likelihood')
 else:
     pass
