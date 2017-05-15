@@ -1,4 +1,4 @@
-[Practical Bayesian Optimization for Variable Cost Objectives]
+Practical Bayesian Optimization for Variable Cost Objectives
 ==================================================
 
 This repository contains the implementation of the work in [Practical Bayesian Optimization for Variable Cost Objectives](https://arxiv.org/abs/1703.04335)
