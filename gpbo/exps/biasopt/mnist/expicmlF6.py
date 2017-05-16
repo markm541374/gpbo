@@ -68,7 +68,7 @@ C={'ninit':30,
 #all3confs.append(['fabmod',C])
 
 labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs':'EnvPES','fabolas':'Fabolas','fabmod':'FabolasM'}[x]
-axisset={12:[30,3*1e4,2*1e-2,1],13:[1e3,4*1e4,2*1e-2,1]}
+axisset={12:[30,3*1e4,2*1e-2,1],13:[0.25*1e2,4*1e4,2*1e-2,1]}
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)

@@ -26,7 +26,7 @@ from objective import f
 #from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='f7/resultsnolog'
+rpath='norm'
 
 #-----------------------
 #eimle
@@ -93,13 +93,13 @@ C={'ninit':20,
 
 
 labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs_ls':'EnvPES2','pesbs':'EnvPES','fabmod':'FabolasM'}[x]
-axisset={6:[1e3,4*1e4,10.5,14]}
+axisset={6:[500,4*1e4,10.5,16]}
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,4,rpath,logx=True,labelfn=labelfn,axisset=axisset,sixylabel='GP Negative Log-Likelihood')
+    gpbo.plotall(all2confs+all3confs,10,rpath,logx=True,labelfn=labelfn,axisset=axisset,sixylabel='GP Negative Log-Likelihood')
 else:
     pass
