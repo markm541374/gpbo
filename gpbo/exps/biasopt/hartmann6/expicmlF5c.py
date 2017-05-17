@@ -91,6 +91,6 @@ if mode=='run':
     #else:
     gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,28,rpath,trueopt=truemin,logx=True,labelfn=labelfn,axisset=axisset)
+    gpbo.plotall(all2confs+all3confs,25,rpath,trueopt=truemin,logx=True,labelfn=labelfn,axisset=axisset)
 else:
     pass

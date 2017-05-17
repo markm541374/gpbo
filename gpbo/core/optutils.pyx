@@ -277,7 +277,7 @@ def boundedlocal(f,l,u,x0,*args,**kwargs):
 def twopartopt(f,l,u,dargs,largs):
     dxmin,dymin,dierror = silentdirectwrapped(f,l,u,**dargs)
     xmin,ymin,ierror = boundedlocal(f,l,u,dxmin,**largs)
-    logger.debug('optresult {} at {} (refine Dx {} Dy {}) message {}'.format(ymin, xmin, sp.linalg.norm(xmin-dxmin), dymin-ymin,dierror+ierror))
+    logger.debug('optresult {} at {} (refine Dx {} Dy {}) message {}'.format(str(ymin), str(xmin), str(sp.linalg.norm(xmin-dxmin)), str(dymin-ymin),dierror+ierror))
     return xmin,ymin,ierror
 
 
