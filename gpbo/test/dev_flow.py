@@ -5,7 +5,7 @@ import time
 import random
 
 t0=time.time()
-N = 40
+N = 4
 x = np.sort(np.random.rand(N,1)*2.-1,axis=0)
 X = np.hstack([x,0*np.ones(shape=(N,1))])
 #print X
