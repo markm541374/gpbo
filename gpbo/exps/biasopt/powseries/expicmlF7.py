@@ -84,7 +84,7 @@ C={'lowtask':64,
 #fabolas
 C={'ninit':20,
    'nsteps':40}
-#all3confs.append(['fabmod',C])
+all3confs.append(['fabmod2',C])
 
 #fabolas
 C={'ninit':20,
@@ -92,14 +92,14 @@ C={'ninit':20,
 #all3confs.append(['fabolas',C])
 
 
-labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs_ls':'EnvPES2','pesbs':'EnvPES','fabmod':'FabolasM'}[x]
-axisset={6:[500,4*1e4,10.5,16]}
+labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs_ls':'EnvPES2','pesbs':'EnvPES','fabmod2':'FabolasM'}[x]
+axisset={6:[800,4*1e4,10.5,16]}
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,10,rpath,logx=True,labelfn=labelfn,axisset=axisset,sixylabel='GP Negative Log-Likelihood')
+    gpbo.plotall(all2confs+all3confs,7,rpath,logx=True,labelfn=labelfn,axisset=axisset,sixylabel='Transformed GP Log-Likelihood')
 else:
     pass

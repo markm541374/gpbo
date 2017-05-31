@@ -38,7 +38,7 @@ if run:
                 if ev['cheattrue']:
                     b = 0
                     n = 0
-            print 'f inputs x:{} ev:{} outputs y:{} (b:{} n:{}) c:{}'.format(x, ev, y + n + b, b, n, c)
+            print('f inputs x:{} ev:{} outputs y:{} (b:{} n:{}) c:{}'.format(x, ev, y + n + b, b, n, c))
             return y + b + n, c, dict()
 
 
@@ -67,7 +67,7 @@ if plot:
 
     d0 = [gpbo.optimize.readoptdata('results/pesbsdemo{}.csv'.format(k),includetaq=True) for k in xrange(nopts)]
 
-    for k in xrange(nopts):
+    for k in range(nopts):
         txt = open('results/pesbsdemo{}.txt'.format(k)).read()
         y[k] = float(r.findall(txt)[0])
 
@@ -78,8 +78,8 @@ if plot:
     f, a = plt.subplots(1)
 
     xaxis = sp.linspace(0,max(d0[0]['cacc']),100)
-    low0, med0, upp0 = gpbo.core.ESutils.quartsirregular([d0[k]['cacc'] for k in xrange(nopts)],
-                                                         [d0[k]['trueyatxrecc'] for k in xrange(nopts)], xaxis)
+    low0, med0, upp0 = gpbo.core.ESutils.quartsirregular([d0[k]['cacc'] for k in range(nopts)],
+                                                         [d0[k]['trueyatxrecc'] for k in range(nopts)], xaxis)
 
     a.fill_between(xaxis, low0, upp0, facecolor='lightblue', edgecolor='lightblue', alpha=0.5)
     a.plot(xaxis, med0, 'b')
@@ -90,8 +90,8 @@ if plot:
     a.set_ylabel('regret')
     f.savefig('plots/out0.pdf')
     f,a = plt.subplots(1)
-    low0, med0, upp0 = gpbo.core.ESutils.quartsirregular([d0[k]['cacc'] for k in xrange(nopts)],
-                                                         [d0[k]['c'] for k in xrange(nopts)], xaxis)
+    low0, med0, upp0 = gpbo.core.ESutils.quartsirregular([d0[k]['cacc'] for k in range(nopts)],
+                                                         [d0[k]['c'] for k in range(nopts)], xaxis)
     a.fill_between(xaxis, low0, upp0, facecolor='lightblue', edgecolor='lightblue', alpha=0.5)
     a.plot(xaxis, med0, 'b')
 

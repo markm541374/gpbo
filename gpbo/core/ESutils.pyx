@@ -36,12 +36,13 @@ SUPPORT_LAPAPROT = 5
 SUPPORT_VARREJ = 6
 #drawing points between lb and ub using specified method
 def draw_support(g, lb, ub, n, method, para=1.):
-    
+    n = int(n)
+
     #para is the std confidence bound
     if (type(g) is int):
-        d=g
+        d=int(g)
     else:
-        d=g.D
+        d=int(g.D)
     #print 'Draw support input GP with d={} lb {} ub {}'.format(d,lb,ub)
     cdef int i,j
     if method==SUPPORT_UNIFORM:
@@ -259,14 +260,14 @@ def draw_support(g, lb, ub, n, method, para=1.):
         for xm in unq:
             #gradient inference
             G,cG = g.infer_full_post(sp.vstack([xm]*d),[[i] for i in xrange(d)])
-            divs = [[]]*(d*(d+1)/2)
+            divs = [[]]*int((d*(d+1)/2))
             #hessian inference
             k=0
             for i in xrange(d):
                 for j in xrange(i+1):
                     divs[k]=[i,j]
                     k+=1
-            vecH,cvecH = g.infer_full_post(sp.vstack([xm]*(d*(d+1)/2)),divs)
+            vecH,cvecH = g.infer_full_post(sp.vstack([xm]*int(d*(d+1)/2)),divs)
             #build hesian matrix
             H = sp.empty(shape=[d,d])
             k=0

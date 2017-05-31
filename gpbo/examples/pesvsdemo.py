@@ -14,7 +14,7 @@ def f(x,**ev):
         if ev['cheattrue']:
             n=0
     c=cfn(x,ev['s'])
-    print 'f inputs x:{} ev:{} outputs y:{} (n:{}) c:{}'.format(x,ev,y+n,n,c)
+    print('f inputs x:{} ev:{} outputs y:{} (n:{}) c:{}'.format(x,ev,y+n,n,c))
     return y+n,c,dict()
 
 D=2
@@ -24,4 +24,4 @@ lsu=-3
 
 C=gpbo.core.config.pesvsdefault(f,cfn,D,n,lsl,lsu,'results','pesvs.csv')
 out = gpbo.search(C)
-print out
+print(out)

@@ -13,7 +13,7 @@ def f(x, **ev):
     if 'cheattrue' in ev.keys():
         if ev['cheattrue']:
             n=0
-    print 'f inputs x:{} ev:{} outputs y:{} (n:{}) c:{}'.format(x, ev, y + n, n, c)
+    print('f inputs x:{} ev:{} outputs y:{} (n:{}) c:{}'.format(x, ev, y + n, n, c))
     return y + n, c, dict()
 
 
@@ -23,4 +23,4 @@ C.stopfn = gpbo.core.optimize.nstopfn
 C.aqpara['mprior']= sp.array([2.,1.,2.])
 
 out = gpbo.search(C)
-print out
+print(out)

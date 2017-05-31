@@ -81,7 +81,7 @@ C={'ninit':20,
    'nsteps':100,
    'switchkernel':True,
    'switchestimator':True}
-#all3confs.append(['fabmod',C])
+all3confs.append(['fabmod',C])
 #---------------
 #fabolas
 C={'ninit':20,
@@ -95,6 +95,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,25,rpath,trueopt=truemin,logx=True,labelfn=labelfn,axisset=axisset)
+    gpbo.plotall(all2confs+all3confs,16,rpath,trueopt=truemin,logx=True,labelfn=labelfn,axisset=axisset)
 else:
     pass

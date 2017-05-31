@@ -77,20 +77,20 @@ C={'lowtask':64,
 #fabolas
 C={'ninit':30,
    'nsteps':80}
-#all3confs.append(['fabmod',C])
+all3confs.append(['fabmod',C])
 #---------------
 #fabolas()
 C={'ninit':30,
    'nsteps':80}
 #all3confs.append(['fabolas',C])
 labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs':'EnvPES','fabmod':'FabolasM'}[x]
-axisset={12:[1e3,1e5,1e-4,1e1],13:[1e3,48*60*60,1e-4,1e1]}
+axisset={12:[1e3,1e5,1e-4,1e1],13:[1e3,1e5,1e-4,1e1]}
 if mode=='run':
     #if vers==2:
     gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     #else:
     gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,25,rpath,trueopt=truemin,logx=True,labelfn=labelfn,axisset=axisset)
+    gpbo.plotall(all2confs+all3confs,20,rpath,trueopt=truemin,logx=True,labelfn=labelfn,axisset=axisset)
 else:
     pass

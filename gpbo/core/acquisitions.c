@@ -10127,7 +10127,6 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_10vmaxaq(CYTHON_UNUSED PyOb
       goto __pyx_L29_try_end;
       __pyx_L22_error:;
       __Pyx_PyThreadState_assign
-      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
@@ -10138,6 +10137,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_10vmaxaq(CYTHON_UNUSED PyOb
       __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
 
       /* "gpbo/core/acquisitions.pyx":258
  *             print('saving as {}'.format(fname))
@@ -15314,7 +15314,6 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14PESbsaq(CYTHON_UNUSED PyO
     goto __pyx_L36_try_end;
     __pyx_L29_error:;
     __Pyx_PyThreadState_assign
-    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -15323,6 +15322,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_14PESbsaq(CYTHON_UNUSED PyO
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
 
     /* "gpbo/core/acquisitions.pyx":407
  *     try:
