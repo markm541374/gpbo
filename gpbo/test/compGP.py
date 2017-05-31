@@ -6,7 +6,7 @@ import time
 import random
 
 t0=time.time()
-N = 40
+N = 14
 x = np.sort(np.random.rand(N,1)*2.-1,axis=0)
 X = np.hstack([x])
 D = [[np.NaN]]*N
@@ -62,17 +62,35 @@ def plot(m,a):
     a[1].plot(xp,dy,'g--')
     a[2].plot(xp,d2y,'g--')
 
-f,a = plt.subplots(nrows=3,ncols=2,figsize=(9, 6))
+#f,a = plt.subplots(nrows=3,ncols=2,figsize=(9, 6))
 m = GPdc.GPcore(X,Y,S,D,GPdc.kernel(GPdc.SQUEXP,1,np.array([2.,0.4])))
 mf = flow.GPcore(X,Y,S,D,flow.kernel(flow.SQUEXP,1,np.array([2.,0.4])))
 
-plot(m,a[:,0])
-#N = 4
-#z = np.linspace(-1,1,N)
-#Z = np.vstack([z,np.zeros(shape=(1,N))]).T
-#print Z
-#Z[2,1]=1.
-#M,V = m.predict_f_full_cov(Z)
-plt.show()
+#plot(m,a[:,0])
+#plot(mf,a[:,1])
+
+M=2
+
+x = np.sort(np.random.rand(M,1)*2.-1,axis=0)
+D = [[[np.NaN],[0],[0,0]][j] for j in np.random.random_integers(0,2,M)]
+
+mean = m.infer_m_post(x,D)
+fmean = mf.infer_m_post(x,D)
+print('post_m: {}'.format(np.allclose(mean,fmean,rtol=1e-4) ))
+
+mean,var = m.infer_diag_post(x,D)
+fmean,fvar = mf.infer_diag_post(x,D)
+print('post_diag: {}'.format(np.allclose(mean,fmean,rtol=1e-4) and np.allclose(var,fvar,rtol=1e-4)))
+
+mean,var = m.infer_full_post(x,D)
+fmean,fvar = mf.infer_full_post(x,D)
+
+print('post_full: {}'.format(np.allclose(mean,fmean,rtol=1e-4) and np.allclose(var,fvar,rtol=1e-4)))
+
+llk = [m.llk(),mf.llk()]
+print('llk: {}'.format(np.allclose(llk[0],llk[1])))
+#plt.show()
 #print(V)
 #print(time.time()-t0)
+mf.m.optimize()
+print(mf.m)

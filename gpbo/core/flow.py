@@ -16,7 +16,6 @@ from scipy.stats import norm as norms
 from numpy import log10, log, isnan, exp
 from gpbo.core import flowkern
 import GPflow as gpf
-from . import __file__ as fl
 
 class flow_Error(Exception):
     pass
@@ -48,29 +47,25 @@ class GP_LKonly:
 
 class GPcore:
     def __init__(self, X, Y, S, D, kf):
-        print(X)
-        print(Y)
-        print(S)
-        print(D)
         self.d = kf.dim
         x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
         self.k = klist[kf.Kindex](self.d)
-        m = gpf.gpr.GPR(x,Y,self.k)
-        m.kern.lengthscales=kf.hyp[1:1+self.d]
-        m.kern.variance=kf.hyp[0]
-        m.likelihood.variance=0.
-        print(m)
+        self.m = gpf.gpr.GPR(x,Y,self.k)
+        self.m.kern.lengthscales=kf.hyp[1:1+self.d]
+        self.m.kern.variance=kf.hyp[0]**2
+        self.m.likelihood.variance=0.25
         return
 
     def printc(self):
-        print( self.size)
-        libGP.ping(self.s, cint(self.size))
+        print(self.m)
         return
+
     def get_cho(self):
         raise NotImplementedError
         C=sp.empty([self.n,self.n*self.size])
         libGP.get_cho(self.s,cint(self.size),C.ctypes.data_as(ctpd))
         return C
+
     def infer_m(self,X_i,D_i):
         raise NotImplementedError
         ns=X_i.shape[0]
@@ -92,13 +87,10 @@ class GPcore:
         
         return R
 
-    def infer_m_post(self,X_,D_i):
-        raise NotImplementedError
-        X_i = copy.copy(X_)
-        ns=X_i.shape[0]
-        R = self.infer_m(X_i,D_i)
-        
-        return sp.mean(R,axis=0).reshape([1,ns])
+    def infer_m_post(self,X,D):
+        x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
+        m, _ = self.m.predict_f(np.hstack([x,np.zeros(shape=x.shape)]))
+        return m.T
     
     
     def infer_full(self,X_,D_i):
@@ -119,24 +111,10 @@ class GPcore:
             raise(GPdcError)
         return [m,V]
     
-    def infer_full_post(self,X_,D_i):
-        raise NotImplementedError
-        X_i = copy.copy(X_)
-        [m,V] = self.infer_full(X_i,D_i)
-        ns=X_i.shape[0]
-        cv = sp.zeros([ns,ns])
-
-        for i in range(self.size):
-            cv+=V[ns*i:ns*(i+1),:]
-        cv= cv/self.size
-        if self.size>1:
-            cv+=sp.cov(m,rowvar=0,bias=1)
-        #print "_________________"
-        #print self.size
-        #print sp.cov(m,rowvar=0,bias=1)
-        #print V
-        #print cv
-        return [sp.mean(m,axis=0).reshape([1,ns]),cv]
+    def infer_full_post(self,X,D):
+        x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
+        m, V = self.m.predict_f_full_cov(np.hstack([x,np.zeros(shape=x.shape)]))
+        return m.T, np.squeeze(V)
     
     def infer_diag(self,X_,D_i):
         raise NotImplementedError
@@ -150,27 +128,17 @@ class GPcore:
         V = sp.vstack([R[i*2+1,:] for i in range(self.size)])
         return [m,V]
 
-    def infer_diag_post(self,X_,D_i):
-        raise NotImplementedError
-        X_i = copy.copy(X_)
-        ns = len(D_i)
-        
-        X_i.resize([ns,self.D])
-        [m,V] = self.infer_diag(X_i,D_i)
+    def infer_diag_post(self, X, D):
+        x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
+        m, V = self.m.predict_f(np.hstack([x,np.zeros(shape=x.shape)]))
+
         if sp.amin(V)<=-0.:
             print( "negative/eq variance")
             #print( [m,V,X_i,D_i])
             print( "_______________")
             #self.printc()
-            raise(GPdcError)
-        if sp.amin(sp.var(m,axis=0))<-0.:
-            print( "negativevar of mean")
-            #print( [m,V,sp.var(m,axis=0),X_i,D_i])
-            print( "_______________")
-            #self.printc()
-            raise(GPdcError)
-        
-        return [sp.mean(m,axis=0).reshape([1,ns]),(sp.mean(V,axis=0)+sp.var(m,axis=0)).reshape([1,ns])]
+            raise(flow_Error)
+        return m.T, V.T
         
     
     def draw(self,X_i,D_i,m):
@@ -193,10 +161,11 @@ class GPcore:
         return R.T
     
     def llk(self):
-        raise NotImplementedError
-        R = sp.empty(self.size)
-        libGP.llk(self.s, cint(self.size), R.ctypes.data_as(ctpd))
-        return R
+        return np.array(self.m.compute_log_likelihood())
+        #raise NotImplementedError
+        #R = sp.empty(self.size)
+        ##libGP.llk(self.s, cint(self.size), R.ctypes.data_as(ctpd))
+        #return R
     
     def infer_LCB(self,X_,D_i, p):
         raise NotImplementedError
