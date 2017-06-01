@@ -47,100 +47,103 @@ class GP_LKonly:
 
 class GPcore:
     def __init__(self, X, Y, S, D, kf):
-        self.d = kf.dim
+        if isinstance(kf,kernel):
+            self.d = kf.dim
+            self.size=1
+            kf = [kf]
+        else:
+            print('aa')
+            self.size=len(kf)
+            self.d = kf[0].dim
         x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
-        self.k = klist[kf.Kindex](self.d)
-        self.m = gpf.gpr.GPR(x,Y,self.k)
-        self.m.kern.lengthscales=kf.hyp[1:1+self.d]
-        self.m.kern.variance=kf.hyp[0]**2
-        self.m.likelihood.variance=0.25
+        self.m = [gpf.gpr.GPR(x,Y,klist[kf[0].Kindex](kf[0].dim)) for i in range(self.size)]
+        for i in range(self.size):
+            self.m[i].kern.lengthscales=kf[i].hyp[1:1+self.d]
+            self.m[i].kern.variance=kf[i].hyp[0]**2
+            self.m[i].likelihood.variance=0.25
         return
 
     def printc(self):
-        print(self.m)
+        for i in range(self.size):
+            print(self.m[i])
         return
 
-    def get_cho(self):
-        raise NotImplementedError
-        C=sp.empty([self.n,self.n*self.size])
-        libGP.get_cho(self.s,cint(self.size),C.ctypes.data_as(ctpd))
-        return C
+    #def get_cho(self):
+     #   raise NotImplementedError
+    #    C=sp.empty([self.n,self.n*self.size])
+   #     libGP.get_cho(self.s,cint(self.size),C.ctypes.data_as(ctpd))
+    #    return C
 
-    def infer_m(self,X_i,D_i):
-        raise NotImplementedError
-        ns=X_i.shape[0]
-        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
-        R=sp.vstack([sp.empty(ns)]*self.size)
-        libGP.infer_m(self.s, cint(self.size), ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
-        return R
-    
-    def infer_m_partial(self,X_,D_i,ki,hyp):
-        raise NotImplementedError
-        X_i = copy.copy(X_)
-        ns=X_i.shape[0]
-        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
-        R=sp.vstack([sp.empty(ns)]*1)
-        
-        #libGP.infer_m_partial(self.s, cint(ki),hyp.ctypes.data_as(ctpd),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
-        libGP.infer_m_partial(self.s,cint(ki),hyp.ctypes.data_as(ctpd),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
-            
-        
-        return R
-
-    def infer_m_post(self,X,D):
+    def infer_m(self,X, D):
         x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
-        m, _ = self.m.predict_f(np.hstack([x,np.zeros(shape=x.shape)]))
+        m = np.empty([X.shape[0],self.size])
+        for i in range(self.size):
+            m[:,i:i+1], _ = self.m[i].predict_f(np.hstack([x,np.zeros(shape=x.shape)]))
         return m.T
     
-    
-    def infer_full(self,X_,D_i):
-        raise NotImplementedError
+
+    def infer_m_post(self,X_,D_i):
         X_i = copy.copy(X_)
         ns=X_i.shape[0]
-        D = [0 if isnan(x[0]) else int(sum([8**j for j in x])) for x in D_i]
-        R=sp.vstack([sp.empty([ns+1,ns])]*self.size)
-        libGP.infer_full(self.s, cint(self.size), ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
-        m = sp.vstack([R[i*(ns+1),:] for i in range(self.size)])
-        V = sp.vstack([R[(ns+1)*i+1:(ns+1)*(i+1),:] for i in range(self.size)])
+        R = self.infer_m(X_i,D_i)
+        return sp.mean(R,axis=0).reshape([1,ns])
 
-        if sp.amin(sp.diag(V))<=-0.:
-            print( "negative/eq diagvariance in full")
-            #print( [m,V,X_i,D_i])
-            print( "_______________")
-            #self.printc()
-            raise(GPdcError)
-        return [m,V]
     
-    def infer_full_post(self,X,D):
+
+    def infer_full(self,X,D):
         x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
-        m, V = self.m.predict_f_full_cov(np.hstack([x,np.zeros(shape=x.shape)]))
-        return m.T, np.squeeze(V)
-    
-    def infer_diag(self,X_,D_i):
-        raise NotImplementedError
+        n = X.shape[0]
+        m = np.empty([n,self.size])
+        V = np.empty([n,n*self.size])
+        for i in range(self.size):
+            m_ ,V_ = self.m[i].predict_f_full_cov(np.hstack([x,np.zeros(shape=x.shape)]))
+            m[:,i:i+1] = m_
+            V[:,i*n:(i+1)*n] = np.squeeze(V_)
+        return m.T,V.T
+
+    def infer_full_post(self,X_,D_i):
         X_i = copy.copy(X_)
+        [m,V] = self.infer_full(X_i,D_i)
         ns=X_i.shape[0]
-        D = [0 if isnan(x[0]) else int(sum([8**j for j in x])) for x in D_i]
-        R=sp.vstack([sp.empty([2,ns])]*self.size)
-        libGP.infer_diag(self.s,cint(self.size), ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
+        cv = sp.zeros([ns,ns])
 
-        m = sp.vstack([R[i*2,:] for i in range(self.size)])
-        V = sp.vstack([R[i*2+1,:] for i in range(self.size)])
-        return [m,V]
+        for i in range(self.size):
+            cv+=V[ns*i:ns*(i+1),:]
+        cv= cv/self.size
+        if self.size>1:
+            cv+=sp.cov(m,rowvar=0,bias=1)
+        return [sp.mean(m,axis=0).reshape([1,ns]),cv]
 
-    def infer_diag_post(self, X, D):
+    def infer_diag(self, X, D):
         x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
-        m, V = self.m.predict_f(np.hstack([x,np.zeros(shape=x.shape)]))
 
+        m = np.empty([X.shape[0],self.size])
+        V = np.empty([X.shape[0],self.size])
+        for i in range(self.size):
+            m[:,i:i+1], V[:,i:i+1] = self.m[i].predict_f(np.hstack([x,np.zeros(shape=x.shape)]))
         if sp.amin(V)<=-0.:
             print( "negative/eq variance")
-            #print( [m,V,X_i,D_i])
             print( "_______________")
-            #self.printc()
             raise(flow_Error)
         return m.T, V.T
-        
-    
+
+    def infer_diag_post(self,X_,D_i):
+        X_i = copy.copy(X_)
+        ns = len(D_i)
+
+        X_i.resize([ns,self.d])
+        [m,V] = self.infer_diag(X_i,D_i)
+        if sp.amin(V)<=-0.:
+            print( "negative/eq variance")
+            print( "_______________")
+            raise(flow_Error)
+        if sp.amin(sp.var(m,axis=0))<-0.:
+            print( "negativevar of mean")
+            print( "_______________")
+            raise(flow_Error)
+
+        return [sp.mean(m,axis=0).reshape([1,ns]),(sp.mean(V,axis=0)+sp.var(m,axis=0)).reshape([1,ns])]
+
     def draw(self,X_i,D_i,m):
         raise NotImplementedError
         #make m draws at X_i Nd, X, D, R, m
@@ -161,12 +164,8 @@ class GPcore:
         return R.T
     
     def llk(self):
-        return np.array(self.m.compute_log_likelihood())
-        #raise NotImplementedError
-        #R = sp.empty(self.size)
-        ##libGP.llk(self.s, cint(self.size), R.ctypes.data_as(ctpd))
-        #return R
-    
+        return np.array([self.m[i].compute_log_likelihood() for i in range(self.size)])
+
     def infer_LCB(self,X_,D_i, p):
         raise NotImplementedError
         X_i = copy.copy(X_)

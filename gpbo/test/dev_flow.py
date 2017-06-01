@@ -7,7 +7,7 @@ import time
 import random
 
 t0=time.time()
-N = 14
+N = 18
 x = np.sort(np.random.rand(N,1)*2.-1,axis=0)
 X = np.hstack([x])
 D = [[np.NaN]]*N
@@ -19,13 +19,13 @@ dy = 2*(np.exp(-x)+np.sin(4*x))*(-np.exp(-x)+4*np.cos(4*x))+np.random.randn(N,1)
 d2y = (2*(-np.exp(-x) + 4*np.cos(4*x))**2 + 2*(np.exp(-x) - 16*np.sin(4*x))* (np.exp(-x) + np.sin(4*x)))+np.random.randn(N,1)*0.5
 
 Y = np.copy(y)
-for i in range(N//2):
-    j = random.randint(0,N-1)
-    Y[j]=dy[j]
-    D[j]=[0]
-    j = random.randint(0,N-1)
-    Y[j]=d2y[j]
-    D[j]=[0,0]
+#for i in range(N//2):
+#    j = random.randint(0,N-1)
+#    Y[j]=dy[j]
+#    D[j]=[0]
+#    j = random.randint(0,N-1)
+#    Y[j]=d2y[j]
+#    D[j]=[0,0]
 
 
 #m.optimize()
@@ -77,9 +77,12 @@ M=2
 
 #mf.m.optimize()
 mf.m.kern.lengthscales.prior = gpf.priors.LogNormal(0.,1.)
-mf.m.kern.variance.prior = gpf.priors.LogNormal(1.,1.)
+mf.m.kern.variance.prior = gpf.priors.LogNormal(1.,2.)
 mf.m.likelihood.variance.fixed = True
-s = mf.m.sample(100,epsilon=0.2,verbose=1)
+s = mf.m.sample(200,epsilon=0.2,verbose=1)
 mf.m.optimize()
 print(mf.m)
 print(s)
+plt.figure()
+plt.semilogy(np.log(1+np.exp(s)))
+plt.show()
