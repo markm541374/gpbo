@@ -7,7 +7,7 @@ import time
 import random
 
 t0=time.time()
-N = 18
+N = 28
 x = np.sort(np.random.rand(N,1)*2.-1,axis=0)
 X = np.hstack([x])
 D = [[np.NaN]]*N

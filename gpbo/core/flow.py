@@ -52,7 +52,6 @@ class GPcore:
             self.size=1
             kf = [kf]
         else:
-            print('aa')
             self.size=len(kf)
             self.d = kf[0].dim
         x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
@@ -61,6 +60,7 @@ class GPcore:
             self.m[i].kern.lengthscales=kf[i].hyp[1:1+self.d]
             self.m[i].kern.variance=kf[i].hyp[0]**2
             self.m[i].likelihood.variance=0.25
+            self.m[i].likelihood.variance.fixed= True
         return
 
     def printc(self):
@@ -241,57 +241,32 @@ class kernel(object):
         return
     
 
-class gen_sqexp_k_d():
-    def __init__(self,theta):
-        raise NotImplementedError
-        self.dim = len(theta)-1
-        self.hyp = sp.array(theta)
-        self.hypinv = sp.array([1./x**2 for x in theta])
-        self.hypinv[0] = theta[0]**2
-        self.Kindex = 0;
-        return
-    def __call__(self,x1, x2, d1=[sp.NaN], d2=[sp.NaN]):
-        D1 = 0 if isnan(d1[0]) else int(sum([8**x for x in d1]))
-        D2 = 0 if isnan(d2[0]) else int(sum([8**x for x in d2]))
-        self.smodel=0.
-        r=libGP.k(x1.ctypes.data_as(ctpd),x2.ctypes.data_as(ctpd), cint(D1),cint(D2),cint(self.dim),self.hypinv.ctypes.data_as(ctpd),cint(0),ct.byref(ct.c_double(self.smodel)))
-        return r
-    
-class gen_lin1_k_d():
-    def __init__(self,theta):
-        raise NotImplementedError
-        self.hyp = sp.array(theta)
-        self.Kindex = 1
-        self.hypinv = sp.array(theta)
-        self.hypinv[0] = self.hypinv[0]**2
-        self.hypinv[2] = self.hypinv[2]**2
-        
-        return
-    
-    def __call__(self,x1, x2, d1=[sp.NaN], d2=[sp.NaN]):
-        raise NotImplementedError
-        D1 = 0 if isnan(d1[0]) else int(sum([8**x for x in d1]))
-        D2 = 0 if isnan(d2[0]) else int(sum([8**x for x in d2]))
-        smodel = 0.
-        r=libGP.k(x1.ctypes.data_as(ctpd),x2.ctypes.data_as(ctpd), cint(D1),cint(D2),cint(-42),self.hypinv.ctypes.data_as(ctpd),cint(1),ct.byref(ct.c_double(smodel)))
-        return r
+
 
 def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=20000,fg=-1e9):
-    raise NotImplementedError
-    libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
-    ns=X.shape[0]
-    dim = X.shape[1]
-    Dx = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D]
+    g = GPcore(X,Y,S,D,kernel(ki,X.shape[1],np.ones(len(lb))))
+    g.m[0].optimize()
+    print(g.m[0])
+    print(g.llk())
+    #libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
+    #dim = X.shape[1]
+   # Dx = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D]
    
-    hy = sp.empty(libGP.numhyp(cint(ki),cint(dim)))
+    #hy = sp.empty(libGP.numhyp(cint(ki),cint(dim)))
     
-    lk = sp.empty(1)
-    r = libGP.HypSearchMLE(cint(dim),cint(len(Dx)),X.ctypes.data_as(ctpd),Y.ctypes.data_as(ctpd),S.ctypes.data_as(ctpd),(cint*len(Dx))(*Dx),lb.ctypes.data_as(ctpd),ub.ctypes.data_as(ctpd),cint(ki), hy.ctypes.data_as(ctpd),lk.ctypes.data_as(ctpd))
+    #lk = sp.empty(1)
+    #r = libGP.HypSearchMLE(cint(dim),cint(len(Dx)),X.ctypes.data_as(ctpd),Y.ctypes.data_as(ctpd),S.ctypes.data_as(ctpd),(cint*len(Dx))(*Dx),lb.ctypes.data_as(ctpd),ub.ctypes.data_as(ctpd),cint(ki), hy.ctypes.data_as(ctpd),lk.ctypes.data_as(ctpd))
     
-    return hy
+    return g
 
 
 def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=20000,fg=-1e9):
+    g = GPcore(X,Y,S,D,kernel(ki,X.shape[1],np.ones(len(m))))
+
+    g.m[0].kern.lengthscales.prior = gpf.priors.LogNormal(m[1:],s[1:]**2)
+    g.m[0].kern.variance.prior = gpf.priors.LogNormal(m[0],s[0]**2)
+    g.m[0].optimize()
+    print(g.m[0])
     raise NotImplementedError
     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
     ns=X.shape[0]

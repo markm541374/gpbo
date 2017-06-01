@@ -74,31 +74,41 @@ mf = flow.GPcore(X,Y,S,D,kf)
 M=4
 
 x = np.sort(np.random.rand(M,1)*2.-1,axis=0)
-D = [[[np.NaN],[0],[0,0]][j] for j in np.random.random_integers(0,2,M)]
+Di = [[[np.NaN],[0],[0,0]][j] for j in np.random.random_integers(0,2,M)]
 
-mean = m.infer_m(x,D)
-fmean = mf.infer_m(x,D)
+mean = m.infer_m(x,Di)
+fmean = mf.infer_m(x,Di)
 print('m: {}'.format(np.allclose(mean,fmean,rtol=1e-3) ))
 
-mean = m.infer_m_post(x,D)
-fmean = mf.infer_m_post(x,D)
+mean = m.infer_m_post(x,Di)
+fmean = mf.infer_m_post(x,Di)
 print('m_post: {}'.format(np.allclose(mean,fmean,rtol=1e-3) ))
 
-mean,var = m.infer_diag(x,D)
-fmean,fvar = mf.infer_diag(x,D)
+mean,var = m.infer_diag(x,Di)
+fmean,fvar = mf.infer_diag(x,Di)
 print('diag: {}'.format(np.allclose(mean,fmean,rtol=1e-3) and np.allclose(var,fvar,rtol=1e-3)))
 
-mean,var = m.infer_diag_post(x,D)
-fmean,fvar = mf.infer_diag_post(x,D)
+mean,var = m.infer_diag_post(x,Di)
+fmean,fvar = mf.infer_diag_post(x,Di)
 print('diag_post: {}'.format(np.allclose(mean,fmean,rtol=1e-3) and np.allclose(var,fvar,rtol=1e-3)))
 
-mean,var = m.infer_full(x,D)
-fmean,fvar = mf.infer_full(x,D)
+mean,var = m.infer_full(x,Di)
+fmean,fvar = mf.infer_full(x,Di)
 print('full: {}'.format(np.allclose(mean,fmean,rtol=1e-3) and np.allclose(var,fvar,rtol=1e-3)))
 
-mean,var = m.infer_full_post(x,D)
-fmean,fvar = mf.infer_full_post(x,D)
+mean,var = m.infer_full_post(x,Di)
+fmean,fvar = mf.infer_full_post(x,Di)
 print('full_post: {}'.format(np.allclose(mean,fmean,rtol=1e-3) and np.allclose(var,fvar,rtol=1e-3)))
 
 llk = [m.llk(),mf.llk()]
 print('llk: {}'.format(np.allclose(llk[0],llk[1])))
+
+#---------------------------------
+#optimize a single hyp set
+#MLE = GPdc.searchMLEhyp(X,Y,S,D, np.array([-2.,-2.]), np.array([2.,2.]), GPdc.SQUEXP)
+#print(MLE[0]**2,MLE[1])
+MLE = flow.searchMLEhyp(X,Y,S,D, np.array([-2.,-2.]), np.array([2.,2.]), GPdc.SQUEXP)
+
+#MAP = GPdc.searchMAPhyp(X,Y,S,D, np.array([0.,0.]), np.array([2.,2.]), GPdc.SQUEXP)
+#print(MAP[0]**2,MAP[1])
+MAP = flow.searchMAPhyp(X,Y,S,D, np.array([0.,0.]), np.array([20.,20.]), GPdc.SQUEXP)
