@@ -6,7 +6,7 @@ import time
 import random
 
 t0=time.time()
-N = 14
+N = 44
 x = np.sort(np.random.rand(N,1)*2.-1,axis=0)
 X = np.hstack([x])
 D = [[np.NaN]]*N
@@ -18,13 +18,13 @@ dy = 2*(np.exp(-x)+np.sin(4*x))*(-np.exp(-x)+4*np.cos(4*x))+np.random.randn(N,1)
 d2y = (2*(-np.exp(-x) + 4*np.cos(4*x))**2 + 2*(np.exp(-x) - 16*np.sin(4*x))* (np.exp(-x) + np.sin(4*x)))+np.random.randn(N,1)*0.5
 
 Y = np.copy(y)
-for i in range(N//2):
-    j = random.randint(0,N-1)
-    Y[j]=dy[j]
-    D[j]=[0]
-    j = random.randint(0,N-1)
-    Y[j]=d2y[j]
-    D[j]=[0,0]
+#for i in range(N//2):
+#    j = random.randint(0,N-1)
+#    Y[j]=dy[j]
+#    D[j]=[0]
+#    j = random.randint(0,N-1)
+#    Y[j]=d2y[j]
+#    D[j]=[0,0]
 
 
 def plot(m,a):
@@ -106,9 +106,9 @@ print('llk: {}'.format(np.allclose(llk[0],llk[1])))
 #---------------------------------
 #optimize a single hyp set
 #MLE = GPdc.searchMLEhyp(X,Y,S,D, np.array([-2.,-2.]), np.array([2.,2.]), GPdc.SQUEXP)
-#print(MLE[0]**2,MLE[1])
-MLE = flow.searchMLEhyp(X,Y,S,D, np.array([-2.,-2.]), np.array([2.,2.]), GPdc.SQUEXP)
+#fMLE = flow.searchMLEhyp(X,Y,S,D, np.array([-2.,-2.]), np.array([2.,2.]), GPdc.SQUEXP)
 
-#MAP = GPdc.searchMAPhyp(X,Y,S,D, np.array([0.,0.]), np.array([2.,2.]), GPdc.SQUEXP)
-#print(MAP[0]**2,MAP[1])
-MAP = flow.searchMAPhyp(X,Y,S,D, np.array([0.,0.]), np.array([20.,20.]), GPdc.SQUEXP)
+MAP = GPdc.searchMAPhyp(X,Y,S,D, np.array([1.,0.]), np.array([2.,2.]), GPdc.SQUEXP)
+fMAP = flow.searchMAPhyp(X,Y,S,D, np.array([1.,0.]), np.array([2.,2.]), GPdc.SQUEXP)
+G = GPdc.GPcore(X,Y,S,D, GPdc.kernel(GPdc.SQUEXP, 1, MAP))
+Gf = flow.GPcore(X,Y,S,D, flow.kernel(flow.SQUEXP, 1, MAP))

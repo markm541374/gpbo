@@ -76,13 +76,30 @@ M=2
 #print(time.time()-t0)
 
 #mf.m.optimize()
-mf.m.kern.lengthscales.prior = gpf.priors.LogNormal(0.,1.)
-mf.m.kern.variance.prior = gpf.priors.LogNormal(1.,2.)
-mf.m.likelihood.variance.fixed = True
-s = mf.m.sample(200,epsilon=0.2,verbose=1)
-mf.m.optimize()
-print(mf.m)
-print(s)
+#mf.m[0].kern.lengthscales.prior = gpf.priors.LogNormal(10.,4.)
+mf.m[0].kern.variance.prior = gpf.priors.LogNormal(np.log(10),np.log(10)**2)
+mf.m[0].kern.variance.transform = gpf.transforms.Identity()
+mf.m[0].kern.lengthscales.fixed =True
+mf.m[0].likelihood.variance.fixed = True
+mf.m[0].kern.lengthscales = 0.4
+mf.m[0].kern.variance = 1.
+#print(mf.m[0])
+#print(mf.m[0].compute_log_likelihood())
+print(mf.m[0].compute_log_prior())
+print(GPdc.GP_LKonly(X,Y,S,D,GPdc.kernel(GPdc.SQUEXP,1,np.array([1.,0.4]))).llk())
+print(GPdc.GP_LKonly(X,Y,S,D,GPdc.kernel(GPdc.SQUEXP,1,np.array([1.,0.4]))).plk(np.array([1.,0.]),np.array([1.,1.])))
+#print(gpf.priors.LogNormal(0.,1.).logp(1.))
+print(0.5*((np.log10(1.)-0.)**2)/1.**2)
 plt.figure()
-plt.semilogy(np.log(1+np.exp(s)))
+a = np.logspace(-2,4,50)
+b = np.empty(a.shape)
+c = np.empty(a.shape)
+for i in range(len(a)):
+    mf.m[0].kern.variance=a[i]
+    b[i]=mf.m[0].compute_log_prior()
+    q = a[i]
+    c[i] =-0.5*((np.log(q)-np.log(10))**2)/(np.log(10))**2 -np.log(q) -0.5 * np.log(2 * np.pi) - 0.5 * np.log((np.log(10))**2)
+plt.semilogx(a,np.exp(b),'b')
+plt.semilogx(a,np.exp(b)*a,'b')
+plt.semilogx(a,np.exp(c),'r')
 plt.show()
