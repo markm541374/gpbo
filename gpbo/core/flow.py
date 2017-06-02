@@ -47,6 +47,8 @@ class GP_LKonly:
 
 class GPcore:
     def __init__(self, X, Y, S, D, kf):
+        self.X=X
+        self.Y=Y
         if isinstance(kf,kernel):
             self.d = kf.dim
             self.size=1
@@ -71,27 +73,18 @@ class GPcore:
             print(self.m[i])
         return
 
-    #def get_cho(self):
-     #   raise NotImplementedError
-    #    C=sp.empty([self.n,self.n*self.size])
-   #     libGP.get_cho(self.s,cint(self.size),C.ctypes.data_as(ctpd))
-    #    return C
-
     def infer_m(self,X, D):
         x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
         m = np.empty([X.shape[0],self.size])
         for i in range(self.size):
             m[:,i:i+1], _ = self.m[i].predict_f(np.hstack([x,np.zeros(shape=x.shape)]))
         return m.T
-    
 
     def infer_m_post(self,X_,D_i):
         X_i = copy.copy(X_)
         ns=X_i.shape[0]
         R = self.infer_m(X_i,D_i)
         return sp.mean(R,axis=0).reshape([1,ns])
-
-    
 
     def infer_full(self,X,D):
         x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
@@ -147,25 +140,34 @@ class GPcore:
 
         return [sp.mean(m,axis=0).reshape([1,ns]),(sp.mean(V,axis=0)+sp.var(m,axis=0)).reshape([1,ns])]
 
-    def draw(self,X_i,D_i,m):
-        raise NotImplementedError
-        #make m draws at X_i Nd, X, D, R, m
-        ns=X_i.shape[0]
-        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
-        R=sp.empty([m*self.size,ns])
-        libGP.draw(self.s, cint(self.size), cint(ns), X_i.ctypes.data_as(ctpd), (cint*len(D))(*D),R.ctypes.data_as(ctpd),cint(m))
-        return R
-    
-    def draw_post(self,X_i,D_i,z):
-        raise NotImplementedError
-        ns = X_i.shape[0]
-        [m,V] = self.infer_full_post(X_i,D_i)
-        R = sp.empty([ns,z])
-        libGP.drawk(V.ctypes.data_as(ctpd),cint(ns),R.ctypes.data_as(ctpd),cint(z))
-        R+=sp.hstack([m.T]*z)
-     #R=sp.random.multivariate_normal(m.flatten(),V,z)
-        return R.T
-    
+    def draw(self,X,D,n):
+        x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
+        s = np.empty([self.size*n,X.shape[0]])
+        for i in range(self.size):
+            s[n*i:n*(i+1),:] = np.squeeze(self.m[i].predict_f_samples(np.hstack([x,np.zeros(shape=x.shape)]),n))
+        return s
+
+    def draw_post(self,X,D,n):
+        x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
+        s = np.empty([n,X.shape[0]])
+        J = np.random.randint(0,self.size,n)
+        for i in range(n):
+            try:
+                s[i,:]= np.squeeze(self.m[J[i]].predict_f_samples(np.hstack([x,np.zeros(shape=x.shape)]),1))
+            except:
+                K= np.squeeze(self.m[J[i]].predict_f_full_cov(np.hstack([x,np.zeros(shape=x.shape)]))[1])
+                print(K.shape)
+                print(K)
+                from scipy.linalg import cho_factor
+                for i in range(-12,0):
+                    try:
+                        cho_factor(K+sp.eye(K.shape[0])*10**i)
+                        print(i)
+                    except:
+                        pass
+                raise
+        return s
+
     def llk(self):
         return np.array([self.m[i].compute_log_likelihood() for i in range(self.size)])
 
@@ -192,38 +194,38 @@ class GPcore:
             raise GPdcError()
         return m-p*sp.sqrt(v)
     
-    def infer_EI(self,X_,D_i,fixI=False,I=0.):
-        raise NotImplementedError
-        X_i = copy.copy(X_)
-        ns=X_i.shape[0]
-        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
-        R=sp.empty([self.size,ns])
+    def infer_EI(self,X,D,fixI=False,I=0.):
+        m,v = self.infer_diag(X,D)
+        if not fixI:
+            I=np.infty
+            for i in range(len(self.Y)):
+                if sum(X[i,self.d:])==0:
+                    I = min(I,self.Y[i,0])
+        E = sp.empty([self.size,X.shape[0]])
+        for i in range(self.size):
+            E[i,:] = EI(m[i,:],sp.sqrt(v[i,:]),I)
+        return E
 
-        libGP.infer_EI(self.s, cint(self.size),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D), R.ctypes.data_as(ctpd),cbool(fixI),cdbl(I))
-        return R
-    
-    def infer_EI_post(self,X_,D_i,fixI=False,I=0.):
-        raise NotImplementedError
-        E = self.infer_EI(X_,D_i,fixI=fixI,I=I)
-        ns=X_.shape[0]
+    def infer_EI_post(self,X,D,fixI=False,I=0.):
+        E = self.infer_EI(X, D, fixI=fixI, I=I)
+        ns = X.shape[0]
+        return np.mean(E, axis=0).reshape([1, ns])
 
-        return sp.mean(E,axis=0).reshape([1,ns])
-
-    def infer_lEI(self,X_,D_i,fixI=False,I=0.):
-        raise NotImplementedError
-        X_i = copy.copy(X_)
-        ns=X_i.shape[0]
-        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
-        R=sp.empty([self.size,ns])
-        libGP.infer_lEI(self.s, cint(self.size),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D), R.ctypes.data_as(ctpd),cbool(fixI),cdbl(I))
-        return R
+    def infer_lEI(self,X,D,fixI=False,I=0.):
+        m,v = self.infer_diag(X,D)
+        if not fixI:
+            I=np.infty
+            for i in range(len(self.Y)):
+                if sum(X[i,self.d:])==0:
+                    I = min(I,self.Y[i,0])
+        E = sp.empty([self.size,X.shape[0]])
+        for i in range(self.size):
+            E[i,:] = lEI(m[i,:],sp.sqrt(v[i,:]),I)
+        return E
 
     def infer_lEI_post(self,X_,D_i,fixI=False,I=0.):
-        raise NotImplementedError
         E = self.infer_lEI(X_,D_i,fixI=fixI,I=I)
         ns=X_.shape[0]
-        #print(E)
-        #print(sp.log(sp.nanmean(sp.exp(E),axis=0)))
         return sp.log(sp.nanmean(sp.exp(E),axis=0)).reshape([1,ns])
 
 
@@ -308,3 +310,31 @@ def draw(m_,V_,z):
         R+=sp.hstack([m.T]*z)
      #R=sp.random.multivariate_normal(m.flatten(),V,z)
         return copy.copy(R).T
+from scipy import stats
+SQRT_1_2PI = 1/np.sqrt(2*np.pi)
+
+def EI(m, s, y ):
+    N = len(m)
+    R = sp.empty(N)
+    for i in range(N):
+        S = (y-m[i])/s[i]
+        c = stats.norm.cdf(S)
+        p = stats.norm.pdf(S)
+        R[i] = (y-m[i])*c+s[i]*p
+    return R
+
+def lEI(m, s, y ):
+    N=len(m)
+    R = EI(m,s,y)
+    for i in range(N):
+        #TODO this switch to log puts a kink in the curve
+        if (R[i]<=0.):
+
+            S = (y-m[i])/s[i]
+            R[i] = np.log(s[i])+np.log(SQRT_1_2PI) - 0.5*S**2
+            #print("logversion: %f\n",R[i]);
+        else:
+            #print("regversion: %f %f\n",R[i], log(R[i]));
+            R[i] = np.log(R[i])
+    return R
+
