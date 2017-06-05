@@ -6,11 +6,12 @@ import time
 import random
 
 t0=time.time()
-N = 10
+scale=1.
+N = 4
 x = np.sort(np.random.rand(N,1)*2.-1,axis=0)
 X = np.hstack([x])
 D = [[np.NaN]]*N
-S = np.ones([N,1])*0.25
+S = np.ones([N,1])*0.*(1e-8)*scale**2
 #print X
 y= (np.exp(-x)+np.sin(4*x))**2+np.random.randn(N,1)*0.5
 dy = 2*(np.exp(-x)+np.sin(4*x))*(-np.exp(-x)+4*np.cos(4*x))+np.random.randn(N,1)*0.5
@@ -18,15 +19,15 @@ dy = 2*(np.exp(-x)+np.sin(4*x))*(-np.exp(-x)+4*np.cos(4*x))+np.random.randn(N,1)
 d2y = (2*(-np.exp(-x) + 4*np.cos(4*x))**2 + 2*(np.exp(-x) - 16*np.sin(4*x))* (np.exp(-x) + np.sin(4*x)))+np.random.randn(N,1)*0.5
 
 Y = np.copy(y)
-for i in range(N//2):
-    j = random.randint(0,N-1)
-    Y[j]=dy[j]
-    D[j]=[0]
-    j = random.randint(0,N-1)
-    Y[j]=d2y[j]
-    D[j]=[0,0]
+#for i in range(N//2):
+#    j = random.randint(0,N-1)
+#    Y[j]=dy[j]
+#    D[j]=[0]
+#    j = random.randint(0,N-1)
+#    Y[j]=d2y[j]
+#    D[j]=[0,0]
 
-
+Y*=scale
 def plot(m,a):
     xp = np.array([np.linspace(-1.6, 1.6, 200)]).T
 
@@ -41,10 +42,10 @@ def plot(m,a):
     mean, var = m.infer_diag_post(xp,[[np.NaN]]*200)
     a[0].plot(xp, mean.flatten(), 'b')
     a[0].fill_between(xp[:,0], mean.flatten() - 2*np.sqrt(var.flatten()), mean.flatten() + 2*np.sqrt(var.flatten()), color='blue', alpha=0.2)
-    #a[0].twinx().semilogy(xp[:,0],var.flatten(),'purple')
+    a[0].twinx().semilogy(xp[:,0],var.flatten(),'purple')
 
-    d = m.draw_post(xp,[[np.NaN]]*200,18)
-    a[0].plot(xp,d.T,'purple',linewidth=0.2)
+    #d = m.draw_post(xp,[[np.NaN]]*200,18)
+    #a[0].plot(xp,d.T,'purple',linewidth=0.2)
 
 
     mean, var = m.infer_diag_post(xp,[[0]]*200)
@@ -63,27 +64,29 @@ def plot(m,a):
     y= 1*(np.exp(-xp)+np.sin(4*xp))**2
     dy = 2*(np.exp(-xp)+np.sin(4*xp))*(-np.exp(-xp)+4*np.cos(4*xp))
     d2y = 1*(2*(-np.exp(-xp) + 4*np.cos(4*xp))**2 + 2*(np.exp(-xp) - 16*np.sin(4*xp))* (np.exp(-xp) + np.sin(4*xp)))
-    a[0].plot(xp,y,'g--')
-    a[1].plot(xp,dy,'g--')
-    a[2].plot(xp,d2y,'g--')
-kp = np.array([[2.,0.2],[3.5,0.3],[2.1,0.4]])
+    a[0].plot(xp,y*scale,'g--')
+    a[1].plot(xp,dy*scale,'g--')
+    a[2].plot(xp,d2y*scale,'g--')
+kp = np.array([[3.*scale**2,0.4]])#,[3.5,0.3],[2.1,0.2]])
 k = [GPdc.kernel(GPdc.SQUEXP,1,kp[i,:]) for i in range(kp.shape[0])]
 kf = [flow.kernel(flow.SQUEXP,1,kp[i,:]) for i in range(kp.shape[0])]
 
 m = GPdc.GPcore(X,Y,S,D,k)
 mf = flow.GPcore(X,Y,S,D,kf)
 
-#f,a = plt.subplots(nrows=3,ncols=2,figsize=(9, 6))
-#plot(m,a[:,0])
-#plot(mf,a[:,1])
+f,a = plt.subplots(nrows=3,ncols=2,figsize=(9, 6))
+plot(m,a[:,0])
+plot(mf,a[:,1])
 
-M=10
+M=5
 
-x = np.array([np.linspace(-1.,1.,M)]).T
+x = np.array([np.linspace(-1.,-0.99,M)]).T
 Di = [[[np.NaN],[0],[0,0]][j] for j in np.random.random_integers(0,2,M)]
+#Di = [[0,0]]*M
 
 mean = m.infer_m(x,Di)
 fmean = mf.infer_m(x,Di)
+print(mean,fmean)
 print('m: {}'.format(np.allclose(mean,fmean,rtol=1e-3) ))
 
 mean = m.infer_m_post(x,Di)
@@ -101,6 +104,34 @@ print('diag_post: {}'.format(np.allclose(mean,fmean,rtol=1e-3) and np.allclose(v
 mean,var = m.infer_full(x,Di)
 fmean,fvar = mf.infer_full(x,Di)
 print('full: {}'.format(np.allclose(mean,fmean,rtol=1e-3) and np.allclose(var,fvar,rtol=1e-3)))
+from scipy.linalg import cho_factor
+
+def trycho(V,d):
+    Vn = V + np.eye(V.shape[0])*(10**d)
+    try:
+        cho_factor(Vn)
+        return True
+    except:
+        return False
+
+def get_cho_white_val(V):
+    n = V.shape[0]
+    left = -40.
+    right = 20.
+    if trycho(V,left):
+       return -40.
+    if not trycho(V,right):
+        return 20.
+    for i in range(10):
+        c = (left+right)/2.
+        if trycho(V,c):
+            right = c
+        else:
+            left = c
+    return c
+a = get_cho_white_val(var/(scale**2))
+af = get_cho_white_val(fvar/(scale**2))
+print('whitevalues {} {}'.format(a,af))
 
 mean,var = m.infer_full_post(x,Di)
 fmean,fvar = mf.infer_full_post(x,Di)
@@ -135,4 +166,4 @@ print('EI_post: {}'.format(np.allclose(E,fE,rtol=1e-3)))
 #fMAP = flow.searchMAPhyp(X,Y,S,D, np.array([1.,0.]), np.array([2.,2.]), GPdc.SQUEXP)
 #G = GPdc.GPcore(X,Y,S,D, GPdc.kernel(GPdc.SQUEXP, 1, MAP))
 #Gf = flow.GPcore(X,Y,S,D, flow.kernel(flow.SQUEXP, 1, MAP))
-#plt.show()
+plt.show()

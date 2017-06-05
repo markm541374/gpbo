@@ -60,10 +60,11 @@ class GPcore:
         self.m = [gpf.gpr.GPR(x,Y,klist[kf[0].Kindex](kf[0].dim)) for i in range(self.size)]
         for i in range(self.size):
             if kf[i].hyparray:
+                self.m[i].kern.variance.transform = gpf.transforms.Log1pe(lower=0.0001*np.min(S))
                 self.m[i].kern.lengthscales=kf[i].hyp[1:1+self.d]
                 self.m[i].kern.variance=kf[i].hyp[0]**2
-                self.m[i].likelihood.variance=0.25
-                self.m[i].likelihood.variance.fixed= True
+                self.m[i].likelihood.variance=S[0]
+                #self.m[i].likelihood.variance.fixed= True
             else:
                 self.m[i].set_parameter_dict(kf[i].hyp)
         return

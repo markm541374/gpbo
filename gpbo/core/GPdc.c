@@ -1797,7 +1797,7 @@ static const char __pyx_k_GPcore_infer_diag_post[] = "GPcore.infer_diag_post";
 static const char __pyx_k_GPcore_infer_full_post[] = "GPcore.infer_full_post";
 static const char __pyx_k_GPcore_infer_m_partial[] = "GPcore.infer_m_partial";
 static const char __pyx_k_ndarray_is_not_C_contiguous[] = "ndarray is not C contiguous";
-static const char __pyx_k_home_mark_Dropbox_workspace_gpb[] = "/home/mark/Dropbox/workspace/gpbo/gpbo/core/GPdc.pyx";
+static const char __pyx_k_home_mark_Dropbox_workspace_gpb[] = "/home/mark/Dropbox/workspace/gpbo_flow/gpbo/core/GPdc.pyx";
 static const char __pyx_k_unknown_dtype_code_in_numpy_pxd[] = "unknown dtype code in numpy.pxd (%d)";
 static const char __pyx_k_Format_string_allocated_too_shor[] = "Format string allocated too short, see comment in numpy.pxd";
 static const char __pyx_k_GPcore_infer_LCB_post_locals_GPd[] = "GPcore.infer_LCB_post.<locals>.GPdcError";
@@ -4178,7 +4178,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_6GPcore___init__(CYTHON_UNUSED PyObj
  *         self.Y_s=Y_s
  * 
  *         D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]             # <<<<<<<<<<<<<<
- *         #print self.get_cho()
+ *         #print(self.get_cho())
  *         c = libGP.presolv(self.s,cint(self.size))
  */
   __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 79, __pyx_L1_error)
@@ -4304,7 +4304,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_6GPcore___init__(CYTHON_UNUSED PyObj
 
   /* "gpbo/core/GPdc.pyx":81
  *         D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]
- *         #print self.get_cho()
+ *         #print(self.get_cho())
  *         c = libGP.presolv(self.s,cint(self.size))             # <<<<<<<<<<<<<<
  *         if c!= 0:
  *             raise GPdcError('failed to presolve!{}'.format(c))
@@ -4377,7 +4377,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_6GPcore___init__(CYTHON_UNUSED PyObj
   __pyx_t_1 = 0;
 
   /* "gpbo/core/GPdc.pyx":82
- *         #print self.get_cho()
+ *         #print(self.get_cho())
  *         c = libGP.presolv(self.s,cint(self.size))
  *         if c!= 0:             # <<<<<<<<<<<<<<
  *             raise GPdcError('failed to presolve!{}'.format(c))
@@ -4455,7 +4455,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_6GPcore___init__(CYTHON_UNUSED PyObj
     __PYX_ERR(0, 83, __pyx_L1_error)
 
     /* "gpbo/core/GPdc.pyx":82
- *         #print self.get_cho()
+ *         #print(self.get_cho())
  *         c = libGP.presolv(self.s,cint(self.size))
  *         if c!= 0:             # <<<<<<<<<<<<<<
  *             raise GPdcError('failed to presolve!{}'.format(c))

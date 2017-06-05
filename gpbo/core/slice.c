@@ -748,7 +748,7 @@ static const char __pyx_k_slice_sample[] = "slice sample:";
 static const char __pyx_k_slice_sample_2[] = "slice_sample";
 static const char __pyx_k_gpbo_core_slice[] = "gpbo.core.slice";
 static const char __pyx_k_Slice_sampler_shrank_too_far[] = "Slice sampler shrank too far.";
-static const char __pyx_k_home_mark_Dropbox_workspace_gpb[] = "/home/mark/Dropbox/workspace/gpbo/gpbo/core/slice.pyx";
+static const char __pyx_k_home_mark_Dropbox_workspace_gpb[] = "/home/mark/Dropbox/workspace/gpbo_flow/gpbo/core/slice.pyx";
 static PyObject *__pyx_n_s_D;
 static PyObject *__pyx_n_s_RuntimeError;
 static PyObject *__pyx_kp_s_Slice_sampler_shrank_too_far;

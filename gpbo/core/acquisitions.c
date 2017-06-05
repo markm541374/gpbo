@@ -1365,7 +1365,7 @@ static const char __pyx_k_choose_to_use_aquisition[] = "choose to use aquisition
 static const char __pyx_k_no_precondition_provided[] = "no precondition provided";
 static const char __pyx_k_localrefine_found_max_EI_at[] = "localrefine found max EI at {} {} {}";
 static const char __pyx_k_localopt_finished_with_z_x_y[] = "localopt finished with z: {} (x: {}) y: {} {}";
-static const char __pyx_k_home_mark_Dropbox_workspace_gpb[] = "/home/mark/Dropbox/workspace/gpbo/gpbo/core/acquisitions.pyx";
+static const char __pyx_k_home_mark_Dropbox_workspace_gpb[] = "/home/mark/Dropbox/workspace/gpbo_flow/gpbo/core/acquisitions.pyx";
 static const char __pyx_k_loghyperparameters_mean_std_min[] = "loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}";
 static const char __pyx_k_reusing_preselected_hyperparamet[] = "reusing preselected hyperparameters";
 static PyObject *__pyx_n_s_BaseException;
