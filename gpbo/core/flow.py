@@ -175,17 +175,11 @@ class GPcore:
 
     def infer_LCB(self,X, D, p):
         m,v = self.infer_diag(X, D)
-        return m-p*v
-        raise NotImplementedError
-        X_i = copy.copy(X_)
-        ns=X_i.shape[0]
-        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
-        R=sp.empty([self.size,ns])
-        libGP.infer_LCB(self.s, cint(self.size), ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D), ct.c_double(p), R.ctypes.data_as(ctpd))
-        
-        return R
-    
-    def infer_LCB_post(self,X_,D_i,p):
+        return m-p*np.sqrt(v)
+
+    def infer_LCB_post(self,X, D, p):
+        m,v = self.infer_diag_post(X, D)
+        return m-p*np.sqrt(v)
         raise NotImplementedError
         X_i = copy.copy(X_)
         [m,v] = self.infer_diag_post(X_i,D_i)

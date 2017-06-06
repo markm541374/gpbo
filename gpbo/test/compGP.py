@@ -74,9 +74,9 @@ m = GPdc.GPcore(X,Y,S,D,k)
 mf = flow.GPcore(X,Y,S,D,kf)
 
 f,a = plt.subplots(nrows=3,ncols=2,figsize=(9, 6))
-plot(m,a[:,0])
-plot(mf,a[:,1])
-print(mf.m[0])
+#plot(m,a[:,0])
+#plot(mf,a[:,1])
+#print(mf.m[0])
 M=5
 
 x = np.array([np.linspace(-1.,-0.99,M)]).T
@@ -85,7 +85,6 @@ Di = [[[np.NaN],[0],[0,0]][j] for j in np.random.random_integers(0,2,M)]
 
 mean = m.infer_m(x,Di)
 fmean = mf.infer_m(x,Di)
-print(mean,fmean)
 print('m: {}'.format(np.allclose(mean,fmean,rtol=1e-3) ))
 
 mean = m.infer_m_post(x,Di)
@@ -156,13 +155,13 @@ E = m.infer_lEI_post(x,Di,fixI=True)
 fE = mf.infer_lEI_post(x,Di,fixI=True)
 print('EI_post: {}'.format(np.allclose(E,fE,rtol=1e-3)))
 
-E = m.infer_lEI(x,Di,fixI=True)
-fE = mf.infer_lEI(x,Di,fixI=True)
-print('lEI: {}'.format(np.allclose(E,fE,rtol=1e-3)))
+E = m.infer_LCB(x,Di,p=1.2)
+fE = mf.infer_LCB(x,Di,p=1.2)
+print('LCB: {}'.format(np.allclose(E,fE,rtol=1e-3)))
 
-#E = m.infer_lEI_post(x,Di,fixI=True)
-#fE = mf.infer_lEI_post(x,Di,fixI=True)
-#print('EI_post: {}'.format(np.allclose(E,fE,rtol=1e-3)))
+E = m.infer_LCB_post(x,Di,p=1.2)
+fE = mf.infer_LCB_post(x,Di,p=1.2)
+print('LCB_post: {}'.format(np.allclose(E,fE,rtol=1e-3)))
 #---------------------------------
 #optimize a single hyp set
 #MLE = GPdc.searchMLEhyp(X,Y,S,D, np.array([-2.,-2.]), np.array([2.,2.]), GPdc.SQUEXP)
@@ -172,4 +171,4 @@ print('lEI: {}'.format(np.allclose(E,fE,rtol=1e-3)))
 #fMAP = flow.searchMAPhyp(X,Y,S,D, np.array([1.,0.]), np.array([2.,2.]), GPdc.SQUEXP)
 #G = GPdc.GPcore(X,Y,S,D, GPdc.kernel(GPdc.SQUEXP, 1, MAP))
 #Gf = flow.GPcore(X,Y,S,D, flow.kernel(flow.SQUEXP, 1, MAP))
-plt.show()
+#plt.show()
