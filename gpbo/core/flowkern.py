@@ -124,15 +124,24 @@ class dkern(Stationary):
         Kpost = tf.reduce_sum(dKdU * dUdZ, axis=2) * dZdX
         return Kpost
 
-class pointvar(Stationary):
-    def K(self, X_, Y_=None, presliced=False):
-        X = tf.slice(X_, [0,1],[-1,-1])
-        Sx = tf.slice(X_, [0,0],[-1,1])
-        if Y_ is None:
-            Y=Y_
-            Sy = Sx
+class Pointwise_Hetroskedastic(gpf.kernels.Kern):
+    """
+    The White kernel
+    """
+    def __init__(self, input_dim, active_dims=None):
+        gpf.kernels.Kern.__init__(self, input_dim, active_dims)
+
+    def K(self, X, X2=None, presliced=False):
+        if not presliced:
+            X, X2 = self._slice(X,X2)
+        if X2 is None:
+#            X = tf.Print(X,[X],message='x',summarize=100)
+            d = tf.zeros(tf.stack([tf.shape(X)[0]]),gpf.kernels.float_type)
+            return tf.diag(tf.squeeze(X))
         else:
-            Y = tf.slice(Y_, [0,1],[-1,-1])
-            Sy = tf.slice(Y_, [0,0],[-1,1])
-        Kpost = super().K(X,Y,presliced=presliced)
-        return Kpost
+            shape = tf.stack([tf.shape(X)[0], tf.shape(X2)[0]])
+            return tf.zeros(shape,gpf.kernels.float_type)
+    def Kdiag(self,X):
+        K= tf.squeeze(tf.diag_part(self.K(X)))
+        return K
+

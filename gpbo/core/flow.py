@@ -57,14 +57,14 @@ class GPcore:
             self.size=len(kf)
             self.d = kf[0].dim
         x = np.hstack([X,np.array([[0 if isnan(x[0]) else (sum([1. if i==j else 0 for i in x ])) for x in D] for j in range(self.d)]).T])
-        self.m = [gpf.gpr.GPR(x,Y,klist[kf[0].Kindex](kf[0].dim)) for i in range(self.size)]
+        X = np.hstack([x,S.reshape(x.shape[0],1)])
+        #self.m = [gpf.gpr.GPR(X,Y,klist[kf[0].Kindex](kf[0].dim)) for i in range(self.size)]
+        self.m = [gpf.gpr.GPR(X,Y,kf[i].K) for i in range(self.size)]
         for i in range(self.size):
             if kf[i].hyparray:
-                self.m[i].kern.variance.transform = gpf.transforms.Log1pe(lower=0.0001*np.min(S))
-                self.m[i].kern.lengthscales=kf[i].hyp[1:1+self.d]
-                self.m[i].kern.variance=kf[i].hyp[0]**2
-                self.m[i].likelihood.variance=S[0]
-                #self.m[i].likelihood.variance.fixed= True
+                self.m[i].likelihood.variance.transform = gpf.transforms.Log1pe(lower=0.001*np.min(S))
+                self.m[i].likelihood.variance=0.0011*np.min(S)
+                self.m[i].likelihood.variance.fixed= True
             else:
                 self.m[i].set_parameter_dict(kf[i].hyp)
         return
@@ -121,6 +121,7 @@ class GPcore:
         if sp.amin(V)<=-0.:
             print( "negative/eq variance")
             print( "_______________")
+            print(V)
             raise(flow_Error)
         return m.T, V.T
 
@@ -172,7 +173,9 @@ class GPcore:
     def llk(self):
         return np.array([self.m[i].compute_log_likelihood() for i in range(self.size)])
 
-    def infer_LCB(self,X_,D_i, p):
+    def infer_LCB(self,X, D, p):
+        m,v = self.infer_diag(X, D)
+        return m-p*v
         raise NotImplementedError
         X_i = copy.copy(X_)
         ns=X_i.shape[0]
@@ -233,8 +236,14 @@ class GPcore:
 
 
 SQUEXP = 0
+def squexphs(d,h):
+    k0 = flowkern.dkern(d)
+    k1 = flowkern.Pointwise_Hetroskedastic(1,active_dims=[flowkern.DXmax*d])
+    k0.lengthscales=h[1:1+d]
+    k0.variance=h[0]**2
+    return k0+k1
 
-klist = [flowkern.dkern]
+klist = [squexphs, flowkern.dkern]
 class kernel(object):
     def __init__(self,K,D,H):
         self.dim = D
@@ -245,6 +254,7 @@ class kernel(object):
             self.hyparray=False
             self.hyp = H
         self.Kindex = K
+        self.K = klist[K](D,H)
         return
     
     def __call__(self,x1, x2, d1=[sp.NaN], d2=[sp.NaN],gets=False):
