@@ -138,7 +138,7 @@ class optimizer:
             rxlast=list(rx)
             logger.info("RC returned {}     recctime: {}\n".format(rx,t3-t2))
             aqaux['host'] = os.uname()[1]
-            logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+',{},'.format(self.state.conditionV)+''.join([str(k)+' '+str(aqaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in aqaux.keys()])[:-1]+'\n'
+            logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+',{},'.format(self.state.conditionV)+''.join([str(k)+' '+str(aqaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in aqaux.keys()])[:-1]+''.join([str(k)+' '+str(chooseaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in chooseaux.keys()])[:-1]+'\n'
             lf.write(logstr)
             lf.flush()
             if gpbo.core.debugoutput['logstate']:
@@ -156,6 +156,27 @@ def norlocalstopfn(optstate,**para):
 
 def nstopfn(optstate,**para):
     return optstate.n >= para['nmax']
+
+def EIstopfn(optstate,**para):
+    try:
+        return optstate.aux['EImax'] <= para['EImin']
+    except:
+
+        return False
+def PIstopfn(optstate,**para):
+    try:
+        logger.info('PI at X was: {} minlimit {}'.format(optstate.aux['PIatX'],para['PImin']))
+        return optstate.aux['PIatX'] <= para['PImin']
+    except:
+        return False
+
+def dxminstopfn(optstate,**para):
+    if optstate.n<2:
+        return False
+    dx = sp.linalg.norm(sp.array(optstate.x[-1])-sp.array(optstate.x[-2]))
+    logger.critical(str(optstate.aux))
+    logger.info('dx between steps was: {} minlimit {}'.format(dx,para['dxmin']))
+    return dx<para['dxmin']
 
 def localstopfn(optstate,**para):
     return optstate.localdone

@@ -103,8 +103,10 @@ def EIMAPaq(optstate,persist,**para):
     xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
     #logger.debug([xmin,ymin,ierror])
     logger.info('localrefine found max EI at {} {} {}'.format(xmin,sp.exp(ymin),ierror))
+    m,v = G.infer_diag_post(xmin,[[sp.NaN]])
+    PIatX = sp.stats.norm.cdf(min(y),loc=m[0,0],scale=sp.sqrt(v[0,0]))
     persist['n']+=1
-    return [i for i in xmin],ev,persist,{'MAPHYP':MAP,'logEImin':ymin,'DIRECTmessage':ierror}
+    return [i for i in xmin],ev,persist,{'MAPHYP':MAP,'logEImin':ymin,'DIRECTmessage':ierror,'EImax':sp.exp(-ymin),'PIatX':PIatX}
 
 
 def eihypaq(optstate,persist,**para):
@@ -154,9 +156,10 @@ def eihypaq(optstate,persist,**para):
     lhmin = lhyp.min(axis=0)
     lhmax = lhyp.max(axis=0)
     logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean,lhstd,lhmin,lhmax))
-
+    m,v = G.infer_diag_post(xmin,[[sp.NaN]])
+    PIatX = sp.stats.norm.cdf(min(y),loc=m[0,0],scale=sp.sqrt(v[0,0]))
     persist['overhead']=time.clock()-t0
-    return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in G.kf],'DIRECTmessage':ierror,'EImax':-ymin,'kindex':para['kindex'],}
+    return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in G.kf],'DIRECTmessage':ierror,'EImax':sp.exp(-ymin),'kindex':para['kindex'],'PIatX':PIatX}
 
 #PES with fixed s ev
 def PESfsaq(optstate,persist,**para):

@@ -15,7 +15,7 @@ class eimledefault():
             'ev': {'s': s, 'd': [sp.NaN]},
             'lb': [-1.]*D,
             'ub': [1.]*D,
-            'nrandinit': n,
+            'nrandinit': 10,
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
             'kindex': GPdc.MAT52,
@@ -417,7 +417,7 @@ class switchdefault():
                       'logfilename': '/dev/null'},
             'lpara': {'gtol': 0.00001,
                       'maxfun': 400},
-            'pvetol':1e-3,
+            'pvetol':1e-2,
             'lineSh':1e-6,
             'nlineS':200
         }

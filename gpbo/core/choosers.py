@@ -65,7 +65,12 @@ def globallocalregret(optstate,persist,**para):
     xvmax,vmax,ierror = gpbo.core.optutils.twopartopt(lambda x:-G.infer_diag_post(x,[[sp.NaN]])[1][0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
     mvmax,vvmax = [j[0,0] for j in G.infer_diag_post(xvmax,[[sp.NaN]])]
     logger.info('post var max {} at {} with mean {} ({})'.format(vvmax,xvmax,mvmax,ierror))
-
+    #get dims that are on teh edge
+    dropdims=[]
+    for i in range(d):
+        if xmin[i]>0.995*(ub[i]-lb[i])+lb[i] or xmin[i]<lb[i]+(1.-0.995)*(ub[i]-lb[i]):
+            dropdims.append(i)
+    logger.info('post min in on edge in axes {}'.format(dropdims))
     #get hessian/grad posterior
     #local probmin elipse at post min
     GH = gpbo.core.optutils.gpGH(G,xmin)
@@ -83,12 +88,27 @@ def globallocalregret(optstate,persist,**para):
     lrest/=200.
     logger.info('localregretest {}'.format(lrest))
 
+    m = sp.diag(H)
+    v = sp.diag(gpbo.core.optutils.Hvec2H(sp.diagonal(varHvec),d))
+
+    logger.debug('axisprobs {}'.format(1.-sp.stats.norm.cdf(sp.zeros(d),loc=m,scale=sp.sqrt(v))))
     #step out to check +ve defininteness
     logger.info('checking for +ve definite ball')
-    pc = gpbo.core.optutils.probgppve(G,sp.array(xmin),tol=para['pvetol'])
-    logger.info('prob pvedef at xmin {}'.format(pc))
+    from gpbo.core import debugoutput
+    if debugoutput['adaptive']:
+        logger.debug('Hessian {} \n\n varH {}'.format(H, gpbo.core.optutils.Hvec2H(sp.diagonal(varHvec),d)))
+    pc2 = gpbo.core.optutils.probgppve(G,sp.array(xmin),tol=para['pvetol'])
+    pc = gpbo.core.optutils.probgppve(G,sp.array(xmin),tol=para['pvetol'],dropdims=dropdims)
+    logger.info('prob pvedef at xmin {} dropdim: {}'.format(pc2,pc))
 
-    PDcondition = lambda x:gpbo.core.optutils.probgppve(G,sp.array(x)+sp.array(xmin),tol=para['pvetol'])>1-para['pvetol']
+    mask = sp.ones(d)
+    for i in dropdims:
+        mask[i]=0.
+    def PDcondition(x):
+        P= gpbo.core.optutils.probgppve(G,sp.array(x)*mask+sp.array(xmin),tol=para['pvetol'],dropdims=dropdims)
+        C= P>1-para['pvetol']
+        #print(C,P,sp.array(x)*mask)
+        return C
     #todo assuming unit radius search region for Rinit=1
     rmax = gpbo.core.optutils.ballradsearch(d,1.,PDcondition,ndirs=para['nlineS'],lineSh=para['lineSh'])
 
@@ -139,7 +159,7 @@ def globallocalregret(optstate,persist,**para):
             plt.close(fig)
             del (fig)
         logger.info('no +ve def region, choosereturns 0')
-        return 0,persist,{'reuseH':[k.hyp for k in G.kf]}
+        return 0,persist,{'reuseH':[k.hyp for k in G.kf],'ppveatx':pc,'rpve':rmax}
     #draw support points
     W = sp.vstack([ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_LAPAPROT, para=20),ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_VARREJ, para=vvmax)])
 
@@ -318,7 +338,7 @@ def globallocalregret(optstate,persist,**para):
         R=minimize(fn2,C.T.dot(xmin),method='bfgs')
         logger.warn('cheat testopt result with precondition {}:\n{}'.format(H,R))
 
-    return rval,persist,{'start':xmin,'H':H,'reuseH':[k.hyp for k in G.kf],'offsetEI':m}
+    return rval,persist,{'start':xmin,'H':H,'reuseH':[k.hyp for k in G.kf],'offsetEI':m,'ppveatx':pc,'rpve':rmax,'GRest':racc}
 
 
 def alternate(optstate,persist,**para):

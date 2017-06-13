@@ -454,7 +454,7 @@ def plotprobstatellipse(cG,H,x,ax,logr=False):
     return
 
 
-def probgppve(G,x,tol=1e-3):
+def probgppve(G,x,tol=1e-3,dropdims=[]):
     nsam = int(1./tol)+1
     Gr, varG, H, Hvec, varHvec, M, varM = gpGH(G,x)
     d=G.D
@@ -462,6 +462,9 @@ def probgppve(G,x,tol=1e-3):
     pvecount = 0
     for i in xrange(nsam):
         Hdraw = Hvec2H(vHdraws[i,:], d)
+        for i in reversed(sorted(dropdims)):
+            Hdraw = np.delete(Hdraw,i,axis=0)
+            Hdraw = np.delete(Hdraw,i,axis=1)
         try:
             sp.linalg.cholesky(Hdraw)
             pvecount += 1
@@ -532,6 +535,8 @@ def ballradsearch(d,rmax,condition,ndirs=200,lineSh=1e-6):
         xunit = x/sp.linalg.norm(x) # normalize
         r,n = rline(xunit,R,condition,htarget=lineSh) # linesearch up to current max
         R = min(R,r) #drop max to new result
+        if R==0.:
+            break
         evcount+=n
     return R
 
