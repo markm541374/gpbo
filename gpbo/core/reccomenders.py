@@ -25,7 +25,7 @@ except ImportError:
 from gpbo.core import GPdc
 
 def argminrecc(optstate,persist,**para):
-    #if para['onlyafter']>len(optstate.y) or not len(optstate.y)%para['everyn']==0:
+    #if para['onlyafter']>optstate.n or not optstate.n%para['everyn']==0:
     #    return [sp.NaN for i in para['lb']],{'didnotrun':True}
     
     logger.info('argmin reccomender')
@@ -41,7 +41,7 @@ argminpara = dict()
 argmin = argminrecc, argminpara
 
 def gpmaprecc(optstate,persist,**para):
-    if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
+    if para['onlyafter']>=optstate.n or not optstate.n%para['everyn']==0:
         return argminrecc(optstate,persist,**para)
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
     logger.info('gpmap reccomender')
@@ -107,8 +107,8 @@ def gpmaprecc(optstate,persist,**para):
     return [i for i in xmin],persist,{'MAPHYP':MAP,'ymin':ymin}
 
 def gpmap2upperrecc(optstate,persist,**para):
-    if para['onlyafter']>=len(optstate.y) :
-        print('{} <= {} : switch to argmin'.format(len(optstate.y),para['onlyafter']))
+    if para['onlyafter']>=optstate.n :
+        print('{} <= {} : switch to argmin'.format(optstate.n,para['onlyafter']))
         return argminrecc(optstate,persist,**para)
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
     logger.info('gpmapucb2 reccomender')
@@ -141,7 +141,7 @@ def gpmap2upperrecc(optstate,persist,**para):
     return [i for i in xmin],persist,{'MAPHYP':MAP,'ymin':ymin}
 
 def gpmapasrecc(optstate,persist,**para):
-    if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
+    if para['onlyafter']>=optstate.n or not optstate.n%para['everyn']==0:
         return argminrecc(optstate,persist, **para)
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
     logger.info('gpmapas reccomender')
@@ -200,7 +200,7 @@ def gpmapasrecc(optstate,persist,**para):
     return [i for i in xmin],persist,{'MAPHYP':MAP,'ymin':ymin}
 
 def gphinasargminrecc(optstate, persist, **para):
-    if para['onlyafter'] >= len(optstate.y) or not len(optstate.y) % para['everyn'] == 0:
+    if para['onlyafter'] >= optstate.n or not optstate.n % para['everyn'] == 0:
         # return [sp.NaN for i in para['lb']],{'didnotrun':True}
         return argminrecc(optstate, persist, **para)
     logger.info('gpmapas reccomender')
@@ -236,7 +236,7 @@ def gphinasargminrecc(optstate, persist, **para):
 
 
 def gphinasrecc(optstate,persist,**para):
-    if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
+    if para['onlyafter']>=optstate.n or not optstate.n%para['everyn']==0:
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
         return argminrecc(optstate,persist, **para)
     logger.info('gpmapas reccomender')
@@ -307,8 +307,8 @@ def gphinasrecc(optstate,persist,**para):
     return [i for i in xmin],persist,{'ymin':ymin}
 
 def gphinrecc(optstate,persist,**para):
-    #print( [para['onlyafter'],len(optstate.y)])
-    if para['onlyafter']>=len(optstate.y) or not len(optstate.y)%para['everyn']==0:
+    #print( [para['onlyafter'],optstate.n])
+    if para['onlyafter']>=optstate.n or not optstate.n%para['everyn']==0:
         #return [sp.NaN for i in para['lb']],{'didnotrun':True}
         return argminrecc(optstate, persist,**para)
     logger.info('gphin reccomender')

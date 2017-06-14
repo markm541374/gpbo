@@ -63,6 +63,21 @@ def shifthart3(x, **ev):
     print( 'f inputs x:{} ev:{} outputs y:{}'.format(z, ev, f))
     return f-hart3min, 1., dict()
 
+def shifthart3D(x,**ev):
+    f,c,d = shifthart3(x,**ev)
+    h=1e-6
+    F = [f]
+    for i in range(3):
+        zp = sp.copy(x)
+        zp[i]+=h
+        zn = sp.copy(x)
+        zn[i]-=h
+        print(zn,zp)
+        fp,_,__=shifthart3(zp,**ev)
+        fn,_,__=shifthart3(zn,**ev)
+        F.append((fp-fn)/(2.*h))
+    return F,c,d
+
 hart6min = -3.32237
 hart6xmin = [0.20169,0.150011,0.476874,0.275332,0.311652,0.6573]
 def shifthart6(x, **ev):

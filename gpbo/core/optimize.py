@@ -39,7 +39,8 @@ class optstate:
         self.c.append(c)
         self.C +=c
         self.Cfull+=c+taq
-        self.n+=1
+        if sp.isnan(ev['d']):
+            self.n+=1
         self.aqtime.append(taq)
         return 
 
@@ -96,7 +97,8 @@ class optimizer:
         lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara[0]['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, condition, aqauxdata'])+'\n')
 #        self.state = optstate()
         stepn=0
-        rxlast=None
+        checky=sp.NaN
+        rxlast=[0.]*self.dx
         while not self.stopfn(self.state,**self.stoppara):
             stepn+=1
             #print self.choosepara
@@ -111,11 +113,27 @@ class optimizer:
             t1 = time.clock()
             self.state.aux = aqaux
             logger.info("AQ returned {} : {}    aqtime: {}\nevaluate:".format(x,ev,t1-t0))
-            
-            y,c,ojaux  = self.ojf(x,**ev)
-            t2 = time.clock()
+            if not self.ojfchar['batchgrad']:
+
+                t2 = time.clock()
+                y,c,ojaux  = self.ojf(x,**ev)
+                logger.info("EV returned {} : {}     evaltime: {}".format(y,c,t2-t1))
+            else:
+                t2 = time.clock()
+                F,c,ojaux  = self.ojf(x,**ev)
+                logger.info("EV returned {} : {}     evaltime: {}".format(F,c,t2-t1))
+                y = F[0]
+                for k in range(len(F)-1):
+                    ev_ = copy.copy(ev)
+                    ev_['d'] = [k]
+                    df = F[k+1]
+                    self.state.update(x,ev_,df,c,t1-t0)
+                    logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev_.items()]+[str(df)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rxlast]+[str(checky)+',']+[str(i)+', ' for i in [0.,0.,0.]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+',{},'.format(self.state.conditionV)+''.join([str(k)+' '+str(aqaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in aqaux.keys()])[:-1]+''.join([str(k)+' '+str(chooseaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in chooseaux.keys()])[:-1]+'\n'
+                    lf.write(logstr)
+
             self.state.update(x,ev,y,c,t1-t0)
-            logger.info("EV returned {} : {}     evaltime: {}".format(y,c,t2-t1))
+
+            t2 = time.clock()
             rx,self.reccpersist[mode],reaux = wrap(self.reccfn[mode],self.state,self.reccpersist[mode],**self.reccpara[mode])
             t3 = time.clock()
 
@@ -130,11 +148,12 @@ class optimizer:
                     checkpara['s']=1e-99
                     checkpara['cheattrue']=True
                     checky,checkc,checkojaux  = self.ojf(rx,**checkpara)
+                    if self.ojfchar['batchgrad']:
+                        checky = checky[0]
                     checkylast, checkclast, checkojauxlast = checky,checkc,checkojaux
                     #logger.info("checkout {} : {} : {}".format(checky,checkc,checkojaux))
             else:
                 checky=sp.NaN
-
             rxlast=list(rx)
             logger.info("RC returned {}     recctime: {}\n".format(rx,t3-t2))
             aqaux['host'] = os.uname()[1]
@@ -143,7 +162,6 @@ class optimizer:
             lf.flush()
             if gpbo.core.debugoutput['logstate']:
                 pickle.dump(self.state,open(os.path.join(gpbo.core.debugoutput['path'],'{}.p'.format(self.state.n)),'wb'))
-
         #import pickle
         #obj = [self.reccpersist, self.aqpersist]
         #pickle.dump(obj, open('dbout/persists.p', 'wb'))
@@ -224,6 +242,8 @@ def search(optconfig,initdata=False):
     if hasattr(optconfig,'multimode'):
         if optconfig.multimode:
             multi=True
+    if not 'batchgrad' in optconfig.ojfchar.keys():
+        optconfig.ojfchar['batchgrad'] = False
     if not multi:
         O = optimizer(optconfig.path, optconfig.fname, [optconfig.aqpara], [optconfig.aqfn], optconfig.stoppara,
                                      optconfig.stopfn, [optconfig.reccpara], [optconfig.reccfn], optconfig.ojf,

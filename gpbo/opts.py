@@ -37,10 +37,10 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                     tmp['xa']=0
                     return f(x,**tmp)
                 C[1].ojf = wrap
-                try:
-                    out = gpbo.search(C[1])
-                except:
-                    pass
+                #try:
+                out = gpbo.search(C[1])
+                #except:
+                #    pass
             elif C[0][:5]=='pesfs':
                 C[1].path = path
                 C[1].fname = '{}_{}.csv'.format(C[0],ii)
@@ -261,7 +261,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             for ii in range(nreps):
                 a[8].plot(data[ii]['index'],data[ii]['trueyatxrecc']-trueopt,color=col, linestyle=line,label=labelfn(C[0]))
             #and averaged
-            pq(a[11],[data[k]['index'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,line,labelfn(C[0]))
+            pq(a[11],[data[k]['n'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,line,labelfn(C[0]))
 
             #second is all the opts per evaluation cost
             for ii in range(nreps):
