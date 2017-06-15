@@ -62,7 +62,7 @@ class GP_LKonly:
         return self.l+tmp
 
 class GPcore:
-    def __init__(self, X_s, Y_s, S_s, D_s, kf):
+    def __init__(self, X__s, Y__s, S__s, D__s, kf):
         #print [X_s, Y_s, S_s, D_s, kf]
         if isinstance(kf,kernel):
             self.size = 1
@@ -71,12 +71,21 @@ class GPcore:
             self.size = len(kf)
         allhyp = sp.hstack([k.hyp for k in kf])
         self.kf=kf
-        [self.n ,self.D] = X_s.shape
-        Dx = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]
+        [self.n ,self.D] = X__s.shape
+        Dx_ = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D__s]
+        perm = sp.flip(sp.argsort(Dx_),axis=0)
+        try:
+            X_s = X__s[perm,:]
+            Y_s = Y__s[perm,:]
+            S_s = S__s[perm,:]
+            Dx = [Dx_[i] for i in perm]
+        except:
+            import traceback
+            print(traceback.format_exc())
         self.s = libGP.newGP_hypset(cint(self.D),cint(self.n),cint(kf[0].Kindex),X_s.ctypes.data_as(ctpd),Y_s.ctypes.data_as(ctpd),S_s.ctypes.data_as(ctpd),(cint*len(Dx))(*Dx),allhyp.ctypes.data_as(ctpd),cint(self.size))
         self.Y_s=Y_s
         
-        D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]
+        #D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]
         #print(self.get_cho())
         c = libGP.presolv(self.s,cint(self.size))
         if c!= 0:
@@ -136,7 +145,14 @@ class GPcore:
 
         if sp.amin(sp.diag(V))<=-0.:
             print( "negative/eq diagvariance in full")
-            #print( [m,V,X_i,D_i])
+            import sys
+            sys.stdout.flush()
+            sys.stderr.flush()
+            for i in range(self.size):
+                vt = R[(ns+1)*i+1:(ns+1)*(i+1),:]
+                print(self.kf[i].hyp)
+                print(sp.diag(vt),'\n')
+            print(X_i,D_i)
             print( "_______________")
             #self.printc()
             raise(GPdcError)

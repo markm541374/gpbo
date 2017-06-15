@@ -93,13 +93,15 @@ def EIMAPaq(optstate,persist,**para):
     MAP = GPdc.searchMAPhyp(x, y, s, dx, mprior, sprior, kindex)
     logger.info('found MAPHYP {}'.format(MAP))
 
-    G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(kindex, d, MAP))
+    G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(kindex, d, mprior))
+
+    G.m[0].set_parameter_dict(MAP)
     def wrap(x):
         xq = copy.copy(x)
         xq.resize([1,d])
         a = G.infer_lEI(xq,[ev['d']])
         return -a[0,0]
-
+    print(wrap([0.,0.]))
     xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
     #logger.debug([xmin,ymin,ierror])
     logger.info('localrefine found max EI at {} {} {}'.format(xmin,sp.exp(ymin),ierror))

@@ -11,7 +11,7 @@ import logging
 import copy
 import pandas as pd
 import gpbo
-
+import traceback
 logger = logging.getLogger(__name__)
 
 class optstate:
@@ -230,6 +230,7 @@ def wrap(fn,optstate,persist,**para):
             logger.info('using raised noise floor {} in {}'.format(optstate.condition,fn))
         return fn(optstate,persist,**para)
     except gpbo.core.GPdc.GPdcError as e:
+        traceback.print_exc()
         optstate.condition=max(optstate.condition+1.,-19.)
         optstate.conditionV=10**optstate.condition
         logger.error('numerical error in {} fn Raising noise to {}\n\n {}'.format(str(fn),optstate.condition,e))

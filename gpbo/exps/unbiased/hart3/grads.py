@@ -7,7 +7,7 @@ import scipy as sp
 gpbo.core.debugoutput['adaptive']=False
 gpbo.core.debugoutput['logstate']=False
 mode=['run','plot'][0]
-nreps=8
+nreps=1
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -44,7 +44,7 @@ C=gpbo.core.config.pesfsdefault(f,D,10,s,'results','null.csv')
 C.stoppara = {'nmax': 40}
 C.stopfn = gpbo.core.optimize.nstopfn
 C.ojfchar['batchgrad']=True
-all2confs.append(['pesfsgrad',C])
+all2confs.append(['pesfsgradx',C])
 
 if mode=='run':
     if vers==2:

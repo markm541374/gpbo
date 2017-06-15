@@ -40,7 +40,6 @@ def makeG(X,Y,S,D,kindex,mprior,sprior,nh,chains=1):
 
 def drawmins(G,n,lb,ub,SUPPORT=300,mode = [ESutils.SUPPORT_SLICELCB],SLICELCB_PARA=1.):
     #draw support points
-    
     W = sp.vstack([ESutils.draw_support(G, lb,ub,SUPPORT/len(mode),m, para = SLICELCB_PARA) for m in mode])
 
     R = ESutils.draw_min(G,W,n)
