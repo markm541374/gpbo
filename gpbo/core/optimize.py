@@ -172,15 +172,24 @@ class optimizer:
 def norlocalstopfn(optstate,**para):
     return nstopfn(optstate,**para) or localstopfn(optstate,**para)
 
+
+
 def nstopfn(optstate,**para):
     return optstate.n >= para['nmax']
 
 def EIstopfn(optstate,**para):
     try:
+        logger.info('EI at X was: {} minlimit {}'.format(optstate.aux['EImax'],para['EImin']))
         return optstate.aux['EImax'] <= para['EImin']
     except:
-
         return False
+
+def EIorNstopfn(optstate, **para):
+    return nstopfn(optstate, **para) or EIstopfn(optstate, **para)
+
+def PIorNstopfn(optstate, **para):
+    return nstopfn(optstate, **para) or PIstopfn(optstate, **para)
+
 def PIstopfn(optstate,**para):
     try:
         logger.info('PI at X was: {} minlimit {}'.format(optstate.aux['PIatX'],para['PImin']))

@@ -160,11 +160,12 @@ def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False):
 
     #print(x)
     a.plot(x, map(lambda x: sp.percentile([i(x) for i in ints], 50), x), color=col,label=lab)
+    #a.plot(x, map(lambda x: sp.mean([i(x) for i in ints]), x), color=col,label=lab)
 
     y25 = map(lambda x: sp.percentile([i(x) for i in ints], 25), x)
     y75 = map(lambda x: sp.percentile([i(x) for i in ints], 75), x)
     a.fill_between(x,y25,y75,edgecolor=col, facecolor=col,lw=0.0,alpha=0.1)
-    a.plot(ends[yendorder], yends[yendorder], '.',color=col ,linestyle=line)
+    #a.plot(ends[yendorder], yends[yendorder], '.',color=col ,linestyle=line)
     a2 = a.twinx()
     a2.plot(ends[sp.argsort(ends)],sp.linspace(1,0,n),color=col, linestyle='--',linewidth=0.2)
     a2.set_ylabel('fraction of optimizations still running')

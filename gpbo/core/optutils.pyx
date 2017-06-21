@@ -468,7 +468,7 @@ def probgppve(G,x,tol=1e-3,dropdims=[]):
         try:
             sp.linalg.cholesky(Hdraw)
             pvecount += 1
-        except sp.linalg.LinAlgError:
+        except:
             pass
     return (pvecount+1)/ float(nsam+2)
 
