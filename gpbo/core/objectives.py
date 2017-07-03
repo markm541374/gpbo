@@ -137,23 +137,36 @@ def genmat52ojf(d,lb,ub,ls=0.3,fixs=-1):
     [X,Y,S,D] = gen_dataset(nt, d, lb, ub, GPdc.MAT52, sp.array([1.5] + [ls] * d))
     G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.MAT52, d, sp.array([1.5] + [ls] * d)))
 
-    def dirwrap(x,y):
-        z = G.infer_m(x,[[sp.NaN]])[0,0]
-        #z = obj(x,0.,[sp.NaN])
-        return (z,0)
-    [xmin,ymin,ierror] = DIRECT.solve(dirwrap,lb,ub,user_data=[], algmethod=1, maxf=20000, logfilename='/dev/null')
+    def wrap(x):
+        xq = sp.copy(x)
+        xq.resize([1, d])
+        a = G.infer_m_post(xq, [[sp.NaN]])
+        return a[0, 0]
 
-    def spowrap(x):
-        z = G.infer_m(x,[[sp.NaN]])[0,0]
-        #z = obj(x,0.,[sp.NaN])
-        return z
-    y = spm(spowrap, xmin,  method='l-bfgs-b',bounds=[(-1,1)]*d,options={'ftol':1e-15})
-    xmin = y.x
-    ymin = spowrap(y.x)
+    dpara= {'user_data': [],
+            'algmethod': 1,
+            'maxf': 40000,
+            'logfilename': '/dev/null'}
+    lpara= {'ftol': 1e-20,
+            'maxfun': 1200}
+    print(wrap([0., 0.]))
+    xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,lb,ub,dpara,lpara)
+
+    print('init {}'.format(ymin))
+    for i in range(50):
+        p = sp.random.normal(size=d)*1e-8
+        res = spm( wrap,xmin+p,method='L-BFGS-B',bounds=tuple([(lb[j],ub[j]) for j in range(d)]),options={'ftol':1e-20})
+       # print(res)
+        #print(xmin,res.x,wrap(xmin),wrap(res.x)<wrap(xmin))
+        if wrap(res.x) < wrap(xmin):
+            xmin = res.x
+        #    ymin = ymin+res.fun
+            print('change: {} {}'.format(xmin,wrap(res.x)-ymin))
+    ymin = wrap(xmin)
     def ojf(x,**ev):
         dx=ev['d']
         s=ev['s']
-        if not fixs<0:
+        if fixs<0:
             if ev['s']>0:
                 noise = sp.random.normal(scale=sp.sqrt(ev['s']))
             else:
@@ -162,9 +175,10 @@ def genmat52ojf(d,lb,ub,ls=0.3,fixs=-1):
             noise = sp.random.normal(scale=sp.sqrt(fixs))
 
         y= G.infer_m(sp.array(x),[dx])[0,0]+noise
-        print('ojf at {} returned {} noise {}'.format([i for i in x],y,noise))
+        if not 'silent' in ev.keys():
+            print('ojf at {} returned {} noise {}'.format([i for i in x],y,noise))
         return y-ymin,1.,dict()
-    logger.info('generated function xmin {} ymin {}(shifted to 0.) globopt:{} locopt:{}'.format(xmin, ymin, ierror, y.status))
+    logger.info('generated function xmin {} ymin {}(shifted to 0.) opt:{}'.format(xmin, ymin, ierror))
     return ojf,xmin,0.
     
 def genbiasedmat52ojf(d,lb,ub,xls,sls):

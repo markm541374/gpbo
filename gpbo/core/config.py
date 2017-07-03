@@ -152,13 +152,13 @@ class eihypdefault():
         self.fname = fname
         return
 class pesfsdefault():
-    def __init__(self,f,D,n,s,path,fname):
+    def __init__(self,f,D,n,s,path,fname,ninit=10):
         self.aqfn = gpbo.core.acquisitions.PESfsaq
         self.aqpara= {
             'ev': {'s': s, 'd': [sp.NaN]},
             'lb': [-1.]*D,
             'ub': [1.]*D,
-            'nrandinit': 10,
+            'nrandinit': ninit,
             #'maxf':500+100*D,
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
@@ -381,7 +381,7 @@ class switchdefault():
     def __init__(self, f, D, ninit,nstop, s, path, fname):
 
 
-        C = gpbo.core.config.pesfsdefault(f, D, ninit, s, 'results', 'introspection.csv')
+        C = gpbo.core.config.pesfsdefault(f, D, 10, s, 'results', 'introspection.csv',ninit=ninit)
         aq0 = C.aqfn
         aq0para = C.aqpara
 
