@@ -52,22 +52,28 @@ C.stoppara['PImin']=0.001
 #all2confs.append(['eihyp_0001',C])
 
 #-----------------------
-C=gpbo.core.config.pesfsdefault(f,D,160,s,rpath,'null.csv')
+C=gpbo.core.config.eihypdefault(f,D,160,s,rpath,'null.csv')
 C.stopfn = gpbo.optimize.PIorNstopfn
-C.stoppara['PImin']=0.1
+C.stoppara['PImin']=0.0001
+#all2confs.append(['eihyp_00001',C])
+
+#-----------------------
+C=gpbo.core.config.pesfsdefault(f,D,160,s,rpath,'null.csv')
+C.stopfn = gpbo.optimize.AQorNstopfn
+C.stoppara['AQmin']=0.1
 all2confs.append(['pesfs_01',C])
 
 
 #-----------------------
 C=gpbo.core.config.pesfsdefault(f,D,160,s,rpath,'null.csv')
-C.stopfn = gpbo.optimize.PIorNstopfn
-C.stoppara['PImin']=0.01
+C.stopfn = gpbo.optimize.AQorNstopfn
+C.stoppara['AQmin']=0.01
 all2confs.append(['pesfs_001',C])
 
 #-----------------------
 C=gpbo.core.config.pesfsdefault(f,D,160,s,rpath,'null.csv')
-C.stopfn = gpbo.optimize.PIorNstopfn
-C.stoppara['PImin']=0.001
+C.stopfn = gpbo.optimize.AQorNstopfn
+C.stoppara['AQmin']=0.001
 all2confs.append(['pesfs_0001',C])
 if mode=='run':
     if vers==2:

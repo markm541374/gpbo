@@ -1264,6 +1264,7 @@ static const char __pyx_k_switch[] = "switch";
 static const char __pyx_k_vmaxaq[] = "vmaxaq";
 static const char __pyx_k_vstack[] = "vstack";
 static const char __pyx_k_xrange[] = "xrange";
+static const char __pyx_k_AQvalue[] = "AQvalue";
 static const char __pyx_k_DM_DROP[] = "DM_DROP";
 static const char __pyx_k_EIHYPaq[] = "EIHYPaq";
 static const char __pyx_k_EIMAPaq[] = "EIMAPaq";
@@ -1377,6 +1378,7 @@ static const char __pyx_k_localopt_finished_with_z_x_y[] = "localopt finished wi
 static const char __pyx_k_home_mark_Dropbox_workspace_gpb[] = "/home/mark/Dropbox/workspace/gpbo/gpbo/core/acquisitions.pyx";
 static const char __pyx_k_loghyperparameters_mean_std_min[] = "loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}";
 static const char __pyx_k_reusing_preselected_hyperparamet[] = "reusing preselected hyperparameters";
+static PyObject *__pyx_n_s_AQvalue;
 static PyObject *__pyx_n_s_BaseException;
 static PyObject *__pyx_n_s_C;
 static PyObject *__pyx_n_s_DH_CHAINS;
@@ -8397,7 +8399,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_8PESfsaq(CYTHON_UNUSED PyOb
  *     m,v = pesobj.G.infer_diag_post(xmin,[[sp.NaN]])
  *     PIatX = sp.stats.norm.cdf(min(y),loc=m[0,0],scale=sp.sqrt(v[0,0]))             # <<<<<<<<<<<<<<
  *     persist['overhead']=time.clock()-t0
- *     return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],'PIatX':PIatX}
+ *     return [i for i in xmin],para['ev'],persist,{'AQvalue':-ymin,'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],'PIatX':PIatX}
  */
   __pyx_t_8 = __Pyx_GetModuleGlobalName(__pyx_n_s_sp); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
@@ -8476,7 +8478,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_8PESfsaq(CYTHON_UNUSED PyOb
  *     m,v = pesobj.G.infer_diag_post(xmin,[[sp.NaN]])
  *     PIatX = sp.stats.norm.cdf(min(y),loc=m[0,0],scale=sp.sqrt(v[0,0]))
  *     persist['overhead']=time.clock()-t0             # <<<<<<<<<<<<<<
- *     return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],'PIatX':PIatX}
+ *     return [i for i in xmin],para['ev'],persist,{'AQvalue':-ymin,'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],'PIatX':PIatX}
  * 
  */
   __pyx_t_10 = __Pyx_GetModuleGlobalName(__pyx_n_s_time); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 202, __pyx_L1_error)
@@ -8511,7 +8513,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_8PESfsaq(CYTHON_UNUSED PyOb
   /* "gpbo/core/acquisitions.pyx":203
  *     PIatX = sp.stats.norm.cdf(min(y),loc=m[0,0],scale=sp.sqrt(v[0,0]))
  *     persist['overhead']=time.clock()-t0
- *     return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],'PIatX':PIatX}             # <<<<<<<<<<<<<<
+ *     return [i for i in xmin],para['ev'],persist,{'AQvalue':-ymin,'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],'PIatX':PIatX}             # <<<<<<<<<<<<<<
  * 
  * 
  */
@@ -8566,6 +8568,10 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_8PESfsaq(CYTHON_UNUSED PyOb
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_10 = PyDict_New(); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 203, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_2 = PyNumber_Negative(__pyx_v_ymin); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_t_10, __pyx_n_s_AQvalue, __pyx_t_2) < 0) __PYX_ERR(0, 203, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_mean, __pyx_v_lhmean) < 0) __PYX_ERR(0, 203, __pyx_L1_error)
@@ -19298,6 +19304,7 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
+  {&__pyx_n_s_AQvalue, __pyx_k_AQvalue, sizeof(__pyx_k_AQvalue), 0, 0, 1, 1},
   {&__pyx_n_s_BaseException, __pyx_k_BaseException, sizeof(__pyx_k_BaseException), 0, 0, 1, 1},
   {&__pyx_n_s_C, __pyx_k_C, sizeof(__pyx_k_C), 0, 0, 1, 1},
   {&__pyx_n_s_DH_CHAINS, __pyx_k_DH_CHAINS, sizeof(__pyx_k_DH_CHAINS), 0, 0, 1, 1},
@@ -19747,7 +19754,7 @@ static int __Pyx_InitCachedConstants(void) {
  *     m,v = pesobj.G.infer_diag_post(xmin,[[sp.NaN]])
  *     PIatX = sp.stats.norm.cdf(min(y),loc=m[0,0],scale=sp.sqrt(v[0,0]))             # <<<<<<<<<<<<<<
  *     persist['overhead']=time.clock()-t0
- *     return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],'PIatX':PIatX}
+ *     return [i for i in xmin],para['ev'],persist,{'AQvalue':-ymin,'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],'PIatX':PIatX}
  */
   __pyx_tuple__16 = PyTuple_Pack(2, __pyx_int_0, __pyx_int_0); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__16);

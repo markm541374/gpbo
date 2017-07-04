@@ -190,6 +190,9 @@ def EIorNstopfn(optstate, **para):
 def PIorNstopfn(optstate, **para):
     return nstopfn(optstate, **para) or PIstopfn(optstate, **para)
 
+def AQorNstopfn(optstate, **para):
+    return nstopfn(optstate, **para) or AQstopfn(optstate, **para)
+
 def PIstopfn(optstate,**para):
     try:
         logger.info('PI at X was: {} minlimit {}'.format(optstate.aux['PIatX'],para['PImin']))
@@ -197,6 +200,12 @@ def PIstopfn(optstate,**para):
     except:
         return False
 
+def AQstopfn(optstate,**para):
+    try:
+        logger.info('AQ at X was: {} minlimit {}'.format(optstate.aux['AQvalue'],para['AQmin']))
+        return optstate.aux['AQatX'] <= para['AQmin']
+    except:
+        return False
 def dxminstopfn(optstate,**para):
     if optstate.n<2:
         return False
