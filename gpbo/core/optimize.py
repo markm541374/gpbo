@@ -203,7 +203,7 @@ def PIstopfn(optstate,**para):
 def AQstopfn(optstate,**para):
     try:
         logger.info('AQ at X was: {} minlimit {}'.format(optstate.aux['AQvalue'],para['AQmin']))
-        return optstate.aux['AQatX'] <= para['AQmin']
+        return optstate.aux['AQvalue'] <= para['AQmin']
     except:
         return False
 def dxminstopfn(optstate,**para):
