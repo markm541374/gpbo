@@ -97,7 +97,7 @@ extern "C" int drawk(double* K_in, int n, double* R, int m){
         j+=1;
         jitter=1;
     }
-    if(j>=-18){
+    if(j>-18){
         printf("Adding 10e%d diagonal to covariance in drawk\n",j-1);
     }
     drawcov(&K[0],n, &R[0], m);
