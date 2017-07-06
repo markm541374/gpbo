@@ -243,6 +243,10 @@ def totaltstopfn(optstate,**para):
         return False
 
 def wrap(fn,optstate,persist,**para):
+    if gpbo.core.debugoutput['forceNoiseFloor']:
+        optstate.condition = gpbo.core.debugoutput['forceNoiseFloor']
+        optstate.conditionV = 10**gpbo.core.debugoutput['forceNoiseFloor']
+
     try:
         if optstate.condition>-20:
             logger.info('using raised noise floor {} in {}'.format(optstate.condition,fn))

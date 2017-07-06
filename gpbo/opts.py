@@ -185,8 +185,8 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             item.set_fontsize(10)
         f.append(f_)
         a.append(a_)
-    colorlist = ['b','r','g','purple','k','grey','orange','c','lightgreen','lightblue','pink']
-    lslist = ['solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted']
+    colorlist = ['b','r','g','purple','k','grey','orange','c','lightgreen','lightblue','pink','b','r','g','purple','k','grey','orange','c','lightgreen','lightblue','pink']
+    lslist = ['solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted']
     ci=-1
     for C in confs:
         if  C[0][:5]=='pesbs' or C[0][:3]=='fab':

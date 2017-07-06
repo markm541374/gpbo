@@ -208,14 +208,6 @@ def globallocalregret(optstate,persist,**para):
 
     m,v=normin
 
-    binormdist = gpbo.core.optutils.bigaussmin().fit(sp.array(Yout),startx=[sp.mean(Yout),0.1,mvmax,sp.sqrt(vvmax),0.])
-    logger.info('Fitresult {}'.format(binormdist))
-    #rbin = 0
-    #for y in Yin:
-    #    rbin += binormdist.ERleft(y)
-    #rbin /= len(Yin)
-
-    rbin,err = spi.quad(lambda y: gpbo.core.GPdc.EI(-y, -m, v)[0, 0] * binormdist.pdf(y), -sp.inf,max(Yin))
 
     racc = 0.
     n=len(Cout)
@@ -229,7 +221,7 @@ def globallocalregret(optstate,persist,**para):
     logger.info('outer regret {}  (due to samples: {} due to tail: {}'.format(racc,tmp,racc-tmp))
 
     #regret lower bound
-    rlow,err = spi.quad(lambda y:gpbo.core.GPdc.EI(-y,-m,v)[0,0]*sp.stats.norm.pdf(y,mvmax,sp.sqrt(vvmax)),-sp.inf,mvmax)
+    #rlow,err = spi.quad(lambda y:gpbo.core.GPdc.EI(-y,-m,v)[0,0]*sp.stats.norm.pdf(y,mvmax,sp.sqrt(vvmax)),-sp.inf,mvmax)
     #regret from samples
 
     rsam=0.
@@ -295,8 +287,8 @@ def globallocalregret(optstate,persist,**para):
 
         ax[1,2].text(0,0.34, 'regretg sample      {}'.format(rsam))
         ax[1,2].text(0,0.24, 'regretg tailest     {}'.format(racc))
-        ax[1,2].text(0,0.18, 'regretg binormest   {}'.format(rbin))
-        ax[1,2].text(0,0.08, 'regretg lowerb      {} '.format(rlow))
+        #ax[1,2].text(0,0.18, 'regretg binormest   {}'.format(rbin))
+        #ax[1,2].text(0,0.08, 'regretg lowerb      {} '.format(rlow))
 
         ax[1,2].text(0,0.5,'maxRin  {} / {}'.format(maxRin,rmax))
         ax[1,2].text(0,0.6,'mode  {}'.format(rval))
@@ -306,9 +298,9 @@ def globallocalregret(optstate,persist,**para):
         persist['Rexists'].append(optstate.n)
         persist['sampleregret'].append(rsam)
         persist['expectedregret'].append(racc)
-        persist['expectedRbinorm'].append(rbin)
+        #persist['expectedRbinorm'].append(rbin)
         persist['localrsam'].append(rloc)
-        persist['regretlower'].append(rlow)
+        #persist['regretlower'].append(rlow)
         persist['localrest'].append(lrest)
         ax[0,3].plot(persist['Rexists'],persist['localrest'],'k')
         ax[0,3].plot(persist['Rexists'],persist['expectedRbinorm'],'purple')
