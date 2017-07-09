@@ -29,7 +29,7 @@ def nullfn(*args,**kwargs):
 f, xm, truemin = objectives.genmat52ojf(D,lb,ub,ls=0.25,fixs=-1)
 all2confs=[]
 all3confs=[]
-rpath='d2res'
+rpath='tmp2'
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'null.csv')
 C.chooser=gpbo.core.choosers.always0
@@ -62,6 +62,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,20,rpath,trueopt=truemin+1e-99,logx=False,showends=True)
+    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin+1e-99,logx=False,showends=True)
 else:
     pass

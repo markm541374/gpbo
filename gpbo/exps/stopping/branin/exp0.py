@@ -4,8 +4,8 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-gpbo.core.debugoutput=True
-gpbo.core.debugoptions={'datavis':False,'drawlap':False,'cost1d':False,'ctaq':False,'support':False,'adaptive':True,'logstate':False}
+gpbo.core.debugoutput['adaptive']=False
+gpbo.core.debugoutput['logstate']=True
 mode=['run','plot'][0]
 nreps=1
 import argparse
@@ -27,13 +27,14 @@ f = objectives.shiftbraninojf
 truemin =0.
 all2confs=[]
 all3confs=[]
-rpath='results'
+rpath='tmp'
 #-----------------------
 #eimle
-C=gpbo.core.config.switchdefault(f,D,10,140,s,rpath,'null.csv')
-all2confs.append(['switching',C])
+C=gpbo.core.config.switchdefault(f,D,10,180,s,rpath,'null.csv')
+C.choosepara['regretswitch']=1e-4
+all2confs.append(['switching_6',C])
 
-
+#out = gpbo.search(C,initdata='dbout/79.p')
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)

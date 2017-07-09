@@ -145,6 +145,8 @@ def eihypaq(optstate,persist,**para):
             logger.info('EIoffset by {}'.format(fixVal))
     def wrap(Q):
         x = sp.array([Q])
+        m,v = G.infer_diag(x,[[sp.NaN]])
+        lei = G.infer_EI(x,[[sp.NaN]],fixI=fixEI,I=fixVal)
         v = G.infer_lEI_post(x,[[sp.NaN]],fixI=fixEI,I=fixVal)[0,0]
         return -v
 

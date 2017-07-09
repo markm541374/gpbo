@@ -59,6 +59,7 @@ class optimizer:
         self.dev = ojfchar['dev']
         if initdata:
             self.state=pickle.load(open(initdata))
+            print('init with \n{} \n{}'.format(self.state.x,self.state.y))
         else:
             self.state=optstate()
         return

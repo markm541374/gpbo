@@ -263,10 +263,23 @@ def silentdirect(f,l,u,*args,**kwargs):
     print('directtime {}'.format(time.clock()-t0))
     return xmin,ymin,ierror
 
+
+def noisydirect(f,l,u,*args,**kwargs):
+    print( 'searching...')
+    t0=time.clock()
+    [xmin, ymin, ierror] = DIRECT.solve(f,l,u,*args,**kwargs)
+    print('directtime {}'.format(time.clock()-t0))
+    return xmin,ymin,ierror
+
 def silentdirectwrapped(f,l,u,*args,**kwargs):
     def dwrap(x,aux):
         return f(x),0
     return silentdirect(dwrap,l,u,*args,**kwargs)
+
+def noisydirectwrapped(f,l,u,*args,**kwargs):
+    def dwrap(x,aux):
+        return f(x),0
+    return noisydirect(dwrap,l,u,*args,**kwargs)
 
 def boundedlocal(f,l,u,x0,*args,**kwargs):
     d = len(u)
