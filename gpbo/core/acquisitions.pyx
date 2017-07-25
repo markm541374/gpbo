@@ -15,6 +15,8 @@ import copy
 import gpbo
 from gpbo.core import GPdc
 from gpbo.core import PES
+import DIRECT
+from multiprocessing import Process, Pipe
 from gpbo.core.optutils import multilocal
 
 try:
@@ -435,6 +437,56 @@ def choiceaq(optstate,persist,**para):
     x,ev,pers,aux = para['aqoptions'][aqn][0](optstate,persist[1][aqn],**para['aqoptions'][aqn][1])
     persist[1][aqn]=pers
     return x,ev,persist,aux
+
+
+
+def directaq(optstate,persist,**para):
+
+    msg = 'direct aq'
+    if persist==None:
+
+        def opt(conn):
+            def inner(x,aux):
+                conn.send(x)
+                y = conn.recv()
+                return y,0
+            try:
+                DIRECT.solve(inner,para['lb'],para['ub'],logfilename='/dev/null')
+            except:
+                pass
+            return
+        class wrap:
+            def __init__(self):
+                self.parent_conn, child_conn = Pipe()
+                self.p = Process(target=opt, args=(child_conn,))
+                self.p.start()
+                return
+            def getx(self):
+                if self.parent_conn.poll(1):
+                    x = self.parent_conn.recv()
+                    print(x)
+                    return x,0
+                else:
+                    return None,-1
+
+            def givey(self,y):
+                self.parent_conn.send(y)
+                return
+        persist = dict()
+        persist['direct'] = wrap()
+
+        x,status = persist['direct'].getx()
+    else:
+        persist['direct'].givey(optstate.y[-1])
+        x,status = persist['direct'].getx()
+
+        if status<0:
+            msg = 'direct is finished'
+            optstate.localdone=True
+            x=[0.]*len(para['lb'])
+    logger.info('directaq x {}'.format(x))
+
+    return list(x),para['ev'],persist,{'msg':msg }
 
 def splocalaq(optstate,persist,**para):
     #logger.error( str(persist))

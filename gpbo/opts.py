@@ -159,15 +159,16 @@ def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False):
         x = sp.linspace(min(starts), max(ends), 200)
 
     #print(x)
-    #a.plot(x, map(lambda x: sp.percentile([i(x) for i in ints], 50), x), color=col,label=lab)
-    m = map(lambda x: sp.mean([i(x) for i in ints]), x)
-    v = map(lambda x: sp.mean([i(x) for i in ints]), x)
-    a.plot(x, map(lambda x: sp.mean([i(x) for i in ints]), x), color=col,label=lab)
+    a.plot(x, map(lambda x: sp.percentile([i(x) for i in ints], 50), x), color=col,label=lab)
+    #m = map(lambda x: sp.mean([i(x) for i in ints]), x)
+    #v = map(lambda x: sp.mean([i(x) for i in ints]), x)
+    #a.plot(x, map(lambda x: sp.mean([i(x) for i in ints]), x), color=col,label=lab)
 
     y25 = map(lambda x: sp.percentile([i(x) for i in ints], 25), x)
     y75 = map(lambda x: sp.percentile([i(x) for i in ints], 75), x)
-    #a.fill_between(x,y25,y75,edgecolor=col, facecolor=col,lw=0.0,alpha=0.1)
+    a.fill_between(x,y25,y75,edgecolor=col, facecolor=col,lw=0.0,alpha=0.1)
     #a.plot(ends[yendorder], yends[yendorder], '.',color=col ,linestyle=line)
+    print("endvalues: {}".format(yends))
     a2 = a.twinx()
     a2.plot(ends[sp.argsort(ends)],sp.linspace(1,0,n),color=col, linestyle='--',linewidth=0.2)
     a2.set_ylabel('fraction of optimizations still running')
@@ -264,6 +265,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             for ii in range(nreps):
                 a[8].plot(data[ii]['index'],data[ii]['trueyatxrecc']-trueopt,color=col, linestyle=line,label=labelfn(C[0]))
             #and averaged
+            print("XXXXXXXXXXXXXX\n")
             pq(a[11],[data[k]['n'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,line,labelfn(C[0]))
 
             #second is all the opts per evaluation cost

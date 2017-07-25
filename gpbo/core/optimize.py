@@ -99,7 +99,7 @@ class optimizer:
 #        self.state = optstate()
         stepn=0
         checky=sp.NaN
-        rxlast=[0.]*self.dx
+        rxlast=[sp.NaN]*self.dx
         while not self.stopfn(self.state,**self.stoppara):
             stepn+=1
             #print self.choosepara

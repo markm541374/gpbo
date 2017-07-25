@@ -4,7 +4,7 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 nreps=1
 import argparse
 gpbo.core.debugoutput['logstate']=True
@@ -30,13 +30,13 @@ rpath='v2'
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'null.csv')
 C.chooser=gpbo.core.choosers.always0
-#all2confs.append(['switching_no',C])
+all2confs.append(['switching_no',C])
 
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,20,61,s,rpath,'null.csv')
 C.choosepara['regretswitch']=1e-2
 C.aqpara[0]['nrandinit']=C.choosepara['onlyafter']=C.reccpara[0]['onlyafter']=20
-#all2confs.append(['switching_2Y',C])
+all2confs.append(['switching_2Y',C])
 
 
 #t = gpbo.search(C,initdata='dbout/60.p')
@@ -49,7 +49,7 @@ all2confs.append(['switching_4',C])
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'null.csv')
 C.choosepara['regretswitch']=1e-6
-#all2confs.append(['switching_6',C])
+all2confs.append(['switching_6',C])
 if args.expnum == -1:
     confs2 = all2confs
 else:

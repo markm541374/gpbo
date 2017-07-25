@@ -409,7 +409,7 @@ class switchdefault():
             'check': True,
             'everyn': 1,
             'support': 2500,
-            'draws': 50000,
+            'draws': 25000,
             'regretswitch':1e-4,
             'dpara': {'user_data': [],
                       'algmethod': 1,
@@ -419,7 +419,7 @@ class switchdefault():
                       'maxfun': 400},
             'pvetol':1e-2,
             'lineSh':1e-6,
-            'nlineS':200
+            'nlineS':150
         }
 
         self.aqfn = [aq0,aq1,aq2]
@@ -439,6 +439,29 @@ class switchdefault():
         self.reccpara = [reccpara0,reccpara1,reccpara0]
 
         self.ojfchar = {'dx': len(aq0para['lb']), 'dev': len(aq0para['ev'])}
+        self.ojf = f
+
+        self.path = path
+        self.fname = fname
+        return
+class directdefault:
+    def __init__(self, f, D, n, s, path, fname):
+        self.aqfn = gpbo.core.acquisitions.directaq
+        self.aqpara = {
+            'ev': {'s': s, 'd': [sp.NaN]},
+            'lb': [-1.] * D,
+            'ub': [1.] * D
+        }
+
+        self.stoppara = {'nmax': n}
+        self.stopfn = gpbo.core.optimize.norlocalstopfn
+
+        self.reccfn = gpbo.core.reccomenders.argminrecc
+        self.reccpara = {
+            'ev': self.aqpara['ev'],
+            'check': True
+        }
+        self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
         self.ojf = f
 
         self.path = path

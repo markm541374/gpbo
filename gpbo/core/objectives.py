@@ -161,7 +161,7 @@ def genmat52ojf(d,lb,ub,ls=0.3,fixs=-1):
         if wrap(res.x) < wrap(xmin):
             xmin = res.x
         #    ymin = ymin+res.fun
-            print('change: {} {}'.format(xmin,wrap(res.x)-ymin))
+            #print('change: {} {}'.format(xmin,wrap(res.x)-ymin))
     ymin = wrap(xmin)
     def ojf(x,**ev):
         dx=ev['d']
