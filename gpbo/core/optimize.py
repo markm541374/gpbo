@@ -283,21 +283,24 @@ def search(optconfig,initdata=False):
 
 def readoptdata(fname,includetaq=False):
     df = pd.DataFrame()
-
-    with open(fname, 'r') as f:
-        for line in f:
-            df = pd.concat([df, pd.DataFrame([tuple(line.strip().split(','))])], ignore_index=True)
-
-    j = 0
-    for i in xrange(df.shape[1]):
-        if not isinstance(df[i][0], str):
-            df[i][0] = 'augdata{}'.format(j)
-            j += 1
-        else:
-           df[i][0] = df[i][0].replace(' ', '')
-    df.columns = df.iloc[0]
-    df.drop(df.index[[0]], inplace=True)
-    df.reset_index(inplace=True)
+    #with open(fname, 'r') as f:
+    #    for line in f:
+    #        df = pd.concat([df, pd.DataFrame([tuple(line.strip().split(','))])], ignore_index=True)
+    #print(df.head())
+    names = (open(fname).readline().strip('\n')+''.join([',q{}'.format(i) for i in range(18)])).replace(' ','')
+    df = pd.read_csv(fname,names=names.split(','),skiprows=1)
+    #print(df2.head())
+    #print(df.keys())
+    #for i in xrange(df.shape[1]):
+    #    if not isinstance(df[i][0], str):
+    #        df[i][0] = 'augdata{}'.format(j)
+     #       j += 1
+     #   else:
+     #      df[i][0] = df[i][0].replace(' ', '')
+    #df.columns = df.iloc[0]
+    #df.drop(df.index[[0]], inplace=True)
+    #df.reset_index(inplace=True)
+    #print(df.head())
     l = len(df['c'])
     df['cacc'] = pd.Series(sp.empty(l), index=df.index)
     df['accE'] = pd.Series(sp.empty(l), index=df.index)
@@ -309,6 +312,7 @@ def readoptdata(fname,includetaq=False):
             pass
 
 
+    print('5')
     #df['accEA'][0] = df.loc[0, ('c')]+df.loc[0, ('taq')]
     df.loc[0,('accEA')] = df.loc[0, ('c')]+df.loc[0, ('taq')]
     for i in xrange(1, l):
