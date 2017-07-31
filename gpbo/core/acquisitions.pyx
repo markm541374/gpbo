@@ -530,3 +530,54 @@ def splocalaq(optstate,persist,**para):
     #print 'xtoev {}'.format(x)
     x = sp.linalg.solve(persist['R'],z)
     return list(x),para['ev'],persist,{'msg':'localopt' }
+import cma
+def cmaesaq(optstate,persist,**para):
+
+    msg = 'cmaes aq'
+    if persist==None:
+
+        def opt(conn):
+            def inner(x):
+                conn.send(x)
+                y = conn.recv()
+                return y
+
+            options = {'boundary_handling':'BoundTransform','bounds':[para['lb'],para['ub']]}
+            try:
+                es = cma.fmin(inner,len(para['lb']) * [0], 0.5,options=options)
+            except:
+                pass
+            return
+
+        class wrap:
+            def __init__(self):
+                self.parent_conn, child_conn = Pipe()
+                self.p = Process(target=opt, args=(child_conn,))
+                self.p.start()
+                return
+            def getx(self):
+                if self.parent_conn.poll(1):
+                    x = self.parent_conn.recv()
+                    print(x)
+                    return x,0
+                else:
+                    return None,-1
+
+            def givey(self,y):
+                self.parent_conn.send(y)
+                return
+        persist = dict()
+        persist['cma'] = wrap()
+
+        x,status = persist['cma'].getx()
+    else:
+        persist['cma'].givey(optstate.y[-1])
+        x,status = persist['cma'].getx()
+
+        if status<0:
+            msg = 'cma is finished'
+            optstate.localdone=True
+            x=[0.]*len(para['lb'])
+    logger.info('cmaesaq x {}'.format(x))
+
+    return list(x),para['ev'],persist,{'msg':msg }

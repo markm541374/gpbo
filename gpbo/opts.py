@@ -37,10 +37,10 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                     tmp['xa']=0
                     return f(x,**tmp)
                 C[1].ojf = wrap
-                #try:
-                out = gpbo.search(C[1])
-                #except:
-                #    pass
+                try:
+                    out = gpbo.search(C[1])
+                except:
+                    pass
             elif C[0][:5]=='pesfs':
                 C[1].path = path
                 C[1].fname = '{}_{}.csv'.format(C[0],ii)
@@ -402,6 +402,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
         a[11].axis('tight')
         if 11 in axisset.keys():
             a[11].axis(axisset[11],'tight')
+        a[11].set_xlim(0,140)
         f[11].savefig(os.path.join(path,'out11.png'),bbox_inches='tight', pad_inches=0.1)
 
         a[12].legend()
@@ -429,3 +430,63 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             a[13].axis(axisset[13],'tight')
         f[13].savefig(os.path.join(path,'out13.png'),bbox_inches='tight', pad_inches=0.1)
 
+def plotprofile(confs,nreps,path,tol=0.9,target=1e-6):
+    f=[]
+    a=[]
+    pmax=1
+    for i in range(pmax):
+        f_,a_ = plt.subplots(1)
+        for item in ([a_.title, a_.xaxis.label, a_.yaxis.label] + a_.get_xticklabels() + a_.get_yticklabels()):
+            item.set_fontsize(10)
+        f.append(f_)
+        a.append(a_)
+    colorlist = ['b','r','g','purple','k','grey','orange','c','lightgreen','lightblue','pink','b','r','g','purple','k','grey','orange','c','lightgreen','lightblue','pink']
+    lslist = ['solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted']
+    ci=-1
+
+    for C in confs:
+        print('plotting {}...'.format(C[0]))
+        ci+=1
+        col = colorlist[ci]
+        line = lslist[ci]
+        #collect the data
+        data=[]
+        xoverheads = sp.empty(nreps)
+        xntotarget = sp.zeros(nreps)
+        overheads = sp.empty(nreps)
+        noverheads = [sp.empty(nreps) for i in range(len(C[1]['N']))]
+        ninrun = sp.zeros(nreps)
+        support = sp.logspace(-2,5,200)
+        success = sp.zeros(nreps)
+        for ii in range(nreps):
+            D = gpbo.optimize.readoptdata(os.path.join(path,'{}_{}.csv'.format(C[0],ii)))
+            A = sp.array(D['trueyatxrecc'].values)
+            if A.min()>=target:
+                xoverheads[ii]=sum(D['taq'])
+                overheads[ii]=sum(D['taq'])
+                for k,n in enumerate(C[1]['N']):
+                    noverheads[k][ii] = sum(D['taq'][:n])
+            else:
+                success[ii]=1
+                i = sp.argmax(A<=target)#while A[i]>=target:
+                xoverheads[ii] = sum(D['taq'][:i+1])
+                overheads[ii] = sum(D['taq'])
+                xntotarget[ii] = i
+                ninrun[ii]=len(D['taq'])
+                for k,n in enumerate(C[1]['N']):
+                    noverheads[k][ii] = sum(D['taq'].values[:n])
+        if sp.mean(success)>=tol:
+            if C[1]['oracle']:
+                a[0].plot(support,sp.mean(xoverheads)+sp.mean(xntotarget)*support,col,label=C[0]+'oracle',linestyle='dashdot')
+            if C[1]['full']:
+                a[0].plot(support,sp.mean(overheads)+sp.mean(ninrun)*support,col,label=C[0]+'_all',linestyle='dashed')
+            for k,n in enumerate(C[1]['N']):
+                if sp.percentile(xntotarget,int(tol*100))<n:
+                    a[0].plot(support,sp.mean(noverheads[k])+n*support,col,label=C[0]+str(n),linestyle='solid')
+        else:
+            print('{} only acchived target on {}'.format(C[0],sp.mean(success)))
+        a[0].set_xscale('log')
+        a[0].set_yscale('log')
+        a[0].legend()
+
+    f[0].savefig(os.path.join(path,'profile_{}.png'.format(sp.log10(target))),bbox_inches='tight', pad_inches=0.1)

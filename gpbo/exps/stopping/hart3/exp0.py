@@ -61,6 +61,8 @@ all2confs.append(['pesfs_1',None])
 #all2confs.append(['pesfs_3',None])
 
 all2confs.append(['pesfs_4',None])
+all2confs.append(['switching_direct'])
+all2confs.append(['switching_cmaes'])
 
 
 if mode=='run':
@@ -69,6 +71,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,12,rpath,trueopt=truemin+1e-99,logx=False,showends=True)
+    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin+1e-99,logx=False,showends=True)
 else:
     pass

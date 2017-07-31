@@ -7,7 +7,7 @@ import scipy as sp
 gpbo.core.debugoutput['adaptive']=False
 gpbo.core.debugoutput['logstate']=False
 mode=['run','plot'][0]
-nreps=25
+nreps=12
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -29,7 +29,7 @@ f = objectives.shifthart3
 truemin =0.
 all2confs=[]
 all3confs=[]
-rpath='eipi'
+rpath='t0'
 
 
 #-----------------------
@@ -47,9 +47,9 @@ C.stoppara['PImin']=0.01
 
 #-----------------------
 C=gpbo.core.config.eihypdefault(f,D,160,s,rpath,'null.csv')
-C.stopfn = gpbo.optimize.PIorNstopfn
-C.stoppara['PImin']=0.001
-#all2confs.append(['eihyp_0001',C])
+C.stopfn = gpbo.optimize.nstopfn
+C.stoppara['nmax']=180
+all2confs.append(['ei_fix',C])
 
 #-----------------------
 C=gpbo.core.config.eihypdefault(f,D,160,s,rpath,'null.csv')
@@ -61,26 +61,26 @@ C.stoppara['PImin']=0.0001
 C=gpbo.core.config.pesfsdefault(f,D,160,s,rpath,'null.csv')
 C.stopfn = gpbo.optimize.AQorNstopfn
 C.stoppara['AQmin']=0.1
-all2confs.append(['pesfs_01',C])
+#all2confs.append(['pesfs_01',C])
 
 
 #-----------------------
 C=gpbo.core.config.pesfsdefault(f,D,160,s,rpath,'null.csv')
 C.stopfn = gpbo.optimize.AQorNstopfn
 C.stoppara['AQmin']=0.01
-all2confs.append(['pesfs_001',C])
+#all2confs.append(['pesfs_001',C])
 
 #-----------------------
 C=gpbo.core.config.pesfsdefault(f,D,160,s,rpath,'null.csv')
 C.stopfn = gpbo.optimize.AQorNstopfn
 C.stoppara['AQmin']=0.001
-all2confs.append(['pesfs_0001',C])
+#all2confs.append(['pesfs_0001',C])
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,25,rpath,trueopt=truemin+1e-99,logx=False,showends=True)
+    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin+1e-99,logx=False,showends=True)
 else:
     pass

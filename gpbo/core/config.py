@@ -467,3 +467,27 @@ class directdefault:
         self.path = path
         self.fname = fname
         return
+
+class cmaesdefault:
+    def __init__(self, f, D, n, s, path, fname):
+        self.aqfn = gpbo.core.acquisitions.cmaesaq
+        self.aqpara = {
+            'ev': {'s': s, 'd': [sp.NaN]},
+            'lb': [-1.] * D,
+            'ub': [1.] * D
+        }
+
+        self.stoppara = {'nmax': n}
+        self.stopfn = gpbo.core.optimize.norlocalstopfn
+
+        self.reccfn = gpbo.core.reccomenders.argminrecc
+        self.reccpara = {
+            'ev': self.aqpara['ev'],
+            'check': True
+        }
+        self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
+        self.ojf = f
+
+        self.path = path
+        self.fname = fname
+        return

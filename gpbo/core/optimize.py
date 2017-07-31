@@ -303,6 +303,7 @@ def readoptdata(fname,includetaq=False):
     #print(df.head())
     l = len(df['c'])
     df['cacc'] = pd.Series(sp.empty(l), index=df.index)
+    df['index'] = pd.Series(range(l), index=df.index)
     df['accE'] = pd.Series(sp.empty(l), index=df.index)
     df['accEA'] = pd.Series(sp.empty(l), index=df.index)
     for c in df.columns:
@@ -312,7 +313,6 @@ def readoptdata(fname,includetaq=False):
             pass
 
 
-    print('5')
     #df['accEA'][0] = df.loc[0, ('c')]+df.loc[0, ('taq')]
     df.loc[0,('accEA')] = df.loc[0, ('c')]+df.loc[0, ('taq')]
     for i in xrange(1, l):
