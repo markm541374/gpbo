@@ -94,12 +94,12 @@ def EIMAPaq(optstate,persist,**para):
     dx=[e['d'] for e in optstate.ev]
     MAP = GPdc.searchMAPhyp(x, y, s, dx, mprior, sprior, kindex)
     logger.info('found MAPHYP {}'.format(MAP))
+    #raise ValueError
+    G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(kindex, d, MAP))
 
-    G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(kindex, d, mprior))
-
-    G.m[0].set_parameter_dict(MAP)
+    #G.m[0].set_parameter_dict(MAP)
     def wrap(x):
-        xq = copy.copy(x)
+        xq = copy.copy(sp.array(x))
         xq.resize([1,d])
         a = G.infer_lEI(xq,[ev['d']])
         return -a[0,0]
