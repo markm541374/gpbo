@@ -915,7 +915,7 @@ static const char __pyx_k_slice_sample[] = "slice sample:";
 static const char __pyx_k_slice_sample_2[] = "slice_sample";
 static const char __pyx_k_gpbo_core_slice[] = "gpbo.core.slice";
 static const char __pyx_k_Slice_sampler_shrank_too_far[] = "Slice sampler shrank too far.";
-static const char __pyx_k_mnt_seagate_home_mark_Dropbox_w[] = "/mnt/seagate/home/mark/Dropbox/workspace/gpbo/gpbo/core/slice.pyx";
+static const char __pyx_k_home_mark_Dropbox_workspace_gpb[] = "/home/mark/Dropbox/workspace/gpbo/gpbo/core/slice.pyx";
 static PyObject *__pyx_n_s_D;
 static PyObject *__pyx_n_s_RuntimeError;
 static PyObject *__pyx_kp_s_Slice_sampler_shrank_too_far;
@@ -924,6 +924,7 @@ static PyObject *__pyx_n_s_copy;
 static PyObject *__pyx_n_s_d;
 static PyObject *__pyx_n_s_empty;
 static PyObject *__pyx_n_s_gpbo_core_slice;
+static PyObject *__pyx_kp_s_home_mark_Dropbox_workspace_gpb;
 static PyObject *__pyx_n_s_i;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_init;
@@ -936,7 +937,6 @@ static PyObject *__pyx_n_s_log;
 static PyObject *__pyx_n_s_loglike;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_mn;
-static PyObject *__pyx_kp_s_mnt_seagate_home_mark_Dropbox_w;
 static PyObject *__pyx_n_s_perm;
 static PyObject *__pyx_n_s_print;
 static PyObject *__pyx_n_s_pt;
@@ -2780,6 +2780,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_d, __pyx_k_d, sizeof(__pyx_k_d), 0, 0, 1, 1},
   {&__pyx_n_s_empty, __pyx_k_empty, sizeof(__pyx_k_empty), 0, 0, 1, 1},
   {&__pyx_n_s_gpbo_core_slice, __pyx_k_gpbo_core_slice, sizeof(__pyx_k_gpbo_core_slice), 0, 0, 1, 1},
+  {&__pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_k_home_mark_Dropbox_workspace_gpb, sizeof(__pyx_k_home_mark_Dropbox_workspace_gpb), 0, 0, 1, 0},
   {&__pyx_n_s_i, __pyx_k_i, sizeof(__pyx_k_i), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_init, __pyx_k_init, sizeof(__pyx_k_init), 0, 0, 1, 1},
@@ -2792,7 +2793,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_loglike, __pyx_k_loglike, sizeof(__pyx_k_loglike), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_mn, __pyx_k_mn, sizeof(__pyx_k_mn), 0, 0, 1, 1},
-  {&__pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_k_mnt_seagate_home_mark_Dropbox_w, sizeof(__pyx_k_mnt_seagate_home_mark_Dropbox_w), 0, 0, 1, 0},
   {&__pyx_n_s_perm, __pyx_k_perm, sizeof(__pyx_k_perm), 0, 0, 1, 1},
   {&__pyx_n_s_print, __pyx_k_print, sizeof(__pyx_k_print), 0, 0, 1, 1},
   {&__pyx_n_s_pt, __pyx_k_pt, sizeof(__pyx_k_pt), 0, 0, 1, 1},
@@ -2896,7 +2896,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__6 = PyTuple_Pack(24, __pyx_n_s_loglike, __pyx_n_s_init, __pyx_n_s_iters, __pyx_n_s_sigma, __pyx_n_s_step_out, __pyx_n_s_burn, __pyx_n_s_subsam, __pyx_n_s_i, __pyx_n_s_mn, __pyx_n_s_D, __pyx_n_s_llh0, __pyx_n_s_last_llh, __pyx_n_s_llh_l, __pyx_n_s_llh_r, __pyx_n_s_samples, __pyx_n_s_xx, __pyx_n_s_pt, __pyx_n_s_perm, __pyx_n_s_d, __pyx_n_s_rr, __pyx_n_s_x_l, __pyx_n_s_x_r, __pyx_n_s_x_cur, __pyx_n_s_xd); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
-  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(7, 0, 24, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_slice_sample_2, 12, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(7, 0, 24, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_slice_sample_2, 12, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
