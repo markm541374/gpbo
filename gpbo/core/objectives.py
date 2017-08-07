@@ -133,8 +133,8 @@ rosenymin=0.
 
 def genmat52ojf(d,lb,ub,A=1.5,ls=0.3,fixs=-1):
     from ESutils import gen_dataset
-    nt=58
-    [X,Y,S,D] = gen_dataset(nt, d, lb, ub, GPdc.MAT52, sp.array([A] + [ls] * d))
+    nt=60
+    [X,Y,S,D] = gen_dataset(nt, d, lb, ub, GPdc.MAT52, sp.array([A] + [ls] * d),s=1e-12)
     G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.MAT52, d, sp.array([A] + [ls] * d)))
 
     def wrap(x):
@@ -149,34 +149,35 @@ def genmat52ojf(d,lb,ub,A=1.5,ls=0.3,fixs=-1):
             'logfilename': '/dev/null'}
     lpara= {'ftol': 1e-20,
             'maxfun': 1200}
-    print(wrap([0., 0.]))
     xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,lb,ub,dpara,lpara)
 
-    print('init {}'.format(ymin))
-    for i in range(50):
-        p = sp.random.normal(size=d)*1e-8
-        res = spm( wrap,xmin+p,method='L-BFGS-B',bounds=tuple([(lb[j],ub[j]) for j in range(d)]),options={'ftol':1e-20})
+    print('init {} {}'.format(xmin, ymin))
+    for i in range(250):
+        p = sp.random.normal(size=d)*1e-2
+        res = spm( wrap,xmin+p,method='L-BFGS-B',bounds=tuple([(lb[j],ub[j]) for j in range(d)]),options={'gtol':1e-30})
        # print(res)
         #print(xmin,res.x,wrap(xmin),wrap(res.x)<wrap(xmin))
         if wrap(res.x) < wrap(xmin):
             xmin = res.x
         #    ymin = ymin+res.fun
-            #print('change: {} {}'.format(xmin,wrap(res.x)-ymin))
+            print('change: {} {}'.format(xmin,wrap(res.x)-ymin))
     ymin = wrap(xmin)
     def ojf(x,**ev):
         dx=ev['d']
         s=ev['s']
         if fixs<0:
-            if ev['s']>0:
+            if ev['s']>0 and not 'cheattrue' in ev.keys():
                 noise = sp.random.normal(scale=sp.sqrt(ev['s']))
             else:
                 noise=0
         else:
-            noise = sp.random.normal(scale=sp.sqrt(fixs))
-
-        y= G.infer_m(sp.array(x),[dx])[0,0]+noise
+            if not 'cheattrue' in ev.keys():
+                noise = sp.random.normal(scale=sp.sqrt(fixs))
+            else:
+                noise=0.
+        y= wrap(x)+noise#G.infer_m(sp.array(x),[dx])[0,0]+noise
         if not 'silent' in ev.keys():
-            print('ojf at {} returned {} noise {}'.format([i for i in x],y,noise))
+            print('ojf at {} {} returned {} noise {}'.format([i for i in x],ev,y,noise))
         return y-ymin,1.,dict()
     logger.info('generated function xmin {} ymin {}(shifted to 0.) opt:{}'.format(xmin, ymin, ierror))
     return ojf,xmin,0.

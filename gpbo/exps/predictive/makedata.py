@@ -12,13 +12,14 @@ lb = np.array([-1.]*D)
 ub = np.array([1.]*D)
 #lengthscales from 0.05 to 1.5
 lengthscale = int(np.random.uniform(0.05,1.2)*100)/100.
-noisevar = int(np.random.uniform(-12,0)*10)/10.
+noisevar = -20.#int(np.random.uniform(-12,0)*10)/10.
 maxit = 100
 #outputscale will be normalized to 1
+for i in range(1):
+    f, xm, truemin = objectives.genmat52ojf(D,lb,ub,A=1.,ls=lengthscale,fixs=10**noisevar)
+    fname = 'eihyp{}_{}_d{}_l{}_n{}_m{}.csv'.format(args.index,i,D,int(100*lengthscale),int(-10*noisevar),maxit)
+    fpath = 'scratch'
 
-f, xm, truemin = objectives.genmat52ojf(D,lb,ub,A=1.,ls=lengthscale,fixs=10**noisevar)
-fname = 'eihyp{}_l{}_n{}_m{}.csv'.format(args.index,int(100*lengthscale),int(-10*noisevar),maxit)
-fpath = 'draw2d'
-
-C=gpbo.core.config.eihypdefault(f,D,maxit,10**noisevar,fpath,fname)
-out = gpbo.search(C)
+    C=gpbo.core.config.eihypdefault(f,D,maxit,10**noisevar,fpath,fname)
+    #C=gpbo.core.config.directdefault(f,D,20000,10**noisevar,fpath,fname)
+    out = gpbo.search(C)
