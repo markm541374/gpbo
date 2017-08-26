@@ -4,7 +4,7 @@
 echo "rebuilding gpbo.core..."
 for FILE in *.pyx; do
     NAME=$(echo $FILE | cut -f 1 -d '.');
-    if $1 #(( $(date +%s -r $FILE) > $(date +%s -r $"$NAME.c") ))
+    if $1 #$(( $(date +%s -r $FILE) > $(date +%s -r $"$NAME.c") ))
     then
         echo "rebuilding $NAME"
         $HOME/.pyenv/shims/cython  $FILE

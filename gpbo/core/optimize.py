@@ -92,7 +92,7 @@ class optimizer:
     
     def run(self):
         logger.info('startopt:')
-        print( self.aqpara)
+        #print( self.aqpara)
         self.stoppara['t0']=time.clock()
         lf = open(os.path.join(self.dirpath,self.name),'w')
         lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara[0]['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, condition, aqauxdata'])+'\n')
@@ -242,6 +242,9 @@ def totaltstopfn(optstate,**para):
         logger.info('Used {}h {}m {}s of {}h {}m {}s budget \n of which {} acquisition {} evaluation'.format(hu,mu,su,ht,mt,st,(tused-optstate.C)/(1e-9+tused),optstate.C/(tused+1e-9)))
         optstate.remaining = para['tmax'] - tused
         return False
+
+def totalTorNstopfn(optstate, **para):
+    return nstopfn(optstate, **para) or totaltstopfn(optstate, **para)
 
 def wrap(fn,optstate,persist,**para):
     if gpbo.core.debugoutput['forceNoiseFloor']:
