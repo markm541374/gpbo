@@ -16,7 +16,7 @@ class eimledefault():
             'lb': [-1.]*D,
             'ub': [1.]*D,
             'nrandinit': 10,
-            'mprior': sp.array([1.]+[-0.3]*D),
+            'mprior': sp.array([1.]+[-1]*D),
             'sprior': sp.array([2.]*(D+1)),
             'kindex': GPdc.MAT52,
             'maxf':500+100*D,

@@ -1657,7 +1657,7 @@ static const char __pyx_k_Drawing_support_using_uniform[] = "Drawing support usi
 static const char __pyx_k_Drawing_support_using_lapaprot[] = "Drawing support using lapaprot:";
 static const char __pyx_k_Drawing_support_using_varreject[] = "Drawing support using varreject:";
 static const char __pyx_k_failed_in_opt_in_support_lapapr[] = "failed in opt in support lapapr";
-static const char __pyx_k_home_mark_Dropbox_workspace_gpb[] = "/home/mark/Dropbox/workspace/gpbo/gpbo/core/ESutils.pyx";
+static const char __pyx_k_mnt_seagate_home_mark_Dropbox_w[] = "/mnt/seagate/home/mark/Dropbox/workspace/gpbo/gpbo/core/ESutils.pyx";
 static const char __pyx_k_Drawing_support_using_slice_samp[] = "Drawing support using slice sample over LCB:";
 static const char __pyx_k_In_drawmin_with_support_drew_uni[] = "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%";
 static const char __pyx_k_drawhyp_plk_locals_f_locals_MJME[] = "drawhyp_plk.<locals>.f.<locals>.MJMError";
@@ -1801,7 +1801,6 @@ static PyObject *__pyx_n_s_gpfake_infer_m_post;
 static PyObject *__pyx_n_s_group;
 static PyObject *__pyx_n_s_groupby;
 static PyObject *__pyx_n_s_hm;
-static PyObject *__pyx_kp_s_home_mark_Dropbox_workspace_gpb;
 static PyObject *__pyx_n_s_hs;
 static PyObject *__pyx_n_s_hstack;
 static PyObject *__pyx_n_s_hyp;
@@ -1851,6 +1850,7 @@ static PyObject *__pyx_n_s_metaclass;
 static PyObject *__pyx_n_s_method;
 static PyObject *__pyx_n_s_min;
 static PyObject *__pyx_n_s_minimize;
+static PyObject *__pyx_kp_s_mnt_seagate_home_mark_Dropbox_w;
 static PyObject *__pyx_n_s_mnv;
 static PyObject *__pyx_n_s_module;
 static PyObject *__pyx_n_s_multivariate_normal;
@@ -25691,7 +25691,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_group, __pyx_k_group, sizeof(__pyx_k_group), 0, 0, 1, 1},
   {&__pyx_n_s_groupby, __pyx_k_groupby, sizeof(__pyx_k_groupby), 0, 0, 1, 1},
   {&__pyx_n_s_hm, __pyx_k_hm, sizeof(__pyx_k_hm), 0, 0, 1, 1},
-  {&__pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_k_home_mark_Dropbox_workspace_gpb, sizeof(__pyx_k_home_mark_Dropbox_workspace_gpb), 0, 0, 1, 0},
   {&__pyx_n_s_hs, __pyx_k_hs, sizeof(__pyx_k_hs), 0, 0, 1, 1},
   {&__pyx_n_s_hstack, __pyx_k_hstack, sizeof(__pyx_k_hstack), 0, 0, 1, 1},
   {&__pyx_n_s_hyp, __pyx_k_hyp, sizeof(__pyx_k_hyp), 0, 0, 1, 1},
@@ -25741,6 +25740,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_method, __pyx_k_method, sizeof(__pyx_k_method), 0, 0, 1, 1},
   {&__pyx_n_s_min, __pyx_k_min, sizeof(__pyx_k_min), 0, 0, 1, 1},
   {&__pyx_n_s_minimize, __pyx_k_minimize, sizeof(__pyx_k_minimize), 0, 0, 1, 1},
+  {&__pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_k_mnt_seagate_home_mark_Dropbox_w, sizeof(__pyx_k_mnt_seagate_home_mark_Dropbox_w), 0, 0, 1, 0},
   {&__pyx_n_s_mnv, __pyx_k_mnv, sizeof(__pyx_k_mnv), 0, 0, 1, 1},
   {&__pyx_n_s_module, __pyx_k_module, sizeof(__pyx_k_module), 0, 0, 1, 1},
   {&__pyx_n_s_multivariate_normal, __pyx_k_multivariate_normal, sizeof(__pyx_k_multivariate_normal), 0, 0, 1, 1},
@@ -26090,7 +26090,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__22 = PyTuple_Pack(4, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_bound, __pyx_n_s_r); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 95, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__22);
   __Pyx_GIVEREF(__pyx_tuple__22);
-  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_f, 95, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_f, 95, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 95, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":104
  *             return y+bound
@@ -26339,7 +26339,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__47 = PyTuple_Pack(4, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_bound, __pyx_n_s_r); if (unlikely(!__pyx_tuple__47)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__47);
   __Pyx_GIVEREF(__pyx_tuple__47);
-  __pyx_codeobj__48 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__47, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_f, 218, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__48)) __PYX_ERR(0, 218, __pyx_L1_error)
+  __pyx_codeobj__48 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__47, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_f, 218, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__48)) __PYX_ERR(0, 218, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":229
  *             retries=5
@@ -26561,7 +26561,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__71 = PyTuple_Pack(1, __pyx_n_s_x); if (unlikely(!__pyx_tuple__71)) __PYX_ERR(0, 356, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__71);
   __Pyx_GIVEREF(__pyx_tuple__71);
-  __pyx_codeobj__72 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__71, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_f, 356, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__72)) __PYX_ERR(0, 356, __pyx_L1_error)
+  __pyx_codeobj__72 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__71, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_f, 356, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__72)) __PYX_ERR(0, 356, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":366
  *             else:
@@ -26584,7 +26584,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__74 = PyTuple_Pack(2, __pyx_n_s_x, __pyx_n_s_ei); if (unlikely(!__pyx_tuple__74)) __PYX_ERR(0, 370, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__74);
   __Pyx_GIVEREF(__pyx_tuple__74);
-  __pyx_codeobj__75 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__74, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_f, 370, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__75)) __PYX_ERR(0, 370, __pyx_L1_error)
+  __pyx_codeobj__75 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__74, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_f, 370, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__75)) __PYX_ERR(0, 370, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":384
  *             else:
@@ -26607,7 +26607,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__77 = PyTuple_Pack(6, __pyx_n_s_x, __pyx_n_s_m, __pyx_n_s_v, __pyx_n_s_p, __pyx_n_s_i, __pyx_n_s_ym); if (unlikely(!__pyx_tuple__77)) __PYX_ERR(0, 388, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__77);
   __Pyx_GIVEREF(__pyx_tuple__77);
-  __pyx_codeobj__78 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__77, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_f, 388, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__78)) __PYX_ERR(0, 388, __pyx_L1_error)
+  __pyx_codeobj__78 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__77, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_f, 388, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__78)) __PYX_ERR(0, 388, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":413
  *             plt.imshow(A)
@@ -26727,7 +26727,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__103 = PyTuple_Pack(4, __pyx_n_s_loghyp, __pyx_n_s_i, __pyx_n_s_r, __pyx_n_s_MJMError); if (unlikely(!__pyx_tuple__103)) __PYX_ERR(0, 522, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__103);
   __Pyx_GIVEREF(__pyx_tuple__103);
-  __pyx_codeobj__104 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__103, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_f, 522, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__104)) __PYX_ERR(0, 522, __pyx_L1_error)
+  __pyx_codeobj__104 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__103, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_f, 522, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__104)) __PYX_ERR(0, 522, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":540
  *     print('using {} slice chains'.format(chains))
@@ -26815,7 +26815,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__119 = PyTuple_Pack(69, __pyx_n_s_g, __pyx_n_s_lb, __pyx_n_s_ub, __pyx_n_s_n, __pyx_n_s_method, __pyx_n_s_para, __pyx_n_s_d, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_X, __pyx_n_s_batch, __pyx_n_s_out, __pyx_n_s_pa, __pyx_n_s_m, __pyx_n_s_v, __pyx_n_s_over, __pyx_n_s_Xsto, __pyx_n_s_fs, __pyx_n_s_Xst, __pyx_n_s_f, __pyx_n_s_f, __pyx_n_s_res, __pyx_n_s_MJMError, __pyx_n_s_unq, __pyx_n_s_tmp, __pyx_n_s_xm, __pyx_n_s_cls, __pyx_n_s_ls, __pyx_n_s_vg, __pyx_n_s_gg, __pyx_n_s_neach, __pyx_n_s_debugoutput, __pyx_n_s_np, __pyx_n_s_x_2, __pyx_n_s_y_2, __pyx_n_s_z, __pyx_n_s_s_2, __pyx_n_s_m_2, __pyx_n_s_v_2, __pyx_n_s_fig, __pyx_n_s_ax, __pyx_n_s_CS, __pyx_n_s_x, __pyx_n_s_xp, __pyx_n_s_yp, __pyx_n_s_f, __pyx_n_s_retries, __pyx_n_s_U, __pyx_n_s_E, __pyx_n_s_G, __pyx_n_s_cG, __pyx_n_s_divs, __pyx_n_s_k, __pyx_n_s_vecH, __pyx_n_s_cvecH, __pyx_n_s_H, __pyx_n_s_Ucg, __pyx_n_s_Ecg, __pyx_n_s_Vcg, __pyx_n_s_C0, __pyx_n_s_varP, __pyx_n_s_Uvp, __pyx_n_s_Evp, __pyx_n_s_Vvp, __pyx_n_s_circ, __pyx_n_s_theta, __pyx_n_s_f, __pyx_n_s_f, __pyx_n_s_f); if (unlikely(!__pyx_tuple__119)) __PYX_ERR(0, 38, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__119);
   __Pyx_GIVEREF(__pyx_tuple__119);
-  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(6, 0, 69, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__119, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_draw_support, 38, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 38, __pyx_L1_error)
+  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(6, 0, 69, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__119, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_draw_support, 38, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 38, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":421
  * 
@@ -26827,7 +26827,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__120 = PyTuple_Pack(12, __pyx_n_s_g, __pyx_n_s_support, __pyx_n_s_n, __pyx_n_s_Z, __pyx_n_s_R, __pyx_n_s_args, __pyx_n_s_i, __pyx_n_s_a, __pyx_n_s_groupby, __pyx_n_s_amins, __pyx_n_s_key, __pyx_n_s_group); if (unlikely(!__pyx_tuple__120)) __PYX_ERR(0, 421, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__120);
   __Pyx_GIVEREF(__pyx_tuple__120);
-  __pyx_codeobj__81 = (PyObject*)__Pyx_PyCode_New(3, 0, 12, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__120, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_draw_min, 421, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__81)) __PYX_ERR(0, 421, __pyx_L1_error)
+  __pyx_codeobj__81 = (PyObject*)__Pyx_PyCode_New(3, 0, 12, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__120, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_draw_min, 421, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__81)) __PYX_ERR(0, 421, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":438
  *     return R
@@ -26839,7 +26839,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__121 = PyTuple_Pack(16, __pyx_n_s_g, __pyx_n_s_support, __pyx_n_s_n, __pyx_n_s_x, __pyx_n_s_m, __pyx_n_s_d, __pyx_n_s_Z, __pyx_n_s_R, __pyx_n_s_Y, __pyx_n_s_args, __pyx_n_s_i, __pyx_n_s_a, __pyx_n_s_groupby, __pyx_n_s_amins, __pyx_n_s_key, __pyx_n_s_group); if (unlikely(!__pyx_tuple__121)) __PYX_ERR(0, 438, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__121);
   __Pyx_GIVEREF(__pyx_tuple__121);
-  __pyx_codeobj__85 = (PyObject*)__Pyx_PyCode_New(4, 0, 16, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__121, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_draw_min_xypairgrad, 438, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__85)) __PYX_ERR(0, 438, __pyx_L1_error)
+  __pyx_codeobj__85 = (PyObject*)__Pyx_PyCode_New(4, 0, 16, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__121, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_draw_min_xypairgrad, 438, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__85)) __PYX_ERR(0, 438, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":460
  * #fake gp class that 9looks like a d-1 gp becuase an extra vaue is added before callind
@@ -26851,7 +26851,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__122 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_g, __pyx_n_s_axis, __pyx_n_s_value); if (unlikely(!__pyx_tuple__122)) __PYX_ERR(0, 460, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__122);
   __Pyx_GIVEREF(__pyx_tuple__122);
-  __pyx_codeobj__89 = (PyObject*)__Pyx_PyCode_New(4, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__122, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_init, 460, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__89)) __PYX_ERR(0, 460, __pyx_L1_error)
+  __pyx_codeobj__89 = (PyObject*)__Pyx_PyCode_New(4, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__122, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_init, 460, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__89)) __PYX_ERR(0, 460, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":468
  *         return
@@ -26863,7 +26863,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__123 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_x, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__123)) __PYX_ERR(0, 468, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__123);
   __Pyx_GIVEREF(__pyx_tuple__123);
-  __pyx_codeobj__90 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__123, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_augx, 468, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__90)) __PYX_ERR(0, 468, __pyx_L1_error)
+  __pyx_codeobj__90 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__123, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_augx, 468, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__90)) __PYX_ERR(0, 468, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":475
  *         return ax
@@ -26875,7 +26875,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__124 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_x, __pyx_n_s_d, __pyx_n_s_dstar, __pyx_n_s_e, __pyx_n_s_i); if (unlikely(!__pyx_tuple__124)) __PYX_ERR(0, 475, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__124);
   __Pyx_GIVEREF(__pyx_tuple__124);
-  __pyx_codeobj__91 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__124, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_infer_m_post, 475, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__91)) __PYX_ERR(0, 475, __pyx_L1_error)
+  __pyx_codeobj__91 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__124, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_infer_m_post, 475, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__91)) __PYX_ERR(0, 475, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":479
  *         return self.g.infer_m_post(self.augx(x),dstar)
@@ -26887,7 +26887,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__125 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_x, __pyx_n_s_d, __pyx_n_s_dstar, __pyx_n_s_e, __pyx_n_s_i); if (unlikely(!__pyx_tuple__125)) __PYX_ERR(0, 479, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__125);
   __Pyx_GIVEREF(__pyx_tuple__125);
-  __pyx_codeobj__92 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__125, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_infer_diag_post, 479, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__92)) __PYX_ERR(0, 479, __pyx_L1_error)
+  __pyx_codeobj__92 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__125, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_infer_diag_post, 479, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__92)) __PYX_ERR(0, 479, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":483
  *         return self.g.infer_diag_post(self.augx(x),d)
@@ -26899,7 +26899,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__126 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_x, __pyx_n_s_d, __pyx_n_s_dstar, __pyx_n_s_e, __pyx_n_s_i); if (unlikely(!__pyx_tuple__126)) __PYX_ERR(0, 483, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__126);
   __Pyx_GIVEREF(__pyx_tuple__126);
-  __pyx_codeobj__93 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__126, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_infer_full_post, 483, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__93)) __PYX_ERR(0, 483, __pyx_L1_error)
+  __pyx_codeobj__93 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__126, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_infer_full_post, 483, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__93)) __PYX_ERR(0, 483, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":487
  *         return self.g.infer_full_post(self.augx(x),d)
@@ -26911,7 +26911,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__127 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_x, __pyx_n_s_d, __pyx_n_s_dstar, __pyx_n_s_e, __pyx_n_s_i); if (unlikely(!__pyx_tuple__127)) __PYX_ERR(0, 487, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__127);
   __Pyx_GIVEREF(__pyx_tuple__127);
-  __pyx_codeobj__94 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__127, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_infer_EI, 487, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__94)) __PYX_ERR(0, 487, __pyx_L1_error)
+  __pyx_codeobj__94 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__127, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_infer_EI, 487, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__94)) __PYX_ERR(0, 487, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":491
  *         return self.g.infer_EI(self.augx(x),d)
@@ -26923,7 +26923,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__128 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_x, __pyx_n_s_d, __pyx_n_s_p, __pyx_n_s_dstar, __pyx_n_s_e, __pyx_n_s_i); if (unlikely(!__pyx_tuple__128)) __PYX_ERR(0, 491, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__128);
   __Pyx_GIVEREF(__pyx_tuple__128);
-  __pyx_codeobj__95 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__128, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_infer_LCB_post, 491, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__95)) __PYX_ERR(0, 491, __pyx_L1_error)
+  __pyx_codeobj__95 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__128, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_infer_LCB_post, 491, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__95)) __PYX_ERR(0, 491, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":496
  * 
@@ -26935,7 +26935,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__129 = PyTuple_Pack(12, __pyx_n_s_g, __pyx_n_s_lb, __pyx_n_s_ub, __pyx_n_s_n, __pyx_n_s_method, __pyx_n_s_axis, __pyx_n_s_value, __pyx_n_s_para, __pyx_n_s_gf, __pyx_n_s_lb_red, __pyx_n_s_ub_red, __pyx_n_s_X); if (unlikely(!__pyx_tuple__129)) __PYX_ERR(0, 496, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__129);
   __Pyx_GIVEREF(__pyx_tuple__129);
-  __pyx_codeobj__96 = (PyObject*)__Pyx_PyCode_New(8, 0, 12, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__129, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_draw_support_inplane, 496, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__96)) __PYX_ERR(0, 496, __pyx_L1_error)
+  __pyx_codeobj__96 = (PyObject*)__Pyx_PyCode_New(8, 0, 12, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__129, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_draw_support_inplane, 496, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__96)) __PYX_ERR(0, 496, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":511
  * 
@@ -26947,7 +26947,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__130 = PyTuple_Pack(7, __pyx_n_s_g, __pyx_n_s_axis, __pyx_n_s_x, __pyx_n_s_d, __pyx_n_s_m, __pyx_n_s_v, __pyx_n_s_s); if (unlikely(!__pyx_tuple__130)) __PYX_ERR(0, 511, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__130);
   __Pyx_GIVEREF(__pyx_tuple__130);
-  __pyx_codeobj__99 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__130, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_plot_gp, 511, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__99)) __PYX_ERR(0, 511, __pyx_L1_error)
+  __pyx_codeobj__99 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__130, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_plot_gp, 511, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__99)) __PYX_ERR(0, 511, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":519
  * 
@@ -26959,7 +26959,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__131 = PyTuple_Pack(18, __pyx_n_s_X, __pyx_n_s_Y, __pyx_n_s_S, __pyx_n_s_D, __pyx_n_s_ki, __pyx_n_s_hm, __pyx_n_s_hs, __pyx_n_s_n, __pyx_n_s_burn, __pyx_n_s_subsam, __pyx_n_s_chains, __pyx_n_s_ub, __pyx_n_s_lb, __pyx_n_s_f, __pyx_n_s_f, __pyx_n_s_starts, __pyx_n_s_i, __pyx_n_s_j); if (unlikely(!__pyx_tuple__131)) __PYX_ERR(0, 519, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__131);
   __Pyx_GIVEREF(__pyx_tuple__131);
-  __pyx_codeobj__102 = (PyObject*)__Pyx_PyCode_New(11, 0, 18, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__131, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_drawhyp_plk, 519, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__102)) __PYX_ERR(0, 519, __pyx_L1_error)
+  __pyx_codeobj__102 = (PyObject*)__Pyx_PyCode_New(11, 0, 18, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__131, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_drawhyp_plk, 519, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__102)) __PYX_ERR(0, 519, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":546
  * 
@@ -26971,7 +26971,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__132 = PyTuple_Pack(13, __pyx_n_s_nt, __pyx_n_s_d, __pyx_n_s_lb, __pyx_n_s_ub, __pyx_n_s_kindex, __pyx_n_s_hyp, __pyx_n_s_s, __pyx_n_s_X, __pyx_n_s_D, __pyx_n_s_kf, __pyx_n_s_Kxx, __pyx_n_s_Y, __pyx_n_s_S); if (unlikely(!__pyx_tuple__132)) __PYX_ERR(0, 546, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__132);
   __Pyx_GIVEREF(__pyx_tuple__132);
-  __pyx_codeobj__108 = (PyObject*)__Pyx_PyCode_New(7, 0, 13, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__132, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_gen_dataset, 546, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__108)) __PYX_ERR(0, 546, __pyx_L1_error)
+  __pyx_codeobj__108 = (PyObject*)__Pyx_PyCode_New(7, 0, 13, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__132, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_gen_dataset, 546, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__108)) __PYX_ERR(0, 546, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":555
  *     return [X,Y,S,D]
@@ -26983,7 +26983,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__133 = PyTuple_Pack(16, __pyx_n_s_f, __pyx_n_s_fname, __pyx_n_s_xmin, __pyx_n_s_atxa, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_x_2, __pyx_n_s_y_2, __pyx_n_s_z, __pyx_n_s_s_2, __pyx_n_s_ev, __pyx_n_s_m_2, __pyx_n_s_fig, __pyx_n_s_ax, __pyx_n_s_CS); if (unlikely(!__pyx_tuple__133)) __PYX_ERR(0, 555, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__133);
   __Pyx_GIVEREF(__pyx_tuple__133);
-  __pyx_codeobj__110 = (PyObject*)__Pyx_PyCode_New(4, 0, 16, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__133, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_plot2dFtofile, 555, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__110)) __PYX_ERR(0, 555, __pyx_L1_error)
+  __pyx_codeobj__110 = (PyObject*)__Pyx_PyCode_New(4, 0, 16, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__133, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_plot2dFtofile, 555, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__110)) __PYX_ERR(0, 555, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":581
  *     return
@@ -26995,7 +26995,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__134 = PyTuple_Pack(3, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_i); if (unlikely(!__pyx_tuple__134)) __PYX_ERR(0, 581, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__134);
   __Pyx_GIVEREF(__pyx_tuple__134);
-  __pyx_codeobj__113 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__134, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_accumulate, 581, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__113)) __PYX_ERR(0, 581, __pyx_L1_error)
+  __pyx_codeobj__113 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__134, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_accumulate, 581, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__113)) __PYX_ERR(0, 581, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":589
  * 
@@ -27007,7 +27007,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__135 = PyTuple_Pack(6, __pyx_n_s_xdata, __pyx_n_s_ydata, __pyx_n_s_xtarget, __pyx_n_s_n, __pyx_n_s_inters, __pyx_n_s_i); if (unlikely(!__pyx_tuple__135)) __PYX_ERR(0, 589, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__135);
   __Pyx_GIVEREF(__pyx_tuple__135);
-  __pyx_codeobj__114 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__135, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_quartsirregular, 589, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__114)) __PYX_ERR(0, 589, __pyx_L1_error)
+  __pyx_codeobj__114 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__135, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_quartsirregular, 589, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__114)) __PYX_ERR(0, 589, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":597
  * 
@@ -27019,7 +27019,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__136 = PyTuple_Pack(3, __pyx_n_s_xdata, __pyx_n_s_ydata, __pyx_n_s_xtarget); if (unlikely(!__pyx_tuple__136)) __PYX_ERR(0, 597, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__136);
   __Pyx_GIVEREF(__pyx_tuple__136);
-  __pyx_codeobj__116 = (PyObject*)__Pyx_PyCode_New(3, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__136, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_medianirregular, 597, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__116)) __PYX_ERR(0, 597, __pyx_L1_error)
+  __pyx_codeobj__116 = (PyObject*)__Pyx_PyCode_New(3, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__136, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_medianirregular, 597, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__116)) __PYX_ERR(0, 597, __pyx_L1_error)
 
   /* "gpbo/core/ESutils.pyx":600
  *     return percentileirregular(xdata,ydata,xtarget,50)
@@ -27031,7 +27031,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__137 = PyTuple_Pack(7, __pyx_n_s_xdata, __pyx_n_s_ydata, __pyx_n_s_xtarget, __pyx_n_s_per, __pyx_n_s_n, __pyx_n_s_inters, __pyx_n_s_i); if (unlikely(!__pyx_tuple__137)) __PYX_ERR(0, 600, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__137);
   __Pyx_GIVEREF(__pyx_tuple__137);
-  __pyx_codeobj__117 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__137, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_percentileirregular, 600, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__117)) __PYX_ERR(0, 600, __pyx_L1_error)
+  __pyx_codeobj__117 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__137, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_percentileirregular, 600, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__117)) __PYX_ERR(0, 600, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;

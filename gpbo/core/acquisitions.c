@@ -1669,8 +1669,8 @@ static const char __pyx_k_directaq_locals_wrap___init[] = "directaq.<locals>.wra
 static const char __pyx_k_localrefine_found_max_EI_at[] = "localrefine found max EI at {} {} {}";
 static const char __pyx_k_localopt_finished_with_z_x_y[] = "localopt finished with z: {} (x: {}) y: {} {}";
 static const char __pyx_k_cmaesaq_locals_opt_locals_inner[] = "cmaesaq.<locals>.opt.<locals>.inner";
-static const char __pyx_k_home_mark_Dropbox_workspace_gpb[] = "/home/mark/Dropbox/workspace/gpbo/gpbo/core/acquisitions.pyx";
 static const char __pyx_k_loghyperparameters_mean_std_min[] = "loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}";
+static const char __pyx_k_mnt_seagate_home_mark_Dropbox_w[] = "/mnt/seagate/home/mark/Dropbox/workspace/gpbo/gpbo/core/acquisitions.pyx";
 static const char __pyx_k_directaq_locals_opt_locals_inner[] = "directaq.<locals>.opt.<locals>.inner";
 static const char __pyx_k_reusing_preselected_hyperparamet[] = "reusing preselected hyperparameters";
 static PyObject *__pyx_n_s_AQvalue;
@@ -1830,7 +1830,6 @@ static PyObject *__pyx_n_s_gpbo_core_optutils;
 static PyObject *__pyx_n_s_gpplot;
 static PyObject *__pyx_n_s_gtol;
 static PyObject *__pyx_n_s_h;
-static PyObject *__pyx_kp_s_home_mark_Dropbox_workspace_gpb;
 static PyObject *__pyx_n_s_hstack;
 static PyObject *__pyx_n_s_hyp;
 static PyObject *__pyx_n_s_hyp_chains;
@@ -1896,6 +1895,7 @@ static PyObject *__pyx_n_s_method;
 static PyObject *__pyx_n_s_min;
 static PyObject *__pyx_n_s_mindraws;
 static PyObject *__pyx_n_s_minimize;
+static PyObject *__pyx_kp_s_mnt_seagate_home_mark_Dropbox_w;
 static PyObject *__pyx_n_s_mode;
 static PyObject *__pyx_n_s_module;
 static PyObject *__pyx_n_s_mprior;
@@ -26556,7 +26556,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_gpplot, __pyx_k_gpplot, sizeof(__pyx_k_gpplot), 0, 0, 1, 1},
   {&__pyx_n_s_gtol, __pyx_k_gtol, sizeof(__pyx_k_gtol), 0, 0, 1, 1},
   {&__pyx_n_s_h, __pyx_k_h, sizeof(__pyx_k_h), 0, 0, 1, 1},
-  {&__pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_k_home_mark_Dropbox_workspace_gpb, sizeof(__pyx_k_home_mark_Dropbox_workspace_gpb), 0, 0, 1, 0},
   {&__pyx_n_s_hstack, __pyx_k_hstack, sizeof(__pyx_k_hstack), 0, 0, 1, 1},
   {&__pyx_n_s_hyp, __pyx_k_hyp, sizeof(__pyx_k_hyp), 0, 0, 1, 1},
   {&__pyx_n_s_hyp_chains, __pyx_k_hyp_chains, sizeof(__pyx_k_hyp_chains), 0, 0, 1, 1},
@@ -26622,6 +26621,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_min, __pyx_k_min, sizeof(__pyx_k_min), 0, 0, 1, 1},
   {&__pyx_n_s_mindraws, __pyx_k_mindraws, sizeof(__pyx_k_mindraws), 0, 0, 1, 1},
   {&__pyx_n_s_minimize, __pyx_k_minimize, sizeof(__pyx_k_minimize), 0, 0, 1, 1},
+  {&__pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_k_mnt_seagate_home_mark_Dropbox_w, sizeof(__pyx_k_mnt_seagate_home_mark_Dropbox_w), 0, 0, 1, 0},
   {&__pyx_n_s_mode, __pyx_k_mode, sizeof(__pyx_k_mode), 0, 0, 1, 1},
   {&__pyx_n_s_module, __pyx_k_module, sizeof(__pyx_k_module), 0, 0, 1, 1},
   {&__pyx_n_s_mprior, __pyx_k_mprior, sizeof(__pyx_k_mprior), 0, 0, 1, 1},
@@ -26813,7 +26813,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__4 = PyTuple_Pack(3, __pyx_n_s_x, __pyx_n_s_xq, __pyx_n_s_a); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
-  __pyx_codeobj__5 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__4, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_wrap, 101, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__5)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __pyx_codeobj__5 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__4, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_wrap, 101, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__5)) __PYX_ERR(0, 101, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":111
  *     logger.info('localrefine found max EI at {} {} {}'.format(xmin,sp.exp(ymin),ierror))
@@ -26872,7 +26872,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__11 = PyTuple_Pack(5, __pyx_n_s_Q, __pyx_n_s_x, __pyx_n_s_m, __pyx_n_s_v, __pyx_n_s_lei); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__11);
   __Pyx_GIVEREF(__pyx_tuple__11);
-  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(1, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_wrap, 148, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(1, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_wrap, 148, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 148, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":166
  *     logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean,lhstd,lhmin,lhmax))
@@ -26956,7 +26956,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__21 = PyTuple_Pack(3, __pyx_n_s_Q, __pyx_n_s_x, __pyx_n_s_v); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 238, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__21);
   __Pyx_GIVEREF(__pyx_tuple__21);
-  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_wrap, 238, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_wrap, 238, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 238, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":257
  *     persist['overhead']=time.clock()-t0
@@ -27066,7 +27066,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__37 = PyTuple_Pack(2, __pyx_n_s_x, __pyx_n_s_ev); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 317, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__37);
   __Pyx_GIVEREF(__pyx_tuple__37);
-  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_cfn, 317, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 317, __pyx_L1_error)
+  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_cfn, 317, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 317, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":334
  *     logger.debug([xmin,ymin,ierror])
@@ -27111,7 +27111,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__42 = PyTuple_Pack(3, __pyx_n_s_x, __pyx_n_s_aux, __pyx_n_s_y); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(0, 449, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__42);
   __Pyx_GIVEREF(__pyx_tuple__42);
-  __pyx_codeobj__43 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__42, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_inner, 449, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__43)) __PYX_ERR(0, 449, __pyx_L1_error)
+  __pyx_codeobj__43 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__42, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_inner, 449, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__43)) __PYX_ERR(0, 449, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":465
  *                 return
@@ -27145,7 +27145,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__46 = PyTuple_Pack(3, __pyx_n_s_conn, __pyx_n_s_inner, __pyx_n_s_inner); if (unlikely(!__pyx_tuple__46)) __PYX_ERR(0, 448, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__46);
   __Pyx_GIVEREF(__pyx_tuple__46);
-  __pyx_codeobj__47 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__46, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_opt, 448, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__47)) __PYX_ERR(0, 448, __pyx_L1_error)
+  __pyx_codeobj__47 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__46, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_opt, 448, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__47)) __PYX_ERR(0, 448, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":459
  *             return
@@ -27157,7 +27157,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__48 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_child_conn); if (unlikely(!__pyx_tuple__48)) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__48);
   __Pyx_GIVEREF(__pyx_tuple__48);
-  __pyx_codeobj__49 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__48, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_init, 459, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__49)) __PYX_ERR(0, 459, __pyx_L1_error)
+  __pyx_codeobj__49 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__48, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_init, 459, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__49)) __PYX_ERR(0, 459, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":464
  *                 self.p.start()
@@ -27169,7 +27169,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__50 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_x); if (unlikely(!__pyx_tuple__50)) __PYX_ERR(0, 464, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__50);
   __Pyx_GIVEREF(__pyx_tuple__50);
-  __pyx_codeobj__51 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__50, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_getx, 464, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__51)) __PYX_ERR(0, 464, __pyx_L1_error)
+  __pyx_codeobj__51 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__50, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_getx, 464, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__51)) __PYX_ERR(0, 464, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":472
  *                     return None,-1
@@ -27181,7 +27181,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__52 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_y); if (unlikely(!__pyx_tuple__52)) __PYX_ERR(0, 472, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__52);
   __Pyx_GIVEREF(__pyx_tuple__52);
-  __pyx_codeobj__53 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__52, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_givey, 472, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__53)) __PYX_ERR(0, 472, __pyx_L1_error)
+  __pyx_codeobj__53 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__52, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_givey, 472, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__53)) __PYX_ERR(0, 472, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":502
  *             persist['R']=R
@@ -27204,7 +27204,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__55 = PyTuple_Pack(2, __pyx_n_s_z, __pyx_n_s_i); if (unlikely(!__pyx_tuple__55)) __PYX_ERR(0, 510, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__55);
   __Pyx_GIVEREF(__pyx_tuple__55);
-  __pyx_codeobj__56 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__55, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_fwrap, 510, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__56)) __PYX_ERR(0, 510, __pyx_L1_error)
+  __pyx_codeobj__56 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__55, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_fwrap, 510, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__56)) __PYX_ERR(0, 510, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":540
  * 
@@ -27216,7 +27216,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__57 = PyTuple_Pack(2, __pyx_n_s_x, __pyx_n_s_y); if (unlikely(!__pyx_tuple__57)) __PYX_ERR(0, 540, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__57);
   __Pyx_GIVEREF(__pyx_tuple__57);
-  __pyx_codeobj__58 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__57, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_inner, 540, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__58)) __PYX_ERR(0, 540, __pyx_L1_error)
+  __pyx_codeobj__58 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__57, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_inner, 540, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__58)) __PYX_ERR(0, 540, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":559
  *                 return
@@ -27250,7 +27250,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__61 = PyTuple_Pack(5, __pyx_n_s_conn, __pyx_n_s_inner, __pyx_n_s_inner, __pyx_n_s_options, __pyx_n_s_es); if (unlikely(!__pyx_tuple__61)) __PYX_ERR(0, 539, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__61);
   __Pyx_GIVEREF(__pyx_tuple__61);
-  __pyx_codeobj__62 = (PyObject*)__Pyx_PyCode_New(1, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__61, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_opt, 539, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__62)) __PYX_ERR(0, 539, __pyx_L1_error)
+  __pyx_codeobj__62 = (PyObject*)__Pyx_PyCode_New(1, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__61, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_opt, 539, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__62)) __PYX_ERR(0, 539, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":553
  * 
@@ -27262,7 +27262,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__63 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_child_conn); if (unlikely(!__pyx_tuple__63)) __PYX_ERR(0, 553, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__63);
   __Pyx_GIVEREF(__pyx_tuple__63);
-  __pyx_codeobj__64 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__63, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_init, 553, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__64)) __PYX_ERR(0, 553, __pyx_L1_error)
+  __pyx_codeobj__64 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__63, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_init, 553, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__64)) __PYX_ERR(0, 553, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":558
  *                 self.p.start()
@@ -27274,7 +27274,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__65 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_x); if (unlikely(!__pyx_tuple__65)) __PYX_ERR(0, 558, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__65);
   __Pyx_GIVEREF(__pyx_tuple__65);
-  __pyx_codeobj__66 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__65, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_getx, 558, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__66)) __PYX_ERR(0, 558, __pyx_L1_error)
+  __pyx_codeobj__66 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__65, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_getx, 558, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__66)) __PYX_ERR(0, 558, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":566
  *                     return None,-1
@@ -27286,7 +27286,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__67 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_y); if (unlikely(!__pyx_tuple__67)) __PYX_ERR(0, 566, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__67);
   __Pyx_GIVEREF(__pyx_tuple__67);
-  __pyx_codeobj__68 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__67, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_givey, 566, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__68)) __PYX_ERR(0, 566, __pyx_L1_error)
+  __pyx_codeobj__68 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__67, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_givey, 566, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__68)) __PYX_ERR(0, 566, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":26
  *     from matplotlib import patches
@@ -27309,7 +27309,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__70 = PyTuple_Pack(7, __pyx_n_s_optstate, __pyx_n_s_persist, __pyx_n_s_para, __pyx_n_s_q, __pyx_n_s_l, __pyx_n_s_u, __pyx_n_s_x); if (unlikely(!__pyx_tuple__70)) __PYX_ERR(0, 34, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__70);
   __Pyx_GIVEREF(__pyx_tuple__70);
-  __pyx_codeobj__71 = (PyObject*)__Pyx_PyCode_New(2, 0, 7, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__70, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_randomaq, 34, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__71)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __pyx_codeobj__71 = (PyObject*)__Pyx_PyCode_New(2, 0, 7, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__70, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_randomaq, 34, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__71)) __PYX_ERR(0, 34, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":42
  * # and grid
@@ -27321,7 +27321,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__72 = PyTuple_Pack(14, __pyx_n_s_optstate, __pyx_n_s_persist, __pyx_n_s_para, __pyx_n_s_pwr, __pyx_n_s_idx, __pyx_n_s_d, __pyx_n_s_k, __pyx_n_s_q, __pyx_n_s_j, __pyx_n_s_a, __pyx_n_s_b, __pyx_n_s_l, __pyx_n_s_u, __pyx_n_s_x); if (unlikely(!__pyx_tuple__72)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__72);
   __Pyx_GIVEREF(__pyx_tuple__72);
-  __pyx_codeobj__73 = (PyObject*)__Pyx_PyCode_New(2, 0, 14, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__72, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_bruteaq, 42, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__73)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __pyx_codeobj__73 = (PyObject*)__Pyx_PyCode_New(2, 0, 14, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__72, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_bruteaq, 42, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__73)) __PYX_ERR(0, 42, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":70
  * 
@@ -27333,7 +27333,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__74 = PyTuple_Pack(30, __pyx_n_s_optstate, __pyx_n_s_persist, __pyx_n_s_para, __pyx_n_s_ev, __pyx_n_s_ub, __pyx_n_s_lb, __pyx_n_s_nrandinit, __pyx_n_s_mprior, __pyx_n_s_sprior, __pyx_n_s_kindex, __pyx_n_s_maxf, __pyx_n_s_n, __pyx_n_s_d, __pyx_n_s_overhead, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_s, __pyx_n_s_dx, __pyx_n_s_MAP, __pyx_n_s_G, __pyx_n_s_wrap, __pyx_n_s_wrap, __pyx_n_s_xmin, __pyx_n_s_ymin, __pyx_n_s_ierror, __pyx_n_s_m, __pyx_n_s_v, __pyx_n_s_PIatX, __pyx_n_s_e, __pyx_n_s_i); if (unlikely(!__pyx_tuple__74)) __PYX_ERR(0, 70, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__74);
   __Pyx_GIVEREF(__pyx_tuple__74);
-  __pyx_codeobj__75 = (PyObject*)__Pyx_PyCode_New(2, 0, 30, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__74, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_EIMAPaq, 70, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__75)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __pyx_codeobj__75 = (PyObject*)__Pyx_PyCode_New(2, 0, 30, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__74, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_EIMAPaq, 70, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__75)) __PYX_ERR(0, 70, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":116
  * 
@@ -27345,7 +27345,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__76 = PyTuple_Pack(31, __pyx_n_s_optstate, __pyx_n_s_persist, __pyx_n_s_para, __pyx_n_s_t0, __pyx_n_s_n, __pyx_n_s_d, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_s, __pyx_n_s_dx, __pyx_n_s_presetH, __pyx_n_s_G, __pyx_n_s_fixEI, __pyx_n_s_fixVal, __pyx_n_s_wrap, __pyx_n_s_wrap, __pyx_n_s_xmin, __pyx_n_s_ymin, __pyx_n_s_ierror, __pyx_n_s_lhyp, __pyx_n_s_lhmean, __pyx_n_s_lhstd, __pyx_n_s_lhmin, __pyx_n_s_lhmax, __pyx_n_s_m, __pyx_n_s_v, __pyx_n_s_PIatX, __pyx_n_s_e, __pyx_n_s_h, __pyx_n_s_k, __pyx_n_s_i); if (unlikely(!__pyx_tuple__76)) __PYX_ERR(0, 116, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__76);
   __Pyx_GIVEREF(__pyx_tuple__76);
-  __pyx_codeobj__77 = (PyObject*)__Pyx_PyCode_New(2, 0, 31, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__76, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_eihypaq, 116, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__77)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __pyx_codeobj__77 = (PyObject*)__Pyx_PyCode_New(2, 0, 31, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__76, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_eihypaq, 116, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__77)) __PYX_ERR(0, 116, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":171
  * 
@@ -27357,7 +27357,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__78 = PyTuple_Pack(26, __pyx_n_s_optstate, __pyx_n_s_persist, __pyx_n_s_para, __pyx_n_s_t0, __pyx_n_s_n, __pyx_n_s_d, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_s, __pyx_n_s_dx, __pyx_n_s_presetH, __pyx_n_s_pesobj, __pyx_n_s_xmin, __pyx_n_s_ymin, __pyx_n_s_ierror, __pyx_n_s_lhyp, __pyx_n_s_lhmean, __pyx_n_s_lhstd, __pyx_n_s_lhmin, __pyx_n_s_lhmax, __pyx_n_s_m, __pyx_n_s_v, __pyx_n_s_PIatX, __pyx_n_s_e, __pyx_n_s_k, __pyx_n_s_i); if (unlikely(!__pyx_tuple__78)) __PYX_ERR(0, 171, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__78);
   __Pyx_GIVEREF(__pyx_tuple__78);
-  __pyx_codeobj__79 = (PyObject*)__Pyx_PyCode_New(2, 0, 26, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__78, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_PESfsaq, 171, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__79)) __PYX_ERR(0, 171, __pyx_L1_error)
+  __pyx_codeobj__79 = (PyObject*)__Pyx_PyCode_New(2, 0, 26, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__78, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_PESfsaq, 171, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__79)) __PYX_ERR(0, 171, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":211
  * 
@@ -27369,7 +27369,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__80 = PyTuple_Pack(30, __pyx_n_s_optstate, __pyx_n_s_persist, __pyx_n_s_para, __pyx_n_s_t0, __pyx_n_s_n, __pyx_n_s_d, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_s, __pyx_n_s_dx, __pyx_n_s_presetH, __pyx_n_s_G, __pyx_n_s_wrap, __pyx_n_s_wrap, __pyx_n_s_xmin, __pyx_n_s_ymin, __pyx_n_s_ierror, __pyx_n_s_vmax, __pyx_n_s_lhyp, __pyx_n_s_lhmean, __pyx_n_s_lhstd, __pyx_n_s_lhmin, __pyx_n_s_lhmax, __pyx_n_s_fig, __pyx_n_s_ax, __pyx_n_s_fname, __pyx_n_s_e, __pyx_n_s_h, __pyx_n_s_k, __pyx_n_s_i); if (unlikely(!__pyx_tuple__80)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__80);
   __Pyx_GIVEREF(__pyx_tuple__80);
-  __pyx_codeobj__81 = (PyObject*)__Pyx_PyCode_New(2, 0, 30, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__80, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_vmaxaq, 211, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__81)) __PYX_ERR(0, 211, __pyx_L1_error)
+  __pyx_codeobj__81 = (PyObject*)__Pyx_PyCode_New(2, 0, 30, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__80, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_vmaxaq, 211, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__81)) __PYX_ERR(0, 211, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":275
  *     return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in G.kf],'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],}
@@ -27381,7 +27381,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__82 = PyTuple_Pack(32, __pyx_n_s_optstate, __pyx_n_s_persist, __pyx_n_s_para, __pyx_n_s_t0, __pyx_n_s_n, __pyx_n_s_d, __pyx_n_s_para2, __pyx_n_s_srel, __pyx_n_s_switch, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_s, __pyx_n_s_dx, __pyx_n_s_pesobj, __pyx_n_s_cx, __pyx_n_s_cc, __pyx_n_s_cfnlog, __pyx_n_s_cfn, __pyx_n_s_cfn, __pyx_n_s_over, __pyx_n_s_xmin, __pyx_n_s_ymin, __pyx_n_s_ierror, __pyx_n_s_xout, __pyx_n_s_lhyp, __pyx_n_s_lhmean, __pyx_n_s_lhstd, __pyx_n_s_lhmin, __pyx_n_s_lhmax, __pyx_n_s_e, __pyx_n_s_i, __pyx_n_s_k); if (unlikely(!__pyx_tuple__82)) __PYX_ERR(0, 275, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__82);
   __Pyx_GIVEREF(__pyx_tuple__82);
-  __pyx_codeobj__83 = (PyObject*)__Pyx_PyCode_New(2, 0, 32, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__82, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_PESvsaq, 275, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__83)) __PYX_ERR(0, 275, __pyx_L1_error)
+  __pyx_codeobj__83 = (PyObject*)__Pyx_PyCode_New(2, 0, 32, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__82, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_PESvsaq, 275, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__83)) __PYX_ERR(0, 275, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":349
  * 
@@ -27393,7 +27393,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__84 = PyTuple_Pack(32, __pyx_n_s_optstate, __pyx_n_s_persist, __pyx_n_s_para, __pyx_n_s_t0, __pyx_n_s_n, __pyx_n_s_d, __pyx_n_s_r, __pyx_n_s_x_2, __pyx_n_s_par, __pyx_n_s_per, __pyx_n_s_d_2, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_s, __pyx_n_s_dx, __pyx_n_s_pesobj, __pyx_n_s_cx, __pyx_n_s_cc, __pyx_n_s_cfn, __pyx_n_s_over, __pyx_n_s_xmin, __pyx_n_s_ymin, __pyx_n_s_ierror, __pyx_n_s_xout, __pyx_n_s_e, __pyx_n_s_lhyp, __pyx_n_s_lhmean, __pyx_n_s_lhstd, __pyx_n_s_lhmin, __pyx_n_s_lhmax, __pyx_n_s_i, __pyx_n_s_k); if (unlikely(!__pyx_tuple__84)) __PYX_ERR(0, 349, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__84);
   __Pyx_GIVEREF(__pyx_tuple__84);
-  __pyx_codeobj__85 = (PyObject*)__Pyx_PyCode_New(2, 0, 32, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__84, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_PESbsaq, 349, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__85)) __PYX_ERR(0, 349, __pyx_L1_error)
+  __pyx_codeobj__85 = (PyObject*)__Pyx_PyCode_New(2, 0, 32, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__84, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_PESbsaq, 349, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__85)) __PYX_ERR(0, 349, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":429
  *     return xout,para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'kindex':para['kindex'],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin}
@@ -27405,7 +27405,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__86 = PyTuple_Pack(10, __pyx_n_s_optstate, __pyx_n_s_persist, __pyx_n_s_para, __pyx_n_s_aqn, __pyx_n_s_choosepersist, __pyx_n_s_transfer, __pyx_n_s_x, __pyx_n_s_ev, __pyx_n_s_pers, __pyx_n_s_aux); if (unlikely(!__pyx_tuple__86)) __PYX_ERR(0, 429, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__86);
   __Pyx_GIVEREF(__pyx_tuple__86);
-  __pyx_codeobj__87 = (PyObject*)__Pyx_PyCode_New(2, 0, 10, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__86, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_choiceaq, 429, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__87)) __PYX_ERR(0, 429, __pyx_L1_error)
+  __pyx_codeobj__87 = (PyObject*)__Pyx_PyCode_New(2, 0, 10, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__86, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_choiceaq, 429, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__87)) __PYX_ERR(0, 429, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":443
  * 
@@ -27417,7 +27417,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__88 = PyTuple_Pack(9, __pyx_n_s_optstate, __pyx_n_s_persist, __pyx_n_s_para, __pyx_n_s_msg, __pyx_n_s_opt, __pyx_n_s_opt, __pyx_n_s_wrap, __pyx_n_s_x, __pyx_n_s_status); if (unlikely(!__pyx_tuple__88)) __PYX_ERR(0, 443, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__88);
   __Pyx_GIVEREF(__pyx_tuple__88);
-  __pyx_codeobj__89 = (PyObject*)__Pyx_PyCode_New(2, 0, 9, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__88, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_directaq, 443, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__89)) __PYX_ERR(0, 443, __pyx_L1_error)
+  __pyx_codeobj__89 = (PyObject*)__Pyx_PyCode_New(2, 0, 9, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__88, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_directaq, 443, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__89)) __PYX_ERR(0, 443, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":491
  *     return list(x),para['ev'],persist,{'msg':msg }
@@ -27429,7 +27429,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__90 = PyTuple_Pack(9, __pyx_n_s_optstate, __pyx_n_s_persist, __pyx_n_s_para, __pyx_n_s_k, __pyx_n_s_R, __pyx_n_s_fwrap, __pyx_n_s_fwrap, __pyx_n_s_z, __pyx_n_s_x); if (unlikely(!__pyx_tuple__90)) __PYX_ERR(0, 491, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__90);
   __Pyx_GIVEREF(__pyx_tuple__90);
-  __pyx_codeobj__91 = (PyObject*)__Pyx_PyCode_New(2, 0, 9, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__90, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_splocalaq, 491, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__91)) __PYX_ERR(0, 491, __pyx_L1_error)
+  __pyx_codeobj__91 = (PyObject*)__Pyx_PyCode_New(2, 0, 9, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__90, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_splocalaq, 491, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__91)) __PYX_ERR(0, 491, __pyx_L1_error)
 
   /* "gpbo/core/acquisitions.pyx":534
  *     return list(x),para['ev'],persist,{'msg':'localopt' }
@@ -27441,7 +27441,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__92 = PyTuple_Pack(9, __pyx_n_s_optstate, __pyx_n_s_persist, __pyx_n_s_para, __pyx_n_s_msg, __pyx_n_s_opt, __pyx_n_s_opt, __pyx_n_s_wrap, __pyx_n_s_x, __pyx_n_s_status); if (unlikely(!__pyx_tuple__92)) __PYX_ERR(0, 534, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__92);
   __Pyx_GIVEREF(__pyx_tuple__92);
-  __pyx_codeobj__93 = (PyObject*)__Pyx_PyCode_New(2, 0, 9, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__92, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mark_Dropbox_workspace_gpb, __pyx_n_s_cmaesaq, 534, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__93)) __PYX_ERR(0, 534, __pyx_L1_error)
+  __pyx_codeobj__93 = (PyObject*)__Pyx_PyCode_New(2, 0, 9, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__92, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mnt_seagate_home_mark_Dropbox_w, __pyx_n_s_cmaesaq, 534, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__93)) __PYX_ERR(0, 534, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
