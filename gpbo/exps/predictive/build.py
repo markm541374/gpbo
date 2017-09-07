@@ -13,7 +13,7 @@ D = args.dimension
 lb = np.array([-1.]*D)
 ub = np.array([1.]*D)
 #lengthscales from 0.05 to 1.5
-lengthscale = 0.3
+lengthscale = 0.2
 #outputscale will be normalized to 1
 fc, xm, truemin = objectives.genmat52ojf(D,lb,ub,A=1.,ls=lengthscale,fixs=-1)
 
