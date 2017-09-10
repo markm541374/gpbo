@@ -517,8 +517,8 @@ def plot_gp(g,axis,x,d):
 
 #draw hyperparameters given data from posterior likelihood
 def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1):
-    ub = hm+1.8*hs
-    lb = hm-1.8*hs
+    ub = hm+2.8*hs
+    lb = hm-2.8*hs
     def f(loghyp):
         cdef double i,r
         if all(loghyp<ub) and all(loghyp>lb):

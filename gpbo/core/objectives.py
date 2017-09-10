@@ -131,11 +131,13 @@ def rosenojf(x,**ev):
 rosenxmin=[0.2,0.2]
 rosenymin=0.
 
-def genmat52ojf(d,lb,ub,A=1.5,ls=0.3,fixs=-1):
+def genmat52ojf(d,lb,ub,A=1.5,ls=0.3,fixs=-1,ki=GPdc.MAT52):
     from ESutils import gen_dataset
-    nt=80
-    [X,Y,S,D] = gen_dataset(nt, d, lb, ub, GPdc.SQUEXP, sp.array([A] + [ls] * d),s=1e-9)
-    G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, d, sp.array([A] + [ls] * d)))
+    if isinstance(ls,float):
+        ls = [ls]*d
+    nt=sp.minimum(int(1./sp.product(ls)),300)
+    [X,Y,S,D] = gen_dataset(nt, d, lb, ub, ki, sp.array([A] + ls ),s=1e-9)
+    G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(ki, d, sp.array([A] + ls )))
 
     def wrap(x):
         xq = sp.copy(x)

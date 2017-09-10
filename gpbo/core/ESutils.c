@@ -653,8 +653,8 @@ struct __pyx_obj_4gpbo_4core_7ESutils___pyx_scope_struct__draw_support {
  * 
  * #draw hyperparameters given data from posterior likelihood
  * def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1):             # <<<<<<<<<<<<<<
- *     ub = hm+1.8*hs
- *     lb = hm-1.8*hs
+ *     ub = hm+2.8*hs
+ *     lb = hm-2.8*hs
  */
 struct __pyx_obj_4gpbo_4core_7ESutils___pyx_scope_struct_1_drawhyp_plk {
   PyObject_HEAD
@@ -1998,8 +1998,8 @@ static PyObject *__pyx_float_1_;
 static PyObject *__pyx_float_2_;
 static PyObject *__pyx_float_0_1;
 static PyObject *__pyx_float_0_5;
-static PyObject *__pyx_float_1_8;
 static PyObject *__pyx_float_1e3;
+static PyObject *__pyx_float_2_8;
 static PyObject *__pyx_float_99_;
 static PyObject *__pyx_float_0_01;
 static PyObject *__pyx_float_0_05;
@@ -20498,8 +20498,8 @@ static PyObject *__pyx_pf_4gpbo_4core_7ESutils_8plot_gp(CYTHON_UNUSED PyObject *
  * 
  * #draw hyperparameters given data from posterior likelihood
  * def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1):             # <<<<<<<<<<<<<<
- *     ub = hm+1.8*hs
- *     lb = hm-1.8*hs
+ *     ub = hm+2.8*hs
+ *     lb = hm-2.8*hs
  */
 
 /* Python wrapper */
@@ -20648,8 +20648,8 @@ static PyObject *__pyx_pw_4gpbo_4core_7ESutils_11drawhyp_plk(PyObject *__pyx_sel
 }
 
 /* "gpbo/core/ESutils.pyx":522
- *     ub = hm+1.8*hs
- *     lb = hm-1.8*hs
+ *     ub = hm+2.8*hs
+ *     lb = hm-2.8*hs
  *     def f(loghyp):             # <<<<<<<<<<<<<<
  *         cdef double i,r
  *         if all(loghyp<ub) and all(loghyp>lb):
@@ -21141,8 +21141,8 @@ static PyObject *__pyx_pf_4gpbo_4core_7ESutils_11drawhyp_plk_f(PyObject *__pyx_s
   goto __pyx_L0;
 
   /* "gpbo/core/ESutils.pyx":522
- *     ub = hm+1.8*hs
- *     lb = hm-1.8*hs
+ *     ub = hm+2.8*hs
+ *     lb = hm-2.8*hs
  *     def f(loghyp):             # <<<<<<<<<<<<<<
  *         cdef double i,r
  *         if all(loghyp<ub) and all(loghyp>lb):
@@ -21173,8 +21173,8 @@ static PyObject *__pyx_pf_4gpbo_4core_7ESutils_11drawhyp_plk_f(PyObject *__pyx_s
  * 
  * #draw hyperparameters given data from posterior likelihood
  * def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1):             # <<<<<<<<<<<<<<
- *     ub = hm+1.8*hs
- *     lb = hm-1.8*hs
+ *     ub = hm+2.8*hs
+ *     lb = hm-2.8*hs
  */
 
 static PyObject *__pyx_pf_4gpbo_4core_7ESutils_10drawhyp_plk(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_X, PyObject *__pyx_v_Y, PyObject *__pyx_v_S, PyObject *__pyx_v_D, PyObject *__pyx_v_ki, PyObject *__pyx_v_hm, PyObject *__pyx_v_hs, PyObject *__pyx_v_n, PyObject *__pyx_v_burn, PyObject *__pyx_v_subsam, PyObject *__pyx_v_chains) {
@@ -21243,11 +21243,11 @@ static PyObject *__pyx_pf_4gpbo_4core_7ESutils_10drawhyp_plk(CYTHON_UNUSED PyObj
   /* "gpbo/core/ESutils.pyx":520
  * #draw hyperparameters given data from posterior likelihood
  * def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1):
- *     ub = hm+1.8*hs             # <<<<<<<<<<<<<<
- *     lb = hm-1.8*hs
+ *     ub = hm+2.8*hs             # <<<<<<<<<<<<<<
+ *     lb = hm-2.8*hs
  *     def f(loghyp):
  */
-  __pyx_t_1 = PyNumber_Multiply(__pyx_float_1_8, __pyx_cur_scope->__pyx_v_hs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 520, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Multiply(__pyx_float_2_8, __pyx_cur_scope->__pyx_v_hs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 520, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = PyNumber_Add(__pyx_cur_scope->__pyx_v_hm, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 520, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -21258,12 +21258,12 @@ static PyObject *__pyx_pf_4gpbo_4core_7ESutils_10drawhyp_plk(CYTHON_UNUSED PyObj
 
   /* "gpbo/core/ESutils.pyx":521
  * def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1):
- *     ub = hm+1.8*hs
- *     lb = hm-1.8*hs             # <<<<<<<<<<<<<<
+ *     ub = hm+2.8*hs
+ *     lb = hm-2.8*hs             # <<<<<<<<<<<<<<
  *     def f(loghyp):
  *         cdef double i,r
  */
-  __pyx_t_2 = PyNumber_Multiply(__pyx_float_1_8, __pyx_cur_scope->__pyx_v_hs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 521, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Multiply(__pyx_float_2_8, __pyx_cur_scope->__pyx_v_hs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 521, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_1 = PyNumber_Subtract(__pyx_cur_scope->__pyx_v_hm, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 521, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -21273,8 +21273,8 @@ static PyObject *__pyx_pf_4gpbo_4core_7ESutils_10drawhyp_plk(CYTHON_UNUSED PyObj
   __pyx_t_1 = 0;
 
   /* "gpbo/core/ESutils.pyx":522
- *     ub = hm+1.8*hs
- *     lb = hm-1.8*hs
+ *     ub = hm+2.8*hs
+ *     lb = hm-2.8*hs
  *     def f(loghyp):             # <<<<<<<<<<<<<<
  *         cdef double i,r
  *         if all(loghyp<ub) and all(loghyp>lb):
@@ -21775,8 +21775,8 @@ static PyObject *__pyx_pf_4gpbo_4core_7ESutils_10drawhyp_plk(CYTHON_UNUSED PyObj
  * 
  * #draw hyperparameters given data from posterior likelihood
  * def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1):             # <<<<<<<<<<<<<<
- *     ub = hm+1.8*hs
- *     lb = hm-1.8*hs
+ *     ub = hm+2.8*hs
+ *     lb = hm-2.8*hs
  */
 
   /* function exit code */
@@ -26718,8 +26718,8 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__101);
 
   /* "gpbo/core/ESutils.pyx":522
- *     ub = hm+1.8*hs
- *     lb = hm-1.8*hs
+ *     ub = hm+2.8*hs
+ *     lb = hm-2.8*hs
  *     def f(loghyp):             # <<<<<<<<<<<<<<
  *         cdef double i,r
  *         if all(loghyp<ub) and all(loghyp>lb):
@@ -26953,8 +26953,8 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * #draw hyperparameters given data from posterior likelihood
  * def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1):             # <<<<<<<<<<<<<<
- *     ub = hm+1.8*hs
- *     lb = hm-1.8*hs
+ *     ub = hm+2.8*hs
+ *     lb = hm-2.8*hs
  */
   __pyx_tuple__131 = PyTuple_Pack(18, __pyx_n_s_X, __pyx_n_s_Y, __pyx_n_s_S, __pyx_n_s_D, __pyx_n_s_ki, __pyx_n_s_hm, __pyx_n_s_hs, __pyx_n_s_n, __pyx_n_s_burn, __pyx_n_s_subsam, __pyx_n_s_chains, __pyx_n_s_ub, __pyx_n_s_lb, __pyx_n_s_f, __pyx_n_s_f, __pyx_n_s_starts, __pyx_n_s_i, __pyx_n_s_j); if (unlikely(!__pyx_tuple__131)) __PYX_ERR(0, 519, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__131);
@@ -27046,8 +27046,8 @@ static int __Pyx_InitGlobals(void) {
   __pyx_float_2_ = PyFloat_FromDouble(2.); if (unlikely(!__pyx_float_2_)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_float_0_1 = PyFloat_FromDouble(0.1); if (unlikely(!__pyx_float_0_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_float_0_5 = PyFloat_FromDouble(0.5); if (unlikely(!__pyx_float_0_5)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_float_1_8 = PyFloat_FromDouble(1.8); if (unlikely(!__pyx_float_1_8)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_float_1e3 = PyFloat_FromDouble(1e3); if (unlikely(!__pyx_float_1e3)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_float_2_8 = PyFloat_FromDouble(2.8); if (unlikely(!__pyx_float_2_8)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_float_99_ = PyFloat_FromDouble(99.); if (unlikely(!__pyx_float_99_)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_float_0_01 = PyFloat_FromDouble(0.01); if (unlikely(!__pyx_float_0_01)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_float_0_05 = PyFloat_FromDouble(0.05); if (unlikely(!__pyx_float_0_05)) __PYX_ERR(0, 1, __pyx_L1_error)
@@ -27840,8 +27840,8 @@ PyMODINIT_FUNC PyInit_ESutils(void)
  * 
  * #draw hyperparameters given data from posterior likelihood
  * def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1):             # <<<<<<<<<<<<<<
- *     ub = hm+1.8*hs
- *     lb = hm-1.8*hs
+ *     ub = hm+2.8*hs
+ *     lb = hm-2.8*hs
  */
   __pyx_t_5 = PyCFunction_NewEx(&__pyx_mdef_4gpbo_4core_7ESutils_11drawhyp_plk, NULL, __pyx_n_s_gpbo_core_ESutils); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 519, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
