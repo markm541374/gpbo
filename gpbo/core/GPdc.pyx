@@ -57,7 +57,7 @@ class GP_LKonly:
         tmp = 0.
 
         for i,h in enumerate(self.hyp):
-            tmp -= 0.5*((log10(h)-lm[i])**2)/ls[i]**2
+            tmp = tmp - 0.5*((log10(h)-lm[i])**2)/ls[i]**2 - 0.5*log(ls[i]) -log(h*log(10.))
         
         return self.l+tmp
 
