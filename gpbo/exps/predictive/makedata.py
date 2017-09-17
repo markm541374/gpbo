@@ -3,10 +3,6 @@ import gpbo
 import os
 from gpbo.core import objectives
 from gpbo.core import GPdc
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('-i', '--index', dest='index', action='store', default=0,type=int)
-args = parser.parse_args()
 
 fpath = 'scratch'
 D = np.random.randint(2,5)

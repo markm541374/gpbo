@@ -3617,7 +3617,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_9GP_LKonly_4plk(CYTHON_UNUSED PyObje
  *         tmp = 0.
  * 
  *         for i,h in enumerate(self.hyp):             # <<<<<<<<<<<<<<
- *             tmp -= 0.5*((log10(h)-lm[i])**2)/ls[i]**2
+ *             tmp = tmp - 0.5*((log10(h)-lm[i])**2)/ls[i]**2 - 0.5*log(ls[i]) -log(h*log(10.))
  * 
  */
   __Pyx_INCREF(__pyx_int_0);
@@ -3677,7 +3677,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_9GP_LKonly_4plk(CYTHON_UNUSED PyObje
     /* "gpbo/core/GPdc.pyx":60
  * 
  *         for i,h in enumerate(self.hyp):
- *             tmp -= 0.5*((log10(h)-lm[i])**2)/ls[i]**2             # <<<<<<<<<<<<<<
+ *             tmp = tmp - 0.5*((log10(h)-lm[i])**2)/ls[i]**2 - 0.5*log(ls[i]) -log(h*log(10.))             # <<<<<<<<<<<<<<
  * 
  *         return self.l+tmp
  */
@@ -3705,17 +3705,40 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_9GP_LKonly_4plk(CYTHON_UNUSED PyObje
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_InPlaceSubtract(__pyx_v_tmp, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Subtract(__pyx_v_tmp, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF_SET(__pyx_v_tmp, __pyx_t_2);
-    __pyx_t_2 = 0;
+    __pyx_t_7 = PyObject_GetItem(__pyx_v_ls, __pyx_v_i); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 60, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_7); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 60, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __pyx_t_7 = PyFloat_FromDouble((0.5 * log(__pyx_t_6))); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 60, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_8 = PyNumber_Subtract(__pyx_t_2, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 60, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __pyx_t_7 = PyFloat_FromDouble(log(10.)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 60, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_2 = PyNumber_Multiply(__pyx_v_h, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 60, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_2 = PyFloat_FromDouble(log(__pyx_t_6)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_7 = PyNumber_Subtract(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 60, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF_SET(__pyx_v_tmp, __pyx_t_7);
+    __pyx_t_7 = 0;
 
     /* "gpbo/core/GPdc.pyx":59
  *         tmp = 0.
  * 
  *         for i,h in enumerate(self.hyp):             # <<<<<<<<<<<<<<
- *             tmp -= 0.5*((log10(h)-lm[i])**2)/ls[i]**2
+ *             tmp = tmp - 0.5*((log10(h)-lm[i])**2)/ls[i]**2 - 0.5*log(ls[i]) -log(h*log(10.))
  * 
  */
   }
@@ -3723,7 +3746,7 @@ static PyObject *__pyx_pf_4gpbo_4core_4GPdc_9GP_LKonly_4plk(CYTHON_UNUSED PyObje
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "gpbo/core/GPdc.pyx":62
- *             tmp -= 0.5*((log10(h)-lm[i])**2)/ls[i]**2
+ *             tmp = tmp - 0.5*((log10(h)-lm[i])**2)/ls[i]**2 - 0.5*log(ls[i]) -log(h*log(10.))
  * 
  *         return self.l+tmp             # <<<<<<<<<<<<<<
  * 
