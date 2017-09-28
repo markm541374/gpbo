@@ -145,7 +145,11 @@ def eihypaq(optstate,persist,**para):
             fixEI=True
             fixVal = para['choosereturn']['offsetEI']
             logger.info('EIoffset by {}'.format(fixVal))
+    global COUNT
+    COUNT=0
     def wrap(Q):
+        global COUNT
+        COUNT+=1
         x = sp.array([Q])
         m,v = G.infer_diag(x,[[sp.NaN]])
         lei = G.infer_EI(x,[[sp.NaN]],fixI=fixEI,I=fixVal)
@@ -155,7 +159,7 @@ def eihypaq(optstate,persist,**para):
     xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,para['lb'],para['ub'],para['dpara'],para['lpara'])
 
 
-    logger.info('DIRECT found max EI at {} {}'.format(xmin,ierror))
+    logger.info('DIRECT found max EI at {} {} using {}aqev'.format(xmin,ierror,COUNT))
     lhyp = sp.log10([k.hyp for k in G.kf])
     lhmean = sp.mean(lhyp, axis=0)
     lhstd = sp.sqrt(sp.var(lhyp, axis=0))
@@ -165,7 +169,7 @@ def eihypaq(optstate,persist,**para):
     m,v = G.infer_diag_post(xmin,[[sp.NaN]])
     PIatX = sp.stats.norm.cdf(min(y),loc=m[0,0],scale=sp.sqrt(v[0,0]))
     persist['overhead']=time.clock()-t0
-    return [i for i in xmin],para['ev'],persist,{'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in G.kf],'DIRECTmessage':ierror,'EImax':sp.exp(-ymin),'kindex':para['kindex'],'PIatX':PIatX}
+    return [i for i in xmin],para['ev'],persist,{'naqev':COUNT,'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in G.kf],'DIRECTmessage':ierror,'EImax':sp.exp(-ymin),'kindex':para['kindex'],'PIatX':PIatX}
 
 #PES with fixed s ev
 def PESfsaq(optstate,persist,**para):

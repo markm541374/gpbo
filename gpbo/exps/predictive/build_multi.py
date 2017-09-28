@@ -23,7 +23,7 @@ D = 2#args.dimension
 lb = np.array([-1.]*D)
 ub = np.array([1.]*D)
 #lengthscales from 0.05 to 1.5
-lengthscale = [0.2,0.2]#,0.8,0.7]
+lengthscale = [0.2]*D#,0.8,0.7]
 #outputscale will be normalized to 1
 fc, xm, truemin = objectives.genmat52ojf(D,lb,ub,A=1.,ls=lengthscale,fixs=-1,ki=GPdc.SQUEXP)
 
@@ -45,81 +45,85 @@ normlogpdf = lambda x,loc,scale: -((x-loc)/scale)**2
 lognormlogpdf = lambda x,s,loc,scale: -((np.log(x)-loc)/scale)**2 - np.log(x)
 tlogpdf = lambda x,v,scale: -0.5*(v+1)*np.log(1+((x/scale)**2)/v)
 
-def modeldouble(x, theta, support=[10, 30, 200]):
-    # theta parameters are value,grad at supports
-    p, q, r = support
-    # left half
-    A = np.array([[1., p, p**2, p**3], [0, 1, 2 * p, 3 * p**2], [1., q, q**2, q**3], [0, 1, 2 * q, 3 * q**2]])
-    cl = np.linalg.solve(A, theta[:4])
-    # right half
-    b = theta[2:6]
-    A = np.array([[1., q, q**2, q**3], [0, 1, 2 * q, 3 * q**2], [1., r, r**2, r**3], [0, 1, 2 * r, 3 * r**2]])
-    cr = np.linalg.solve(A, theta[2:6])
+def ccmodel(x,theta):
+    y0 = theta[1]
+    g0 = theta[2]
+    y1 = theta[3]
+    g1 = theta[4]
+    a=0
+    b=200
+    r=b-a
+    r2 = r**2
+    r3 = r**3
+    c0 = 3*y0/r2 + g0/r
+    d0 = 2*y0/r3 + g0/r2
+    c1 = 3*y1/r2 - g1/r
+    d1 = -2*y1/r3 + g1/r2
+    Y = np.maximum(theta[0],(d0*(x-b)+c0)*(x-b)**2 + (d1*(x-a)+c1)*(x-a)**2)
+    return np.select([x<10,x>=10],[theta[5],Y])
+def ccboundary(theta):
+    y0 = theta[1]
+    g0 = theta[2]
+    y1 = theta[3]
+    g1 = theta[4]
+    a=0
+    b=200
+    r=b-a
+    r2 = r**2
+    r3 = r**3
+    c0 = 3*y0/r2 + g0/r
+    d0 = 2*y0/r3 + g0/r2
+    c1 = 3*y1/r2 - g1/r
+    d1 = -2*y1/r3 + g1/r2
+    x = np.arange(b)
+    return np.argmax(theta[0]<(d0*(x-b)+c0)*(x-b)**2 + (d1*(x-a)+c1)*(x-a)**2)-1
 
-    yl = cl[0] + cl[1] * x + cl[2] * x ** 2 + cl[3] * x ** 3
-    yr = cr[0] + cr[1] * x + cr[2] * x ** 2 + cr[3] * x ** 3
-    y = theta[8]*(x < p) +yl*np.logical_and(x>=p,x<q)+yr*(x>=q)
-    return y
+def extraT(X,Y,P):
+    theta0 = np.empty(11)
+    for i in range(11):
+        if i in [0,1,3,5,6,7,8,9,10]:
+            theta0[i] = P[i][0]*P[i][2]
+        else:
+            theta0[i] = P[i][0]
 
-def extraTdouble(X, Y, P, support=[10, 30, 200]):
-
-    theta0 = np.array([P[0][0] * P[0][2], P[1][0], P[2][0] * P[2][2], P[3][0], P[4][0] * P[4][2], P[5][0] * P[5][2],
-                       P[6][0] * P[6][2], P[7][0] * P[7][2], P[8][0]])
     if Y.size == 0:
         return theta0
-    if Y.size < support[0]:
+    if Y.size < 10:
         thetaopt = theta0
-        thetaopt[8] = np.mean(Y)
+        thetaopt[5] = np.mean(Y)
+        thetaopt[10] = np.sqrt(np.var(Y))
         return thetaopt
 
+
     def llk(theta):
+        pa=0
+        for i in range(11):
+            if i in [0,1,3,5,6,7,8,9,10]:
+                pa += gammalogpdf(theta[i],P[i][0],P[i][2])
+            else:
+                pa += normlogpdf(theta[i],P[i][0],P[i][1])
 
-        pa = 0
-        #pa += gammadist.logpdf(theta[0], P[0][0], loc=0, scale=P[0][2])
-        pa += gammalogpdf(theta[0], P[0][0], P[0][2])
-
-        #pa += norm.logpdf(theta[1], loc=P[1][0], scale=P[1][1])
-        pa += normlogpdf(theta[1], P[1][0], P[1][1])
-
-        #pa += gammadist.logpdf(theta[2], P[2][0], loc=0., scale=P[2][2])
-        pa += gammalogpdf(theta[2], P[2][0], P[2][2])
-        #pa += norm.logpdf(theta[3], loc=P[3][0], scale=P[3][1])
-        pa += normlogpdf(theta[3], P[3][0], P[3][1])
-
-        #pa += gammadist.logpdf(theta[4], P[4][0], loc=0., scale=P[4][2])
-        pa += gammalogpdf(theta[4], P[4][0], P[4][2])
-        #pa += gammadist.logpdf(theta[5], P[5][0], loc=0., scale=P[5][2])
-        pa += gammalogpdf(theta[5], P[5][0], P[5][2])
-
-        #pa += gammadist.logpdf(theta[6], P[6][0], loc=0., scale=P[6][2])
-        pa += gammalogpdf(theta[6], P[6][0], P[6][2])
-        #pa += gammadist.logpdf(theta[7], P[7][0], loc=0., scale=P[7][2])
-        pa += gammalogpdf(theta[7], P[7][0], P[7][2])
-
-        pa += lognormlogpdf(theta[8], P[8][0], P[8][1], P[8][2])
-
-        Yh = modeldouble(X, theta)
-
-        E = Y - Yh
-        L = -pa
-        L -= np.sum(tlogpdf(E, 1./theta[7],theta[6]))
-
+        Yh = ccmodel(X,theta)
+        switch = np.argmax(theta[0]<Yh)-1
+        E = Y-Yh
+        L=-pa
+        L-=np.sum(normlogpdf(E[:10],0.,theta[10]))
+        L-=np.sum(tlogpdf(E[10:switch],1./theta[7],theta[6]))
+        L-=np.sum(tlogpdf(E[switch:],1./theta[9],theta[8]))
         return L
-
-    res = minimize(llk, theta0, method='Nelder-Mead')
-    thetaopt = res.x
-    if Y.size <= support[1]:
-        thetaopt[4] = theta0[4]
-        thetaopt[5] = theta0[5]
-    return thetaopt
+    bds = ((1e-9,np.Inf),(1e-9,np.Inf),(-np.Inf,np.Inf),(1e-9,np.Inf),
+              (1e-9,np.Inf),(1e-9,np.Inf),(1e-9,np.Inf),(1e-9,np.Inf),
+             (1e-9,np.Inf),(1e-9,np.Inf),(1e-9,np.Inf))
+    res = minimize(llk,theta0,method='L-BFGS-B',bounds=bds)
+    return res.x
 
 def overlearn(X,Y,P):
-    Theta = extraTdouble(X,Y,P)
-    f = lambda x:modeldouble(x,Theta)
+    Theta = extraT(X,Y,P)
+    f = lambda x:ccmodel(x,Theta)
     return f
 
 def getVopt(optstate,persist,para,ev,aux):
-    P = pickle.load(open('/home/mark/Desktop/overheaddouble.p','rb'))[0]
+    P = pickle.load(open('overheadv2.p','rb'))[0]
     #overhead predictor
     opredict = overlearn(np.arange(optstate.n),np.array(optstate.aqtime),P)
     OIapprox = lambda x:np.sum([opredict(i) for i in range(x)])
@@ -151,8 +155,8 @@ def getVopt(optstate,persist,para,ev,aux):
         thetagrid = nl2thetam(np.log10(noise),lengths)
         R=0
         for i in range(thetagrid.shape[1]):
-            R += thetam2r(thetagrid[:,i],nsteps)*weights[i]
-        return R/float(thetagrid.shape[1])
+            R += 10**(thetam2r(thetagrid[:,i],nsteps))*weights[i]
+        return np.log10(R/float(thetagrid.shape[1]))
 
     #basic sanity check bounds
     sigmamin = para['icostfn'](Bremain) #only take 1 evaluation
@@ -263,21 +267,21 @@ for i in range(1):
     fname = 'eihyp{}.csv'.format(i)
     C=gpbo.core.config.eihypdefault(f,D,20,1e-6,fpath,fname)
     C.reccpara['kindex']=C.aqpara['kindex']=GPdc.SQUEXP
-    C.reccpara['mprior']=C.aqpara['mprior']= sp.array([0.]+[0.]*D)
+    C.reccpara['mprior']=C.aqpara['mprior']= sp.array([0.]+[-0.5]*D)
     C.reccpara['sprior']=C.aqpara['sprior']= sp.array([0.5]*(D+1))
 
-    debugoutput['predictive']=False
+    debugoutput['predictive']=True
     C.aqpara['DH_SAMPLES']=200
-    C.aqpara['B']=75*cfn(1e-6)
+    C.aqpara['B']=125*cfn(1e-6)
     C.aqfn = eihyppredictiveaq
     C.stopfn = gpbo.optimize.totalTorNstopfn
-    C.stoppara['nmax']=20
+    C.stoppara['nmax']=200
     C.stoppara['tmax']=C.aqpara['B']
     C.aqpara['costfn']=cfn
     C.aqpara['icostfn']=icfn
 
 
-    lref,nref,M,V = pickle.load(open('/home/mark/Desktop/multidpara.p','rb'))[D]
+    lref,nref,M,V = pickle.load(open('multidpara.p','rb'))[D]
     #mean-var of regret model
     C.aqpara['means'] = [interp2d(lref,nref,M[i].T) for i in range(len(M))]
     C.aqpara['vars']  = [interp2d(lref,nref,V[i].T) for i in range(len(V))]
