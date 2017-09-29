@@ -29,10 +29,10 @@ import gpbo
 import os
 import time
 
-def makeG(X,Y,S,D,kindex,mprior,sprior,nh,chains=1):
+def makeG(X,Y,S,D,kindex,mprior,sprior,nh,chains=1,prior='lognorm'):
     #draw hyps based on plk
     #print "RRRRRRRRRRRRRR"+str([X,Y,S,D,kindex,mprior,sprior,nh])
-    H = ESutils.drawhyp_plk(X,Y,S,D,kindex,mprior,sprior,nh,chains=chains)
+    H = ESutils.drawhyp_plk(X,Y,S,D,kindex,mprior,sprior,nh,chains=chains,prior=prior)
     
     G = GPdc.GPcore(X, Y, S, D, [GPdc.kernel(kindex, X.shape[1], i) for i in H])
     

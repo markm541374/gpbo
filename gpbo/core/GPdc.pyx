@@ -52,13 +52,21 @@ class GP_LKonly:
         #log likelihood of data given hyperparametrs
         return self.l
     
-    def plk(self,lm,ls):
+    def plk(self,lm,ls,shape='lognorm'):
         #log likelihood given lognormal prior over hyperparameters
         tmp = 0.
-
-        for i,h in enumerate(self.hyp):
-            tmp = tmp - 0.5*((log10(h)-lm[i])**2)/ls[i]**2 - 0.5*log(ls[i]) -log(h*log(10.))
-        
+        if shape=='lognorm':
+            for i,h in enumerate(self.hyp):
+                tmp = tmp - 0.5*((log10(h)-lm[i])**2)/ls[i]**2 - 0.5*log(ls[i]) -log(h*log(10.))
+        elif shape=='gamma':
+            #lm->shape(k) ls->scale(s)
+            for i,h in enumerate(self.hyp):
+                #tmp = tmp + sp.stats.gamma.logpdf(h,lm[i],scale=ls[i])#lm[i]-1)*np.log(h)-h/ls[i]
+                tmp = tmp + (lm[i]-1)*np.log(h)-h/ls[i]
+            #lm->shape
+            pass
+        else:
+            raise
         return self.l+tmp
 
 class GPcore:

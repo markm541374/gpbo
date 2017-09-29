@@ -23,7 +23,8 @@ D = 2#args.dimension
 lb = np.array([-1.]*D)
 ub = np.array([1.]*D)
 #lengthscales from 0.05 to 1.5
-lengthscale = [0.2]*D#,0.8,0.7]
+#lengthscale = [np.round(gammadist.rvs(3.,scale=0.15),3) for i in range(D)]
+lengthscale = [0.6]*D
 #outputscale will be normalized to 1
 fc, xm, truemin = objectives.genmat52ojf(D,lb,ub,A=1.,ls=lengthscale,fixs=-1,ki=GPdc.SQUEXP)
 
@@ -61,6 +62,7 @@ def ccmodel(x,theta):
     d1 = -2*y1/r3 + g1/r2
     Y = np.maximum(theta[0],(d0*(x-b)+c0)*(x-b)**2 + (d1*(x-a)+c1)*(x-a)**2)
     return np.select([x<10,x>=10],[theta[5],Y])
+
 def ccboundary(theta):
     y0 = theta[1]
     g0 = theta[2]
@@ -209,15 +211,17 @@ def getVopt(optstate,persist,para,ev,aux):
 
     if debugoutput['predictive']:
         from matplotlib import pyplot as plt
-        f,a = plt.subplots(nrows=4,ncols=2,figsize=[12,8])
+        f,a = plt.subplots(nrows=5,ncols=2,figsize=[14,8])
         #a[0,0].plot(np.sort(A),np.linspace(0,1,A.size))
         if not 'stepexpect' in persist.keys():
             persist['stepexpect']=np.array([[optstate.n,N[2,j]]])
         else:
             persist['stepexpect'] = np.vstack([persist['stepexpect'],[optstate.n,N[2,j]]])
+        a[4,0].hist([h[1] for h in aux['HYPdraws']],20,normed=1)
+        a[4,1].hist([h[2] for h in aux['HYPdraws']],20,normed=1)
 
-        a[0,0].hist(l,20)
-        a[0,1].hist(A,20)
+        a[0,0].hist(l,20,normed=1)
+        a[0,1].hist(A,20,normed=1)
         a[0,1].set_ylabel('A')
         a[0,0].set_ylabel('l')
         a[1,1].semilogx(N[0,:],N[2,:])
@@ -266,16 +270,21 @@ def eihyppredictiveaq(optstate,persist,**para):
 for i in range(1):
     fname = 'eihyp{}.csv'.format(i)
     C=gpbo.core.config.eihypdefault(f,D,20,1e-6,fpath,fname)
-    C.reccpara['kindex']=C.aqpara['kindex']=GPdc.SQUEXP
-    C.reccpara['mprior']=C.aqpara['mprior']= sp.array([0.]+[-0.5]*D)
-    C.reccpara['sprior']=C.aqpara['sprior']= sp.array([0.5]*(D+1))
+    C.reccpara['kindex']=C.aqpara['kindex']= GPdc.SQUEXP
+    #C.reccpara['mprior']=C.aqpara['mprior']= sp.array([0.]+[-0.5]*D)
+    #C.reccpara['sprior']=C.aqpara['sprior']= sp.array([0.5]*(D+1))
 
+    C.reccpara['mprior']=C.aqpara['mprior']= sp.array([2.]+[3.]*D)
+    C.reccpara['sprior']=C.aqpara['sprior']= sp.array([0.5]+[0.15]*D)
+    C.reccpara['priorshape']=C.aqpara['priorshape']='gamma'
+    C.aqpara['hypchains']=10
+    C.reccpara['onlyafter']=C.aqpara['nrandinit']= 100
     debugoutput['predictive']=True
-    C.aqpara['DH_SAMPLES']=200
+    C.aqpara['DH_SAMPLES']=1000
     C.aqpara['B']=125*cfn(1e-6)
     C.aqfn = eihyppredictiveaq
     C.stopfn = gpbo.optimize.totalTorNstopfn
-    C.stoppara['nmax']=200
+    C.stoppara['nmax']=101
     C.stoppara['tmax']=C.aqpara['B']
     C.aqpara['costfn']=cfn
     C.aqpara['icostfn']=icfn

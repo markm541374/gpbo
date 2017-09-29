@@ -133,8 +133,12 @@ def eihypaq(optstate,persist,**para):
     if 'choosereturn' in para.keys():
         if 'reuseH' in para['choosereturn'].keys():
             presetH = para['choosereturn']['reuseH']
+    if 'priorshape' in para.keys():
+        prior = para['priorshape']
+    else:
+        prior = 'lognorm'
     if not presetH:
-        G = PES.makeG(x,y,s,dx,para['kindex'],para['mprior'],para['sprior'],para['DH_SAMPLES'])
+        G = PES.makeG(x,y,s,dx,para['kindex'],para['mprior'],para['sprior'],para['DH_SAMPLES'],prior=prior)
     else:
         logger.info('reusing preselected hyperparameters')
         G =  GPdc.GPcore(x,y,s,dx, [GPdc.kernel(para['kindex'], x.shape[1], h) for h in presetH])

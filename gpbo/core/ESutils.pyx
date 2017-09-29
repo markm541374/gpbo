@@ -516,31 +516,60 @@ def plot_gp(g,axis,x,d):
     return 0
 
 #draw hyperparameters given data from posterior likelihood
-def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1):
-    ub = hm+2.8*hs
-    lb = hm-2.8*hs
-    def f(loghyp):
-        cdef double i,r
-        if all(loghyp<ub) and all(loghyp>lb):
-            r=GPdc.GP_LKonly(X, Y, S, D, GPdc.kernel(ki, X.shape[1], [10 ** i for i in loghyp])).plk(hm, hs)
-            if isnan(r):
-                class MJMError(Exception):
-                    pass
-                print( 'nan from GPLKonly with input')
-                print( [X,Y,S,D,ki,hm,hs,n,burn,subsam])
-                raise MJMError('nan from GPLKonly with input')
-        else:
-            r=-1e99
-        #print [loghyp, r]
-        return r
+def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1,prior='lognorm'):
+    if prior=='lognorm':
+        ub = hm+2.8*hs
+        lb = hm-2.8*hs
 
-    starts = sp.vstack([hm]*chains)
-    print('using {} slice chains'.format(chains))
-    for i in range(chains):
-        starts[i,:]+=2*(sp.random.uniform(size=len(ub))-0.5)*hs
-    X = sp.vstack([slice.slice_sample(f,starts[j,:],n/chains+1,0.05*hs,burn=burn,subsam=subsam) for j in xrange(chains)])
+        def f(loghyp):
+            cdef double i,r
+            if all(loghyp<ub) and all(loghyp>lb):
+                r=GPdc.GP_LKonly(X, Y, S, D, GPdc.kernel(ki, X.shape[1], [10 ** i for i in loghyp])).plk(hm, hs,shape=prior)
+                if isnan(r):
+                    class MJMError(Exception):
+                        pass
+                    print( 'nan from GPLKonly with input')
+                    print( [X,Y,S,D,ki,hm,hs,n,burn,subsam])
+                    raise MJMError('nan from GPLKonly with input')
+            else:
+                r=-1e99
+            #print [loghyp, r]
+            return r
 
-    return 10**X[:n,:]
+        starts = sp.vstack([hm]*chains)
+        print('using {} slice chains'.format(chains))
+        for i in range(chains):
+            starts[i,:]+=2*(sp.random.uniform(size=len(ub))-0.5)*hs
+        X = sp.vstack([slice.slice_sample(f,starts[j,:],n/chains+1,0.05*hs,burn=burn,subsam=subsam) for j in xrange(chains)])
+
+        return 10**X[:n,:]
+
+    elif prior=='gamma':
+        ub = hm*hs+5*sp.sqrt(hm*hs**2)
+        lb = sp.zeros_like(ub)
+        def f(hyp):
+            cdef double i,r
+            if all(hyp<ub) and all(hyp>lb):
+                r=GPdc.GP_LKonly(X, Y, S, D, GPdc.kernel(ki, X.shape[1], hyp)).plk(hm, hs,shape=prior)
+                if isnan(r):
+                    class MJMError(Exception):
+                        pass
+                    print( 'nan from GPLKonly with input')
+                    print( [X,Y,S,D,ki,hm,hs,n,burn,subsam])
+                    raise MJMError('nan from GPLKonly with input')
+            else:
+                r=-1e99
+            #print [loghyp, r]
+            return r
+
+        starts = sp.vstack([hm*hs]*chains)
+        print('using {} slice chains'.format(chains))
+        for i in range(chains):
+            starts[i,:]+=0.25*(sp.random.uniform(size=len(ub))-0.5)*(hm*hs)
+        X = sp.vstack([slice.slice_sample(f,starts[j,:],n/chains+1,0.05*sp.sqrt(hm*hs**2),burn=burn,subsam=subsam) for j in xrange(chains)])
+
+        return X[:n,:]
+
 
 #take a random draw of X points and draw Y from the specified kernel
 def gen_dataset(nt,d,lb,ub,kindex,hyp,s=1e-9):
