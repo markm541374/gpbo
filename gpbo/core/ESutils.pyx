@@ -576,7 +576,7 @@ def gen_dataset(nt,d,lb,ub,kindex,hyp,s=1e-9):
     X = draw_support(d, lb,ub,nt,SUPPORT_UNIFORM)
     D = [[sp.NaN]]*(nt)
     kf = GPdc.kernel(kindex, d, hyp)
-    Kxx = GPdc.buildKsym_d(kf, X, D)
+    Kxx = GPdc.buildKsym_d(kf, X, D,s=s)
     Y = spl.cholesky(Kxx,lower=True)*sp.matrix(sps.norm.rvs(0,1.,nt)).T+sp.matrix(sps.norm.rvs(0,sp.sqrt(s),nt)).T
     S = sp.matrix([s]*nt).T
     return [X,Y,S,D]

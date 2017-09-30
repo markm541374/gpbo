@@ -5,7 +5,6 @@ import gpbo
 import copy
 import os
 import matplotlib
-print( matplotlib.get_backend())
 from matplotlib import pyplot as plt
 plt.style.use('seaborn-paper')
 plt.rc('font',serif='Times')

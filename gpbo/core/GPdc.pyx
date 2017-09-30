@@ -397,13 +397,13 @@ def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=20000,fg=-1e9):
     return hy
 
 #just for quickly making test draws
-def buildKsym_d(kf,x,d):
+def buildKsym_d(kf,x,d,s=1e-9):
         #x should be  column vector
         (l,_)=x.shape
         K=sp.matrix(sp.empty([l,l]))
         cdef int i,j
         for i in range(l):
-            K[i,i]=kf(x[i,:],x[i,:],d1=d[i],d2=d[i])+10**-10
+            K[i,i]=kf(x[i,:],x[i,:],d1=d[i],d2=d[i])+s
             for j in range(i+1,l):
                 K[i,j]=kf(x[i,:],x[j,:],d1=d[i],d2=d[j])
                 

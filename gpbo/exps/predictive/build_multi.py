@@ -24,7 +24,7 @@ lb = np.array([-1.]*D)
 ub = np.array([1.]*D)
 #lengthscales from 0.05 to 1.5
 #lengthscale = [np.round(gammadist.rvs(3.,scale=0.15),3) for i in range(D)]
-lengthscale = [0.6]*D
+lengthscale = [0.3]*D
 #outputscale will be normalized to 1
 fc, xm, truemin = objectives.genmat52ojf(D,lb,ub,A=1.,ls=lengthscale,fixs=-1,ki=GPdc.SQUEXP)
 
@@ -244,6 +244,7 @@ def getVopt(optstate,persist,para,ev,aux):
         plt.savefig('dbout/fig{}.png'.format(optstate.n))
         f.clf()
         plt.close(f)
+
         del (f)
     #persist['overhead']=time.clock()-t0
     aux['lmean']=np.mean(l)
@@ -260,6 +261,7 @@ def eihyppredictiveaq(optstate,persist,**para):
         ev['s'] = icostfn(para['B']/200.)
         return x,ev,persist,aux
     print('-------------------------------------------')
+
     t0=time.clock()
     ev['s'],persist,aux = getVopt(optstate,persist,para,ev,aux)
     t1=time.clock()
@@ -277,10 +279,9 @@ for i in range(1):
     C.reccpara['mprior']=C.aqpara['mprior']= sp.array([2.]+[3.]*D)
     C.reccpara['sprior']=C.aqpara['sprior']= sp.array([0.5]+[0.15]*D)
     C.reccpara['priorshape']=C.aqpara['priorshape']='gamma'
-    C.aqpara['hypchains']=10
     C.reccpara['onlyafter']=C.aqpara['nrandinit']= 100
     debugoutput['predictive']=True
-    C.aqpara['DH_SAMPLES']=1000
+    C.aqpara['DH_SAMPLES']=500
     C.aqpara['B']=125*cfn(1e-6)
     C.aqfn = eihyppredictiveaq
     C.stopfn = gpbo.optimize.totalTorNstopfn
