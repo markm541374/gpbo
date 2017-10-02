@@ -11,6 +11,7 @@ import logging
 import copy
 import pandas as pd
 import gpbo
+import re
 import traceback
 logger = logging.getLogger(__name__)
 
@@ -129,7 +130,9 @@ class optimizer:
                     ev_['d'] = [k]
                     df = F[k+1]
                     self.state.update(x,ev_,df,c,t1-t0)
-                    logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev_.items()]+[str(df)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rxlast]+[str(checky)+',']+[str(i)+', ' for i in [0.,0.,0.]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+',{},'.format(self.state.conditionV)+''.join([str(k)+' '+str(aqaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in aqaux.keys()])[:-1]+''.join([str(k)+' '+str(chooseaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in chooseaux.keys()])[:-1]+'\n'
+                    taildata0 = ','.join([str(k)+' '+sanitize(str(aqaux[k])) for k in aqaux.keys()])
+                    taildata1 = ','.join([str(k)+' '+sanitize(str(aqaux[k])) for k in chooseaux.keys()])
+                    logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev_.items()]+[str(df)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rxlast]+[str(checky)+',']+[str(i)+', ' for i in [0.,0.,0.]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+',{},'.format(self.state.conditionV)+taildata0+taildata1+'\n'
                     lf.write(logstr)
 
             self.state.update(x,ev,y,c,t1-t0)
@@ -158,7 +161,10 @@ class optimizer:
             rxlast=list(rx)
             logger.info("RC returned {}     recctime: {}\n".format(rx,t3-t2))
             aqaux['host'] = os.uname()[1]
-            logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+',{},'.format(self.state.conditionV)+''.join([str(k)+' '+str(aqaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in aqaux.keys()])[:-1]+''.join([str(k)+' '+str(chooseaux[k]).replace(',',' ').replace('\n',';').replace('\r',';')+' ,' for k in chooseaux.keys()])[:-1]+'\n'
+
+            taildata0 = ','.join([str(k)+' '+sanitize(str(aqaux[k])) for k in aqaux.keys()])
+            taildata1 = ','.join([str(k)+' '+sanitize(str(aqaux[k])) for k in chooseaux.keys()])
+            logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+',{},'.format(self.state.conditionV)+taildata0 + taildata1+'\n'
             lf.write(logstr)
             lf.flush()
             if gpbo.core.debugoutput['logstate']:
@@ -169,7 +175,12 @@ class optimizer:
         logger.info('endopt')
 
         return rx,reaux
-    
+def sanitize(s):
+    s0 = re.sub(r","," ",s)
+    s1 = re.sub(r"\n", ";", s0)
+    s2 = re.sub(r"\r", ";", s1)
+    s3 = re.sub(r"(\d+\.\d\d)\d+", r"\1", s2)
+    return s3
 def norlocalstopfn(optstate,**para):
     return nstopfn(optstate,**para) or localstopfn(optstate,**para)
 
