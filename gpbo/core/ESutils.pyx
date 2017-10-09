@@ -520,7 +520,6 @@ def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1,prior='lognorm'):
     if prior=='lognorm':
         ub = hm+2.8*hs
         lb = hm-2.8*hs
-
         def f(loghyp):
             cdef double i,r
             if all(loghyp<ub) and all(loghyp>lb):
@@ -541,13 +540,16 @@ def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1,prior='lognorm'):
         for i in range(chains):
             starts[i,:]+=2*(sp.random.uniform(size=len(ub))-0.5)*hs
         X = sp.vstack([slice.slice_sample(f,starts[j,:],n/chains+1,0.05*hs,burn=burn,subsam=subsam) for j in xrange(chains)])
-
         return 10**X[:n,:]
 
     elif prior=='gamma':
+        global count
+        count=0
         ub = hm*hs+5*sp.sqrt(hm*hs**2)
         lb = sp.zeros_like(ub)
         def f(hyp):
+            global count
+            count = count+1
             cdef double i,r
             if all(hyp<ub) and all(hyp>lb):
                 r=GPdc.GP_LKonly(X, Y, S, D, GPdc.kernel(ki, X.shape[1], hyp)).plk(hm, hs,shape=prior)
@@ -568,6 +570,7 @@ def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1,prior='lognorm'):
             starts[i,:]+=0.25*(sp.random.uniform(size=len(ub))-0.5)*(hm*hs)
         X = sp.vstack([slice.slice_sample(f,starts[j,:],n/chains+1,0.05*sp.sqrt(hm*hs**2),burn=burn,subsam=subsam) for j in xrange(chains)])
 
+        print('used {} plk evals'.format(count))
         return X[:n,:]
 
 
