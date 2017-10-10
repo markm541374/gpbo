@@ -135,9 +135,12 @@ def genmat52ojf(d,lb,ub,A=1.,ls=0.3,fixs=-1,ki=GPdc.MAT52):
     from ESutils import gen_dataset
     if isinstance(ls,float):
         ls = [ls]*d
-    nt=sp.maximum(150,sp.minimum(int(d*60./sp.product(ls)),2500))
-    #print(nt)
+    #nt=sp.maximum(250,sp.minimum(int(d*100./sp.product(ls)),3000))
+    nt=sp.maximum(150,sp.minimum(int(d*20./sp.product(ls)),2500))
+    #nt=500
+
     s=1e-9
+
     for s in sp.logspace(-9,0,20):
         try:
             [X,Y,S,D] = gen_dataset(nt, d, lb, ub, ki, sp.array([A] + ls ),s=1e-9)
@@ -149,6 +152,7 @@ def genmat52ojf(d,lb,ub,A=1.,ls=0.3,fixs=-1,ki=GPdc.MAT52):
    # plt.figure()
    # plt.plot(sp.array(X),sp.array(Y),'b.')
    # plt.show(block=True)
+    print('training GP')
     G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(ki, d, sp.array([A] + ls )))
 
     def wrap(x):

@@ -299,17 +299,17 @@ for i in range(1):
     C.reccpara['sprior']=C.aqpara['sprior']= sp.array([0.5]+[0.15]*D)
     C.reccpara['priorshape']=C.aqpara['priorshape']='gamma'
     C.reccpara['onlyafter']=C.aqpara['nrandinit']= 10
-    debugoutput['predictive']=False
+    debugoutput['predictive']=True
     C.aqpara['DH_SAMPLES']=100
     C.aqpara['B']=100*cfn(1e-6)
     C.aqfn = eihyppredictiveaq
     C.stopfn = gpbo.optimize.totalTorNstopfn
-    C.stoppara['nmax']=100
+    C.stoppara['nmax']=200
     C.stoppara['tmax']=C.aqpara['B']
     C.aqpara['costfn']=cfn
     C.aqpara['icostfn']=icfn
 
-    C.aqpara['vchecks']=['all','twice','once','none'][args.mode]
+    C.aqpara['vchecks']=['all','twice','once','none'][0]#[args.mode]
     if C.aqpara['vchecks']=='none':
         ntarget = np.random.randint(50,150)
         C.aqpara['v']=icfn(C.aqpara['B']/float(ntarget))
