@@ -38,12 +38,18 @@ cbool = ct.c_bool
 
 class GP_LKonly:
     def __init__(self, X_s, Y_s, S_s, D_s, kf):
+
         cdef int n, D, i
         n ,D = X_s.shape
         self.hyp = kf.hyp
         R = ct.c_double()
         Dc = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_s]
-        libGP.newGP_LKonly(cint(D),cint(n),X_s.ctypes.data_as(ctpd),Y_s.ctypes.data_as(ctpd),S_s.ctypes.data_as(ctpd),(cint*len(Dc))(*Dc), cint(kf.Kindex), kf.hyp.ctypes.data_as(ctpd),ct.byref(R))
+
+        mask = np.array(Dc)==0
+        trueYmean = np.mean(Y_s[mask])
+
+        Ynorm = Y_s-mask.reshape(Y_s.shape)*trueYmean
+        libGP.newGP_LKonly(cint(D),cint(n),X_s.ctypes.data_as(ctpd),Ynorm.ctypes.data_as(ctpd),S_s.ctypes.data_as(ctpd),(cint*len(Dc))(*Dc), cint(kf.Kindex), kf.hyp.ctypes.data_as(ctpd),ct.byref(R))
         self.l = R.value
         
         return
@@ -71,6 +77,7 @@ class GP_LKonly:
 
 class GPcore:
     def __init__(self, X__s, Y__s, S__s, D__s, kf):
+
         #print [X_s, Y_s, S_s, D_s, kf]
         if isinstance(kf,kernel):
             self.size = 1
@@ -81,10 +88,17 @@ class GPcore:
         self.kf=kf
         [self.n ,self.D] = X__s.shape
         Dx_ = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D__s]
+        mask = np.array(Dx_)==0
+        #print(Dx_,mask)
+        trueYmean = np.mean(Y__s[mask])
+        #print('offset{}'.format(trueYmean))
+        self.trueYmean=trueYmean
+        Ynorm = Y__s-mask.reshape(Y__s.shape)*trueYmean
+        #print(Y__s,Ynorm)
         perm = sp.flip(sp.argsort(Dx_),axis=0)
         try:
             X_s = X__s[perm,:]
-            Y_s = Y__s[perm,:]
+            Y_s = Ynorm[perm,:]
             S_s = S__s[perm,:]
             Dx = [Dx_[i] for i in perm]
         except:
@@ -119,6 +133,8 @@ class GPcore:
         D = [0 if isnan(x[0]) else int(sum([8**i for i in x])) for x in D_i]
         R=sp.vstack([sp.empty(ns)]*self.size)
         libGP.infer_m(self.s, cint(self.size), ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
+        mask = np.vstack([np.array(D)==0]*self.size)
+        R+=mask*self.trueYmean
         return R
     
     def infer_m_partial(self,X_,D_i,ki,hyp):
@@ -129,8 +145,9 @@ class GPcore:
         
         #libGP.infer_m_partial(self.s, cint(ki),hyp.ctypes.data_as(ctpd),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
         libGP.infer_m_partial(self.s,cint(ki),hyp.ctypes.data_as(ctpd),ns,X_i.ctypes.data_as(ctpd),(cint*len(D))(*D),R.ctypes.data_as(ctpd))
-            
-        
+
+        mask = np.vstack([np.array(D)==0]*1)
+        R+=mask*self.trueYmean
         return R
 
     def infer_m_post(self,X_,D_i):
@@ -164,6 +181,8 @@ class GPcore:
             print( "_______________")
             #self.printc()
             raise(GPdcError)
+        mask = np.vstack([np.array(D)==0]*self.size)
+        m+=mask*self.trueYmean
         return [m,V]
     
     def infer_full_post(self,X_,D_i):
@@ -195,6 +214,8 @@ class GPcore:
 
         m = sp.vstack([R[i*2,:] for i in range(self.size)])
         V = sp.vstack([R[i*2+1,:] for i in range(self.size)])
+        mask = np.vstack([np.array(D)==0]*self.size)
+        m+=mask*self.trueYmean
         return [m,V]
     
     def infer_diag_post(self,X_,D_i):
