@@ -4,7 +4,8 @@
 import gpbo
 from gpbo.core import ESutils as ESutils
 import gpbo.core
-gpbo.core.debugoutput=True
+from gpbo.core import debugoutput
+debugoutput['drawlap']=True
 import scipy as sp
 from scipy import linalg as spl
 from scipy import stats as sps
@@ -34,28 +35,11 @@ G = GPdc.GPcore(X, Y, S, D, GPdc.kernel(GPdc.SQUEXP, 2, sp.array([1.5, 0.25, 0.2
 
 np=40
 
-Z = ESutils.draw_support(G, sp.array([-1.,-1.]),sp.array([1.,1.]),500,ESutils.SUPPORT_LAPAPR,para=np)
-R = ESutils.draw_min(G,Z,500)
-
-Z2 = ESutils.draw_support(G, sp.array([-1.,-1.]),sp.array([1.,1.]),500,ESutils.SUPPORT_LAPAPROT,para=np)
+#Z = ESutils.draw_support(G, sp.array([-1.,-1.]),sp.array([1.,1.]),500,ESutils.SUPPORT_LAPAPR,para=np)
+#R = ESutils.draw_min(G,Z,500)
+f,a = plt.subplots()
+Z2 = ESutils.draw_support(G, sp.array([-1.,-1.]),sp.array([1.,1.]),500,ESutils.SUPPORT_LAPAPROT,para=np,weighted=True)
 R2 = ESutils.draw_min(G,Z2,500)
 
-plt.figure()
-for i in xrange(Z.shape[0]):
-    plt.plot(Z[i,0],Z[i,1],'r.')
-for i in xrange(Z2.shape[0]):
-    plt.plot(Z2[i,0],Z2[i,1],'b.')
-
-plt.axis([-1,1,-1,1])
-ng = 30
-A = sp.empty([ng,ng])
-for i in xrange(ng):
-    for j in xrange(ng):
-        A[i,j] = G.infer_m_post(sp.array([2*j/float(ng)-1.,-2*i/float(ng)+1.]),[[sp.NaN]])[0,0]
-plt.figure()
-plt.imshow(A)
-
-
-
-
-plt.show()
+a.plot(Z2[:,0],Z2[:,1],'b.')
+f.savefig('dbout/support.png')

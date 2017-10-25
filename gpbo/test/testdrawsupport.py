@@ -4,7 +4,6 @@
 import gpbo
 from gpbo.core import ESutils as ESutils
 import gpbo.core
-gpbo.core.debugoutput=True
 import scipy as sp
 from scipy import linalg as spl
 from scipy import stats as sps

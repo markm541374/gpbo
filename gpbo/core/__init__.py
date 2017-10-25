@@ -10,3 +10,4 @@ from .config import *
 from .GPdc import *
 from .ESutils import *
 from .choosers import *
+from .objectives import *

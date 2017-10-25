@@ -7,7 +7,9 @@
 #TODO need to check initial steps
 from __future__ import print_function
 xrange=range
+import numpy as np
 import scipy as sp
+import emcee
 from tqdm import tqdm
 def slice_sample(loglike, init, iters, sigma, step_out=True,burn=20,subsam=4):
     """
@@ -85,3 +87,15 @@ def slice_sample(loglike, init, iters, sigma, step_out=True,burn=20,subsam=4):
             pt+=1
    
     return samples[burn:,:]
+
+def sample_emcee(llk,p0,n,burn=100,subsam=17):
+    nwalkers=10
+    if isinstance(p0,float):
+        D=1
+    else:
+        D = p0.size
+    sampler = emcee.EnsembleSampler(nwalkers, D, llk ,args=[])
+    pos,prob,state = sampler.run_mcmc(np.vstack([np.array(p0).flatten()]*nwalkers)+np.random.normal(size=[nwalkers,1])*1e-6, burn)
+    sampler.reset()
+    sampler.run_mcmc(pos,max(1,subsam*n//nwalkers))
+    return sampler.flatchain[np.arange(n)*subsam]

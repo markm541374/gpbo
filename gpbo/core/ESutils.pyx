@@ -10,6 +10,7 @@ from gpbo.core import slice
 import scipy as sp
 from scipy import linalg as spl
 from scipy import stats as sps
+from scipy.stats import norm
 import gpbo
 import logging
 logger = logging.getLogger(__name__)
@@ -35,7 +36,7 @@ SUPPORT_LAPAPR = 4
 SUPPORT_LAPAPROT = 5
 SUPPORT_VARREJ = 6
 #drawing points between lb and ub using specified method
-def draw_support(g, lb, ub, n, method, para=1.):
+def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
     n = int(n)
 
     #para is the std confidence bound
@@ -252,7 +253,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
             for xm in unq:
                 tmp.append(abs((xm-Xst[i+para,:])).max())
 
-            if min(tmp)>0.0002:
+            if min(tmp)>0.002:
                 unq.append(Xst[i+para,:])
 
         U = []
@@ -292,17 +293,40 @@ def draw_support(g, lb, ub, n, method, para=1.):
         X = sp.empty(shape=[n,d])
         if d==1:
             X.resize([n,1])
-        neach = int(n/(len(unq)+1))
-        for i in range(len(unq)):
-            X[i*neach:(i+1)*neach,:]= U[i].dot(sp.diag(sp.sqrt(E[i])).dot(sp.random.normal(size=[d,neach]))).T
-            for j in range(d):
-                X[i*neach:(i+1)*neach,j]+=unq[i][j]
-        X[len(unq)*neach:,:]=sp.random.uniform(size=[n-len(unq)*neach,d])
-        for i in range(d):
-            X[len(unq)*neach:,i] *= ub[i]-lb[i]
-            X[len(unq)*neach:,i] += lb[i]
+        neach = int(n/(len(unq)+1*pad_unif))
+        if not weighted:
+            for i in range(len(unq)):
+                X[i*neach:(i+1)*neach,:]= U[i].dot(sp.diag(sp.sqrt(E[i])).dot(sp.random.normal(size=[d,neach]))).T
+                for j in range(d):
+                    X[i*neach:(i+1)*neach,j]+=unq[i][j]
+            X[len(unq)*neach:,:]=sp.random.uniform(size=[n-len(unq)*neach,d])
+            for i in range(d):
+                X[len(unq)*neach:,i] *= ub[i]-lb[i]
+                X[len(unq)*neach:,i] += lb[i]
 
-        sp.clip(X,-1,1,out=X)
+            sp.clip(X,-1,1,out=X)
+        else:
+            nu = len(unq)
+            means = sp.empty(nu)
+            vars = sp.empty(nu)
+            probs = sp.empty(nu)
+            weights = sp.empty(nu,dtype=int)
+            for i in range(nu):
+                means[i],vars[i] = g.infer_diag_post(sp.array(unq[i]),[[sp.NaN]])
+            mn = sp.argmin(means)
+            for i in range(nu):
+                probs[i] = norm.cdf(0,loc=means[i]-means[mn],scale=sp.sqrt(vars[i]+vars[mn]))
+            #probs[mn] = probs[sp.arange(nu)!=mn].max()
+            weights = (sp.maximum(1,n*probs/sp.sum(probs))).astype(int)
+            weights[0] = n-sum(weights[1:])
+            print( sp.vstack([means,vars,probs,weights]).T)
+            cweights = sp.hstack([0,sp.cumsum(weights)])
+            for i in range(len(unq)):
+                X[cweights[i]:cweights[i]+weights[i],:]= U[i].dot(sp.diag(sp.sqrt(E[i])).dot(sp.random.normal(size=[d,weights[i]]))).T
+                for j in range(d):
+                    X[cweights[i]:cweights[i]+weights[i],j]+=unq[i][j]
+
+            sp.clip(X,-1,1,out=X)
 
         from gpbo.core import debugoutput
 
@@ -383,7 +407,7 @@ def draw_support(g, lb, ub, n, method, para=1.):
                 return -1e99
         print( "Drawing support using slice sample over EI:")
         X = slice.slice_sample(f,0.5*(ub+lb),n,0.125*(ub-lb))
-    
+
     elif method==SUPPORT_SLICEPM:
         def f(x):
             if all(x>lb) and all(x<ub):
