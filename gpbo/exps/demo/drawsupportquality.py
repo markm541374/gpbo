@@ -28,12 +28,13 @@ def measures(n):
         m = Z.shape[0]
         c = np.zeros(m)
         for i in range(10):
-            P = G.draw_post(Z,[[np.NaN]]*m,600)
+            P = G.draw_post(Z,[[np.NaN]]*m,1200)
             A = np.argmin(P,axis=1)
             for a in A:
                 c[a]+=1
-        p = (c+1)/(m+1.)
-        return np.sum(-(1./float(m))*np.log(p*m)),np.sum(c==0)
+        p = (c+1)/(m+np.sum(c))
+        q = 1./float(m)
+        return np.sum(-p*np.log(q/p)),np.sum(-q*np.log(p/q)),np.sum(c==0)
 
 
     m = 1000
@@ -52,10 +53,11 @@ def measures(n):
     return laprot,laprotw,ei,lcb
 
 
-npts = 10*np.arange(1,9)
+npts = np.linspace(10,90,91).astype(int)
 nv = npts.size
-meas = np.empty([4,nv])
-unuse = np.empty([4,nv])
+meas = np.zeros([4,nv])
+meas2 = np.zeros([4,nv])
+unuse = np.zeros([4,nv])
 for i in range(nv):
     try:
         laprot,laprotw,ei,lcb = measures(npts[i])
@@ -64,21 +66,31 @@ for i in range(nv):
         meas[1,i]=ei[0]
         meas[2,i]=lcb[0]
         meas[3,i]=laprotw[0]
-        unuse[0,i]=laprot[1]
-        unuse[1,i]=ei[1]
-        unuse[2,i]=lcb[1]
-        unuse[3,i]=laprotw[1]
+        meas2[0,i]=laprot[1]
+        meas2[1,i]=ei[1]
+        meas2[2,i]=lcb[1]
+        meas2[3,i]=laprotw[1]
+        unuse[0,i]=laprot[2]
+        unuse[1,i]=ei[2]
+        unuse[2,i]=lcb[2]
+        unuse[3,i]=laprotw[2]
     except:
         pass
 
-f,a = plt.subplots(nrows=2,ncols=1)
-a[0].plot(npts,meas[0,:],'b')
-a[0].plot(npts,meas[1,:],'r')
-a[0].plot(npts,meas[2,:],'g')
-a[0].plot(npts,meas[3,:],'k')
 
-a[1].plot(npts,unuse[0,:],'b')
-a[1].plot(npts,unuse[1,:],'r')
-a[1].plot(npts,unuse[2,:],'g')
-a[1].plot(npts,unuse[3,:],'k')
+f,a = plt.subplots(nrows=3,ncols=1)
+a[0].plot(npts,meas[0,:],'bx')
+a[0].plot(npts,meas[1,:],'rx')
+a[0].plot(npts,meas[2,:],'gx')
+a[0].plot(npts,meas[3,:],'kx')
+
+a[1].plot(npts,unuse[0,:],'bx')
+a[1].plot(npts,unuse[1,:],'rx')
+a[1].plot(npts,unuse[2,:],'gx')
+a[1].plot(npts,unuse[3,:],'kx')
+
+a[2].plot(npts,meas2[0,:],'bx')
+a[2].plot(npts,meas2[1,:],'rx')
+a[2].plot(npts,meas2[2,:],'gx')
+a[2].plot(npts,meas2[3,:],'kx')
 f.savefig('figs/quality.png')

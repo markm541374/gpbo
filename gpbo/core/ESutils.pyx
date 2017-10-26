@@ -5,14 +5,18 @@
 from __future__ import print_function
 xrange=range
 import os
+import sys
 from gpbo.core import GPdc
 from gpbo.core import slice
+import numpy as np
 import scipy as sp
 from scipy import linalg as spl
 from scipy import stats as sps
 from scipy.stats import norm
 import gpbo
 import logging
+from cvxopt.solvers import qp
+from cvxopt import matrix as cm
 logger = logging.getLogger(__name__)
 try:
     from matplotlib import pyplot as plt
@@ -157,7 +161,7 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
 
         if debugoutput['drawlap'] and plots:
             print( "plotting draw_support...",)
-            np = para
+            npa = para
             #print 'para{}'.format(para)
             #print Xst.shape
             n = 200
@@ -176,8 +180,8 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
             CS = ax[1].contour(x_,y_,s_,20)
             ax[0].axis([-1.,1.,-1.,1.])
             ax[1].clabel(CS, inline=1, fontsize=10)
-            for i in range(np):
-                ax[0].plot([Xst[i,0],Xst[i+np,0]],[Xst[i,1],Xst[i+np,1]],'b.-')
+            for i in range(npa):
+                ax[0].plot([Xst[i,0],Xst[i+npa,0]],[Xst[i,1],Xst[i+npa,1]],'b.-')
             for j in range(len(unq)):
                 x = unq[j]
                 ax[0].plot(x[0],x[1],'ro')
@@ -285,6 +289,14 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
             Uvp,Evp,Vvp=spl.svd(varP)
             U.append(Uvp)
             E.append(Evp)
+
+           # if sp.any(E>1e3):
+           #     print('--------------highE\n')
+            #    print('x {}'.format(xm))
+            ##    print('g {}'.format(G))
+            #    print('vg {}'.format(cG))
+            #    print('H {}'.format(H))
+            #    print('cvH {}'.format(cvecH))
             #print '\nat {}\ngrad\n{} \nvargrad\n{} \nhess\n{} \nsvdvargrad\n {}\n{}\nnewcov\n{}\newsvd\n{}\n{}'.format(xm,G,cG,H,Ucg,Ecg,varP,Uvp,Evp)
 
 
@@ -305,21 +317,25 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
                 X[len(unq)*neach:,i] += lb[i]
 
             sp.clip(X,-1,1,out=X)
-        else:
+        elif weighted==1:
             nu = len(unq)
             means = sp.empty(nu)
             vars = sp.empty(nu)
             probs = sp.empty(nu)
             weights = sp.empty(nu,dtype=int)
+            edges = sp.zeros(nu)
+
             for i in range(nu):
                 means[i],vars[i] = g.infer_diag_post(sp.array(unq[i]),[[sp.NaN]])
+                if sp.any(unq[i]<-0.99) or sp.any(unq[i]>0.99):
+                    edges[i]=1
             mn = sp.argmin(means)
             for i in range(nu):
                 probs[i] = norm.cdf(0,loc=means[i]-means[mn],scale=sp.sqrt(vars[i]+vars[mn]))
             #probs[mn] = probs[sp.arange(nu)!=mn].max()
             weights = (sp.maximum(1,n*probs/sp.sum(probs))).astype(int)
             weights[0] = n-sum(weights[1:])
-            print( sp.vstack([means,vars,probs,weights]).T)
+            #print( sp.vstack([edges,means,vars,probs,weights]).T)
             cweights = sp.hstack([0,sp.cumsum(weights)])
             for i in range(len(unq)):
                 X[cweights[i]:cweights[i]+weights[i],:]= U[i].dot(sp.diag(sp.sqrt(E[i])).dot(sp.random.normal(size=[d,weights[i]]))).T
@@ -327,13 +343,48 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
                     X[cweights[i]:cweights[i]+weights[i],j]+=unq[i][j]
 
             sp.clip(X,-1,1,out=X)
+        else:
+            nu = len(unq)
+            Y = np.ones(n)*np.Inf
+            try:
+                fileno = sys.stdout.fileno()
+            except:
+                fileno = sys.stdout
+            with os.fdopen(os.dup(fileno), 'wb') as stdout:
+                with os.fdopen(os.open(os.devnull, os.O_WRONLY), 'wb') as devnull:
+                    sys.stdout.flush();
+                    os.dup2(devnull.fileno(), fileno)  # redirect
+                    for i in range(nu):
+                        M,vM,G,vG,H,Hvec,vH,A,vA = gpbo.core.optutils.gpYGH(g,unq[i])
+                        c = spl.cholesky(vA,lower=True)
+                        draws = A.T+c.dot(sp.random.normal(size=[(d * (d + 1) / 2)+d+1,n]))
+                        conB = np.hstack([1-unq[i],unq[i]+1]).T
+                        conA = np.vstack([np.eye(d),-np.eye(d)])
+                        for j in range(draws.shape[1]):
+                            cons,grad,hess = gpbo.core.optutils.allvec2all(draws[:,j],d)
+                            xr = -spl.solve(hess,grad).flatten()
+                            xd = unq[i].flatten()+xr
+                            if np.any(np.abs(xd)>=1) or np.any(np.diagonal(hess)<0):
+                                try:
+                                    xr = np.array(qp(cm(hess),cm(grad.reshape([d,1])),cm(conA),cm(conB),initvals=cm([0.]*d))['x']).flatten()
+                                    xd = unq[i].flatten()+xr
+                                except:
+                                    xd = np.random.uniform(-1,1,d)
+                                    xr = xd-unq[i].flatten()
+
+                            yd = cons+xr.dot(hess.dot(xr.T))+xr.dot(grad.T)
+                            if yd<Y[j]:
+                                Y[j]=yd
+                                X[j,:]=xd
+                sys.stdout.flush();
+                os.dup2(stdout.fileno(), fileno)
 
         from gpbo.core import debugoutput
 
         if debugoutput['drawlap'] and plots:
             print( "plotting draw_support...",)
 
-            np = para
+            npa = para
             #print 'para{}'.format(para)
             #print Xst.shape
             n = 200
@@ -352,8 +403,8 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
             CS = ax[1].contour(x_,y_,s_,20)
             ax[0].axis([-1.,1.,-1.,1.])
             ax[1].clabel(CS, inline=1, fontsize=10)
-            for i in range(np):
-                ax[0].plot([Xst[i,0],Xst[i+np,0]],[Xst[i,1],Xst[i+np,1]],'b.-')
+            for i in range(npa):
+                ax[0].plot([Xst[i,0],Xst[i+npa,0]],[Xst[i,1],Xst[i+npa,1]],'b.-')
 
             circ=sp.empty([2,100])
             for j in range(len(unq)):
@@ -364,11 +415,6 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
                     theta = 2.*sp.pi*i/99.
                     circ[:,i]=U[j].dot(sp.array([sp.sin(theta)*sp.sqrt(E[j][0]),sp.cos(theta)*sp.sqrt(E[j][1])]))+unq[j].T
                 ax[0].plot(circ[0,:],circ[1,:],'r')
-
-
-
-                #ax[0].plot([x[0],x[0]+(svd[j][2][0,0])*0.1],[x[1],x[1]+(svd[j][2][1,0])*0.1],'g')
-                #ax[0].plot([x[0],x[0]+(svd[j][2][0,1])*0.1],[x[1],x[1]+(svd[j][2][1,1])*0.1],'g')
             fig.savefig(os.path.join(debugoutput['path'],'drawlapaprot'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
             fig.clf()
             plt.close(fig)

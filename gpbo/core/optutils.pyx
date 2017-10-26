@@ -434,6 +434,44 @@ def gpGH(G,x):
     varHvec = varM[d:,d:]
     H = Hvec2H(Hvec,d)
     return G,varG,H,Hvec,varHvec,M,varM
+def allvec2all(L,d):
+
+    y = L[0]
+    M = L.flatten()[1:]
+    G = M[:d]
+    Hvec = M[d:]
+    H = Hvec2H(Hvec,d)
+    return y,G,H
+
+def gpYGH(G,x):
+    """
+    get the mean and joint covariance of y gradient and hessian of a GP returns vectorized H after G after y
+    :param G: a GP
+    :param x: location X
+    :return:
+    """
+    d = G.D
+
+    divs = [[]] * ((d * (d + 1) / 2)+d+1)
+    k = d
+    divs[0]=[np.NaN]
+    for i in xrange(d):
+        divs[i+1]=[i]
+        for j in xrange(i + 1):
+            divs[k+1] = [i, j]
+            k += 1
+    X = sp.vstack([x] * ((d*(d + 1)/2)+d+1) )
+    L,varL = G.infer_full_post(X,divs)
+    y = L[0,0]
+    vary = varL[0,0]
+    M = L[:,1:]
+    varM = L[1:,1:]
+    G = M[:,:d]
+    varG = varM[:d,:d]
+    Hvec = M[:,d:]
+    varHvec = varM[d:,d:]
+    H = Hvec2H(Hvec,d)
+    return y,vary,G,varG,H,Hvec,varHvec,L,varL
 
 def drawconditionH(G,varG,H,Hvec,varHvec,M,varM):
     d=G.size

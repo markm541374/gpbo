@@ -21,7 +21,7 @@ G = gpbo.core.PES.makeG(X,Y,S,D,ki, np.array([1.,0.,0.,0.]),np.array([1.,1.,1.,1
 
 
 def times(f,nmax):
-    nt=50
+    nt=10
 
     times = np.zeros([2,nt])
     for j,n in enumerate([int(i) for i in np.linspace(1,nmax,nt)]):
@@ -38,8 +38,10 @@ def times(f,nmax):
 laprot = lambda n: gpbo.core.ESutils.draw_support(G, lb, ub, n,gpbo.core.ESutils.SUPPORT_LAPAPROT,para=20,pad_unif=False)
 laptimes = times(laprot,5000)
 
+laprotw2 = lambda n: gpbo.core.ESutils.draw_support(G, lb, ub, n,gpbo.core.ESutils.SUPPORT_LAPAPROT,para=20,pad_unif=False,weighted=2)
+lapw2times = times(laprotw2,5000)
 ei = lambda n: gpbo.core.ESutils.draw_support(G, lb, ub, n,gpbo.core.ESutils.SUPPORT_SLICEEI)
-#eitimes = times(ei,200)
+eitimes = times(ei,200)
 
 lcb = lambda n: gpbo.core.ESutils.draw_support(G, lb, ub, n,gpbo.core.ESutils.SUPPORT_SLICELCB,para=2)
 #lcbtimes = times(ei,200)
@@ -69,13 +71,14 @@ def emceeei(n):
     sampler.reset()
     sampler.run_mcmc(p0, max(1,n//nwalkers))
     return sampler.flatchain
-emeitimes = times(emceeei,5000)
+#emeitimes = times(emceeei,5000)
 
 f,ax = plt.subplots(nrows=1, ncols=1,figsize=[8,8])
 ax.plot(laptimes[0,:],laptimes[1,:],'b')
-#ax.plot(eitimes[0,:],eitimes[1,:],'r-.')
+ax.plot(lapw2times[0,:],lapw2times[1,:],'r')
+ax.plot(eitimes[0,:],eitimes[1,:],'g')
 #ax.plot(lcbtimes[0,:],lcbtimes[1,:],'g-.')
-ax.plot(emeitimes[0,:],emeitimes[1,:],'g')
+#ax.plot(emeitimes[0,:],emeitimes[1,:],'g')
 
 
 f.savefig('figs/timedemo.png')
