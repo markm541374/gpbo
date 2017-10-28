@@ -203,17 +203,18 @@ def PESfsaq(optstate,persist,**para):
     [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],para)
 
     logger.info('DIRECT found max PES at {} {}'.format(xmin,ierror))
-    lhyp = sp.log10([k.hyp for k in pesobj.G.kf])
-    lhmean = sp.mean(lhyp, axis=0)
-    lhstd = sp.sqrt(sp.var(lhyp, axis=0))
-    lhmin = lhyp.min(axis=0)
-    lhmax = lhyp.max(axis=0)
-    logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean,lhstd,lhmin,lhmax))
 
+    hyp = sp.array([k.hyp for k in pesobj.G.kf])
+    hmean = sp.mean(hyp, axis=0)
+    hstd = sp.sqrt(sp.var(hyp, axis=0))
+    hmin = hyp.min(axis=0)
+    hmax = hyp.max(axis=0)
+    hmed = sp.median(hyp,axis=0)
+    logger.debug('hyperparameters:\nmean {}\nmedian {}\nstd {}\nmin {}\nmax {}'.format(hmean,hmed,hstd,hmin,hmax))
     m,v = pesobj.G.infer_diag_post(xmin,[[sp.NaN]])
     PIatX = sp.stats.norm.cdf(min(y),loc=m[0,0],scale=sp.sqrt(v[0,0]))
     persist['overhead']=time.clock()-t0
-    return [i for i in xmin],para['ev'],persist,{'AQvalue':-ymin,'logHYPstats':{'mean':lhmean,'std':lhstd,'min':lhmin,'max':lhmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],'PIatX':PIatX}
+    return [i for i in xmin],para['ev'],persist,{'AQvalue':-ymin,'HYPstats':{'mean':hmean,'std':hstd,'min':hmin,'max':hmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],'PIatX':PIatX}
 
 
 
