@@ -587,6 +587,8 @@ def plot_gp(g,axis,x,d):
 
 #draw hyperparameters given data from posterior likelihood
 def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1,prior='lognorm'):
+    if not X.flags['C_CONTIGUOUS']:
+        X = np.ascontiguousarray(X)
     if prior=='lognorm':
         ub = hm+2.8*hs
         lb = hm-2.8*hs
@@ -631,7 +633,7 @@ def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1,prior='lognorm'):
                     raise MJMError('nan from GPLKonly with input')
             else:
                 r=-1e99
-            #print [loghyp, r]
+            print(hyp, r)
             return r
 
         starts = sp.vstack([hm*hs]*chains)

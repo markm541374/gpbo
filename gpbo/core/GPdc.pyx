@@ -38,7 +38,6 @@ cbool = ct.c_bool
 
 class GP_LKonly:
     def __init__(self, X_s, Y_s, S_s, D_s, kf):
-
         cdef int n, D, i
         n ,D = X_s.shape
         self.hyp = kf.hyp
@@ -391,6 +390,8 @@ class gen_lin1_k_d():
         return r
 
 def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=20000,fg=-1e9):
+    if not X.flags['C_CONTIGUOUS']:
+        X = np.ascontiguousarray(X)
     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
     ns=X.shape[0]
     dim = X.shape[1]
@@ -405,6 +406,8 @@ def searchMLEhyp(X,Y,S,D,lb,ub, ki, mx=20000,fg=-1e9):
 
 
 def searchMAPhyp(X,Y,S,D,m,s, ki, MAPmargin = 1.8, mx=20000,fg=-1e9):
+    if not X.flags['C_CONTIGUOUS']:
+        X = np.ascontiguousarray(X)
     libGP.SetHypSearchPara(cint(mx),ct.c_double(fg))
     ns=X.shape[0]
     dim = X.shape[1]
