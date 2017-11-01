@@ -37,9 +37,9 @@ def makeG(X,Y,S,D,kindex,mprior,sprior,nh,chains=1,prior='lognorm'):
     
     return G
 
-def drawmins(G,n,lb,ub,SUPPORT=300,mode = [ESutils.SUPPORT_SLICELCB],SLICELCB_PARA=1.):
+def drawmins(G,n,lb,ub,SUPPORT=300,mode = [ESutils.SUPPORT_SLICELCB],SLICELCB_PARA=1.,weighted=False):
     #draw support points
-    W = sp.vstack([ESutils.draw_support(G, lb,ub,SUPPORT/len(mode),m, para = SLICELCB_PARA) for m in mode])
+    W = sp.vstack([ESutils.draw_support(G, lb,ub,SUPPORT/len(mode),m, para = SLICELCB_PARA,weighted=weighted) for m in mode])
 
     R = ESutils.draw_min(G,W,n)
     #draw in samples on the support
@@ -245,7 +245,7 @@ def Vadj(m,V):
 
 #basic PES class if search_pes is used. variable noise if search_acq is used
 class PES:
-    def __init__(self,X,Y,S,D,lb,ub,kindex,mprior,sprior,DH_SAMPLES=8,DM_SAMPLES=8, DM_SUPPORT=400,DM_SLICELCBPARA=1.,mode=ESutils.SUPPORT_SLICELCB,noS=False,DM_DROP=True,preselectH=False):
+    def __init__(self,X,Y,S,D,lb,ub,kindex,mprior,sprior,DH_SAMPLES=8,DM_SAMPLES=8, DM_SUPPORT=400,DM_SLICELCBPARA=1.,mode=ESutils.SUPPORT_SLICELCB,noS=False,DM_DROP=True,preselectH=False,weighted=False,prior='lognorm'):
         print( "PES init:")
         self.lb=lb
         self.ub=ub
@@ -253,12 +253,12 @@ class PES:
         if noS:
             S=sp.zeros(S.shape)
         if not preselectH:
-            self.G = makeG(X,Y,S,D,kindex,mprior,sprior,DH_SAMPLES)
+            self.G = makeG(X,Y,S,D,kindex,mprior,sprior,DH_SAMPLES,prior=prior)
         else:
             logger.info('reusing preselected hyperparameters')
             self.G =  GPdc.GPcore(X,Y,S,D, [GPdc.kernel(kindex, X.shape[1], h) for h in preselectH])
         HS = sp.vstack([k.hyp for k in self.G.kf])
-        self.Z = drawmins(self.G,DM_SAMPLES,lb,ub,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode)
+        self.Z = drawmins(self.G,DM_SAMPLES,lb,ub,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode,weighted=weighted)
         #print "mindraws: "+str(self.Z)
         self.Ga = [GPdc.GPcore(*addmins(self.G, X, Y, S, D, self.Z[i, :],dropedge=DM_DROP) + [self.G.kf]) for i in xrange(DM_SAMPLES)]
     def __del__(self):

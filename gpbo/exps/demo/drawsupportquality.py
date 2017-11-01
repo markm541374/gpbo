@@ -5,21 +5,21 @@ from gpbo.core import objectives
 import gpbo
 import time
 import pandas as pd
+import sys
 ki = gpbo.core.GPdc.MAT52
-lb = np.array([-1.,-1.])
-ub = np.array([1.,1.])
 Dim=2
+lb = np.array([-1.]*Dim)
+ub = np.array([1.]*Dim)
 
-mpri = np.array([1.,0.,0.])
-spri = np.array([1.,1.,1.])
+mpri = np.array([1.]+[0.]*Dim)
+spri = np.array([1.]*(Dim+1))
 #mpri=np.array([2.]+[3.]*Dim)
 #spri=np.array([0.5]+[0.15]*Dim)
-def measures(n):
+def measures(n,f):
     print('measures with n={}'.format(n))
-    f = 'results/pesfsd2.csv'
     names = (open(f).readline().strip('\n')+''.join([',q{}'.format(i) for i in range(5)])).replace(' ','')
     df = pd.read_csv(f,names=names.split(','),skiprows=1,engine='c')
-    X = np.vstack([df['x0'].values[:n],df['x1'].values[:n]]).T
+    X = np.vstack([df['x{}'.format(i)].values[:n] for i in range(Dim)]).T
     Y = df['y'].values[:n].reshape([X.shape[0],1])
     S = df['s'].values[:n].reshape([X.shape[0],1])
     D = [[np.NaN]]*n
@@ -51,77 +51,100 @@ def measures(n):
         q = 1./float(m)
         return np.sum(-p*np.log(q/p)),np.mean(M),np.sum(c==0)
 
-
-    f,a = plt.subplots(nrows=4,ncols=2,figsize=[12,17])
+    plot=False
+    if plot:
+        f,a = plt.subplots(nrows=4,ncols=2,figsize=[12,17])
     m = 1000
+    def plotdraw(Z,a):
+        a.plot(Z[:,0],Z[:,1],'b.')
+        P = G.draw_post(Z,[[np.NaN]]*m,1000)
+        A = np.argmin(P,axis=1)
+        a.plot(Z[:,0][A],Z[:,1][A],'r.')
+        return
     try:
+        t0=time.clock()
         Z = gpbo.core.ESutils.draw_support(G, lb, ub, m,gpbo.core.ESutils.SUPPORT_LAPAPROT,para=12,pad_unif=False)
-        laprot = kl(Z,G)
-        a[0,0].plot(Z[:,0],Z[:,1],'b.')
-        P = G.draw_post(Z,[[np.NaN]]*m,1000)
-        A = np.argmin(P,axis=1)
-        a[0,0].plot(Z[:,0][A],Z[:,1][A],'r.')
+        T = time.clock()-t0
+        laprot = list(kl(Z,G))
+        laprot.append(T)
+        if plot:
+            plotdraw(Z,a[0,0])
     except:
-        laprot = [np.Inf,np.Inf,np.Inf]
+        laprot = [np.Inf,np.Inf,np.Inf,np.Inf]
     try:
+        t0=time.clock()
         Z = gpbo.core.ESutils.draw_support(G, lb, ub, m,gpbo.core.ESutils.SUPPORT_LAPAPROT,para=12,pad_unif=False,weighted=2)
-        laprotw = kl(Z,G)
-        a[0,1].plot(Z[:,0],Z[:,1],'b.')
-        P = G.draw_post(Z,[[np.NaN]]*m,1000)
-        A = np.argmin(P,axis=1)
-        a[0,1].plot(Z[:,0][A],Z[:,1][A],'r.')
+        T = time.clock()-t0
+        laprotw = list(kl(Z,G))
+        laprotw.append(T)
+        if plot:
+            plotdraw(Z,a[0,1])
     except:
-        laprotw = [np.Inf,np.Inf,np.Inf]
+        laprotw = [np.Inf,np.Inf,np.Inf,np.Inf]
 
     try:
+        t0=time.clock()
         Z = gpbo.core.ESutils.draw_support(G, lb, ub, m,gpbo.core.ESutils.SUPPORT_SLICEEI)
-        ei = kl(Z,G)
-        a[1,0].plot(Z[:,0],Z[:,1],'b.')
-        P = G.draw_post(Z,[[np.NaN]]*m,1000)
-        A = np.argmin(P,axis=1)
-        a[1,0].plot(Z[:,0][A],Z[:,1][A],'r.')
+        T = time.clock()-t0
+        ei = list(kl(Z,G))
+        ei.append(T)
+        if plot:
+            plotdraw(Z,a[1,0])
     except:
-        ei = [np.Inf,np.Inf,np.Inf]
+        ei = [np.Inf,np.Inf,np.Inf,np.Inf]
     try:
+        t0=time.clock()
         Z = gpbo.core.ESutils.draw_support(G, lb, ub, m,gpbo.core.ESutils.SUPPORT_SLICELCB,para=2)
-        lcb = kl(Z,G)
-        a[1,1].plot(Z[:,0],Z[:,1],'b.')
-        P = G.draw_post(Z,[[np.NaN]]*m,1000)
-        A = np.argmin(P,axis=1)
-        a[1,1].plot(Z[:,0][A],Z[:,1][A],'r.')
+        T = time.clock()-t0
+        lcb = list(kl(Z,G))
+        lcb.append(T)
+        if plot:
+            plotdraw(Z,a[1,1])
     except:
-        lcb = [np.Inf,np.Inf,np.Inf]
+        lcb = [np.Inf,np.Inf,np.Inf,np.Inf]
 
     try:
+        t0=time.clock()
         Z = gpbo.core.ESutils.draw_support(G.D, lb, ub, m,gpbo.core.ESutils.SUPPORT_UNIFORM)
-        unif = kl(Z,G)
-        a[2,0].plot(Z[:,0],Z[:,1],'b.')
-        P = G.draw_post(Z,[[np.NaN]]*m,1000)
-        A = np.argmin(P,axis=1)
-        a[2,0].plot(Z[:,0][A],Z[:,1][A],'r.')
+        T = time.clock()-t0
+        unif = list(kl(Z,G))
+        unif.append(T)
+        if plot:
+            plotdraw(Z,a[2,0])
     except:
-        unif = [np.Inf,np.Inf,np.Inf]
+        unif = [np.Inf,np.Inf,np.Inf,np.Inf]
 
+    if plot:
+        l = 200
+        x_ = sp.linspace(-1,1,l)
+        y_ = sp.linspace(-1,1,l)
+        z_ = sp.empty([l,l])
+        s_ = sp.empty([l,l])
+        for i in range(l):
+            for j in range(l):
+                m_,v_ = G.infer_diag_post(sp.array([y_[j],x_[i]]),[[sp.NaN]])
+                z_[i,j] = m_[0,0]
+                s_[i,j] = sp.sqrt(v_[0,0])
+        CS = a[2,1].contour(x_,y_,z_,20)
+        a[2,1].clabel(CS, inline=1, fontsize=10)
+        CS = a[3,1].contour(x_,y_,s_,20)
+        a[3,1].clabel(CS, inline=1, fontsize=10)
+        f.savefig('dbout/h{}.svg'.format(n))
+    plt.close(f)
 
-    l = 200
-    x_ = sp.linspace(-1,1,l)
-    y_ = sp.linspace(-1,1,l)
-    z_ = sp.empty([l,l])
-    s_ = sp.empty([l,l])
-    for i in range(l):
-        for j in range(l):
-            m_,v_ = G.infer_diag_post(sp.array([y_[j],x_[i]]),[[sp.NaN]])
-            z_[i,j] = m_[0,0]
-            s_[i,j] = sp.sqrt(v_[0,0])
-    CS = a[2,1].contour(x_,y_,z_,20)
-    a[2,1].clabel(CS, inline=1, fontsize=10)
-    CS = a[3,1].contour(x_,y_,s_,20)
-    a[3,1].clabel(CS, inline=1, fontsize=10)
-    f.savefig('dbout/{}.svg'.format(n))
     return laprot,laprotw,ei,lcb,unif
 
 
-npts = np.linspace(10,80,8).astype(int)
+with open('results/d2support.csv','w') as f:
+    f.write('n,LRkl,LRy,LRm,LRt,LHkl,LHy,LHm,LHt,EIkl,EIy,EIm,EIt,CBkl,CBy,CBm,CBt,Ukl,Uy,Um,Ut\n')
+for i in np.arange(10,60):
+    with open('results/d2support.csv','a') as f:
+        res=np.hstack([[i],np.hstack(measures(i,'results/pesfsd.csv'))])
+        f.write(','.join([str(j) for j in res])+'\n')
+
+sys.exit(0)
+
+npts = np.linspace(10,120,30).astype(int)
 nv = npts.size
 f,a = plt.subplots(nrows=3,ncols=1)
 a[0].set_yscale('log')
@@ -146,4 +169,4 @@ for i in range(nv):
     a[2].plot(npts[i],ei[2],'g.')
     a[2].plot(npts[i],lcb[2],'k.')
     a[2].plot(npts[i],unif[2],'m.')
-    f.savefig('figs/quality.svg')
+    f.savefig('figs/qualityh.svg')

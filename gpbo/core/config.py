@@ -151,7 +151,7 @@ class eihypdefault():
         self.path = path
         self.fname = fname
         return
-class pesfsdefault():
+class pesfsdefault(object):
     def __init__(self,f,D,n,s,path,fname,ninit=10):
         self.aqfn = gpbo.core.acquisitions.PESfsaq
         self.aqpara= {
@@ -203,6 +203,16 @@ class pesfsdefault():
         self.path = path
         self.fname = fname
         return
+
+class pesfspredictive(pesfsdefault):
+    def __init__(self,*args,**kwargs):
+        super(pesfspredictive,self).__init__(*args,**kwargs)
+        D = len(self.aqpara['lb'])
+        self.reccpara['kindex']=self.aqpara['kindex']= GPdc.MAT52
+        self.reccpara['mprior']=self.aqpara['mprior']= sp.array([2.]+[3.]*D)
+        self.reccpara['sprior']=self.aqpara['sprior']= sp.array([0.5]+[0.15]*D)
+        self.reccpara['priorshape']=self.aqpara['priorshape']='gamma'
+        self.aqpara['weighted']=2
 
 class pesvsdefault():
     def __init__(self,f,cfn,D,n,lsl,lsu,path,fname):

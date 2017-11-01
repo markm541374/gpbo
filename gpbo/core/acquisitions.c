@@ -1586,6 +1586,7 @@ static const char __pyx_k_strftime[] = "strftime";
 static const char __pyx_k_subplots[] = "subplots";
 static const char __pyx_k_traincfn[] = "traincfn";
 static const char __pyx_k_transfer[] = "transfer";
+static const char __pyx_k_weighted[] = "weighted";
 static const char __pyx_k_DH_CHAINS[] = "DH_CHAINS";
 static const char __pyx_k_aqoptions[] = "aqoptions";
 static const char __pyx_k_cmaesaq_x[] = "cmaesaq x {}";
@@ -2037,6 +2038,7 @@ static PyObject *__pyx_n_s_vmaxaq;
 static PyObject *__pyx_n_s_vmaxaq_locals_wrap;
 static PyObject *__pyx_n_s_vmaxaqplot;
 static PyObject *__pyx_n_s_vstack;
+static PyObject *__pyx_n_s_weighted;
 static PyObject *__pyx_n_s_wrap;
 static PyObject *__pyx_n_s_x;
 static PyObject *__pyx_n_s_x_2;
@@ -9315,7 +9317,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_8PESfsaq(CYTHON_UNUSED PyOb
  *     if 'choosereturn' in para.keys():
  *         if 'reuseH' in para['choosereturn'].keys():             # <<<<<<<<<<<<<<
  *             presetH = para['choosereturn']['reuseH']
- *     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH)
+ *     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH,weighted=para['weighted'],prior=para['priorshape'])
  */
     __pyx_t_10 = PyObject_GetItem(__pyx_v_para, __pyx_n_s_choosereturn); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 200, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
@@ -9349,7 +9351,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_8PESfsaq(CYTHON_UNUSED PyOb
  *     if 'choosereturn' in para.keys():
  *         if 'reuseH' in para['choosereturn'].keys():
  *             presetH = para['choosereturn']['reuseH']             # <<<<<<<<<<<<<<
- *     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH)
+ *     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH,weighted=para['weighted'],prior=para['priorshape'])
  *     [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],para)
  */
       __pyx_t_3 = PyObject_GetItem(__pyx_v_para, __pyx_n_s_choosereturn); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
@@ -9365,7 +9367,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_8PESfsaq(CYTHON_UNUSED PyOb
  *     if 'choosereturn' in para.keys():
  *         if 'reuseH' in para['choosereturn'].keys():             # <<<<<<<<<<<<<<
  *             presetH = para['choosereturn']['reuseH']
- *     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH)
+ *     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH,weighted=para['weighted'],prior=para['priorshape'])
  */
     }
 
@@ -9381,7 +9383,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_8PESfsaq(CYTHON_UNUSED PyOb
   /* "gpbo/core/acquisitions.pyx":202
  *         if 'reuseH' in para['choosereturn'].keys():
  *             presetH = para['choosereturn']['reuseH']
- *     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH)             # <<<<<<<<<<<<<<
+ *     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH,weighted=para['weighted'],prior=para['priorshape'])             # <<<<<<<<<<<<<<
  *     [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],para)
  * 
  */
@@ -9460,6 +9462,14 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_8PESfsaq(CYTHON_UNUSED PyOb
   if (PyDict_SetItem(__pyx_t_11, __pyx_n_s_DM_DROP, __pyx_t_4) < 0) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (PyDict_SetItem(__pyx_t_11, __pyx_n_s_preselectH, __pyx_v_presetH) < 0) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_4 = PyObject_GetItem(__pyx_v_para, __pyx_n_s_weighted); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  if (PyDict_SetItem(__pyx_t_11, __pyx_n_s_weighted, __pyx_t_4) < 0) __PYX_ERR(0, 202, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = PyObject_GetItem(__pyx_v_para, __pyx_n_s_priorshape); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  if (PyDict_SetItem(__pyx_t_11, __pyx_n_s_prior, __pyx_t_4) < 0) __PYX_ERR(0, 202, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_11); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -9470,7 +9480,7 @@ static PyObject *__pyx_pf_4gpbo_4core_12acquisitions_8PESfsaq(CYTHON_UNUSED PyOb
 
   /* "gpbo/core/acquisitions.pyx":203
  *             presetH = para['choosereturn']['reuseH']
- *     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH)
+ *     pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH,weighted=para['weighted'],prior=para['priorshape'])
  *     [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],para)             # <<<<<<<<<<<<<<
  * 
  *     logger.info('DIRECT found max PES at {} {}'.format(xmin,ierror))
@@ -26909,6 +26919,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_vmaxaq_locals_wrap, __pyx_k_vmaxaq_locals_wrap, sizeof(__pyx_k_vmaxaq_locals_wrap), 0, 0, 1, 1},
   {&__pyx_n_s_vmaxaqplot, __pyx_k_vmaxaqplot, sizeof(__pyx_k_vmaxaqplot), 0, 0, 1, 1},
   {&__pyx_n_s_vstack, __pyx_k_vstack, sizeof(__pyx_k_vstack), 0, 0, 1, 1},
+  {&__pyx_n_s_weighted, __pyx_k_weighted, sizeof(__pyx_k_weighted), 0, 0, 1, 1},
   {&__pyx_n_s_wrap, __pyx_k_wrap, sizeof(__pyx_k_wrap), 0, 0, 1, 1},
   {&__pyx_n_s_x, __pyx_k_x, sizeof(__pyx_k_x), 0, 0, 1, 1},
   {&__pyx_n_s_x_2, __pyx_k_x_2, sizeof(__pyx_k_x_2), 0, 0, 1, 1},

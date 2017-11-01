@@ -137,6 +137,7 @@ def genmat52ojf(d,lb,ub,A=1.,ls=0.3,fixs=-1,ki=GPdc.MAT52):
         ls = [ls]*d
     #nt=sp.maximum(250,sp.minimum(int(d*100./sp.product(ls)),3000))
     nt=sp.maximum(150,sp.minimum(int(d*20./sp.product(ls)),2500))
+    #print(nt)
     #nt=500
 
     s=1e-9
@@ -146,7 +147,7 @@ def genmat52ojf(d,lb,ub,A=1.,ls=0.3,fixs=-1,ki=GPdc.MAT52):
             [X,Y,S,D] = gen_dataset(nt, d, lb, ub, ki, sp.array([A] + ls ),s=1e-9)
             break
         except:
-            pass
+            raise
 
    # from matplotlib import pyplot as plt
    # plt.figure()

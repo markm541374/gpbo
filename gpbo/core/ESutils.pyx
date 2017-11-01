@@ -344,6 +344,7 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
 
             sp.clip(X,-1,1,out=X)
         else:
+            print('using complex approx')
             nu = len(unq)
             Y = np.ones(n)*np.Inf
             try:
@@ -633,7 +634,7 @@ def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1,prior='lognorm'):
                     raise MJMError('nan from GPLKonly with input')
             else:
                 r=-1e99
-            print(hyp, r)
+            #print(hyp, r)
             return r
 
         starts = sp.vstack([hm*hs]*chains)

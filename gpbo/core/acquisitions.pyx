@@ -199,7 +199,7 @@ def PESfsaq(optstate,persist,**para):
     if 'choosereturn' in para.keys():
         if 'reuseH' in para['choosereturn'].keys():
             presetH = para['choosereturn']['reuseH']
-    pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH)
+    pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH,weighted=para['weighted'],prior=para['priorshape'])
     [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],para)
 
     logger.info('DIRECT found max PES at {} {}'.format(xmin,ierror))
