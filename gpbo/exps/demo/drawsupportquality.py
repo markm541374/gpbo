@@ -7,7 +7,7 @@ import time
 import pandas as pd
 import sys
 ki = gpbo.core.GPdc.MAT52
-Dim=2
+Dim=4
 lb = np.array([-1.]*Dim)
 ub = np.array([1.]*Dim)
 
@@ -135,11 +135,11 @@ def measures(n,f):
     return laprot,laprotw,ei,lcb,unif
 
 
-with open('results/d2support.csv','w') as f:
+with open('results/d4support.csv','w') as f:
     f.write('n,LRkl,LRy,LRm,LRt,LHkl,LHy,LHm,LHt,EIkl,EIy,EIm,EIt,CBkl,CBy,CBm,CBt,Ukl,Uy,Um,Ut\n')
 for i in np.arange(10,60):
-    with open('results/d2support.csv','a') as f:
-        res=np.hstack([[i],np.hstack(measures(i,'results/pesfsd.csv'))])
+    with open('results/d4support.csv','a') as f:
+        res=np.hstack([[i],np.hstack(measures(i,'results/pesfs4d.csv'))])
         f.write(','.join([str(j) for j in res])+'\n')
 
 sys.exit(0)
