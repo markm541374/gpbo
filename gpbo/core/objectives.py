@@ -44,7 +44,6 @@ def shifthart3(x, **ev):
                          [4699, 4387, 7470],
                          [1091, 8732, 5547],
                          [381, 5743, 8828]])
-
     outer = 0
     for ii in range(4):
         inner = 0
@@ -53,8 +52,6 @@ def shifthart3(x, **ev):
             Aij = A[ii, jj]
             Pij = P[ii, jj]
             inner += Aij * (xj - Pij)**2
-
-
 
         new = al[ii] * sp.exp(-inner)
         outer = outer + new
@@ -92,7 +89,6 @@ def shifthart6(x, **ev):
                            [2329., 4135., 8307., 3736., 1004., 9991.],
                            [2348., 1451., 3522., 2883., 3047., 6650.],
                            [4047., 8828., 8732., 5743., 1091., 381.]])
-
     outer = 0
     for ii in range(4):
         inner = 0
@@ -101,8 +97,6 @@ def shifthart6(x, **ev):
             Aij = A[ii, jj]
             Pij = P[ii, jj]
             inner += Aij * (xj - Pij)**2
-
-
 
         new = al[ii] * sp.exp(-inner)
         outer = outer + new
@@ -131,6 +125,82 @@ def rosenojf(x,**ev):
 rosenxmin=[0.2,0.2]
 rosenymin=0.
 
+
+def shiftshekel5(x,**ev):
+    #shekel4d fn m=5 shifted to [-1,1]^4, min at 0
+    z = [5.*xi+5. for xi in x]
+    b = 0.1*sp.array([1.,2.,2.,4.,4.,6.,3.,7.,5.,5.])
+    C = sp.array([[4., 1., 8., 6., 3., 2., 5., 8., 6., 7.0],
+                  [4., 1., 8., 6., 7., 9., 3., 1., 2., 3.6],
+                  [4., 1., 8., 6., 3., 2., 5., 8., 6., 7.0],
+                  [4., 1., 8., 6., 7., 9., 3., 1., 2., 3.6]])
+
+    acco= 0
+    for i in range(5):
+        acci = 0
+        for j in range(4):
+            acci += (z[j]-C[j,i])**2
+        acco-= 1./(acci+b[i])
+    f = acco+10.153195850979039072035
+    print( 'f inputs x:{} ev:{} outputs y:{}  '.format(z, ev, f))
+    return f, 1., dict()
+
+def shiftshekel7(x,**ev):
+    #shekel4d fn m=7 shifted to [-1,1]^4, min at 0
+    z = [5.*xi+5. for xi in x]
+    b = 0.1*sp.array([1.,2.,2.,4.,4.,6.,3.,7.,5.,5.])
+    C = sp.array([[4., 1., 8., 6., 3., 2., 5., 8., 6., 7.0],
+                  [4., 1., 8., 6., 7., 9., 3., 1., 2., 3.6],
+                  [4., 1., 8., 6., 3., 2., 5., 8., 6., 7.0],
+                  [4., 1., 8., 6., 7., 9., 3., 1., 2., 3.6]])
+
+    acco= 0
+    for i in range(7):
+        acci = 0
+        for j in range(4):
+            acci += (z[j]-C[j,i])**2
+        acco-= 1./(acci+b[i])
+    f = acco+10.4028188369303046476802
+    print( 'f inputs x:{} ev:{} outputs y:{}  '.format(z, ev, f))
+    return f, 1., dict()
+
+def shiftshekel10(x,**ev):
+    #shekel4d fn m=10 shifted to [-1,1]^4, min at 0
+    z = [5.*xi+5. for xi in x]
+    b = 0.1*sp.array([1.,2.,2.,4.,4.,6.,3.,7.,5.,5.])
+    C = sp.array([[4., 1., 8., 6., 3., 2., 5., 8., 6., 7.0],
+                  [4., 1., 8., 6., 7., 9., 3., 1., 2., 3.6],
+                  [4., 1., 8., 6., 3., 2., 5., 8., 6., 7.0],
+                  [4., 1., 8., 6., 7., 9., 3., 1., 2., 3.6]])
+
+    acco= 0
+    for i in range(10):
+        acci = 0
+        for j in range(4):
+            acci += (z[j]-C[j,i])**2
+        acco-= 1./(acci+b[i])
+    f = acco+10.5362837262196020977228
+    print( 'f inputs x:{} ev:{} outputs y:{}  '.format(z, ev, f))
+    return f, 1., dict()
+
+def camel3(x,**ev):
+    #3hump camel funciton
+    z = [0.2*xi for xi in x]
+    f = 2*z[0]**2-1.05*z[0]**4+(z[0]**6)/6. +z[0]*z[1] + z[1]**2
+    return f,1,dict()
+
+def camel6(x,**ev):
+    #6hump camel funciton
+    z = [x[0]*3.,x[1]*2.]
+    f = (4.-2.1*z[0]**2 + (z[0]**4)/3.)*z[0]**2 + z[0]*z[1] + (-4 + 4*z[1]**2)*z[1]**2
+    fs = f + 1.03162845348987744408920985
+    return fs,1,dict()
+
+def colville(x,**ev):
+    #colville funciton (4d)
+    z = [xi*10. for xi in x]
+    f = 100*(z[0]**2 -z[1])**2 + (z[0]-1)**2 + (z[2]-1)**2 + 90*(z[2]**2 -z[3])**2 + 10.1*((z[1]-1)**2+(z[3]-1)**2) + 19.8*(z[1]-1)*(z[3]-1)
+    return f,1,dict()
 def genmat52ojf(d,lb,ub,A=1.,ls=0.3,fixs=-1,ki=GPdc.MAT52):
     from ESutils import gen_dataset
     if isinstance(ls,float):

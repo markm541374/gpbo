@@ -54,7 +54,7 @@ def globallocalregret(optstate,persist,**para):
     s = sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx = [e['d'] for e in optstate.ev]
     logger.info('building GP')
-    G = PES.makeG(x, y, s, dx, para['kindex'], para['mprior'], para['sprior'], para['nhyp'])
+    G = PES.makeG(x, y, s, dx, para['kindex'], para['mprior'], para['sprior'], para['nhyp'],prior=para['priorshape'])
     logger.critical('mean hyp{}'.format(sp.mean(sp.vstack([k.hyp for k in G.kf]),axis=0)))
     #MAP = gpbo.core.GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
     #logger.critical('{}'.format(MAP))
@@ -67,10 +67,10 @@ def globallocalregret(optstate,persist,**para):
     mvmax,vvmax = [j[0,0] for j in G.infer_diag_post(xvmax,[[sp.NaN]])]
     logger.info('post var max {} at {} with mean {} ({})'.format(vvmax,xvmax,mvmax,ierror))
 
-    xtrue = sp.array([[-0.597,-0.700,-0.046,-0.449,-0.377,0.315]])
-    xm,xv = G.infer_diag_post(xtrue,[[sp.NaN]])
-    xe = G.infer_EI_post(xtrue,[[sp.NaN]])
-    logger.critical('m,v,EI at truemin {} {} {}'.format(xm,sp.sqrt(xv),xe))
+    #xtrue = sp.array([[-0.597,-0.700,-0.046,-0.449,-0.377,0.315]])
+    #xm,xv = G.infer_diag_post(xtrue,[[sp.NaN]])
+    #xe = G.infer_EI_post(xtrue,[[sp.NaN]])
+    #logger.critical('m,v,EI at truemin {} {} {}'.format(xm,sp.sqrt(xv),xe))
     #get dims that are on teh edge
     dropdims=[]
     for i in range(d):

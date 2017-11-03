@@ -163,7 +163,7 @@ class optimizer:
             aqaux['host'] = os.uname()[1]
 
             taildata0 = ','.join([str(k)+' '+sanitize(str(aqaux[k])) for k in aqaux.keys()])
-            taildata1 = ','.join([str(k)+' '+sanitize(str(aqaux[k])) for k in chooseaux.keys()])
+            taildata1 = ','.join([str(k)+' '+sanitize(str(chooseaux[k])) for k in chooseaux.keys()])
             logstr = ''.join([str(stepn)+', ']+[str(xi)+', ' for xi in x]+[str(evi[1])+', ' for evi in ev.items()]+[str(y)+', ']+[str(c)+', ']+[str(ri)+', ' for ri in rx]+[str(checky)+',']+[str(i)+', ' for i in [t1-t0,t2-t1,t3-t2]]+[time.strftime('%H:%M:%S  %d-%m-%y')])+',{},'.format(self.state.conditionV)+taildata0 + taildata1+'\n'
             lf.write(logstr)
             lf.flush()

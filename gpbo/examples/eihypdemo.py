@@ -2,7 +2,7 @@ import gpbo
 import scipy as sp
 
 
-D=2
+D=4
 n=10
 s=0.
 
@@ -28,12 +28,15 @@ def fdf(x, **ev):
             n=0
     print('f inputs x:{} ev:{} outputs y:{} (n:{}) c:{}'.format(x, ev, y + n, n, c))
     return F + n, c, dict()
-
-C=gpbo.core.config.eihypdefault(fdf,D,n,s,'results','eihyp.csv')
-C.ojfchar['batchgrad']=True
-C.stoppara = {'nmax': 50}
+f = gpbo.core.objectives.colville
+q=f([0.1,0.1,0.1,0.1],**{})
+C=gpbo.core.config.eihypdefault(f,D,n,s,'results','eihyp3.csv')
+#C=gpbo.core.config.pesfsdefault(f,D,n,s,'results','pesfs.csv')
+C.aqpara['nrandinit']=C.reccpara['onlyafter']=20
+#C.ojfchar['batchgrad']=True
+C.stoppara = {'nmax': 250}
 C.stopfn = gpbo.core.optimize.nstopfn
-C.aqpara['mprior']= sp.array([2.,1.,2.])
+#C.aqpara['mprior']= sp.array([2.,1.,2.])
 
 out = gpbo.search(C)
 print(out)
