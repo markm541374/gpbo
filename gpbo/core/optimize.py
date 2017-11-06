@@ -273,6 +273,12 @@ def wrap(fn,optstate,persist,**para):
         logger.error('numerical error in {} fn Raising noise to {}\n\n {}'.format(str(fn),optstate.condition,e))
         return wrap(fn,optstate,persist,**para)
 
+    except np.linalg.linalg.LinAlgError as e:
+        traceback.print_exc()
+        optstate.condition=max(optstate.condition+1.,-19.)
+        optstate.conditionV=10**optstate.condition
+        logger.error('numerical error in {} fn Raising noise to {}\n\n {}'.format(str(fn),optstate.condition,e))
+        return wrap(fn,optstate,persist,**para)
 def search(optconfig,initdata=False):
     if not hasattr(optconfig,'fname'):
         optconfig.fname='traces.csv'

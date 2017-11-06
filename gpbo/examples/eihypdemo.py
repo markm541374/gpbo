@@ -30,8 +30,8 @@ def fdf(x, **ev):
     return F + n, c, dict()
 f = gpbo.core.objectives.colville
 q=f([0.1,0.1,0.1,0.1],**{})
-C=gpbo.core.config.eihypdefault(f,D,n,s,'results','eihyp3.csv')
-#C=gpbo.core.config.pesfsdefault(f,D,n,s,'results','pesfs.csv')
+#C=gpbo.core.config.eihypdefault(f,D,n,s,'results','eihyp3.csv')
+C=gpbo.core.config.pesfspredictive(f,D,n,s,'results','pesfs.csv')
 C.aqpara['nrandinit']=C.reccpara['onlyafter']=20
 #C.ojfchar['batchgrad']=True
 C.stoppara = {'nmax': 250}

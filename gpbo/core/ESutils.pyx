@@ -131,7 +131,6 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
             if min(tmp)>0.0002:
                 unq.append(Xst[i+para,:])
 
-
         cls = []
         for xm in unq:
             ls = []
@@ -260,6 +259,7 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
             if min(tmp)>0.002:
                 unq.append(Xst[i+para,:])
 
+        logger.info('Found {} unique local min:\n'.format(len(unq))+'\n'.join([str(u) for u in unq]))
         U = []
         E = []
         for xm in unq:
@@ -501,7 +501,7 @@ def draw_min(g,support,n):
         R[i,:] = support[a,:]
     from itertools import groupby
     amins = [len(list(group)) for key, group in groupby(sorted(args))]
-    print( "In drawmin with {} support drew {} unique mins. Most freqent min chosen {}%".format(support.shape[0],len(amins),100.*max(amins)/float(n)))
+    print( "In drawmin with {} support drew {} unique mins from {}. Most freqent min chosen {}%".format(support.shape[0],len(amins),n,100.*max(amins)/float(n)))
 
 
     return R

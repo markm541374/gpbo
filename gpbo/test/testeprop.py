@@ -4,15 +4,15 @@
 # To change this license header, choose License Headers in Project Properties.
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
-
-import eprop
+import gpbo
+from gpbo.core import eprop
 import scipy as sp
 from scipy import linalg as spl
 from scipy import stats as sps
 from matplotlib import pyplot as plt
 
 #basic ep test on three values
-m = sp.array([1.,2.,0.5])
+m = sp.array([[1.,2.,0.5]])
 v = sp.array([[1.,0.5,0.2],[0.5,2.,0.5],[0.2,0.5,1.]])
 n=len(m)
 
@@ -33,8 +33,8 @@ for i in xrange(n):
     ax[i].twinx().plot(sup,sps.norm.cdf(Z[i]*(sup-Y[i])/max(F[i],1e-20))*sps.norm.pdf(sup,loc=m[i],scale=sp.sqrt(v[i,i])),'g')
 #est on a gp
 
-import ESutils
-import GPdc
+from gpbo.core import ESutils
+from gpbo.core import GPdc
 nt=5
 X = sp.matrix(sp.linspace(-1,1,nt)).T
 D = [[sp.NaN]]*(nt)

@@ -393,7 +393,7 @@ class switchdefault():
     def __init__(self, f, D, ninit,nstop, s, path, fname):
 
 
-        C = gpbo.core.config.pesfsdefault(f, D, 10, s, 'results', 'introspection.csv',ninit=ninit)
+        C = gpbo.core.config.pesfspredictive(f, D, 10, s, 'results', 'introspection.csv',ninit=ninit)
         aq0 = C.aqfn
         aq0para = C.aqpara
 
@@ -419,6 +419,7 @@ class switchdefault():
             'priorshape': aq0para['priorshape'],
             'nhyp' : aq0para['DH_SAMPLES'],
             'onlyafter': aq0para['nrandinit'],
+            'weighted': aq0para['weighted'],
             'check': True,
             'everyn': 1,
             'support': 2500,

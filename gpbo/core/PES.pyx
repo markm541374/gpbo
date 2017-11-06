@@ -119,6 +119,8 @@ def addmins(G,X,Y,S,D,xmin,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,int
     Z = sp.array([-1]+[1.]*dim)
     F = sp.array([S[yminarg,0]]+[EP_SOFTNESS]*dim)
     [Yd,Stmp] = eprop.expectation_prop(m,V,Y_,Z,F,EPROP_LOOPS)
+    #logger.debug('EPin \n{}\n{} '.format(m,V))
+    #logger.debug('EPout \n{}\n{} '.format(Yd,Stmp))
     Sd = sp.diagonal(Stmp).flatten()
     Sd.resize([dim+1,1])
     Yd.resize([dim+1,1])
@@ -127,6 +129,9 @@ def addmins(G,X,Y,S,D,xmin,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,int
             Sd[i,0]=1e9
 
     #concat the obs
+    #logger.critical('altering Sh to {}'.format(Sd.flatten().min()))
+    #Sh = sp.ones([nh,1])*Sd.flatten().min()
+
     Xo = sp.vstack([X,Xg,Xd,Xh])
     Yo = sp.vstack([Y,Yg,Yd,Yh])
     So = sp.vstack([S,Sg,Sd,Sh])

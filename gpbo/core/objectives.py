@@ -200,7 +200,7 @@ def colville(x,**ev):
     #colville funciton (4d)
     z = [xi*10. for xi in x]
     f = 100*(z[0]**2 -z[1])**2 + (z[0]-1)**2 + (z[2]-1)**2 + 90*(z[2]**2 -z[3])**2 + 10.1*((z[1]-1)**2+(z[3]-1)**2) + 19.8*(z[1]-1)*(z[3]-1)
-    return f,1,dict()
+    return f/10000.,1,dict()
 def genmat52ojf(d,lb,ub,A=1.,ls=0.3,fixs=-1,ki=GPdc.MAT52):
     from ESutils import gen_dataset
     if isinstance(ls,float):

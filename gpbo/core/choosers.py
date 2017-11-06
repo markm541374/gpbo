@@ -96,7 +96,7 @@ def globallocalregret(optstate,persist,**para):
 
     m = sp.diag(H)
     v = sp.diag(gpbo.core.optutils.Hvec2H(sp.diagonal(varHvec),d))
-
+    logger.debug('H,stH\n{}\n{}'.format(H,sp.sqrt(gpbo.core.optutils.Hvec2H(sp.diagonal(varHvec),d))))
     logger.debug('axisprobs {}'.format(1.-sp.stats.norm.cdf(sp.zeros(d),loc=m,scale=sp.sqrt(v))))
     #step out to check +ve defininteness
     logger.info('checking for +ve definite ball')
@@ -167,7 +167,7 @@ def globallocalregret(optstate,persist,**para):
         logger.info('no +ve def region, choosereturns 0')
         return 0,persist,{'reuseH':[k.hyp for k in G.kf],'ppveatx':pc,'rpve':rmax}
     #draw support points
-    W = sp.vstack([ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_LAPAPROT, para=20),ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_VARREJ, para=vvmax)])
+    W = sp.vstack([ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_LAPAPROT, para=20,weighted=para['weighted']),ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_VARREJ, para=vvmax)])
 
     Q, maxRin = gpbo.core.optutils.drawpartitionmin(G,W,xmin,rmax,para['draws'])
 
