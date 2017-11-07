@@ -155,8 +155,8 @@ def eihypaq(optstate,persist,**para):
         global COUNT
         COUNT+=1
         x = sp.array([Q])
-        m,v = G.infer_diag(x,[[sp.NaN]])
-        lei = G.infer_EI(x,[[sp.NaN]],fixI=fixEI,I=fixVal)
+        #m,v = G.infer_diag(x,[[sp.NaN]])
+        #lei = G.infer_EI(x,[[sp.NaN]],fixI=fixEI,I=fixVal)
         v = G.infer_lEI_post(x,[[sp.NaN]],fixI=fixEI,I=fixVal)[0,0]
         return -v
 
@@ -170,10 +170,31 @@ def eihypaq(optstate,persist,**para):
     hmin = hyp.min(axis=0)
     hmax = hyp.max(axis=0)
     hmed = sp.median(hyp,axis=0)
-    logger.debug('hyperparameters:\nmean {}\nmedian {}\nstd {}\nmin {}\nmax {}'.format(hmean,hmed,hstd,hmin,hmax))
+    #logger.debug('hyperparameters:\nmean {}\nmedian {}\nstd {}\nmin {}\nmax {}'.format(hmean,hmed,hstd,hmin,hmax))
     m,v = G.infer_diag_post(xmin,[[sp.NaN]])
     PIatX = sp.stats.norm.cdf(min(y),loc=m[0,0],scale=sp.sqrt(v[0,0]))
     persist['overhead']=time.clock()-t0
+
+    if gpbo.core.debugoutput['tmp']:
+        x = sp.linspace(-1,1,100)
+        A = sp.empty([100,100])
+        M = sp.empty([100,100])
+        V = sp.empty([100,100])
+        for i in range(100):
+            for j in range(100):
+                m,v = G.infer_diag_post(sp.array([[x[i],x[j]]]),[[sp.NaN]])
+                M[i,j]=m[0]
+                V[i,j]=v[0]
+                A[i,j] = G.infer_lEI_post(sp.array([[x[i],x[j]]]),[[sp.NaN]],fixI=fixEI,I=fixVal)[0,0]
+        f,a = plt.subplots(nrows=2,ncols=2,figsize=[20,20])
+        CS = a[0,0].contour(x,x,M,30)
+        a[0,0].clabel(CS, inline=1, fontsize=10)
+        CS = a[1,0].contour(x,x,V,30)
+        a[1,0].clabel(CS, inline=1, fontsize=10)
+        CS = a[0,1].contour(x,x,A,30)
+        a[0,1].clabel(CS, inline=1, fontsize=10)
+        f.savefig('dbout/eihyp_{}.png'.format(optstate.n))
+        plt.close(f)
     return [i for i in xmin],para['ev'],persist,{'naqev':COUNT,'logHYPstats':{'mean':hmean,'median':hmed,'std':hstd,'min':hmin,'max':hmax},'HYPdraws':[k.hyp for k in G.kf], 'EImax':sp.exp(-ymin),'kindex':para['kindex'],'PIatX':PIatX}
 
 #PES with fixed s ev
@@ -210,7 +231,7 @@ def PESfsaq(optstate,persist,**para):
     hmin = hyp.min(axis=0)
     hmax = hyp.max(axis=0)
     hmed = sp.median(hyp,axis=0)
-    logger.debug('hyperparameters:\nmean {}\nmedian {}\nstd {}\nmin {}\nmax {}'.format(hmean,hmed,hstd,hmin,hmax))
+    #logger.debug('hyperparameters:\nmean {}\nmedian {}\nstd {}\nmin {}\nmax {}'.format(hmean,hmed,hstd,hmin,hmax))
     m,v = pesobj.G.infer_diag_post(xmin,[[sp.NaN]])
     PIatX = sp.stats.norm.cdf(min(y),loc=m[0,0],scale=sp.sqrt(v[0,0]))
     persist['overhead']=time.clock()-t0
@@ -260,7 +281,7 @@ def vmaxaq(optstate,persist,**para):
     lhstd = sp.sqrt(sp.var(lhyp, axis=0))
     lhmin = lhyp.min(axis=0)
     lhmax = lhyp.max(axis=0)
-    logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean,lhstd,lhmin,lhmax))
+    #logger.debug('loghyperparameters:\nmean {}\nstd {}\nmin {}\nmax {}'.format(lhmean,lhstd,lhmin,lhmax))
 
     persist['overhead']=time.clock()-t0
     if gpbo.core.debugoutput['datavis']:

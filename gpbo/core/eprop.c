@@ -1393,7 +1393,6 @@ int __pyx_module_is_main_gpbo__core__eprop = 0;
 
 /* Implementation of 'gpbo.core.eprop' */
 static PyObject *__pyx_builtin_range;
-static PyObject *__pyx_builtin_print;
 static PyObject *__pyx_builtin_open;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_RuntimeError;
@@ -1422,7 +1421,6 @@ static const char __pyx_k_mt[] = "mt";
 static const char __pyx_k_pr[] = "pr";
 static const char __pyx_k_sp[] = "sp";
 static const char __pyx_k_wb[] = "wb";
-static const char __pyx_k_all[] = "all";
 static const char __pyx_k_cdf[] = "cdf";
 static const char __pyx_k_dot[] = "dot";
 static const char __pyx_k_eye[] = "eye";
@@ -1448,7 +1446,6 @@ static const char __pyx_k_array[] = "array";
 static const char __pyx_k_delta[] = "delta";
 static const char __pyx_k_empty[] = "empty";
 static const char __pyx_k_kappa[] = "kappa";
-static const char __pyx_k_print[] = "print";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_scipy[] = "scipy";
 static const char __pyx_k_shape[] = "shape";
@@ -1476,13 +1473,11 @@ static const char __pyx_k_ndarray_is_not_C_contiguous[] = "ndarray is not C cont
 static const char __pyx_k_mnt_seagate_home_mark_Dropbox_w[] = "/mnt/seagate/home/mark/Dropbox/workspace/gpbo/gpbo/core/eprop.pyx";
 static const char __pyx_k_numpy_core_multiarray_failed_to[] = "numpy.core.multiarray failed to import";
 static const char __pyx_k_unknown_dtype_code_in_numpy_pxd[] = "unknown dtype code in numpy.pxd (%d)";
-static const char __pyx_k_EP_not_needed_for_all_values_5st[] = "EP not needed for all values (>5std): ";
 static const char __pyx_k_Format_string_allocated_too_shor[] = "Format string allocated too short, see comment in numpy.pxd";
 static const char __pyx_k_Non_native_byte_order_not_suppor[] = "Non-native byte order not supported";
 static const char __pyx_k_ndarray_is_not_Fortran_contiguou[] = "ndarray is not Fortran contiguous";
 static const char __pyx_k_numpy_core_umath_failed_to_impor[] = "numpy.core.umath failed to import";
 static const char __pyx_k_Format_string_allocated_too_shor_2[] = "Format string allocated too short.";
-static PyObject *__pyx_kp_s_EP_not_needed_for_all_values_5st;
 static PyObject *__pyx_n_s_F;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor_2;
@@ -1500,7 +1495,6 @@ static PyObject *__pyx_n_s_Vt;
 static PyObject *__pyx_n_s_Vtprev;
 static PyObject *__pyx_n_s_Y;
 static PyObject *__pyx_n_s_Z;
-static PyObject *__pyx_n_s_all;
 static PyObject *__pyx_n_s_alpha;
 static PyObject *__pyx_n_s_amax;
 static PyObject *__pyx_n_s_array;
@@ -1546,7 +1540,6 @@ static PyObject *__pyx_n_s_open;
 static PyObject *__pyx_n_s_pdf;
 static PyObject *__pyx_n_s_pickle;
 static PyObject *__pyx_n_s_pr;
-static PyObject *__pyx_n_s_print;
 static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_scipy;
 static PyObject *__pyx_n_s_shape;
@@ -2314,10 +2307,9 @@ static PyObject *__pyx_pf_4gpbo_4core_5eprop_4expectation_prop(CYTHON_UNUSED PyO
   PyObject *__pyx_t_11 = NULL;
   PyObject *__pyx_t_12 = NULL;
   int __pyx_t_13;
-  int __pyx_t_14;
+  PyObject *__pyx_t_14 = NULL;
   PyObject *__pyx_t_15 = NULL;
   PyObject *__pyx_t_16 = NULL;
-  PyObject *__pyx_t_17 = NULL;
   __Pyx_RefNannySetupContext("expectation_prop", 0);
 
   /* "gpbo/core/eprop.pyx":22
@@ -2351,7 +2343,7 @@ static PyObject *__pyx_pf_4gpbo_4core_5eprop_4expectation_prop(CYTHON_UNUSED PyO
  *     needed = [True]*V0.shape[0]
  *     for i in xrange(V0.shape[0]):             # <<<<<<<<<<<<<<
  *         needed[i] =  not Z[i]*(m0[0,i]-Z[i]*5*sp.sqrt(V0[i,i]))>Z[i]*Y[i]
- *     if not sp.all(needed):
+ *     #if not sp.all(needed):
  */
   __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_xrange); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -2454,8 +2446,8 @@ static PyObject *__pyx_pf_4gpbo_4core_5eprop_4expectation_prop(CYTHON_UNUSED PyO
  *     needed = [True]*V0.shape[0]
  *     for i in xrange(V0.shape[0]):
  *         needed[i] =  not Z[i]*(m0[0,i]-Z[i]*5*sp.sqrt(V0[i,i]))>Z[i]*Y[i]             # <<<<<<<<<<<<<<
- *     if not sp.all(needed):
- *         print( "EP not needed for all values (>5std): "+str(needed))
+ *     #if not sp.all(needed):
+ *      #   print( "EP not needed for all values (>5std): "+str(needed))
  */
     __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_Z, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
@@ -2578,111 +2570,14 @@ static PyObject *__pyx_pf_4gpbo_4core_5eprop_4expectation_prop(CYTHON_UNUSED PyO
  *     needed = [True]*V0.shape[0]
  *     for i in xrange(V0.shape[0]):             # <<<<<<<<<<<<<<
  *         needed[i] =  not Z[i]*(m0[0,i]-Z[i]*5*sp.sqrt(V0[i,i]))>Z[i]*Y[i]
- *     if not sp.all(needed):
+ *     #if not sp.all(needed):
  */
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-  /* "gpbo/core/eprop.pyx":25
- *     for i in xrange(V0.shape[0]):
- *         needed[i] =  not Z[i]*(m0[0,i]-Z[i]*5*sp.sqrt(V0[i,i]))>Z[i]*Y[i]
- *     if not sp.all(needed):             # <<<<<<<<<<<<<<
- *         print( "EP not needed for all values (>5std): "+str(needed))
- *     try:
- */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_sp); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_all); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 25, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
-    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_5);
-    if (likely(__pyx_t_1)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-      __Pyx_INCREF(__pyx_t_1);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_5, function);
-    }
-  }
-  if (!__pyx_t_1) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_v_needed); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-  } else {
-    #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(__pyx_t_5)) {
-      PyObject *__pyx_temp[2] = {__pyx_t_1, __pyx_v_needed};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __Pyx_GOTREF(__pyx_t_2);
-    } else
-    #endif
-    #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
-      PyObject *__pyx_temp[2] = {__pyx_t_1, __pyx_v_needed};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __Pyx_GOTREF(__pyx_t_2);
-    } else
-    #endif
-    {
-      __pyx_t_10 = PyTuple_New(1+1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 25, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_10);
-      __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_1); __pyx_t_1 = NULL;
-      __Pyx_INCREF(__pyx_v_needed);
-      __Pyx_GIVEREF(__pyx_v_needed);
-      PyTuple_SET_ITEM(__pyx_t_10, 0+1, __pyx_v_needed);
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    }
-  }
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 25, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_14 = ((!__pyx_t_13) != 0);
-  if (__pyx_t_14) {
-
-    /* "gpbo/core/eprop.pyx":26
- *         needed[i] =  not Z[i]*(m0[0,i]-Z[i]*5*sp.sqrt(V0[i,i]))>Z[i]*Y[i]
- *     if not sp.all(needed):
- *         print( "EP not needed for all values (>5std): "+str(needed))             # <<<<<<<<<<<<<<
- *     try:
- *         return expectation_prop_inner(m0,V0,Y,Z,F,z,needed)
- */
-    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_INCREF(__pyx_v_needed);
-    __Pyx_GIVEREF(__pyx_v_needed);
-    PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_needed);
-    __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&PyString_Type)), __pyx_t_2, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 26, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_Add(__pyx_kp_s_EP_not_needed_for_all_values_5st, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 26, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_GIVEREF(__pyx_t_2);
-    PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2);
-    __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-    /* "gpbo/core/eprop.pyx":25
- *     for i in xrange(V0.shape[0]):
- *         needed[i] =  not Z[i]*(m0[0,i]-Z[i]*5*sp.sqrt(V0[i,i]))>Z[i]*Y[i]
- *     if not sp.all(needed):             # <<<<<<<<<<<<<<
- *         print( "EP not needed for all values (>5std): "+str(needed))
- *     try:
- */
-  }
 
   /* "gpbo/core/eprop.pyx":27
- *     if not sp.all(needed):
- *         print( "EP not needed for all values (>5std): "+str(needed))
+ *     #if not sp.all(needed):
+ *      #   print( "EP not needed for all values (>5std): "+str(needed))
  *     try:             # <<<<<<<<<<<<<<
  *         return expectation_prop_inner(m0,V0,Y,Z,F,z,needed)
  *     except:
@@ -2690,104 +2585,104 @@ static PyObject *__pyx_pf_4gpbo_4core_5eprop_4expectation_prop(CYTHON_UNUSED PyO
   {
     __Pyx_PyThreadState_declare
     __Pyx_PyThreadState_assign
-    __Pyx_ExceptionSave(&__pyx_t_15, &__pyx_t_16, &__pyx_t_17);
+    __Pyx_ExceptionSave(&__pyx_t_14, &__pyx_t_15, &__pyx_t_16);
+    __Pyx_XGOTREF(__pyx_t_14);
     __Pyx_XGOTREF(__pyx_t_15);
     __Pyx_XGOTREF(__pyx_t_16);
-    __Pyx_XGOTREF(__pyx_t_17);
     /*try:*/ {
 
       /* "gpbo/core/eprop.pyx":28
- *         print( "EP not needed for all values (>5std): "+str(needed))
+ *      #   print( "EP not needed for all values (>5std): "+str(needed))
  *     try:
  *         return expectation_prop_inner(m0,V0,Y,Z,F,z,needed)             # <<<<<<<<<<<<<<
  *     except:
  *         import pickle
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_expectation_prop_inner); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 28, __pyx_L6_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_10 = NULL;
+      __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_expectation_prop_inner); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L5_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __pyx_t_5 = NULL;
       __pyx_t_8 = 0;
-      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
-        __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_5);
-        if (likely(__pyx_t_10)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-          __Pyx_INCREF(__pyx_t_10);
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
+        __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_1);
+        if (likely(__pyx_t_5)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+          __Pyx_INCREF(__pyx_t_5);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_5, function);
+          __Pyx_DECREF_SET(__pyx_t_1, function);
           __pyx_t_8 = 1;
         }
       }
       #if CYTHON_FAST_PYCALL
-      if (PyFunction_Check(__pyx_t_5)) {
-        PyObject *__pyx_temp[8] = {__pyx_t_10, __pyx_v_m0, __pyx_v_V0, __pyx_v_Y, __pyx_v_Z, __pyx_v_F, __pyx_v_z, __pyx_v_needed};
-        __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_8, 7+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L6_error)
-        __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+      if (PyFunction_Check(__pyx_t_1)) {
+        PyObject *__pyx_temp[8] = {__pyx_t_5, __pyx_v_m0, __pyx_v_V0, __pyx_v_Y, __pyx_v_Z, __pyx_v_F, __pyx_v_z, __pyx_v_needed};
+        __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_8, 7+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L5_error)
+        __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else
       #endif
       #if CYTHON_FAST_PYCCALL
-      if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
-        PyObject *__pyx_temp[8] = {__pyx_t_10, __pyx_v_m0, __pyx_v_V0, __pyx_v_Y, __pyx_v_Z, __pyx_v_F, __pyx_v_z, __pyx_v_needed};
-        __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_8, 7+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L6_error)
-        __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+      if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
+        PyObject *__pyx_temp[8] = {__pyx_t_5, __pyx_v_m0, __pyx_v_V0, __pyx_v_Y, __pyx_v_Z, __pyx_v_F, __pyx_v_z, __pyx_v_needed};
+        __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_8, 7+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L5_error)
+        __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else
       #endif
       {
-        __pyx_t_1 = PyTuple_New(7+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L6_error)
-        __Pyx_GOTREF(__pyx_t_1);
-        if (__pyx_t_10) {
-          __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_10); __pyx_t_10 = NULL;
+        __pyx_t_10 = PyTuple_New(7+__pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 28, __pyx_L5_error)
+        __Pyx_GOTREF(__pyx_t_10);
+        if (__pyx_t_5) {
+          __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_5); __pyx_t_5 = NULL;
         }
         __Pyx_INCREF(__pyx_v_m0);
         __Pyx_GIVEREF(__pyx_v_m0);
-        PyTuple_SET_ITEM(__pyx_t_1, 0+__pyx_t_8, __pyx_v_m0);
+        PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_8, __pyx_v_m0);
         __Pyx_INCREF(__pyx_v_V0);
         __Pyx_GIVEREF(__pyx_v_V0);
-        PyTuple_SET_ITEM(__pyx_t_1, 1+__pyx_t_8, __pyx_v_V0);
+        PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_8, __pyx_v_V0);
         __Pyx_INCREF(__pyx_v_Y);
         __Pyx_GIVEREF(__pyx_v_Y);
-        PyTuple_SET_ITEM(__pyx_t_1, 2+__pyx_t_8, __pyx_v_Y);
+        PyTuple_SET_ITEM(__pyx_t_10, 2+__pyx_t_8, __pyx_v_Y);
         __Pyx_INCREF(__pyx_v_Z);
         __Pyx_GIVEREF(__pyx_v_Z);
-        PyTuple_SET_ITEM(__pyx_t_1, 3+__pyx_t_8, __pyx_v_Z);
+        PyTuple_SET_ITEM(__pyx_t_10, 3+__pyx_t_8, __pyx_v_Z);
         __Pyx_INCREF(__pyx_v_F);
         __Pyx_GIVEREF(__pyx_v_F);
-        PyTuple_SET_ITEM(__pyx_t_1, 4+__pyx_t_8, __pyx_v_F);
+        PyTuple_SET_ITEM(__pyx_t_10, 4+__pyx_t_8, __pyx_v_F);
         __Pyx_INCREF(__pyx_v_z);
         __Pyx_GIVEREF(__pyx_v_z);
-        PyTuple_SET_ITEM(__pyx_t_1, 5+__pyx_t_8, __pyx_v_z);
+        PyTuple_SET_ITEM(__pyx_t_10, 5+__pyx_t_8, __pyx_v_z);
         __Pyx_INCREF(__pyx_v_needed);
         __Pyx_GIVEREF(__pyx_v_needed);
-        PyTuple_SET_ITEM(__pyx_t_1, 6+__pyx_t_8, __pyx_v_needed);
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L6_error)
+        PyTuple_SET_ITEM(__pyx_t_10, 6+__pyx_t_8, __pyx_v_needed);
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       }
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_r = __pyx_t_2;
       __pyx_t_2 = 0;
-      goto __pyx_L10_try_return;
+      goto __pyx_L9_try_return;
 
       /* "gpbo/core/eprop.pyx":27
- *     if not sp.all(needed):
- *         print( "EP not needed for all values (>5std): "+str(needed))
+ *     #if not sp.all(needed):
+ *      #   print( "EP not needed for all values (>5std): "+str(needed))
  *     try:             # <<<<<<<<<<<<<<
  *         return expectation_prop_inner(m0,V0,Y,Z,F,z,needed)
  *     except:
  */
     }
-    __pyx_L6_error:;
+    __pyx_L5_error:;
     __Pyx_PyThreadState_assign
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
 
     /* "gpbo/core/eprop.pyx":29
@@ -2799,10 +2694,10 @@ static PyObject *__pyx_pf_4gpbo_4core_5eprop_4expectation_prop(CYTHON_UNUSED PyO
  */
     /*except:*/ {
       __Pyx_AddTraceback("gpbo.core.eprop.expectation_prop", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_5, &__pyx_t_1) < 0) __PYX_ERR(0, 29, __pyx_L8_except_error)
+      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_10) < 0) __PYX_ERR(0, 29, __pyx_L7_except_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_GOTREF(__pyx_t_10);
 
       /* "gpbo/core/eprop.pyx":30
  *         return expectation_prop_inner(m0,V0,Y,Z,F,z,needed)
@@ -2811,10 +2706,10 @@ static PyObject *__pyx_pf_4gpbo_4core_5eprop_4expectation_prop(CYTHON_UNUSED PyO
  *         pickle.dump([m0,V0,Y,Z,F,z],open('epkill.p','wb'))
  *         raise
  */
-      __pyx_t_10 = __Pyx_Import(__pyx_n_s_pickle, 0, -1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 30, __pyx_L8_except_error)
-      __Pyx_GOTREF(__pyx_t_10);
-      __pyx_v_pickle = __pyx_t_10;
-      __pyx_t_10 = 0;
+      __pyx_t_5 = __Pyx_Import(__pyx_n_s_pickle, 0, -1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 30, __pyx_L7_except_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_v_pickle = __pyx_t_5;
+      __pyx_t_5 = 0;
 
       /* "gpbo/core/eprop.pyx":31
  *     except:
@@ -2823,9 +2718,9 @@ static PyObject *__pyx_pf_4gpbo_4core_5eprop_4expectation_prop(CYTHON_UNUSED PyO
  *         raise
  * def expectation_prop_inner(m0,V0,Y,Z,F,z,needed):
  */
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_pickle, __pyx_n_s_dump); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 31, __pyx_L8_except_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_pickle, __pyx_n_s_dump); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 31, __pyx_L7_except_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_3 = PyList_New(6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 31, __pyx_L8_except_error)
+      __pyx_t_3 = PyList_New(6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 31, __pyx_L7_except_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_v_m0);
       __Pyx_GIVEREF(__pyx_v_m0);
@@ -2845,7 +2740,7 @@ static PyObject *__pyx_pf_4gpbo_4core_5eprop_4expectation_prop(CYTHON_UNUSED PyO
       __Pyx_INCREF(__pyx_v_z);
       __Pyx_GIVEREF(__pyx_v_z);
       PyList_SET_ITEM(__pyx_t_3, 5, __pyx_v_z);
-      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 31, __pyx_L8_except_error)
+      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 31, __pyx_L7_except_error)
       __Pyx_GOTREF(__pyx_t_9);
       __pyx_t_11 = NULL;
       __pyx_t_8 = 0;
@@ -2862,9 +2757,9 @@ static PyObject *__pyx_pf_4gpbo_4core_5eprop_4expectation_prop(CYTHON_UNUSED PyO
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_4)) {
         PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_t_3, __pyx_t_9};
-        __pyx_t_10 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 31, __pyx_L8_except_error)
+        __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 31, __pyx_L7_except_error)
         __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __Pyx_GOTREF(__pyx_t_10);
+        __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       } else
@@ -2872,15 +2767,15 @@ static PyObject *__pyx_pf_4gpbo_4core_5eprop_4expectation_prop(CYTHON_UNUSED PyO
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
         PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_t_3, __pyx_t_9};
-        __pyx_t_10 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 31, __pyx_L8_except_error)
+        __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 31, __pyx_L7_except_error)
         __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __Pyx_GOTREF(__pyx_t_10);
+        __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       } else
       #endif
       {
-        __pyx_t_12 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 31, __pyx_L8_except_error)
+        __pyx_t_12 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 31, __pyx_L7_except_error)
         __Pyx_GOTREF(__pyx_t_12);
         if (__pyx_t_11) {
           __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_11); __pyx_t_11 = NULL;
@@ -2891,12 +2786,12 @@ static PyObject *__pyx_pf_4gpbo_4core_5eprop_4expectation_prop(CYTHON_UNUSED PyO
         PyTuple_SET_ITEM(__pyx_t_12, 1+__pyx_t_8, __pyx_t_9);
         __pyx_t_3 = 0;
         __pyx_t_9 = 0;
-        __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_12, NULL); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 31, __pyx_L8_except_error)
-        __Pyx_GOTREF(__pyx_t_10);
+        __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_12, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 31, __pyx_L7_except_error)
+        __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       }
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
       /* "gpbo/core/eprop.pyx":32
  *         import pickle
@@ -2906,33 +2801,33 @@ static PyObject *__pyx_pf_4gpbo_4core_5eprop_4expectation_prop(CYTHON_UNUSED PyO
  *     #expectation propagation on multivariate gaussian for soft inequality constraint
  */
       __Pyx_GIVEREF(__pyx_t_2);
-      __Pyx_GIVEREF(__pyx_t_5);
-      __Pyx_XGIVEREF(__pyx_t_1);
-      __Pyx_ErrRestoreWithState(__pyx_t_2, __pyx_t_5, __pyx_t_1);
-      __pyx_t_2 = 0; __pyx_t_5 = 0; __pyx_t_1 = 0; 
-      __PYX_ERR(0, 32, __pyx_L8_except_error)
+      __Pyx_GIVEREF(__pyx_t_1);
+      __Pyx_XGIVEREF(__pyx_t_10);
+      __Pyx_ErrRestoreWithState(__pyx_t_2, __pyx_t_1, __pyx_t_10);
+      __pyx_t_2 = 0; __pyx_t_1 = 0; __pyx_t_10 = 0; 
+      __PYX_ERR(0, 32, __pyx_L7_except_error)
     }
-    __pyx_L8_except_error:;
+    __pyx_L7_except_error:;
 
     /* "gpbo/core/eprop.pyx":27
- *     if not sp.all(needed):
- *         print( "EP not needed for all values (>5std): "+str(needed))
+ *     #if not sp.all(needed):
+ *      #   print( "EP not needed for all values (>5std): "+str(needed))
  *     try:             # <<<<<<<<<<<<<<
  *         return expectation_prop_inner(m0,V0,Y,Z,F,z,needed)
  *     except:
  */
     __Pyx_PyThreadState_assign
+    __Pyx_XGIVEREF(__pyx_t_14);
     __Pyx_XGIVEREF(__pyx_t_15);
     __Pyx_XGIVEREF(__pyx_t_16);
-    __Pyx_XGIVEREF(__pyx_t_17);
-    __Pyx_ExceptionReset(__pyx_t_15, __pyx_t_16, __pyx_t_17);
+    __Pyx_ExceptionReset(__pyx_t_14, __pyx_t_15, __pyx_t_16);
     goto __pyx_L1_error;
-    __pyx_L10_try_return:;
+    __pyx_L9_try_return:;
     __Pyx_PyThreadState_assign
+    __Pyx_XGIVEREF(__pyx_t_14);
     __Pyx_XGIVEREF(__pyx_t_15);
     __Pyx_XGIVEREF(__pyx_t_16);
-    __Pyx_XGIVEREF(__pyx_t_17);
-    __Pyx_ExceptionReset(__pyx_t_15, __pyx_t_16, __pyx_t_17);
+    __Pyx_ExceptionReset(__pyx_t_14, __pyx_t_15, __pyx_t_16);
     goto __pyx_L0;
   }
 
@@ -7630,7 +7525,6 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
-  {&__pyx_kp_s_EP_not_needed_for_all_values_5st, __pyx_k_EP_not_needed_for_all_values_5st, sizeof(__pyx_k_EP_not_needed_for_all_values_5st), 0, 0, 1, 0},
   {&__pyx_n_s_F, __pyx_k_F, sizeof(__pyx_k_F), 0, 0, 1, 1},
   {&__pyx_kp_u_Format_string_allocated_too_shor, __pyx_k_Format_string_allocated_too_shor, sizeof(__pyx_k_Format_string_allocated_too_shor), 0, 1, 0, 0},
   {&__pyx_kp_u_Format_string_allocated_too_shor_2, __pyx_k_Format_string_allocated_too_shor_2, sizeof(__pyx_k_Format_string_allocated_too_shor_2), 0, 1, 0, 0},
@@ -7648,7 +7542,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_Vtprev, __pyx_k_Vtprev, sizeof(__pyx_k_Vtprev), 0, 0, 1, 1},
   {&__pyx_n_s_Y, __pyx_k_Y, sizeof(__pyx_k_Y), 0, 0, 1, 1},
   {&__pyx_n_s_Z, __pyx_k_Z, sizeof(__pyx_k_Z), 0, 0, 1, 1},
-  {&__pyx_n_s_all, __pyx_k_all, sizeof(__pyx_k_all), 0, 0, 1, 1},
   {&__pyx_n_s_alpha, __pyx_k_alpha, sizeof(__pyx_k_alpha), 0, 0, 1, 1},
   {&__pyx_n_s_amax, __pyx_k_amax, sizeof(__pyx_k_amax), 0, 0, 1, 1},
   {&__pyx_n_s_array, __pyx_k_array, sizeof(__pyx_k_array), 0, 0, 1, 1},
@@ -7694,7 +7587,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_pdf, __pyx_k_pdf, sizeof(__pyx_k_pdf), 0, 0, 1, 1},
   {&__pyx_n_s_pickle, __pyx_k_pickle, sizeof(__pyx_k_pickle), 0, 0, 1, 1},
   {&__pyx_n_s_pr, __pyx_k_pr, sizeof(__pyx_k_pr), 0, 0, 1, 1},
-  {&__pyx_n_s_print, __pyx_k_print, sizeof(__pyx_k_print), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
   {&__pyx_n_s_scipy, __pyx_k_scipy, sizeof(__pyx_k_scipy), 0, 0, 1, 1},
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
@@ -7718,7 +7610,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
 };
 static int __Pyx_InitCachedBuiltins(void) {
   __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 5, __pyx_L1_error)
-  __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_n_s_print); if (!__pyx_builtin_print) __PYX_ERR(0, 26, __pyx_L1_error)
   __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 31, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 218, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(1, 799, __pyx_L1_error)

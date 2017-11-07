@@ -290,7 +290,7 @@ def boundedlocal(f,l,u,x0,*args,**kwargs):
 def twopartopt(f,l,u,dargs,largs):
     dxmin,dymin,dierror = silentdirectwrapped(f,l,u,**dargs)
     xmin,ymin,ierror = boundedlocal(f,l,u,dxmin,**largs)
-    logger.debug('optresult {} at {} (refine Dx {} Dy {}) message {}'.format(str(ymin), str(xmin), str(sp.linalg.norm(xmin-dxmin)), str(dymin-ymin),str(dierror)+str(ierror)))
+    logger.debug('optresult {} at {}'.format(str(ymin), str(xmin)))
     return xmin,ymin,ierror
 
 
@@ -506,7 +506,7 @@ def plotprobstatellipse(cG,H,x,ax,logr=False):
 
 
 def probgppve(G,x,tol=1e-3,dropdims=[]):
-    nsam = int(1./tol)+1
+    nsam = 10*int(1./tol)+1
     Gr, varG, H, Hvec, varHvec, M, varM = gpGH(G,x)
     d=G.D
     vHdraws = GPdc.draw(Hvec.flatten(),varHvec,nsam)

@@ -22,8 +22,8 @@ def expectation_prop(m0,V0,Y,Z,F,z):
     needed = [True]*V0.shape[0]
     for i in xrange(V0.shape[0]):
         needed[i] =  not Z[i]*(m0[0,i]-Z[i]*5*sp.sqrt(V0[i,i]))>Z[i]*Y[i]
-    if not sp.all(needed):
-        print( "EP not needed for all values (>5std): "+str(needed))
+    #if not sp.all(needed):
+     #   print( "EP not needed for all values (>5std): "+str(needed))
     try:
         return expectation_prop_inner(m0,V0,Y,Z,F,z,needed)
     except:

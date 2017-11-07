@@ -609,11 +609,12 @@ def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1,prior='lognorm'):
             return r
 
         starts = sp.vstack([hm]*chains)
-        print('using {} slice chains'.format(chains))
+        #print('using {} slice chains'.format(chains))
         for i in range(chains):
             starts[i,:]+=2*(sp.random.uniform(size=len(ub))-0.5)*hs
         X = sp.vstack([slice.slice_sample(f,starts[j,:],n/chains+1,0.05*hs,burn=burn,subsam=subsam) for j in xrange(chains)])
-        return 10**X[:n,:]
+        hyp = 10**X[:n,:]
+        #return 10**X[:n,:]
 
     elif prior=='gamma':
         global count
@@ -644,8 +645,17 @@ def drawhyp_plk(X,Y,S,D,ki,hm,hs,n,burn=80,subsam=5,chains=1,prior='lognorm'):
         X = sp.vstack([slice.slice_sample(f,starts[j,:],n/chains+1,0.05*sp.sqrt(hm*hs**2),burn=burn,subsam=subsam) for j in xrange(chains)])
 
         print('used {} plk evals'.format(count))
-        return X[:n,:]
+        hyp = X[:n,:]
+    else:
+        raise ValueError('prior should be lognorm or gamma')
 
+    hmean = sp.mean(hyp, axis=0)
+    hstd = sp.sqrt(sp.var(hyp, axis=0))
+    hmin = hyp.min(axis=0)
+    hmax = hyp.max(axis=0)
+    hmed = sp.median(hyp,axis=0)
+    logger.debug('hyperparameters:\nmean   {}\nmedian {}\nstd    {}\nmin    {}\nmax    {}'.format(hmean,hmed,hstd,hmin,hmax))
+    return hyp
 
 #take a random draw of X points and draw Y from the specified kernel
 def gen_dataset(nt,d,lb,ub,kindex,hyp,s=1e-9):

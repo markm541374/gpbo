@@ -5,6 +5,7 @@ from __future__ import print_function
 xrange=range
 import pickle
 import scipy as sp
+import numpy as np
 import os
 import time
 import logging
@@ -147,7 +148,7 @@ class optimizer:
                     print('reusing check')
                     checky, checkc, checkojaux = checkylast,checkclast,checkojauxlast
                 else:
-                    print('checking rx')
+                    print('checking reccomendation:')
                     checkpara=copy.copy(self.aqpara[mode]['ev'])
                     checkpara['s']=1e-99
                     checkpara['cheattrue']=True

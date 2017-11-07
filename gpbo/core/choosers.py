@@ -55,17 +55,17 @@ def globallocalregret(optstate,persist,**para):
     dx = [e['d'] for e in optstate.ev]
     logger.info('building GP')
     G = PES.makeG(x, y, s, dx, para['kindex'], para['mprior'], para['sprior'], para['nhyp'],prior=para['priorshape'])
-    logger.critical('mean hyp{}'.format(sp.mean(sp.vstack([k.hyp for k in G.kf]),axis=0)))
+    #logger.critical('mean hyp{}'.format(sp.mean(sp.vstack([k.hyp for k in G.kf]),axis=0)))
     #MAP = gpbo.core.GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
     #logger.critical('{}'.format(MAP))
     #find the pred. minimum
 
     xmin,ymin,ierror = gpbo.core.optutils.twopartopt(lambda x:G.infer_m_post(x,[[sp.NaN]])[0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
     mxmin,vxmin = [j[0,0] for j in G.infer_diag_post(xmin,[[sp.NaN]])]
-    logger.info('post min {} at {} ({})'.format(xmin,ymin,ierror))
+    logger.info('post min {} at {} '.format(xmin,ymin))
     xvmax,vmax,ierror = gpbo.core.optutils.twopartopt(lambda x:-G.infer_diag_post(x,[[sp.NaN]])[1][0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
     mvmax,vvmax = [j[0,0] for j in G.infer_diag_post(xvmax,[[sp.NaN]])]
-    logger.info('post var max {} at {} with mean {} ({})'.format(vvmax,xvmax,mvmax,ierror))
+    logger.info('post var max {} at {} with mean {}'.format(vvmax,xvmax,mvmax))
 
     #xtrue = sp.array([[-0.597,-0.700,-0.046,-0.449,-0.377,0.315]])
     #xm,xv = G.infer_diag_post(xtrue,[[sp.NaN]])
@@ -103,9 +103,8 @@ def globallocalregret(optstate,persist,**para):
     from gpbo.core import debugoutput
     if debugoutput['adaptive']:
         logger.debug('Hessian {} \n\n varH {}'.format(H, gpbo.core.optutils.Hvec2H(sp.diagonal(varHvec),d)))
-    pc2 = gpbo.core.optutils.probgppve(G,sp.array(xmin),tol=para['pvetol'])
     pc = gpbo.core.optutils.probgppve(G,sp.array(xmin),tol=para['pvetol'],dropdims=dropdims)
-    logger.info('prob pvedef at xmin {} dropdim: {}'.format(pc2,pc))
+    logger.info('prob pvedef at xmin {}'.format(pc))
 
     mask = sp.ones(d)
     for i in dropdims:
@@ -206,17 +205,17 @@ def globallocalregret(optstate,persist,**para):
             return Cout[i]
         return
 
-    m,v=normin
-
+    m,std=normin
+    logger.debug('inner approx m{} std{}\noutsample stats min{} max{} mean{}'.format(m,std,sp.array(Yout).min(),sp.array(Yout).max(),sp.mean(Yout)))
 
     racc = 0.
     n=len(Cout)
     #regret from samples after the min
     for i in xrange(1,n):
-        racc+= gpbo.core.GPdc.EI(-Yout[i],-m,v)[0,0]/float(n)
+        racc+= gpbo.core.GPdc.EI(-Yout[i],-m,std)[0,0]/float(n)
     tmp=racc
     #regret from the tail bound
-    I,err = spi.quad(lambda y:gpbo.core.GPdc.EI(-y,-m,v)[0,0]*sp.stats.norm.pdf(y,mu,sp.sqrt(vvmax)),-sp.inf,Yout[0])
+    I,err = spi.quad(lambda y:gpbo.core.GPdc.EI(-y,-m,std)[0,0]*sp.stats.norm.pdf(y,mu,sp.sqrt(vvmax)),-sp.inf,Yout[0])
     racc+=I
     logger.info('outer regret {}  (due to samples: {} due to tail: {}'.format(racc,tmp,racc-tmp))
 

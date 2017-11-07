@@ -405,8 +405,13 @@ class switchdefault():
             'start': [0.] * D
         }
         C2 = gpbo.core.config.eihypdefault(f, D, ninit, s, 'results', 'introspection.csv')
+
         aq2 = C2.aqfn
         aq2para = C2.aqpara
+        aq2para['priorshape']=aq0para['priorshape']
+        aq2para['mprior']= aq0para['mprior']
+        aq2para['sprior']= aq0para['sprior']
+        aq2para['kindex']= aq0para['kindex']
 
         self.chooser = gpbo.core.choosers.globallocalregret
         self.choosepara = {
