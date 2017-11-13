@@ -40,9 +40,11 @@ SUPPORT_LAPAPR = 4
 SUPPORT_LAPAPROT = 5
 SUPPORT_VARREJ = 6
 #drawing points between lb and ub using specified method
-def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
+def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False,rotation=None):
     n = int(n)
 
+    if rotation is None:
+        rotation = sp.eye(len(lb))
     #para is the std confidence bound
     if (type(g) is int):
         d=int(g)
@@ -56,7 +58,10 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
         for i in range(d):
             X[:,i] *= ub[i]-lb[i]
             X[:,i] += lb[i]
+        X = X.dot(rotation)
     elif method==SUPPORT_VARREJ:
+        if not np.allclose(rotation,sp.eye(len(lb))):
+            raise NotImplementedError
         print( "Drawing support using varreject:")
         batch=500
         out=[]
@@ -73,6 +78,8 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
         X=sp.vstack(out[:n])
     elif method==SUPPORT_LAPAPR:
 
+        if not np.allclose(rotation,sp.eye(len(lb))):
+            raise NotImplementedError
         print( "Drawing support using lapapr:")
         #start with 4 times as many points as needed
         #print 'a'
@@ -204,6 +211,7 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
         for i in range(d):
             Xsto[:,i] *= ub[i]-lb[i]
             Xsto[:,i] += lb[i]
+        Xsto = Xsto.dot(rotation)
         #eval mean at the points
         #print 'b'
         fs = sp.empty(para*over)
@@ -222,7 +230,7 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
         def f(x):
             y= g.infer_m_post(sp.array(x),[[sp.NaN]])[0,0]
             bound=0
-            r = max(abs(x))
+            r = max(abs(rotation.T.dot(x.flatten())))
             if r>1:
                 #print 'offedge {}'.format(x)
                 bound=(1e3*(r-1))**6
@@ -315,8 +323,9 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
             for i in range(d):
                 X[len(unq)*neach:,i] *= ub[i]-lb[i]
                 X[len(unq)*neach:,i] += lb[i]
-
+            X = X.dot(rotation.T)
             sp.clip(X,-1,1,out=X)
+            X = X.dot(rotation)
         elif weighted==1:
             nu = len(unq)
             means = sp.empty(nu)
@@ -342,7 +351,9 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
                 for j in range(d):
                     X[cweights[i]:cweights[i]+weights[i],j]+=unq[i][j]
 
+            X = X.dot(rotation.T)
             sp.clip(X,-1,1,out=X)
+            X = X.dot(rotation)
         else:
             print('using complex approx')
             nu = len(unq)
@@ -359,18 +370,19 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False):
                         M,vM,G,vG,H,Hvec,vH,A,vA = gpbo.core.optutils.gpYGH(g,unq[i])
                         c = spl.cholesky(vA,lower=True)
                         draws = A.T+c.dot(sp.random.normal(size=[(d * (d + 1) / 2)+d+1,n]))
-                        conB = np.hstack([1-unq[i],unq[i]+1]).T
-                        conA = np.vstack([np.eye(d),-np.eye(d)])
+                        conB = np.hstack([1-rotation.dot(unq[i]),rotation.dot(unq[i])+1]).T
+                        conA = np.vstack([np.eye(d),-np.eye(d)]).dot(rotation)
                         for j in range(draws.shape[1]):
                             cons,grad,hess = gpbo.core.optutils.allvec2all(draws[:,j],d)
                             xr = -spl.solve(hess,grad).flatten()
                             xd = unq[i].flatten()+xr
-                            if np.any(np.abs(xd)>=1) or np.any(np.diagonal(hess)<0):
+                            if np.any(np.abs(rotation.dot(xd.flatten()))>=1) or np.any(np.diagonal(hess)<0):
                                 try:
+                                    #xr = np.zeros_like(xr)
                                     xr = np.array(qp(cm(hess),cm(grad.reshape([d,1])),cm(conA),cm(conB),initvals=cm([0.]*d))['x']).flatten()
                                     xd = unq[i].flatten()+xr
                                 except:
-                                    xd = np.random.uniform(-1,1,d)
+                                    xd = rotation.T.dot(np.random.uniform(-1,1,d))
                                     xr = xd-unq[i].flatten()
 
                             yd = cons+xr.dot(hess.dot(xr.T))+xr.dot(grad.T)
