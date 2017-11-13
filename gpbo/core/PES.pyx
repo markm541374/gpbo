@@ -37,9 +37,12 @@ def makeG(X,Y,S,D,kindex,mprior,sprior,nh,chains=1,prior='lognorm'):
     
     return G
 
-def drawmins(G,n,lb,ub,SUPPORT=300,mode = [ESutils.SUPPORT_SLICELCB],SLICELCB_PARA=1.,weighted=False):
+def drawmins(G,n,lb,ub,SUPPORT=300,mode = [ESutils.SUPPORT_SLICELCB],SLICELCB_PARA=1.,weighted=False,rotation=None):
+
+    if rotation is None:
+        rotation = sp.eye(len(lb))
     #draw support points
-    W = sp.vstack([ESutils.draw_support(G, lb,ub,SUPPORT/len(mode),m, para = SLICELCB_PARA,weighted=weighted) for m in mode])
+    W = sp.vstack([ESutils.draw_support(G, lb,ub,SUPPORT/len(mode),m, para = SLICELCB_PARA,weighted=weighted,rotation=rotation) for m in mode])
 
     R = ESutils.draw_min(G,W,n)
     #draw in samples on the support
@@ -48,10 +51,12 @@ def drawmins(G,n,lb,ub,SUPPORT=300,mode = [ESutils.SUPPORT_SLICELCB],SLICELCB_PA
     from gpbo.core import debugoutput
     if debugoutput['support'] and plots:
         fig, ax = plt.subplots(1)
-        ax.plot(W[:,0],W[:,1],'bx')
+        ax.plot(W[:,0],W[:,1],'b.')
         ax.plot(R[:,0],R[:,1],'r.')
-        from gpbo.core import debugpath
-        fig.savefig(os.path.join(debugpath,'support'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
+        ax.axis('equal')
+        S = rotation.T.dot(sp.array([[-1,-1,1,1,-1],[-1,1,1,-1,-1]]))
+        ax.plot(S[0,:],S[1,:],'r')
+        fig.savefig(os.path.join(debugoutput['path'],'support'+time.strftime('%d_%m_%y_%H:%M:%S')+'.png'))
         fig.clf()
         plt.close(fig)
         del(fig)
@@ -250,20 +255,25 @@ def Vadj(m,V):
 
 #basic PES class if search_pes is used. variable noise if search_acq is used
 class PES:
-    def __init__(self,X,Y,S,D,lb,ub,kindex,mprior,sprior,DH_SAMPLES=8,DM_SAMPLES=8, DM_SUPPORT=400,DM_SLICELCBPARA=1.,mode=ESutils.SUPPORT_SLICELCB,noS=False,DM_DROP=True,preselectH=False,weighted=False,prior='lognorm'):
+    def __init__(self,X_,Y,S,D,lb,ub,kindex,mprior,sprior,DH_SAMPLES=8,DM_SAMPLES=8, DM_SUPPORT=400,DM_SLICELCBPARA=1.,mode=ESutils.SUPPORT_SLICELCB,noS=False,DM_DROP=True,preselectH=False,weighted=False,prior='lognorm',rotation=None):
         print( "PES init:")
         self.lb=lb
         self.ub=ub
         self.noS=noS
         if noS:
             S=sp.zeros(S.shape)
+        if rotation is None:
+            rotation = sp.eye(X_.shape[1])
+        self.rotation=rotation
+        X = X_.dot(rotation.T)
+        self.X=X
         if not preselectH:
             self.G = makeG(X,Y,S,D,kindex,mprior,sprior,DH_SAMPLES,prior=prior)
         else:
             logger.info('reusing preselected hyperparameters')
             self.G =  GPdc.GPcore(X,Y,S,D, [GPdc.kernel(kindex, X.shape[1], h) for h in preselectH])
         HS = sp.vstack([k.hyp for k in self.G.kf])
-        self.Z = drawmins(self.G,DM_SAMPLES,lb,ub,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode,weighted=weighted)
+        self.Z = drawmins(self.G,DM_SAMPLES,lb,ub,SUPPORT=DM_SUPPORT,SLICELCB_PARA=DM_SLICELCBPARA,mode=mode,weighted=weighted,rotation=rotation)
         #print "mindraws: "+str(self.Z)
         self.Ga = [GPdc.GPcore(*addmins(self.G, X, Y, S, D, self.Z[i, :],dropedge=DM_DROP) + [self.G.kf]) for i in xrange(DM_SAMPLES)]
     def __del__(self):
@@ -277,11 +287,15 @@ class PES:
             pass
         return    
     def query_pes(self,Xq,Sq,Dq):
-        
+        if not sp.allclose(self.rotation,sp.eye(len(self.lb))):
+            raise NotImplementedError
+
         a = PESgain(self.G,self.Ga,self.Z,Xq,Dq,Sq)
         return a
     
     def query_acq(self,Xq,Sq,Dq,costfn):
+        if not sp.allclose(self.rotation,sp.eye(len(self.lb))):
+            raise NotImplementedError
         a = PESgain(self.G,self.Ga,self.Z,Xq,Dq,Sq)
         for i in xrange(Xq.shape[0]):
             a[i] = a[i]/costfn(Xq[i,:].flatten(),Sq[i,:].flatten())
@@ -290,6 +304,8 @@ class PES:
 
 
     def search_vmax(self,s,spara,dv=[[sp.NaN]],):
+        if not sp.allclose(self.rotation,sp.eye(len(self.lb))):
+            raise NotImplementedError
         self.stmp = s
         def wrap(Q):
             x = sp.array([Q])
@@ -304,7 +320,7 @@ class PES:
     def search_pes(self,s,spara,dv=[[sp.NaN]],):
         self.stmp = s
         def wrap(Q):
-            x = sp.array([Q])
+            x = self.rotation.dot(sp.array([Q]).flatten()).reshape([1,Q.size])
             if self.noS:
                 alls = [k(x,x,dv,dv,gets=True)[1] for k in self.G.kf]
                 s = exp(sp.mean(log(alls)))
@@ -317,9 +333,41 @@ class PES:
         xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,self.lb,self.ub,spara['dpara'],spara['lpara'])
         #[xmin, ymin, ierror] = direct(directwrap,self.lb,self.ub,user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
 
+        if gpbo.core.debugoutput['acqfn2d']:
+            print( 'plotting acq2d...')
+            import time
+            import tqdm
+            from matplotlib import pyplot as plt
+            f,ax=plt.subplots(nrows=2,ncols=2,figsize=[10,10],sharex=True)
+            n = 50
+            x_ = sp.linspace(-1,1,n)
+            y_ = sp.linspace(-1,1,n)
+            z_ = sp.empty([n,n])
+            s_ = sp.empty([n,n])
+            p_ = sp.empty([n,n])
+            for i in tqdm.tqdm(range(n)):
+                for j in range(n):
+                    m_,v_ = self.G.infer_diag_post(self.rotation.dot(sp.array([y_[j],x_[i]])).reshape([1,2]),[[sp.NaN]])
+                    z_[i,j] = m_[0,0]
+                    s_[i,j] = sp.sqrt(v_[0,0])
+                    p_[i,j] = wrap(sp.array([y_[j],x_[i]]))
+            CS = ax[0,0].contour(x_,y_,z_,20)
+            ax[0,0].clabel(CS, inline=1, fontsize=10)
+            ax[0,0].plot(self.X.dot(self.rotation)[:,0],self.X.dot(self.rotation)[:,1],'ro')
+            CS = ax[0,1].contour(x_,y_,s_,20)
+            ax[0,1].clabel(CS, inline=1, fontsize=10)
+            CS = ax[1,0].contour(x_,y_,p_,20)
+            ax[1,0].clabel(CS, inline=1, fontsize=10)
+
+            f.savefig(os.path.join(gpbo.core.debugoutput['path'], 'aq2d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
+            plt.close(f)
+            del(f)
+
         return [xmin,ymin,ierror]
     
     def search_acq(self,cfn,logsl,logsu,spara,dv=[[sp.NaN]],over=0.):
+        if not sp.allclose(self.rotation,sp.eye(len(self.lb))):
+            raise NotImplementedError
         print('over {}'.format(over))
         def wrap(Q):
             x = sp.array([Q[:-1]])
@@ -333,34 +381,6 @@ class PES:
 
         #[xmin, ymin, ierror] = direct(directwrap,sp.hstack([self.lb,logsl]),sp.hstack([self.ub,logsu]),user_data=[], algmethod=1, maxf=maxf, logfilename='/dev/null')
         xmin,ymin,ierror = gpbo.core.optutils.twopartopt(wrap,sp.hstack([self.lb,logsl]),sp.hstack([self.ub,logsu]),spara['dpara'],spara['lpara'])
-
-        if gpbo.core.debugoutput['acqfn1d']:
-            print( 'plotting acq1d...')
-            import time
-            from matplotlib import pyplot as plt
-            f,a=plt.subplots(3,figsize=[8,10],sharex=True)
-            nn = 100
-            cost = sp.empty(nn)
-            infgain = sp.empty(nn)
-            acqfn = sp.empty(nn)
-            srange = sp.linspace(logsl,logsu+4,nn)
-            for i in xrange(nn):
-                s=10**srange[i]
-                cost[i] = cfn(xmin,**{'s':s})+over
-                infgain[i] = PESgain(self.G,self.Ga,self.Z,sp.array([xmin[:-1]]),dv,[s])
-                acqfn[i] = infgain[i]/cost[i]
-
-            m,v = self.G.infer_diag_post(sp.array([xmin[:-1]]),[[sp.NaN]])
-            a[1].plot([sp.log10(v[0,0]),sp.log10(v[0,0])],[0.01,1.],'r')
-            a[0].plot(srange,cost)
-            a[1].plot(srange,infgain)
-            a[2].plot(srange,acqfn)
-            a[0].set_yscale('log')
-            a[1].set_yscale('log')
-            a[2].set_yscale('log')
-            f.savefig(os.path.join(gpbo.core.debugoutput['path'], 'aq1d' + time.strftime('%d_%m_%y_%H:%M:%S') + '.png'))
-            plt.close(f)
-            del(f)
 
         return [xmin,ymin,ierror]
 
