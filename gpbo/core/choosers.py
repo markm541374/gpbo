@@ -31,25 +31,42 @@ from copy import deepcopy
 
 def always0(optstate,persist,**para):
     return 0,None,dict()
-
+from gpbo.core import GPdc
+def prob(G,x,tol=1e-3,dropdims=[]):
+    nsam = 10*int(1./tol)+1
+    Gr, varG, H, Hvec, varHvec, M, varM = gpbo.core.optutils.gpGH(G,x)
+    d=G.D
+    vHdraws = GPdc.draw(Hvec.flatten(),varHvec,nsam)
+    pvecount = 0
+    count = sp.zeros(d)
+    count2  = sp.zeros(d)
+    for i in xrange(nsam):
+        Hdraw = gpbo.core.optutils.Hvec2H(vHdraws[i,:], d)
+        g,v = sp.linalg.eigh(Hdraw)
+        count+=g>0
+        
+    logger.debug('eigenvector probs {}'.format((count+1.)/(nsam+2.)))
+    return
 def globallocalregret(optstate,persist,**para):
     #doublenormdist
     #norprior
     if persist == None:
         persist = defaultdict(list)
         persist['raiseS']=False
+        persist['R']=sp.eye(len(para['lb']))
     if optstate.n < para['onlyafter']:
         return 0, persist, dict()
     if persist['flip']:
         return 1, persist, dict()
 
     logging.info('globallocalregretchooser with {} inflated diagonal'.format(persist['raiseS']))
+    logging.info('rotate\n{}'.format(persist['R']))
     d = len(para['lb'])
     lb = para['lb']
     ub = para['ub']
 
     #build a GP with slice-samples hypers
-    x = sp.vstack(optstate.x)
+    x = sp.vstack(optstate.x).dot(persist['R'].T)
     y = sp.vstack(optstate.y)
     s = sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
     dx = [e['d'] for e in optstate.ev]
@@ -101,11 +118,32 @@ def globallocalregret(optstate,persist,**para):
     #step out to check +ve defininteness
     logger.info('checking for +ve definite ball')
     from gpbo.core import debugoutput
-    if debugoutput['adaptive']:
-        logger.debug('Hessian {} \n\n varH {}'.format(H, gpbo.core.optutils.Hvec2H(sp.diagonal(varHvec),d)))
     pc = gpbo.core.optutils.probgppve(G,sp.array(xmin),tol=para['pvetol'],dropdims=dropdims)
     logger.info('prob pvedef at xmin {}'.format(pc))
 
+    _ = prob(G,sp.array(xmin),tol=para['pvetol'],dropdims=dropdims)
+    if para['rotate']:
+        #U,S,V = sp.linalg.svd(H)
+        eva,eve = sp.linalg.eigh(H)
+        V = eve.T
+        #print('________________')
+        #G = PES.makeG(x.dot(V.T), y, s, dx, para['kindex'], para['mprior'], para['sprior'], para['nhyp'],prior=para['priorshape'])
+        #xmin,ymin,ierror = gpbo.core.optutils.twopartopt(lambda x:G.infer_m_post(V.dot(x.flatten()).reshape([1,4]),[[sp.NaN]])[0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
+        #print('newxmin {}'.format(xmin))
+        #xmin = V.dot(xmin.flatten()).reshape(xmin.shape)
+        #GH = gpbo.core.optutils.gpGH(G,xmin)
+        #Gr,cG,H,Hvec,varHvec,M,varM = GH
+        #m = sp.diag(H)
+        #v = sp.diag(gpbo.core.optutils.Hvec2H(sp.diagonal(varHvec),d))
+        #logger.debug('H,stH\n{}\n{}'.format(H,sp.sqrt(gpbo.core.optutils.Hvec2H(sp.diagonal(varHvec),d))))
+        #logger.debug('axisprobs {}'.format(1.-sp.stats.norm.cdf(sp.zeros(d),loc=m,scale=sp.sqrt(v))))
+        #pc = gpbo.core.optutils.probgppve(G,sp.array(xmin),tol=para['pvetol'],dropdims=dropdims)
+        #logger.info('prob pvedef at xmin {}'.format(pc))
+        #print('________ ____________')
+        #raise
+        persist['R'] = V.dot(persist['R'])
+    else:
+        evector = sp.eye(d)
     mask = sp.ones(d)
     for i in dropdims:
         mask[i]=0.
@@ -117,7 +155,6 @@ def globallocalregret(optstate,persist,**para):
     #todo assuming unit radius search region for Rinit=1
     rmax = gpbo.core.optutils.ballradsearch(d,1.,PDcondition,ndirs=para['nlineS'],lineSh=para['lineSh'])
 
-    logger.info('+ve region radius {}'.format(rmax))
     if gpbo.core.debugoutput['adaptive']:
         fig, ax = plt.subplots(nrows=3, ncols=4, figsize=(85, 85))
         # plot the current GP
@@ -164,12 +201,13 @@ def globallocalregret(optstate,persist,**para):
             plt.close(fig)
             del (fig)
         logger.info('no +ve def region, choosereturns 0')
-        return 0,persist,{'reuseH':[k.hyp for k in G.kf],'ppveatx':pc,'rpve':rmax}
+        return 0,persist,{'reuseH':[k.hyp for k in G.kf],'ppveatx':pc,'rpve':rmax,'R':persist['R']}
     #draw support points
     W = sp.vstack([ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_LAPAPROT, para=20,weighted=para['weighted']),ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_VARREJ, para=vvmax)])
 
     Q, maxRin = gpbo.core.optutils.drawpartitionmin(G,W,xmin,rmax,para['draws'])
 
+    logger.info('+ve region radius {} max sample radius {}'.format(rmax, maxRin))
     #pcurves from Q
     def data2cdf(X):
         n = X.size
@@ -239,7 +277,7 @@ def globallocalregret(optstate,persist,**para):
         rval=1
         persist['flip']=True
         optstate.startlocal=xmin
-    elif maxRin<0.2*rmax:
+    elif maxRin<0.9*rmax:
         rval=2
 
     else:
@@ -335,7 +373,7 @@ def globallocalregret(optstate,persist,**para):
         R=minimize(fn2,C.T.dot(xmin),method='bfgs')
         logger.warn('cheat testopt result with precondition {}:\n{}'.format(H,R))
 
-    return rval,persist,{'start':xmin,'H':H,'reuseH':[k.hyp for k in G.kf],'offsetEI':m,'ppveatx':pc,'rpve':rmax,'GRest':racc}
+    return rval,persist,{'start':xmin,'H':H,'reuseH':[k.hyp for k in G.kf],'offsetEI':m,'ppveatx':pc,'rpve':rmax,'log10GRest':sp.log10(racc)}
 
 
 def alternate(optstate,persist,**para):

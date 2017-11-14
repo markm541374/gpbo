@@ -2,7 +2,7 @@ import gpbo
 from gpbo.core import objectives
 import numpy as np
 import scipy as sp
-gpbo.core.debugoutput['tmp']=True
+#gpbo.core.debugoutput['tmp']=True
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -11,13 +11,13 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 
-D=2
+D=4
 
 s=0.
 lb = sp.array([-1.]*D)
 ub = sp.array([1.]*D)
 
-rawf = objectives.camel6
+rawf = objectives.powell
 
 truemin =0.
 rpath='results'
@@ -25,7 +25,15 @@ def f(x,**kwargs):
     y,c,aux = rawf(x,**kwargs)
     return np.log(y+1),c,aux
 
-g = lambda x: f(x,**{})[0]
+def q(x,**kwargs):
+    t  = 1.*sp.pi/6.
+    z0 = x[0]*sp.cos(t)-x[1]*sp.sin(t)
+    z1 = x[0]*sp.sin(t)+x[1]*sp.cos(t)
+    y  = 0.1*z0**2 + 25.*z1**2
+    return np.log(y+1),1.,dict()
+#f([0.78547/5. -1]*3,**{})
+def g(x,y):
+    return rawf(np.array(x),**{})[0],0
 #from matplotlib import pyplot as plt
 #m=200
 #x = np.linspace(-1,1,m)
@@ -41,10 +49,9 @@ g = lambda x: f(x,**{})[0]
 #print(res)
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,250,s,rpath,'s_{}.csv'.format(args.offset))
-C.choosepara['regretswitch']=1e-4
+C.choosepara['regretswitch']=1e-2
 #
+#C = gpbo.core.config.eihypgamma(f,D,200,s,rpath,'S_{}.csv'.format(args.offset))
 out = gpbo.search(C)
 #print(out)
 
-#confs = [['switching0',gpbo.core.config.switchdefault(f,D,10,160,s,rpath,'s_{}.csv'.format(i))] for i in range(16)]
-#gpbo.plotall(confs,10,rpath,trueopt=truemin+1e-99,logx=False,showends=True)

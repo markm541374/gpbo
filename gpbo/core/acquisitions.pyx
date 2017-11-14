@@ -209,6 +209,9 @@ def PESfsaq(optstate,persist,**para):
         persist['n']+=1
         
         return randomaq(optstate,persist,**para)
+    if not 'R' in persist.keys():
+        persist['R']=sp.eye(d)
+
     logger.info('PESfsaq')
     #logger.debug(sp.vstack([e[0] for e in optstate.ev]))
     #raise
@@ -220,7 +223,10 @@ def PESfsaq(optstate,persist,**para):
     if 'choosereturn' in para.keys():
         if 'reuseH' in para['choosereturn'].keys():
             presetH = para['choosereturn']['reuseH']
-    pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH,weighted=para['weighted'],prior=para['priorshape'])
+        if 'R' in para['choosereturn'].keys():
+            persist['R']=para['choosereturn']['R']
+            logger.info('rotation from choose by \n{}'.format(persist['R']))
+    pesobj = PES.PES(x,y,s,dx,para['lb'],para['ub'],para['kindex'],para['mprior'],para['sprior'],DH_SAMPLES=para['DH_SAMPLES'],DM_SAMPLES=para['DM_SAMPLES'], DM_SUPPORT=para['DM_SUPPORT'],DM_SLICELCBPARA=para['DM_SLICELCBPARA'],mode=para['SUPPORT_MODE'],noS=para['noS'],DM_DROP=para['drop'],preselectH=presetH,weighted=para['weighted'],prior=para['priorshape'],rotation=persist['R'])
     [xmin,ymin,ierror] = pesobj.search_pes(para['ev']['s'],para)
 
     logger.info('DIRECT found max PES at {} {}'.format(xmin,ierror))
@@ -232,7 +238,7 @@ def PESfsaq(optstate,persist,**para):
     hmax = hyp.max(axis=0)
     hmed = sp.median(hyp,axis=0)
     #logger.debug('hyperparameters:\nmean {}\nmedian {}\nstd {}\nmin {}\nmax {}'.format(hmean,hmed,hstd,hmin,hmax))
-    m,v = pesobj.G.infer_diag_post(xmin,[[sp.NaN]])
+    m,v = pesobj.G.infer_diag_post(persist['R'].dot(xmin.flatten()).reshape([1,d]),[[sp.NaN]])
     PIatX = sp.stats.norm.cdf(min(y),loc=m[0,0],scale=sp.sqrt(v[0,0]))
     persist['overhead']=time.clock()-t0
     return [i for i in xmin],para['ev'],persist,{'AQvalue':-ymin,'HYPstats':{'mean':hmean,'std':hstd,'min':hmin,'max':hmax},'HYPdraws':[k.hyp for k in pesobj.G.kf],'mindraws':pesobj.Z,'DIRECTmessage':ierror,'PESmin':ymin,'kindex':para['kindex'],'PIatX':PIatX}

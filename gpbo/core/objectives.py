@@ -30,7 +30,7 @@ def shiftbraninojf(x,**ev):
     return f-braninymin,1.,dict()
 
 
-hart3min = -3.86278
+hart3min = -3.86278214782076
 def shifthart3(x, **ev):
     #hartmann4 with a linear offset agains quadratic cost
 
@@ -43,7 +43,7 @@ def shifthart3(x, **ev):
     P = 0.0001*sp.array([[3689, 1170, 2673],
                          [4699, 4387, 7470],
                          [1091, 8732, 5547],
-                         [381, 5743, 8828]])
+                         [381.0, 5743, 8828]])
     outer = 0
     for ii in range(4):
         inner = 0
@@ -196,6 +196,19 @@ def camel6(x,**ev):
     fs = f + 1.03162845348987744408920985
     return fs,1,dict()
 
+def schmidtvetters(x,**ev):
+    z = [xi*5. +5. for xi in x]
+    f = 1./(1+(z[0]-z[1])**2) + sp.sin(0.5*(sp.pi*z[1]+z[2])) + sp.exp(((z[0]+z[1])/z[1] -2.)**2)
+    fs = f
+    if True:
+        pass
+    return fs,1.,dict()
+
+def powell(x,**ev):
+    z = [xi*10. for xi in x]
+    f = (z[0]+10*z[1])**2 + 5*(z[2]-z[3])**2 + (z[1]-2*z[2])**4 + 10*(z[0]-z[3])**4
+    print(f)
+    return f,1.,dict()
 def colville(x,**ev):
     #colville funciton (4d)
     z = [xi*10. for xi in x]

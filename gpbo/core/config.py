@@ -104,7 +104,7 @@ class eimlelearns():
         self.fname = fname
         return
 
-class eihypdefault():
+class eihypdefault(object):
     def __init__(self,f,D,n,s,path,fname):
         self.aqfn = gpbo.core.acquisitions.eihypaq
         self.aqpara= {
@@ -151,6 +151,16 @@ class eihypdefault():
         self.path = path
         self.fname = fname
         return
+
+class eihypgamma(eihypdefault):
+    def __init__(self,*args,**kwargs):
+        super(eihypgamma,self).__init__(*args,**kwargs)
+        D = len(self.aqpara['lb'])
+        self.reccpara['kindex']=self.aqpara['kindex']= GPdc.MAT52
+        self.reccpara['mprior']=self.aqpara['mprior']= sp.array([2.]+[3.]*D)
+        self.reccpara['sprior']=self.aqpara['sprior']= sp.array([0.5]+[0.15]*D)
+        self.reccpara['priorshape']=self.aqpara['priorshape']='gamma'
+
 class pesfsdefault(object):
     def __init__(self,f,D,n,s,path,fname,ninit=10):
         self.aqfn = gpbo.core.acquisitions.PESfsaq
@@ -438,6 +448,7 @@ class switchdefault():
                       'maxfun': 400},
             'pvetol':1e-2,
             'lineSh':1e-6,
+            'rotate':True,
             'nlineS':150
         }
 
