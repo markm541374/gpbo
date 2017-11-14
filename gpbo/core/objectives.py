@@ -30,7 +30,7 @@ def shiftbraninojf(x,**ev):
     return f-braninymin,1.,dict()
 
 
-hart3min = -3.86278214782076
+hart3min = -3.862779787332660444
 def shifthart3(x, **ev):
     #hartmann4 with a linear offset agains quadratic cost
 
@@ -57,7 +57,7 @@ def shifthart3(x, **ev):
         outer = outer + new
     f = -outer
 
-    print( 'f inputs x:{} ev:{} outputs y:{}'.format(z, ev, f))
+    print( 'f inputs x:{} ev:{} outputs y:{}'.format(x, ev, f))
     return f-hart3min, 1., dict()
 
 def shifthart3D(x,**ev):
