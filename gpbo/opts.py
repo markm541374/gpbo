@@ -14,12 +14,13 @@ plt.rc('font',serif='Times')
 
 import matplotlib.patches as mpatches
 import scipy as sp
-try:
-    from gpbo.exps.thirdwrap.mtbowrap import optmtbo
-    from gpbo.exps.thirdwrap.fabwrap import optfabolas
-    from gpbo.exps.thirdwrap.fabwrap import optfabolas_mod
-except:
-    print('\n\ndidnt import robo!!!!!!\n\n')
+print('removed robo import in opts.py l17 due to theano errors')
+#try:
+#    from gpbo.exps.thirdwrap.mtbowrap import optmtbo
+#    from gpbo.exps.thirdwrap.fabwrap import optfabolas
+#    from gpbo.exps.thirdwrap.fabwrap import optfabolas_mod
+#except:
+#    print('\n\ndidnt import robo!!!!!!\n\n')
 def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
     for i_ in range(nreps):
         ii=i_+indexoffset

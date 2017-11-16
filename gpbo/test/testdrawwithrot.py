@@ -17,7 +17,7 @@ from gpbo.core import GPdc
 #2d gp test
 
 
-nt=25
+nt=15
 X = ESutils.draw_support(2, sp.array([-1.,-1.]),sp.array([1.,1.]),nt,ESutils.SUPPORT_UNIFORM)
 D = [[sp.NaN]]*(nt)
 hyp = sp.array([1.5,0.45,0.45])
@@ -38,7 +38,7 @@ RotM = sp.array([[sp.cos(t),-sp.sin(t)],[sp.sin(t),sp.cos(t)]])
 #Z = ESutils.draw_support(G, sp.array([-1.,-1.]),sp.array([1.,1.]),500,ESutils.SUPPORT_LAPAPR,para=np)
 #R = ESutils.draw_min(G,Z,500)
 f,a = plt.subplots()
-Z2 = ESutils.draw_support(G, sp.array([-1.,-1.]),sp.array([1.,1.]),500,ESutils.SUPPORT_LAPAPROT,para=40,weighted=2,rotation=RotM)
+Z2 = ESutils.draw_support(G, sp.array([-1.,-1.]),sp.array([1.,1.]),500,ESutils.SUPPORT_VARREJ,para=40,weighted=2,rotation=RotM)
 R2 = ESutils.draw_min(G,Z2,500)
 
 a.plot(Z2[:,0],Z2[:,1],'b.')

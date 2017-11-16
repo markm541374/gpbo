@@ -60,13 +60,13 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False,rota
             X[:,i] += lb[i]
         X = X.dot(rotation)
     elif method==SUPPORT_VARREJ:
-        if not np.allclose(rotation,sp.eye(len(lb))):
-            raise NotImplementedError
+        #if not np.allclose(rotation,sp.eye(len(lb))):
+        #    raise NotImplementedError
         print( "Drawing support using varreject:")
         batch=500
         out=[]
         while len(out)<n:
-            X=sp.random.uniform(size=[batch,d])
+            X=sp.random.uniform(size=[batch,d]).dot(rotation)
             for i in range(d):
                 X[:,i] *= ub[i]-lb[i]
                 X[:,i] += lb[i]

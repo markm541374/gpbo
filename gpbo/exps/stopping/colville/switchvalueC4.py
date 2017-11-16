@@ -11,7 +11,7 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 
-D=4
+D=2
 
 s=0.
 lb = sp.array([-1.]*D)
@@ -48,7 +48,7 @@ def g(x,y):
 
 #print(res)
 #-----------------------
-C=gpbo.core.config.switchdefault(f,D,10,250,s,rpath,'s_{}.csv'.format(args.offset))
+C=gpbo.core.config.switchdefault(q,D,10,250,s,rpath,'s_{}.csv'.format(args.offset))
 C.choosepara['regretswitch']=1e-2
 #
 #C = gpbo.core.config.eihypgamma(f,D,200,s,rpath,'S_{}.csv'.format(args.offset))

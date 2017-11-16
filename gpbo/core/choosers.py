@@ -47,6 +47,34 @@ def prob(G,x,tol=1e-3,dropdims=[]):
         
     logger.debug('eigenvector probs {}'.format((count+1.)/(nsam+2.)))
     return
+
+def drawpartitionmin2(G,S,xm,rm,n):
+    #distance to xmin
+    xm = sp.array(xm)
+    ns,d = S.shape
+    #R is distance from xm for each S
+    R = sp.empty(ns)
+    for i in xrange(ns):
+        R[i] = sp.linalg.norm(S[i,:]-xm)
+    #O is indicies by distance from xm
+    O = sp.argsort(R)
+    split = sp.searchsorted(R[O],rm)+1
+    S_ = sp.vstack([xm,S[O,:]])
+    Z = G.draw_post(S_, [[sp.NaN]] *(ns+1),  n)
+    Res = sp.empty([n,5])
+    Res[:,1] = Z[:,:split].min(axis=1)
+    Res[:,2] = Z[:,split:].min(axis=1)
+    Res[:,3] = Z[:,0]
+    Res[:,0] = Res[:,1:3].min(axis=1)
+    Res[:,4] = Res[:,1:3].argmin(axis=1)
+
+    argminin = Z[:,:split].argmin(axis=1)
+    argminmax = argminin.max()
+    maxRin = R[O[argminmax-1]]
+    #print(str(argminin)+'\n'+str(argminmax)+'\n'+str(maxRin)+' ' +str(rm)+'\n'+str(R[O[argminin]]))
+    print('from {} draws {} in rpve with rad {}. Furthest within rpve index{} rad{} '.format(ns,split,rm,argminmax-1, maxRin))
+    return Res, maxRin
+
 def globallocalregret(optstate,persist,**para):
     #doublenormdist
     #norprior
@@ -72,27 +100,18 @@ def globallocalregret(optstate,persist,**para):
     dx = [e['d'] for e in optstate.ev]
     logger.info('building GP')
     G = PES.makeG(x, y, s, dx, para['kindex'], para['mprior'], para['sprior'], para['nhyp'],prior=para['priorshape'])
-    #logger.critical('mean hyp{}'.format(sp.mean(sp.vstack([k.hyp for k in G.kf]),axis=0)))
-    #MAP = gpbo.core.GPdc.searchMAPhyp(x, y, s, dx, para['mprior'], para['sprior'], para['kindex'])
-    #logger.critical('{}'.format(MAP))
-    #find the pred. minimum
 
-    xmin,ymin,ierror = gpbo.core.optutils.twopartopt(lambda x:G.infer_m_post(x,[[sp.NaN]])[0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
-    mxmin,vxmin = [j[0,0] for j in G.infer_diag_post(xmin,[[sp.NaN]])]
+    xminr,ymin,ierror = gpbo.core.optutils.twopartopt(lambda x:G.infer_m_post(persist['R'].dot(x.flatten()).reshape([1,d]),[[sp.NaN]])[0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
+    xmin = persist['R'].dot(xminr.flatten()).reshape([1,d])
+    #mxmin,vxmin = [j[0,0] for j in G.infer_diag_post(xmin,[[sp.NaN]])]
     logger.info('post min {} at {} '.format(xmin,ymin))
-    xvmax,vmax,ierror = gpbo.core.optutils.twopartopt(lambda x:-G.infer_diag_post(x,[[sp.NaN]])[1][0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
-    mvmax,vvmax = [j[0,0] for j in G.infer_diag_post(xvmax,[[sp.NaN]])]
-    logger.info('post var max {} at {} with mean {}'.format(vvmax,xvmax,mvmax))
 
-    #xtrue = sp.array([[-0.597,-0.700,-0.046,-0.449,-0.377,0.315]])
-    #xm,xv = G.infer_diag_post(xtrue,[[sp.NaN]])
-    #xe = G.infer_EI_post(xtrue,[[sp.NaN]])
-    #logger.critical('m,v,EI at truemin {} {} {}'.format(xm,sp.sqrt(xv),xe))
-    #get dims that are on teh edge
     dropdims=[]
     for i in range(d):
-        if xmin[i]>0.995*(ub[i]-lb[i])+lb[i] or xmin[i]<lb[i]+(1.-0.995)*(ub[i]-lb[i]):
+        if xminr[i]>0.995*(ub[i]-lb[i])+lb[i] or xminr[i]<lb[i]+(1.-0.995)*(ub[i]-lb[i]):
             dropdims.append(i)
+            if not sp.allclose(sp.eye(d),persist['R']):
+                print('edge isn\'t working with nonzero rotation')
     logger.info('post min in on edge in axes {}'.format(dropdims))
     #get hessian/grad posterior
     #local probmin elipse at post min
@@ -126,24 +145,7 @@ def globallocalregret(optstate,persist,**para):
         #U,S,V = sp.linalg.svd(H)
         eva,eve = sp.linalg.eigh(H)
         V = eve.T
-        #print('________________')
-        #G = PES.makeG(x.dot(V.T), y, s, dx, para['kindex'], para['mprior'], para['sprior'], para['nhyp'],prior=para['priorshape'])
-        #xmin,ymin,ierror = gpbo.core.optutils.twopartopt(lambda x:G.infer_m_post(V.dot(x.flatten()).reshape([1,4]),[[sp.NaN]])[0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
-        #print('newxmin {}'.format(xmin))
-        #xmin = V.dot(xmin.flatten()).reshape(xmin.shape)
-        #GH = gpbo.core.optutils.gpGH(G,xmin)
-        #Gr,cG,H,Hvec,varHvec,M,varM = GH
-        #m = sp.diag(H)
-        #v = sp.diag(gpbo.core.optutils.Hvec2H(sp.diagonal(varHvec),d))
-        #logger.debug('H,stH\n{}\n{}'.format(H,sp.sqrt(gpbo.core.optutils.Hvec2H(sp.diagonal(varHvec),d))))
-        #logger.debug('axisprobs {}'.format(1.-sp.stats.norm.cdf(sp.zeros(d),loc=m,scale=sp.sqrt(v))))
-        #pc = gpbo.core.optutils.probgppve(G,sp.array(xmin),tol=para['pvetol'],dropdims=dropdims)
-        #logger.info('prob pvedef at xmin {}'.format(pc))
-        #print('________ ____________')
-        #raise
         persist['R'] = V.dot(persist['R'])
-    else:
-        evector = sp.eye(d)
     mask = sp.ones(d)
     for i in dropdims:
         mask[i]=0.
@@ -152,6 +154,7 @@ def globallocalregret(optstate,persist,**para):
         C= P>1-para['pvetol']
         #print(C,P,sp.array(x)*mask)
         return C
+
     #todo assuming unit radius search region for Rinit=1
     rmax = gpbo.core.optutils.ballradsearch(d,1.,PDcondition,ndirs=para['nlineS'],lineSh=para['lineSh'])
 
@@ -177,7 +180,7 @@ def globallocalregret(optstate,persist,**para):
             logger.debug('plotting some draws...')
             #draw support points
 
-            W = sp.vstack([ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_LAPAPROT, para=20),ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_VARREJ, para=vvmax)])
+            W = sp.vstack([ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_LAPAPROT, para=20,rotation=persist['R']),ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_VARREJ, para=vvmax,rotation=persist['R'])])
             nd = 1500
             #draw mins and value of g at xmin as pair
             R, Y, A = ESutils.draw_min_xypairgrad(G, W, nd, xmin)
@@ -202,10 +205,16 @@ def globallocalregret(optstate,persist,**para):
             del (fig)
         logger.info('no +ve def region, choosereturns 0')
         return 0,persist,{'reuseH':[k.hyp for k in G.kf],'ppveatx':pc,'rpve':rmax,'R':persist['R']}
-    #draw support points
-    W = sp.vstack([ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_LAPAPROT, para=20,weighted=para['weighted']),ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_VARREJ, para=vvmax)])
 
-    Q, maxRin = gpbo.core.optutils.drawpartitionmin(G,W,xmin,rmax,para['draws'])
+
+    xvmaxr,vmax,ierror = gpbo.core.optutils.twopartopt(lambda x:-G.infer_diag_post(persist['R'].dot(x.flatten()),[[sp.NaN]])[1][0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
+    xvmax = persist['R'].dot(xvmaxr.flatten())
+    mvmax,vvmax = [j[0,0] for j in G.infer_diag_post(xvmax,[[sp.NaN]])]
+    logger.info('post var max {} at {} with mean {}'.format(vvmax,xvmax,mvmax))
+    #draw support points
+    W = sp.vstack([ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_LAPAPROT, para=20,weighted=para['weighted'],rotation=persist['R']),ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_VARREJ, para=vvmax, rotation=persist['R'])])
+
+    Q, maxRin = drawpartitionmin2(G,W,xmin,rmax,para['draws'])
 
     logger.info('+ve region radius {} max sample radius {}'.format(rmax, maxRin))
     #pcurves from Q
