@@ -75,8 +75,35 @@ def shifthart3D(x,**ev):
         F.append((fp-fn)/(2.*h))
     return F,c,d
 
-hart6min = -3.32237
-hart6xmin = [0.20169,0.150011,0.476874,0.275332,0.311652,0.6573]
+hart4min = -3.1344941412223984440892
+def shifthart4(x, **ev):
+    #hartmann4 with a linear offset agains quadratic cost
+    z = [0.5*xi +0.5 for xi in x]
+    al = sp.array([1.,1.2,3.,3.2]).T
+    A = sp.array([[10., 3., 17., 3.5, 1.7, 8.],
+                  [0.05, 10., 17., 0.1, 8, 14.],
+                  [3., 3.5, 1.7, 10., 17., 8.],
+                  [17., 8., 0.05, 10., 0.1, 14.]])
+    P = 0.0001 * sp.array([[1312., 1696., 5569., 124., 8283., 5886.],
+                           [2329., 4135., 8307., 3736., 1004., 9991.],
+                           [2348., 1451., 3522., 2883., 3047., 6650.],
+                           [4047., 8828., 8732., 5743., 1091., 381.]])
+    outer = 0
+    for ii in range(4):
+        inner = 0
+        for jj in range(4):
+            xj = z[jj]
+            Aij = A[ii, jj]
+            Pij = P[ii, jj]
+            inner += Aij * (xj - Pij)**2
+
+        new = al[ii] * sp.exp(-inner)
+        outer = outer + new
+    f = (1.1-outer)/0.839
+
+    #print( 'f inputs x:{} ev:{} outputs y:{}  '.format(z, ev, f))
+    return f-hart4min, 1., dict()
+hart6min = -3.3223680114155138112
 def shifthart6(x, **ev):
     #hartmann4 with a linear offset agains quadratic cost
     z = [0.5*xi +0.5 for xi in x]
@@ -102,7 +129,7 @@ def shifthart6(x, **ev):
         outer = outer + new
     f = -outer
 
-    print( 'f inputs x:{} ev:{} outputs y:{}  '.format(z, ev, f))
+    #print( 'f inputs x:{} ev:{} outputs y:{}  '.format(z, ev, f))
     return f-hart6min, 1., dict()
 
 def rosenojf(x,**ev):

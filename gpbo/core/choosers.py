@@ -103,8 +103,8 @@ def globallocalregret(optstate,persist,**para):
 
     xminr,ymin,ierror = gpbo.core.optutils.twopartopt(lambda x:G.infer_m_post(persist['R'].dot(x.flatten()).reshape([1,d]),[[sp.NaN]])[0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
     xmin = persist['R'].dot(xminr.flatten()).reshape([1,d])
-    #mxmin,vxmin = [j[0,0] for j in G.infer_diag_post(xmin,[[sp.NaN]])]
-    logger.info('post min {} at {} '.format(xmin,ymin))
+    #:mxmin,vxmin = [j[0,0] for j in G.infer_diag_post(optstate.x[0],[[sp.NaN]])]
+    logger.info('post min at {}(true) {}(rotated) is {}'.format(xminr,xmin,ymin))
 
     dropdims=[]
     for i in range(d):
@@ -382,7 +382,7 @@ def globallocalregret(optstate,persist,**para):
         R=minimize(fn2,C.T.dot(xmin),method='bfgs')
         logger.warn('cheat testopt result with precondition {}:\n{}'.format(H,R))
 
-    return rval,persist,{'start':xmin,'H':H,'reuseH':[k.hyp for k in G.kf],'offsetEI':m,'ppveatx':pc,'rpve':rmax,'log10GRest':sp.log10(racc)}
+    return rval,persist,{'start':xminr.flatten(),'H':H,'reuseH':[k.hyp for k in G.kf],'offsetEI':m,'ppveatx':pc,'rpve':rmax,'log10GRest':sp.log10(racc)}
 
 
 def alternate(optstate,persist,**para):

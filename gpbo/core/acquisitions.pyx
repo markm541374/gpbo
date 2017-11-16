@@ -124,6 +124,11 @@ def eihypaq(optstate,persist,**para):
         persist['n']+=1
 
         return randomaq(optstate,persist,**para)
+    if not 'R' in persist.keys():
+        rotation=sp.eye(d)
+    else:
+        rotation = persist['R']
+
     logger.info('EIHYPaq')
     x=sp.vstack(optstate.x)
     y=sp.vstack(optstate.y)
@@ -138,10 +143,10 @@ def eihypaq(optstate,persist,**para):
     else:
         prior = 'lognorm'
     if not presetH:
-        G = PES.makeG(x,y,s,dx,para['kindex'],para['mprior'],para['sprior'],para['DH_SAMPLES'],prior=prior)
+        G = PES.makeG(x.dot(rotation.T),y,s,dx,para['kindex'],para['mprior'],para['sprior'],para['DH_SAMPLES'],prior=prior)
     else:
         logger.info('reusing preselected hyperparameters')
-        G =  GPdc.GPcore(x,y,s,dx, [GPdc.kernel(para['kindex'], x.shape[1], h) for h in presetH])
+        G =  GPdc.GPcore(x.dot(rotation.T),y,s,dx, [GPdc.kernel(para['kindex'], x.shape[1], h) for h in presetH])
     fixEI=False
     fixVal=0.
     if 'choosereturn' in para.keys():
@@ -154,7 +159,7 @@ def eihypaq(optstate,persist,**para):
     def wrap(Q):
         global COUNT
         COUNT+=1
-        x = sp.array([Q])
+        x = rotation.dot(sp.array([Q]).flatten()).reshape([1,d])
         #m,v = G.infer_diag(x,[[sp.NaN]])
         #lei = G.infer_EI(x,[[sp.NaN]],fixI=fixEI,I=fixVal)
         v = G.infer_lEI_post(x,[[sp.NaN]],fixI=fixEI,I=fixVal)[0,0]
@@ -171,7 +176,7 @@ def eihypaq(optstate,persist,**para):
     hmax = hyp.max(axis=0)
     hmed = sp.median(hyp,axis=0)
     #logger.debug('hyperparameters:\nmean {}\nmedian {}\nstd {}\nmin {}\nmax {}'.format(hmean,hmed,hstd,hmin,hmax))
-    m,v = G.infer_diag_post(xmin,[[sp.NaN]])
+    m,v = G.infer_diag_post(rotation.dot(xmin.flatten()).reshape([1,d]),[[sp.NaN]])
     PIatX = sp.stats.norm.cdf(min(y),loc=m[0,0],scale=sp.sqrt(v[0,0]))
     persist['overhead']=time.clock()-t0
 
@@ -182,10 +187,10 @@ def eihypaq(optstate,persist,**para):
         V = sp.empty([100,100])
         for i in range(100):
             for j in range(100):
-                m,v = G.infer_diag_post(sp.array([[x[i],x[j]]]),[[sp.NaN]])
+                m,v = G.infer_diag_post(sp.array([x[i],x[j]]).dot(rotation.T),[[sp.NaN]])
                 M[i,j]=m[0]
                 V[i,j]=v[0]
-                A[i,j] = G.infer_lEI_post(sp.array([[x[i],x[j]]]),[[sp.NaN]],fixI=fixEI,I=fixVal)[0,0]
+                A[i,j] = G.infer_lEI_post(sp.array([x[i],x[j]]).dot(rotation.T),[[sp.NaN]],fixI=fixEI,I=fixVal)[0,0]
         f,a = plt.subplots(nrows=2,ncols=2,figsize=[20,20])
         CS = a[0,0].contour(x,x,M,30)
         a[0,0].clabel(CS, inline=1, fontsize=10)
@@ -193,7 +198,7 @@ def eihypaq(optstate,persist,**para):
         a[1,0].clabel(CS, inline=1, fontsize=10)
         CS = a[0,1].contour(x,x,A,30)
         a[0,1].clabel(CS, inline=1, fontsize=10)
-        f.savefig('dbout/eihyp_{}.png'.format(optstate.n))
+        f.savefig('dbout/eihyp_{}_{}.png'.format(optstate.n,rotation[0,0]))
         plt.close(f)
     return [i for i in xmin],para['ev'],persist,{'naqev':COUNT,'logHYPstats':{'mean':hmean,'median':hmed,'std':hstd,'min':hmin,'max':hmax},'HYPdraws':[k.hyp for k in G.kf], 'EImax':sp.exp(-ymin),'kindex':para['kindex'],'PIatX':PIatX}
 
