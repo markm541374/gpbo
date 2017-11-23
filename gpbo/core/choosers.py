@@ -88,7 +88,8 @@ def globallocalregret(optstate,persist,**para):
         return 1, persist, dict()
 
     logging.info('globallocalregretchooser with {} inflated diagonal'.format(persist['raiseS']))
-    logging.info('rotate\n{}'.format(persist['R']))
+    if para['rotate']:
+        logging.info('rotate\n{}'.format(persist['R']))
     d = len(para['lb'])
     lb = para['lb']
     ub = para['ub']

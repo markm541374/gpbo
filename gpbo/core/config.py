@@ -437,8 +437,8 @@ class switchdefault():
             'weighted': aq0para['weighted'],
             'check': True,
             'everyn': 1,
-            'support': 2500,
-            'draws': 25000,
+            'support': 1500,
+            'draws': 10000,
             'regretswitch':1e-4,
             'dpara': {'user_data': [],
                       'algmethod': 1,
@@ -447,9 +447,9 @@ class switchdefault():
             'lpara': {'gtol': 0.00001,
                       'maxfun': 400},
             'pvetol':1e-2,
-            'lineSh':1e-6,
+            'lineSh':1e-4,
             'rotate':True,
-            'nlineS':150
+            'nlineS':30+10*D
         }
 
         self.aqfn = [aq0,aq1,aq2]

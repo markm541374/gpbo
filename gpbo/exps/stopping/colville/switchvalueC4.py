@@ -11,13 +11,13 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 
-D=4
+D=2
 
 s=0.
 lb = sp.array([-1.]*D)
 ub = sp.array([1.]*D)
 
-rawf = objectives.shifthart4
+rawf = objectives.camel3
 
 truemin =0.
 rpath='results'
@@ -49,7 +49,7 @@ def g(x,y):
 #print(res)
 #-----------------------
 C=gpbo.core.config.switchdefault(f,D,10,250,s,rpath,'s_{}.csv'.format(args.offset))
-C.aqpara[0]['nrandinit']=C.reccpara[0]['onlyafter']=C.choosepara['onlyafter']=80
+C.aqpara[0]['nrandinit']=C.reccpara[0]['onlyafter']=C.choosepara['onlyafter']=40
 C.choosepara['regretswitch']=1e-2
 #
 #C = gpbo.core.config.eihypgamma(f,D,200,s,rpath,'S_{}.csv'.format(args.offset))

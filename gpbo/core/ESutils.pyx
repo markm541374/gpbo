@@ -63,19 +63,29 @@ def draw_support(g, lb, ub, n, method, para=1.,pad_unif=True,weighted=False,rota
         #if not np.allclose(rotation,sp.eye(len(lb))):
         #    raise NotImplementedError
         print( "Drawing support using varreject:")
-        batch=500
+        batch=1000
         out=[]
-        while len(out)<n:
-            X=sp.random.uniform(size=[batch,d]).dot(rotation)
-            for i in range(d):
-                X[:,i] *= ub[i]-lb[i]
-                X[:,i] += lb[i]
+        w=(np.array(ub)-np.array(lb)).reshape([1,d])
+        l=np.array(lb).reshape([1,d])
+        c=0
+        out = np.empty([0,d])
+        while out.shape[0]<n:
+            c+=1
+            X=(sp.random.uniform(size=[batch,d])*w+l).dot(rotation)
+            #for i in range(d):
+            #    X[:,i] *= ub[i]-lb[i]
+            #    X[:,i] += lb[i]
+            #X = X.dot(rotation)
             pa = sp.random.uniform(size=batch)
             m,v = g.infer_diag_post(X,[[sp.NaN]]*batch)
-            for j in range(batch):
-                if para*pa[j]<v[0,j]:
-                    out.append(X[j,:])
+
+            M = para*pa<v[0,:]
+            out = np.vstack([out,X[M,:]])
+            #for j in range(batch):
+            #    if para*pa[j]<v[0,j]:
+            #        out.append(X[j,:])
         X=sp.vstack(out[:n])
+        print('reject {} {}'.format(n,c*batch))
     elif method==SUPPORT_LAPAPR:
 
         if not np.allclose(rotation,sp.eye(len(lb))):
