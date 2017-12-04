@@ -54,7 +54,55 @@ class eimledefault():
         self.path = path
         self.fname = fname
         return
+import copy
+class eifixdefault():
+    """
+    fixed s, space is [-1,1]^D
 
+    """
+    def __init__(self,f,D,n,s,path,fname):
+        self.aqfn = gpbo.core.acquisitions.EIFIXaq
+        self.aqpara= {
+            'ev': {'s': s, 'd': [sp.NaN]},
+            'lb': [-1.]*D,
+            'ub': [1.]*D,
+            'nrandinit': 10,
+            'hyper': sp.array([1.]+[0.5]*D),
+            'kindex': GPdc.MAT52,
+            'maxf':500+100*D,
+            'overhead':None,
+            'dpara': {'user_data': [],
+                      'algmethod': 1,
+                      'maxf': 2000,
+                      'logfilename': '/dev/null'},
+            'lpara': {'gtol': 0.00001,
+                      'maxfun': 200}
+        }
+
+        self.stoppara = {'nmax': n}
+        self.stopfn = gpbo.core.optimize.nstopfn
+
+        self.reccfn = gpbo.core.reccomenders.gpfixrecc
+        self.reccpara = {
+            'ev':self.aqpara['ev'],
+            'lb':self.aqpara['lb'],
+            'ub':self.aqpara['ub'],
+            'hyper':self.aqpara['hyper'],
+            'kindex':self.aqpara['kindex'],
+            'maxf':500+100*D,
+            'onlyafter':self.aqpara['nrandinit'],
+            'check':True,
+            'smode':'direct',
+            'dpara':copy.deepcopy(self.aqpara['dpara']),
+            'lpara':self.aqpara['lpara'],
+            'everyn':1
+        }
+        self.ojfchar = {'dx': len(self.aqpara['lb']), 'dev': len(self.aqpara['ev'])}
+        self.ojf=f
+
+        self.path = path
+        self.fname = fname
+        return
 class eimlelearns():
     """
     fixed s, space is [-1,1]^D

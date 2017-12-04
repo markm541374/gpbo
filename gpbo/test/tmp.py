@@ -2,9 +2,9 @@ import numpy as np
 import scipy as sp
 import gpbo
 import pandas as pd
-#gpbo.core.debugoutput['tmp']=True
+gpbo.core.debugoutput['adaptive']=True
 #df = pd.read_csv('/home/mark/gpbo/exps/stopping/colville/results/s_3.csv')
-df = pd.read_csv('/home/mark/gpbo/exps/stopping/colville/results/switchingp_-2_6.csv')
+df = pd.read_csv('/home/mark/gpbo/exps/stopping/colville/results/switchingp_-4_8.csv')
 dim=2
 X = np.vstack([df[' x{}'.format(i)].values for i in range(dim)]).T
 Y = np.array([df[' y'].values]).T
@@ -12,7 +12,7 @@ print(Y.min())
 S = np.array([[0.]*Y.size]).T
 D=[[np.NaN]]*Y.size
 O = gpbo.core.optimize.optstate()
-n=40
+n=70
 for i in range(n):
     O.update(X[i,:],{'d':[np.NaN],'s':0.},Y[i,0],1.,1.)
 #C = gpbo.core.config.eihypdefault(lambda x:0,4,10,0.,'','')
@@ -23,6 +23,9 @@ R=np.array([[-0.39400595, -0.02694207, -0.19059855, -0.89872444],
  [ 0.23588363, -0.43604394, -0.8634903,   0.09278525],
  [-0.1428457,  -0.89857822,  0.41490941,  0.00156942]])
 persist = {'n':n,'d':dim,'flip':False,'raiseS':False,'R':np.eye(2)}
+
+for k in ['localsampleregret','Rexists','sampleregret','expectedregret','localrsam','localrest','expectedRbinorm']:
+    persist[k]=[]
 #C.aqpara['choosereturn']={'offsetEI':0}
 #x,par,per,aux = gpbo.core.acquisitions.eihypaq(O,persist,**C.aqpara)
 #x1,par,per,aux = gpbo.core.acquisitions.eihypaq(O,persist,**C.aqpara)

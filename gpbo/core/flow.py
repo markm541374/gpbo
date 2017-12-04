@@ -210,6 +210,7 @@ class GPcore:
         return np.mean(E, axis=0).reshape([1, ns])
 
     def infer_lEI(self,X,D,fixI=False,I=0.):
+        print('xxxx')
         m,v = self.infer_diag(X,D)
         if not fixI:
             I=np.infty

@@ -161,12 +161,13 @@ def globallocalregret(optstate,persist,**para):
 
     if gpbo.core.debugoutput['adaptive']:
         fig, ax = plt.subplots(nrows=3, ncols=4, figsize=(85, 85))
+        xmin=xmin.flatten()
         # plot the current GP
         if d==2:
-            gpbo.core.optutils.gpplot(ax[0,0],ax[0,1],G,para['lb'],para['ub'],ns=60)
+            #gpbo.core.optutils.gpplot(ax[0,0],ax[0,1],G,para['lb'],para['ub'],ns=60)
             ax[0,0].set_title('GP_post_mean')
             ax[0,1].set_title('GP_post_var')
-            ax[0, 0].plot(xmin[0], xmin[1], 'ro')
+            ax[0,0].plot(xmin[0], xmin[1], 'ro')
             #plot some draws from H
             for i in xrange(20):
                 Gm,Gv,Hd = gpbo.core.drawconditionH(*GH)
@@ -181,6 +182,9 @@ def globallocalregret(optstate,persist,**para):
             logger.debug('plotting some draws...')
             #draw support points
 
+            xvmaxr,vmax,ierror = gpbo.core.optutils.twopartopt(lambda x:-G.infer_diag_post(persist['R'].dot(x.flatten()),[[sp.NaN]])[1][0,0],para['lb'],para['ub'],para['dpara'],para['lpara'])
+            xvmax = persist['R'].dot(xvmaxr.flatten())
+            mvmax,vvmax = [j[0,0] for j in G.infer_diag_post(xvmax,[[sp.NaN]])]
             W = sp.vstack([ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_LAPAPROT, para=20,rotation=persist['R']),ESutils.draw_support(G, lb, ub, para['support']/2, ESutils.SUPPORT_VARREJ, para=vvmax,rotation=persist['R'])])
             nd = 1500
             #draw mins and value of g at xmin as pair
@@ -300,6 +304,7 @@ def globallocalregret(optstate,persist,**para):
             #plot mindraws
             R, Y, A = ESutils.draw_min_xypairgrad(G, W, 1500, xmin)
             gpbo.core.optutils.plotaslogrtheta(R[:,0],R[:,1],xmin[0],xmin[1],ax[1,1],'r.')
+
             ax[0,2].plot(R[:,0],R[:,1],'r.')
         ax[2,2].plot(Q[:,1],Q[:,2],'r.')
         ax[2,2].set_xlabel('inR')
@@ -312,7 +317,7 @@ def globallocalregret(optstate,persist,**para):
         ax[2,1].plot([ymin],[ymin],'go')
 
         def pltcdf(Y,C,ax,col):
-            return ax.plot(sp.hstack([[i,i] for i in Y]),sp.hstack([[i-C[0],i] for i in C]),col)
+            return ax.plot(sp.hstack([[i,i] for i in Y])[1:-1],sp.hstack([[i-C[0],i] for i in C])[1:-1],color=col,label='Sampled CDF')
 
         pltcdf(Yin,Cin,ax[2,0],'b')
         rin = sp.linspace(Yin[0],Yin[-1],150)
@@ -324,9 +329,40 @@ def globallocalregret(optstate,persist,**para):
         ax[2,0].plot(rat, map(lambda x:sp.stats.norm.cdf(x,*normat),rat),'k')
         ax[2,0].set_yscale('logit')
 
-        pltcdf(Yout,Cout,ax[1,0],'r')
-        ax[1,0].set_yscale('log')
 
+        pltcdf(Yout,Cout,ax[1,0],'r')
+        ax[1,0].set_yscale('logit')
+
+        rl = min(Yout)
+        ru = max(Yout)
+        sup = sp.linspace(rl-0.25*(ru-rl),0.5*(rl+ru),50)
+        ax[1,0].plot(sup,sp.stats.norm.cdf(sup,loc=mu,scale=sp.sqrt(vvmax)),'b--',label='Approximate Tail Upper Bound')
+        ax[1,0].plot(sup,sp.stats.norm.cdf(sup,loc=mvmax,scale=sp.sqrt(vvmax)),'g--',label='Lower Bound')
+        ax[1,0].axvline(ymin)
+
+        if True:
+            f2,a2 = plt.subplots(figsize=[8,5])
+            pltcdf(Yout,Cout,a2,'r')
+            a2.set_yscale('logit')
+
+            a2.plot(sup,sp.stats.norm.cdf(sup,loc=mu,scale=sp.sqrt(vvmax)),color='b',linestyle='--', label='Approx Tail Upper Bound')
+            a2.plot(sup,sp.stats.norm.cdf(sup,loc=mvmax,scale=sp.sqrt(vvmax)),color='b',linestyle='-.',label='Lower Bound')
+            a2.axvline(ymin,label='Posterior Mean Minimum',color='k',linestyle=':')
+            a2.set_ylabel('CDF')
+            a2.set_xlabel('y')
+            from matplotlib.ticker import NullFormatter
+            a2.yaxis.set_minor_formatter(NullFormatter())
+            a2.spines['left']._adjust_location()
+
+            #a2_=a2.twinx()
+            #sup2 = sp.linspace(rl-0.15*(ru-rl),ru,100)
+            #a2_.plot(sup2,[gpbo.core.GPdc.EI(-s,-m,std)[0,0] for s in sup2],'purple',label='Expected Improvement on Incumbent Model')
+            #a2_.set_ylabel('EI')
+            a2.legend()
+            #a2_.legend()
+            f2.savefig(os.path.join(debugoutput['path'],'ends.png'))
+
+            plt.close(f2)
         mxo=Yout[-1]
         mno=Yout[0]
         ro = sp.linspace(min(mno-0.05*(mxo-mno),ymin),mxo+0.05*(mxo-mno),200)
@@ -350,7 +386,7 @@ def globallocalregret(optstate,persist,**para):
         #persist['regretlower'].append(rlow)
         persist['localrest'].append(lrest)
         ax[0,3].plot(persist['Rexists'],persist['localrest'],'k')
-        ax[0,3].plot(persist['Rexists'],persist['expectedRbinorm'],'purple')
+        #ax[0,3].plot(persist['Rexists'],persist['expectedRbinorm'],'purple')
         ax[0,3].plot(persist['Rexists'],persist['sampleregret'],'b')
         ax[0,3].plot(persist['Rexists'],persist['expectedregret'],'g')
         ax[0,3].plot(persist['Rexists'],persist['localrsam'],'r')

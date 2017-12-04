@@ -312,7 +312,6 @@ class GPcore:
     def infer_lEI_post(self,X_,D_i,fixI=False,I=0.):
         E = self.infer_lEI(X_,D_i,fixI=fixI,I=I-self.trueYmean)
         ns=X_.shape[0]
-        #print(E)
         #print(sp.log(sp.nanmean(sp.exp(E),axis=0)))
         return (sp.log(sp.nanmean(sp.exp(E-sp.nanmax(E,axis=0)),axis=0))+sp.nanmax(E,axis=0)).reshape([1,ns])
 

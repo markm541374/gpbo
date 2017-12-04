@@ -113,6 +113,64 @@ def EIMAPaq(optstate,persist,**para):
     return [i for i in xmin],ev,persist,{'MAPHYP':MAP,'logEImin':ymin,'DIRECTmessage':ierror,'EImax':sp.exp(-ymin),'PIatX':PIatX}
 
 
+def EIFIXaq(optstate,persist,**para):
+    ev=para['ev']
+    ub = para['ub']
+    lb = para['lb']
+    nrandinit = para['nrandinit']
+    hyper = para['hyper']
+    kindex = para['kindex']
+    maxf = para['maxf']
+
+    if persist==None:
+        persist = {'n':0,'d':len(ub)}
+    n = optstate.n
+    d = persist['d']
+    if n<nrandinit:
+        persist['n']+=1
+        return randomaq(optstate,persist,ev=ev,lb=lb,ub=ub)
+    logger.info('EIMAPaq')
+
+    if para['overhead']=='predict':
+        overhead = geteffectiveoverhead(optstate,nrandinit)
+    x=sp.vstack(optstate.x)
+    y=sp.vstack(optstate.y)
+    s= sp.vstack([e['s']+10**optstate.condition for e in optstate.ev])
+    dx=[e['d'] for e in optstate.ev]
+    #raise ValueError
+    G = GPdc.GPcore(x, y, s, dx, GPdc.kernel(kindex, d, hyper))
+
+    #G.m[0].set_parameter_dict(MAP)
+    global count
+    count=0
+    def wrap(x):
+        global count
+        count+=x.shape[0]
+        xq = copy.copy(sp.array(x))
+        xq.resize([x.size/d,d])
+        a = G.infer_lEI(xq,[ev['d']])
+        return -a.flatten()
+    #print(wrap([0.,0.]))
+    #xmin,ymin,ierror = gpbo.core.optutils.silentdirect(wrap,para['lb'],para['ub'],**para['dpara'])
+    #logger.debug([xmin,ymin,ierror])
+    t0 = time.clock()
+    t0t=time.time()
+    res = cma.fmin(wrap, x0=0.5*sp.array(para['lb'])+0.5*sp.array(para['ub']), sigma0=0.6,
+                       restarts=0.,
+                       options={"bounds": [para['lb'], para['ub']],
+                                "verbose": -9,
+                                "verb_log": sys.maxsize,
+                                "maxfevals": para['dpara']['maxf']})
+    t1 = time.clock()
+    t1t = time.time()
+    xmin = res[0]
+    ymin = res[1]
+    logger.info('localrefine found max EI at {} {} clocktime {} {} {}'.format(xmin,sp.exp(ymin),t1-t0,t1t-t0t,count))
+    m,v = G.infer_diag_post(xmin,[[sp.NaN]])
+    PIatX = sp.stats.norm.cdf(min(y),loc=m[0,0],scale=sp.sqrt(v[0,0]))
+    persist['n']+=1
+    return [i for i in xmin],ev,persist,{'logEImin':ymin,'EImax':sp.exp(-ymin),'PIatX':PIatX}
+
 def eihypaq(optstate,persist,**para):
     t0=time.clock()
     para = copy.deepcopy(para)

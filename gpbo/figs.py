@@ -23,7 +23,7 @@ def stoppingplots(path,names,n,legendnames=None,fname='',title='',offset=0.):
 
     f,a = plt.subplots(1)
     for j,name in enumerate(names):
-        gpbo.opts.plotquartsends(a,[D[name][k]['index'] for k in range(n)],[D[name][k]['trueyatxrecc']-offset for k in range(n)],colors[j],0,legendnames[j])
+        gpbo.opts.plotquartsends(a,[D[name][k]['index'] for k in range(n)],[D[name][k]['trueyatxrecc']-offset-min(0,D[name][k]['trueyatxrecc'].values[-1]) for k in range(n)],colors[j],0,legendnames[j])
 
     a.set_yscale('log')
     a.set_xlabel('Steps')
@@ -40,11 +40,11 @@ def stoppingplots(path,names,n,legendnames=None,fname='',title='',offset=0.):
         E[name]['endRegret'] = np.empty(n)
         for i in range(n):
             E[name]['steps'][i] = D[name][i]['index'].values[-1]
-            E[name]['endRegret'][i] = D[name][i]['trueyatxrecc'].values[-1]-offset
+            E[name]['endRegret'][i] = D[name][i]['trueyatxrecc'].values[-1]-offset-min(0,D[name][i]['trueyatxrecc'].values[-1])
         E[name]['r'] = '{:.3g}'.format(np.mean(E[name]['endRegret']))
         print(name)
         print(E[name]['endRegret'])
-        print(E[name]['endRegret']*E[name]['steps'])
+       # print(E[name]['endRegret']*E[name]['steps'])
         E[name]['s'] = '{:.3g}'.format(np.mean(E[name]['steps']))
         E[name]['rs']= '{:.3g}'.format(np.mean(E[name]['steps']*E[name]['endRegret']))
 
@@ -55,19 +55,49 @@ def stoppingplots(path,names,n,legendnames=None,fname='',title='',offset=0.):
 
     return
 
-def overhead(path,name0,name1,n0,n1,legendnames=None,fname='',title=''):
+def overhead(path,name0,names,n,legendnames=None,fname='',title=''):
 
     if legendnames==None:
-        legendnames=[name0,name1]
+        legendnames=[name0,names]
     D = dict()
     D[name0]=[]
-    for i in range(n0):
+    for i in range(n):
         D[name0].append(gpbo.optimize.readoptdata(os.path.join(path,'{}_{}.csv'.format(name0,i))))
-    D[name1]=[]
-    for i in range(n1):
-        D[name1].append(gpbo.optimize.readoptdata(os.path.join(path,'{}_{}.csv'.format(name1,i))))
+    for name in names:
+        D[name]=[]
+        for i in range(n):
+            D[name].append(gpbo.optimize.readoptdata(os.path.join(path,'{}_{}.csv'.format(name,i))))
     f,a = plt.subplots(1)
-    gpbo.opts.plotquartsends(a,[D[name0][k]['index'] for k in range(n0)],[D[name0][k]['taq'] for k in range(n0)],colors[0],0,legendnames[0])
-    gpbo.opts.plotquartsends(a,[D[name1][k]['index'] for k in range(n1)],[D[name1][k]['taq'] for k in range(n1)],colors[1],0,legendnames[1])
+    gpbo.opts.plotquarts(a,[D[name0][k]['index'] for k in range(n)],[D[name0][k]['taq'] for k in range(n)],colors[0],'-',legendnames[0])
+    gpbo.opts.plotquarts(a,[D[names[0]][k]['index'] for k in range(n)],[D[names[0]][k]['taq'] for k in range(n)],colors[1],'-',legendnames[1][0])
+    for i in range(n):
+        a.plot(D[names[0]][i]['index'],D[names[0]][i]['taq'],color=colors[1],linestyle='-')
+    a.set_xlabel('Steps')
+    a.set_ylabel('Overhead (s)')
+    a.set_title(title)
+    a.legend()
     f.savefig(os.path.join(path,'overhead_{}.png'.format(fname)))
+
+    j = max([max([len(D[name][i]['taq']) for i in range(n)]) for name in names])
+    print(j)
+    ref = np.zeros(j)
+    a =0
+    for i in range(n):
+        print(len(D[name0][i]['taq']))
+        if len(D[name0][i]['taq']) >= j:
+            ref+=D[name0][i]['taq'].values[:j]
+            a+=1
+    ref/=float(a)
+
+    for name in names:
+
+        acc=[0.,0.]
+        for i in range(n):
+            l = len(D[name][i]['taq'])
+            tref = np.sum(ref[:l])
+            taq = np.sum(D[name][i]['taq'].values[:l])
+            #print(l,taq,tref)
+            acc[0]+= taq
+            acc[1]+=tref
+        print(acc[0]/acc[1])
     return
