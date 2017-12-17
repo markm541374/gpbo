@@ -71,6 +71,7 @@ GP_LKonly::GP_LKonly(int d, int n, double* Xin, double* Yin, double* Sin, int* D
 		//printf("2 %f\n",R[0]);
 		R[0] -= 0.5*cblas_ddot(N,&Yin[0],1,&Yd[0],1);
 		//printf("3 %f\n",R[0]);
+		//printf("yd %f\n",Yin[0]);
                 return;
 	}
 
