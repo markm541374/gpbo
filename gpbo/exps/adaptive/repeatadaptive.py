@@ -7,6 +7,7 @@ import time
 import tqdm
 import pandas as pd
 from matplotlib import pyplot as plt
+import pickle
 ki = gpbo.core.GPdc.MAT52
 Dim=2
 lb = np.array([-1.]*Dim)
@@ -150,50 +151,61 @@ def similarity(k0,K):
 #    K = getdivisions(i)
 #    print(i,similarity(Kprev,K))
 #    Kprev=K
-allK=[]
-allS=[]
-#header [n,unique,last1,last2,last3,new]
-Data = np.zeros([70,6])
+def experiment():
+    allK=[]
+    allS=[]
+    #header [n,unique,last1,last2,last3,new]
+    Data = np.zeros([3,6])
 
-for e,i in enumerate(range(10,80)):
-    Data[e,0]=i
-    K0 = getdivisions(i)
-    if len(allK)>=1:
-        Data[e,2] = similarity(K0,allK[-1:])
-    else:
-        Data[e,2]=np.NaN
-    if len(allK)>=2:
-        Data[e,3] = similarity(K0,allK[-2:])
-    else:
-        Data[e,3]=np.NaN
-    if len(allK)>=3:
-        Data[e,4] = similarity(K0,allK[-3:])
-    else:
-        Data[e,4]=np.NaN
-    Data[e,5] = similarity(K0,[allS])
-    print('step {} prev1 {:.4g} prev2 {:.4g} prev3 {:.4g} ever {:.4g}'.format(i,similarity(K0,allK[-1:]),similarity(K0,allK[-2:]),similarity(K0,allK[-3:]),similarity(K0,[allS])))
-    allK.append(K0)
-    for k in K0:
-        if not k in allS:
-            allS.append(k)
+    for e,i in enumerate(range(10,13)):
+        Data[e,0]=i
+        K0 = getdivisions(i)
+        if len(allK)>=1:
+            Data[e,2] = similarity(K0,allK[-1:])
+        else:
+            Data[e,2]=np.NaN
+        if len(allK)>=2:
+            Data[e,3] = similarity(K0,allK[-2:])
+        else:
+            Data[e,3]=np.NaN
+        if len(allK)>=3:
+            Data[e,4] = similarity(K0,allK[-3:])
+        else:
+            Data[e,4]=np.NaN
+        Data[e,5] = similarity(K0,[allS])
+        print('step {} prev1 {:.4g} prev2 {:.4g} prev3 {:.4g} ever {:.4g}'.format(i,similarity(K0,allK[-1:]),similarity(K0,allK[-2:]),similarity(K0,allK[-3:]),similarity(K0,[allS])))
+        allK.append(K0)
+        for k in K0:
+            if not k in allS:
+                allS.append(k)
 
-    Data[e,1]=len(allS)
+        Data[e,1]=len(allS)
+    return Data,K0
 
+def plots(Data,K0):
 
-f,a = plt.subplots(nrows=1,ncols=1,sharex=True)
-a.plot(Data[:,0]+1,35*Data[:,1],'b',label='O(n^2) operations')
-a.plot(Data[:,0],35*len(K0)*(1-Data[:,5]),'r',label='O(n^3) operations')
-a.set_ylabel('Hyperparameter count')
-a.legend()
-f.savefig('figs/adaptive.png')
+    f,a = plt.subplots(nrows=1,ncols=1,sharex=True)
+    a.plot(Data[:,0]+1,35*Data[:,1],'b',label='O(n^2) operations')
+    a.plot(Data[:,0],35*len(K0)*(1-Data[:,5]),'r',label='O(n^3) operations')
+    a.set_ylabel('Hyperparameter count')
+    a.legend()
+    f.savefig('figs/adaptive.png')
 
-f,a = plt.subplots(nrows=1,ncols=1,sharex=True)
-a.plot(Data[:,0],1-Data[:,5],'b',label='All previous steps')
-#a.plot(Data[:,0],1-Data[:,2],'r',label='1-step')
-a.plot(Data[:,0],1-Data[:,4],'r',label='3 previous steps')
-a.plot(Data[:,0],1-Data[:,2],'g',label='1 previous step')
-#a.set_yscale('symlog',linthreshy=1./len(K0))
-a.set_xlabel('Iteration')
-a.set_ylabel('Fraction repeated \nhyperparameter values')
-a.legend()
-f.savefig('figs/adaptivefrac.png')
+    f,a = plt.subplots(nrows=1,ncols=1,sharex=True)
+    a.plot(Data[:,0],1-Data[:,5],'b',label='All previous steps')
+    #a.plot(Data[:,0],1-Data[:,2],'r',label='1-step')
+    a.plot(Data[:,0],1-Data[:,4],'r',label='3 previous steps')
+    a.plot(Data[:,0],1-Data[:,2],'g',label='1 previous step')
+    #a.set_yscale('symlog',linthreshy=1./len(K0))
+    a.set_xlabel('Iteration')
+    a.set_ylabel('Fraction repeated \nhyperparameter values')
+    a.legend()
+    f.savefig('figs/adaptivefrac.png')
+
+if __name__=="__main__":
+    if True:
+        #run the experiment
+        Data,K0 = experiment()
+        pickle.dump([Data,K0],open('data/expdata.p','w'))
+
+    plots(*pickle.load(open('data/expdata.p','r')))

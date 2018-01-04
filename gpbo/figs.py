@@ -8,11 +8,13 @@ import gpbo
 import os
 import matplotlib
 from matplotlib import pyplot as plt
-plt.style.use('seaborn-paper')
-plt.rc('font',serif='Times')
+#plt.style.use('seaborn-paper')
+#plt.rc('font',serif='Times')
 
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-def stoppingplots(path,names,n,legendnames=None,fname='',title='',offset=0.):
+def stoppingplots(path,names,n,legendnames=None,fname='',title='',offset=0.,fpath=None,showlegend=False):
+    if fpath is None:
+        fpath=path
     if legendnames==None:
         legendnames=names
     D = dict()
@@ -29,8 +31,9 @@ def stoppingplots(path,names,n,legendnames=None,fname='',title='',offset=0.):
     a.set_xlabel('Steps')
     a.set_ylabel('Regret')
     a.set_title(title)
-    a.legend()
-    f.savefig(os.path.join(path,'stopping_{}.png'.format(fname)))
+    if showlegend:
+        a.legend()
+    f.savefig(os.path.join(fpath,'stopping_{}.pdf'.format(fname)))
 
     print('tablerow:')
     E=dict()
@@ -55,8 +58,9 @@ def stoppingplots(path,names,n,legendnames=None,fname='',title='',offset=0.):
 
     return
 
-def overhead(path,name0,names,n,legendnames=None,fname='',title=''):
-
+def overhead(path,name0,names,n,legendnames=None,fname='',title='',fpath=None):
+    if fpath is None:
+        fpath=path
     if legendnames==None:
         legendnames=[name0,names]
     D = dict()
@@ -76,7 +80,7 @@ def overhead(path,name0,names,n,legendnames=None,fname='',title=''):
     a.set_ylabel('Overhead (s)')
     a.set_title(title)
     a.legend()
-    f.savefig(os.path.join(path,'overhead_{}.png'.format(fname)))
+    f.savefig(os.path.join(fpath,'overhead_{}.png'.format(fname)))
 
     j = max([max([len(D[name][i]['taq']) for i in range(n)]) for name in names])
     print(j)

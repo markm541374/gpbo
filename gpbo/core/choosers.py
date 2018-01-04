@@ -20,7 +20,7 @@ try:
     from matplotlib import pyplot as plt
     from matplotlib import patches
     plots=True
-    plt.style.use('seaborn-paper')
+    #plt.style.use('seaborn-paper')
 except ImportError:
     plots=False
     plt=None

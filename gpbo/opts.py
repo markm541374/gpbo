@@ -6,8 +6,8 @@ import copy
 import os
 import matplotlib
 from matplotlib import pyplot as plt
-plt.style.use('seaborn-paper')
-plt.rc('font',serif='Times')
+#plt.style.use('seaborn-paper')
+#plt.rc('font',serif='Times')
 
 
 
@@ -170,7 +170,8 @@ def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False):
     #a.plot(ends[yendorder], yends[yendorder], '.',color=col ,linestyle=line)
     #print("endvalues: {}".format(yends))
     a2 = a.twinx()
-    a2.plot(ends[sp.argsort(ends)],sp.linspace(1,0,n),color=col, linestyle='--',linewidth=0.2)
+    a2.grid(False)
+    a2.plot(ends[sp.argsort(ends)],sp.linspace(1,0,n),color=col, linestyle='--',linewidth=0.4)
     a2.set_ylabel('fraction of optimizations still running')
     return
 

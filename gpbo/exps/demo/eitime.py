@@ -1,9 +1,11 @@
 import numpy as np
 import scipy as sp
+import matplotlib
+from matplotlib import pyplot as plt
 import gpbo
 import time
+import pickle
 import tqdm
-from matplotlib import pyplot as plt
 ki = gpbo.core.GPdc.MAT52
 Dim=3
 lb = np.array([-1.]*Dim)
@@ -38,23 +40,27 @@ def timing(n,N):
             t1 = time.time()
             tsingle[i,k] = t1-t0
     return nrange,np.median(tbatch,axis=1),np.median(tsingle,axis=1)
-
+if False:
+    D0  = timing(100,40)
+    D1  = timing(20,40)
+    pickle.dump([D0,D1],open('data/eitimedata.p','w'))
+D0,D1 = pickle.load(open('data/eitimedata.p','r'))
 f,a = plt.subplots(1)
-x,tb,ts  = timing(100,40)
-a.plot(x,tb,color='b',linestyle='-',marker='D',label='n=100, Batch')
-a.plot(x,ts,color='b',linestyle='-',marker='o',label='n=100, Sequential')
+x,tb,ts  = D0
+cmap = plt.rcParams['axes.prop_cycle'].by_key()['color']
+a.plot(x,tb,color=cmap[0],linestyle='-',label='n=100, Batch')
+a.plot(x,ts,color=cmap[0],linestyle='--',label='n=100, Sequential')
 
 #x,tb,ts  = timing(50,30)
 #a.plot(x,tb,color='g',marker='D')
 #a.plot(x,ts,color='g',marker='o')
 #f.savefig('figs/timing.png')
 
-x,tb,ts  = timing(20,40)
-a.plot(x,tb,color='r',marker='D',linestyle='-', label='n=20,   Batch')
-a.plot(x,ts,color='r',marker='o',linestyle='-', label='n=20,   Sequential')
+x,tb,ts  = D1
+a.plot(x,tb,color=cmap[1],linestyle='-', label='n=20,   Batch')
+a.plot(x,ts,color=cmap[1],linestyle='--', label='n=20,   Sequential')
 a.set_yscale('log')
 a.set_ylabel('CPU time (s)')
 a.set_xlabel('Evaluation Points')
 a.legend()
-f.savefig('figs/timing.png')
-print(1)
+f.savefig('figs/timing.pdf')
