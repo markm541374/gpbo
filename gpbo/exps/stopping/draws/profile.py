@@ -7,7 +7,7 @@ import scipy as sp
 
 
 all2confs=[]
-rpath='friday'
+rpath='results2d'
 #-----------------------
 
 

@@ -160,16 +160,18 @@ def globallocalregret(optstate,persist,**para):
     rmax = gpbo.core.optutils.ballradsearch(d,1.,PDcondition,ndirs=para['nlineS'],lineSh=para['lineSh'])
 
     if gpbo.core.debugoutput['adaptive']:
+        import matplotlib
+        matplotlib.rcParams['text.usetex']=False
         fig, ax = plt.subplots(nrows=3, ncols=4, figsize=(85, 85))
         xmin=xmin.flatten()
         # plot the current GP
         if d==2:
             #gpbo.core.optutils.gpplot(ax[0,0],ax[0,1],G,para['lb'],para['ub'],ns=60)
-            ax[0,0].set_title('GP_post_mean')
-            ax[0,1].set_title('GP_post_var')
+            ax[0,0].set_title('GP post mean')
+            ax[0,1].set_title('GP post var')
             ax[0,0].plot(xmin[0], xmin[1], 'ro')
             #plot some draws from H
-            for i in xrange(20):
+            for i in xrange(4):
                 Gm,Gv,Hd = gpbo.core.drawconditionH(*GH)
                 try:
                     sp.linalg.cholesky(Hd)
@@ -354,15 +356,12 @@ def globallocalregret(optstate,persist,**para):
             a2.yaxis.set_minor_formatter(NullFormatter())
             a2.spines['left']._adjust_location()
 
-            #a2_=a2.twinx()
-            #sup2 = sp.linspace(rl-0.15*(ru-rl),ru,100)
-            #a2_.plot(sup2,[gpbo.core.GPdc.EI(-s,-m,std)[0,0] for s in sup2],'purple',label='Expected Improvement on Incumbent Model')
-            #a2_.set_ylabel('EI')
             a2.legend()
-            #a2_.legend()
             f2.savefig(os.path.join(debugoutput['path'],'ends.png'))
 
             plt.close(f2)
+            import pickle
+            pickle.dump([sup,mu,vvmax,mvmax,ymin,Yout,Cout],open('results/bounddata.p','w'))
         mxo=Yout[-1]
         mno=Yout[0]
         ro = sp.linspace(min(mno-0.05*(mxo-mno),ymin),mxo+0.05*(mxo-mno),200)

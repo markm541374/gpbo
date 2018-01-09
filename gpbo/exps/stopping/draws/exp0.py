@@ -27,10 +27,10 @@ f = objectives.shifthart3
 truemin =0
 all2confs=[]
 all3confs=[]
-rpath='friday'
+rpath='results2d'
 #-----------------------
 
-all2confs.append(['switching_no',None])
+#all2confs.append(['switching_no',None])
 
 all2confs.append(['switching_2',None])
 
@@ -64,12 +64,22 @@ all2confs.append(['pesfs_4',None])
 all2confs.append(['switching_direct',None])
 all2confs.append(['switching_cmaes',None])
 
+keys ={ 'switching_2':'Switching: $R_{global}=10^{-2}$',
+        'switching_4':'Switching: $R_{global}=10^{-4}$',
+        'switching_6':'Switching: $R_{global}=10^{-6}$',
+        'eihyp_6':'EI: $PI_{stop}=10^{-6}$',
+        'eihyp_12':'EI: $PI_{stop}=10^{-12}$',
+        'pesfs_1':'PES: $AQ_{stop}=10^{-1}$',
+        'pesfs_4':'PES: $AQ_{stop}=10^{-4}$',
+        'switching_direct':'DIRECT',
+        'switching_cmaes':'CMAES'}
+lfn = lambda x:keys[x]
 if mode=='run':
     if vers==2:
         gpbo.runexp(f,lb,ub,rpath,nreps,all2confs,indexoffset=args.offset*nreps)
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin+1e-99,logx=False,showends=True)
+    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin+1e-99,logx=False,labelfn=lfn,showends=True,needed=[11])
 else:
     pass

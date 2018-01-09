@@ -74,13 +74,13 @@ def overhead(path,name0,names,n,legendnames=None,fname='',title='',fpath=None):
     f,a = plt.subplots(1)
     gpbo.opts.plotquarts(a,[D[name0][k]['index'] for k in range(n)],[D[name0][k]['taq'] for k in range(n)],colors[0],'-',legendnames[0])
     gpbo.opts.plotquarts(a,[D[names[0]][k]['index'] for k in range(n)],[D[names[0]][k]['taq'] for k in range(n)],colors[1],'-',legendnames[1][0])
-    for i in range(n):
-        a.plot(D[names[0]][i]['index'],D[names[0]][i]['taq'],color=colors[1],linestyle='-')
+    #for i in range(n):
+    #    a.plot(D[names[0]][i]['index'],D[names[0]][i]['taq'],color=colors[1],linestyle='-')
     a.set_xlabel('Steps')
-    a.set_ylabel('Overhead (s)')
+    a.set_ylabel('Overhead Time (s)')
     a.set_title(title)
     a.legend()
-    f.savefig(os.path.join(fpath,'overhead_{}.png'.format(fname)))
+    f.savefig(os.path.join(fpath,'overhead_{}.pdf'.format(fname)))
 
     j = max([max([len(D[name][i]['taq']) for i in range(n)]) for name in names])
     print(j)

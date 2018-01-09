@@ -6,7 +6,7 @@ import scipy as sp
 
 gpbo.core.debugoutput['adaptive']=False
 gpbo.core.debugoutput['logstate']=False
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 nreps=8
 import argparse
 
@@ -55,6 +55,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,14,rpath,trueopt=truemin+1e-99,logx=False,showends=True)
+    gpbo.plotall(all2confs+all3confs,6,rpath,trueopt=truemin+1e-99,logx=False,showends=True)
 else:
     pass

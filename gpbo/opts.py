@@ -175,21 +175,26 @@ def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False):
     a2.set_ylabel('fraction of optimizations still running')
     return
 
-def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False,showends=False):
+def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False,showends=False,needed=None):
     if showends:
         pq=plotquartsends
     else:
         pq=plotquarts
+    if needed is None:
+        needed=range(20)
     f=[]
     a=[]
     pmax=20
     for i in range(pmax):
-        f_,a_ = plt.subplots(1)
-        for item in ([a_.title, a_.xaxis.label, a_.yaxis.label] + a_.get_xticklabels() + a_.get_yticklabels()):
-            item.set_fontsize(10)
-        f.append(f_)
-        a.append(a_)
-    colorlist = ['b','r','g','purple','k','grey','orange','c','lightgreen','lightblue','pink','b','r','g','purple','k','grey','orange','c','lightgreen','lightblue','pink']
+        if i in needed:
+            f_,a_ = plt.subplots(1)
+            f.append(f_)
+            a.append(a_)
+        else:
+            f.append(None)
+            a.append(None)
+    colorlist = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    #['b','r','g','purple','k','grey','orange','c','lightgreen','lightblue','pink','b','r','g','purple','k','grey','orange','c','lightgreen','lightblue','pink']
     lslist = ['solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted','solid' , 'dashed', 'dashdot', 'dotted']
     ci=-1
     for C in confs:
@@ -207,38 +212,49 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
         for ii in range(nreps):
             data.append(gpbo.optimize.readoptdata(os.path.join(path,'{}_{}.csv'.format(C[0],ii))))
 
-        if True:
+        #if True:
             #first plot is all the opts per step
-            termregret = sp.mean([list(d['trueyatxrecc'])[-1] for d in data])
+            #termregret = sp.mean([list(d['trueyatxrecc'])[-1] for d in data])
+        if 0 in needed:
             for ii in range(nreps):
                 a[0].plot(data[ii]['index'],data[ii]['trueyatxrecc'],color=col, linestyle=line,label=labelfn(C[0]))
             #and averaged
+        if 4 in needed:
             pq(a[4],[data[k]['index'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,line,labelfn(C[0]))
 
+        if 1 in needed:
             #second is all the opts per evaluation cost
             for ii in range(nreps):
                 a[1].plot(data[ii]['accE'],data[ii]['trueyatxrecc'],color=col, linestyle=line,label=labelfn(C[0]))
             #and averaged
+        if 5 in needed:
             pq(a[5],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,line,labelfn(C[0]))
 
+        if 2 in needed:
             #third is all the opts per evaluation + acquisition cost
             for ii in range(nreps):
                 a[2].plot(data[ii]['accEA'],data[ii]['trueyatxrecc'],color=col, linestyle=line,label=labelfn(C[0]))
+        if 6 in needed:
             #and averaged
             pq(a[6],[data[k]['accEA'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,line,labelfn(C[0]))
 
+        if 3 in needed:
             #fourth is evcost per step
             for ii in range(nreps):
                 a[3].plot(data[ii]['index'],data[ii]['c'],color=col, linestyle=line,label=labelfn(C[0]))
+        if 7 in needed:
             #and averaged
             pq(a[7],[data[k]['index'] for k in range(nreps)],[data[k]['c'] for k in range(nreps)],col,line,labelfn(C[0]))
 
+        if 14 in needed:
              #fiifth is overhead clock time
             for ii in range(nreps):
                 a[14].plot(data[ii]['index'],data[ii]['taq'],color=col, linestyle=line,label=labelfn(C[0]))
+        if 15 in needed:
             #and averaged
             pq(a[15],[data[k]['index'] for k in range(nreps)],[data[k]['taq'] for k in range(nreps)],col,line,labelfn(C[0]))
 
+        if (16 in needed) or (17 in needed):
             #fiifth is overhead clock time
             try:
                 for ii in range(nreps):
@@ -250,8 +266,12 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
                     a[16].plot(data[ii]['index'],data[ii]['s'],color=col, linestyle=line,label=labelfn(C[0]))
                 #and averaged
                 pq(a[17],[data[k]['index'] for k in range(nreps)],[data[k]['s'] for k in range(nreps)],col,line,labelfn(C[0]))
-                a[16].set_yscale('log')
-                a[17].set_yscale('log')
+                try:
+                    a[16].set_yscale('log')
+                    a[17].set_yscale('log')
+                except:
+                    pass
+        if (18 in needed) or (19 in needed):
             try:
                 for ii in range(nreps):
                     a[18].plot(data[ii]['index'],data[ii]['condition'],color=col, linestyle=line,label=labelfn(C[0]))
@@ -262,174 +282,199 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             except:
                 pass
         if trueopt:
-            #first plot is all the opts per step
-            for ii in range(nreps):
-                a[8].plot(data[ii]['index'],data[ii]['trueyatxrecc']-trueopt,color=col, linestyle=line,label=labelfn(C[0]))
-            #and averaged
-            print("XXXXXXXXXXXXXX\n")
-            pq(a[11],[data[k]['n'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,line,labelfn(C[0]))
+            if 8 in needed:
+                #first plot is all the opts per step
+                for ii in range(nreps):
+                    a[8].plot(data[ii]['index'],data[ii]['trueyatxrecc']-trueopt,color=col, linestyle=line,label=labelfn(C[0]))
+            if 11 in needed:
+                #and averaged
+                pq(a[11],[data[k]['n'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,line,labelfn(C[0]))
 
-            #second is all the opts per evaluation cost
-            for ii in range(nreps):
-                a[9].plot(data[ii]['accE'],data[ii]['trueyatxrecc']-trueopt,color=col, linestyle=line,label=labelfn(C[0]))
-            #and averaged
-            pq(a[12],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,line,labelfn(C[0]))
+            if 9 in needed:
+                #second is all the opts per evaluation cost
+                for ii in range(nreps):
+                    a[9].plot(data[ii]['accE'],data[ii]['trueyatxrecc']-trueopt,color=col, linestyle=line,label=labelfn(C[0]))
+            if 12 in needed:
+                #and averaged
+                pq(a[12],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,line,labelfn(C[0]))
 
-            #third is all the opts per evaluation + acquisition cost
-            for ii in range(nreps):
-                a[10].plot(data[ii]['accEA'],data[ii]['trueyatxrecc']-trueopt,color=col, linestyle=line,label=labelfn(C[0]))
-            #and averaged
-            pq(a[13],[data[k]['accEA'][ninit:] for k in range(nreps)],[data[k]['trueyatxrecc'][ninit:]-trueopt for k in range(nreps)],col,line,labelfn(C[0]),log=True)
+            if 10 in needed:
+                #third is all the opts per evaluation + acquisition cost
+                for ii in range(nreps):
+                    a[10].plot(data[ii]['accEA'],data[ii]['trueyatxrecc']-trueopt,color=col, linestyle=line,label=labelfn(C[0]))
+            if 13 in needed:
+                #and averaged
+                pq(a[13],[data[k]['accEA'][ninit:] for k in range(nreps)],[data[k]['trueyatxrecc'][ninit:]-trueopt for k in range(nreps)],col,line,labelfn(C[0]),log=True)
 
+    if 0 in needed:
+        a[0].legend()
+        a[0].set_xlabel('Steps')
+        a[0].set_ylabel('result')
+        if 0 in axisset.keys():
+            a[0].axis(axisset[0])
+        f[0].savefig(os.path.join(path,'out0.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-    a[0].legend()
-    a[0].set_xlabel('Steps')
-    a[0].set_ylabel('result')
-    if 0 in axisset.keys():
-        a[0].axis(axisset[0])
-    f[0].savefig(os.path.join(path,'out0.png'),bbox_inches='tight', pad_inches=0.1)
+    if 1 in needed:
+        a[1].legend()
+        a[1].set_xlabel('Evaluation Cost')
+        a[1].set_ylabel('result')
+        if logx:
+            a[1].set_xscale('log')
+        a[1].axis('tight')
+        f[1].savefig(os.path.join(path,'out1.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-    a[1].legend()
-    a[1].set_xlabel('Evaluation Cost')
-    a[1].set_ylabel('result')
-    if logx:
-        a[1].set_xscale('log')
-    a[1].axis('tight')
-    f[1].savefig(os.path.join(path,'out1.png'),bbox_inches='tight', pad_inches=0.1)
+    if 2 in needed:
+        #a[2].legend()
+        a[2].set_xlabel('Evaluation+Acquisition Cost')
+        a[2].set_ylabel('result')
+        if logx:
+            a[2].set_xscale('log')
+        a[2].axis('tight')
+        f[2].savefig(os.path.join(path,'out2.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-    #a[2].legend()
-    a[2].set_xlabel('Evaluation+Acquisition Cost')
-    a[2].set_ylabel('result')
-    if logx:
-        a[2].set_xscale('log')
-    a[2].axis('tight')
-    f[2].savefig(os.path.join(path,'out2.png'),bbox_inches='tight', pad_inches=0.1)
+    if 3 in needed:
+        a[3].legend()
+        a[3].set_xlabel('Steps')
+        a[3].set_ylabel('EVcost')
+        f[3].savefig(os.path.join(path,'out3.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-    a[3].legend()
-    a[3].set_xlabel('Steps')
-    a[3].set_ylabel('EVcost')
-    f[3].savefig(os.path.join(path,'out3.png'),bbox_inches='tight', pad_inches=0.1)
+    if 4 in needed:
+        a[4].legend()
+        a[4].set_xlabel('Steps')
+        a[4].set_ylabel('result')
+        f[4].savefig(os.path.join(path,'out4.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-    a[4].legend()
-    a[4].set_xlabel('Steps')
-    a[4].set_ylabel('result')
-    f[4].savefig(os.path.join(path,'out4.png'),bbox_inches='tight', pad_inches=0.1)
+    if 5 in needed:
+        a[5].legend()
+        a[5].set_xlabel('Evaluation Cost (s)')
+        a[5].set_ylabel('result')
+        if logx:
+            a[5].set_xscale('log')
+        a[5].axis('tight')
+        if 5 in axisset.keys():
+            a[5].axis(axisset[5])
+        f[5].savefig(os.path.join(path,'out5.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-    a[5].legend()
-    a[5].set_xlabel('Evaluation Cost (s)')
-    a[5].set_ylabel('result')
-    if logx:
-        a[5].set_xscale('log')
-    a[5].axis('tight')
-    if 5 in axisset.keys():
-        a[5].axis(axisset[5])
-    f[5].savefig(os.path.join(path,'out5.png'),bbox_inches='tight', pad_inches=0.1)
+    if 6 in needed:
+        a[6].legend()
+        a[6].set_xlabel('Total Clock Time (s)')
+        if sixylabel:
+            a[6].set_ylabel(sixylabel)
+        else:
+            a[6].set_ylabel('Result')
+        if logx:
+            a[6].set_xscale('log')
+        a[6].axis('tight')
+        if 6 in axisset.keys():
+            a[6].axis(axisset[6])
+        f[6].savefig(os.path.join(path,'out6.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-    a[6].legend()
-    a[6].set_xlabel('Total Clock Time (s)')
-    if sixylabel:
-        a[6].set_ylabel(sixylabel)
-    else:
-        a[6].set_ylabel('Result')
-    if logx:
-        a[6].set_xscale('log')
-    a[6].axis('tight')
-    if 6 in axisset.keys():
-        a[6].axis(axisset[6])
-    f[6].savefig(os.path.join(path,'out6.png'),bbox_inches='tight', pad_inches=0.1)
+    if 7 in needed:
+        a[7].legend()
+        a[7].set_xlabel('Steps')
+        a[7].set_ylabel('EVcost')
+        f[7].savefig(os.path.join(path,'out7.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-    a[7].legend()
-    a[7].set_xlabel('Steps')
-    a[7].set_ylabel('EVcost')
-    f[7].savefig(os.path.join(path,'out7.png'),bbox_inches='tight', pad_inches=0.1)
+    if 14 in needed:
+        a[14].legend()
+        a[14].set_xlabel('Steps')
+        a[14].set_ylabel('Overhead Clocktime (s)')
+        f[14].savefig(os.path.join(path,'out14.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-    a[14].legend()
-    a[14].set_xlabel('Steps')
-    a[14].set_ylabel('Overhead Clocktime (s)')
-    f[14].savefig(os.path.join(path,'out14.png'),bbox_inches='tight', pad_inches=0.1)
+    if 15 in needed:
+        #:a[15].legend()
+        a[15].set_xlabel('Steps')
+        a[15].set_ylabel('Overhead Clocktime (s)')
+        if 15 in axisset.keys():
+            a[15].axis(axisset[15],'tight')
+        f[15].savefig(os.path.join(path,'out15.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-    #:a[15].legend()
-    a[15].set_xlabel('Steps')
-    a[15].set_ylabel('Overhead Clocktime (s)')
-    if 15 in axisset.keys():
-        a[15].axis(axisset[15],'tight')
-    f[15].savefig(os.path.join(path,'out15.png'),bbox_inches='tight', pad_inches=0.1)
+    if 16 in needed:
+        a[16].legend()
+        a[16].set_xlabel('Steps')
+        a[16].set_ylabel('env Var')
+        f[16].savefig(os.path.join(path,'out16.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-    a[16].legend()
-    a[16].set_xlabel('Steps')
-    a[16].set_ylabel('env Var')
-    f[16].savefig(os.path.join(path,'out16.png'),bbox_inches='tight', pad_inches=0.1)
+    if 17 in needed:
+        a[17].legend()
+        a[17].set_xlabel('Steps')
+        a[17].set_ylabel('env Var')
+        f[17].savefig(os.path.join(path,'out17.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-    a[17].legend()
-    a[17].set_xlabel('Steps')
-    a[17].set_ylabel('env Var')
-    f[17].savefig(os.path.join(path,'out17.png'),bbox_inches='tight', pad_inches=0.1)
+    if 18 in needed:
+        a[18].legend()
+        a[18].set_xlabel('Steps')
+        a[18].set_ylabel('condition magnitude')
+        f[18].savefig(os.path.join(path,'out18.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-    a[18].legend()
-    a[18].set_xlabel('Steps')
-    a[18].set_ylabel('condition magnitude')
-    f[18].savefig(os.path.join(path,'out18.png'),bbox_inches='tight', pad_inches=0.1)
-
-    a[19].legend()
-    a[19].set_xlabel('Steps')
-    a[19].set_ylabel('condition magnitude')
-    f[19].savefig(os.path.join(path,'out19.png'),bbox_inches='tight', pad_inches=0.1)
+    if 19 in needed:
+        a[19].legend()
+        a[19].set_xlabel('Steps')
+        a[19].set_ylabel('condition magnitude')
+        f[19].savefig(os.path.join(path,'out19.pdf'),bbox_inches='tight', pad_inches=0.1)
 
     if trueopt:
-        a[8].set_xlabel('Steps')
-        a[8].set_ylabel('regret')
-        a[8].set_yscale('log')
-        f[8].savefig(os.path.join(path,'out8.png'),bbox_inches='tight', pad_inches=0.1)
+        if 8 in needed:
+            a[8].set_xlabel('Steps')
+            a[8].set_ylabel('regret')
+            a[8].set_yscale('log')
+            f[8].savefig(os.path.join(path,'out8.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-        a[9].set_xlabel('Evaluation Cost (s)')
-        a[9].set_ylabel('regret')
-        a[9].set_yscale('log')
-        f[9].savefig(os.path.join(path,'out9.png'),bbox_inches='tight', pad_inches=0.1)
+        if 9 in needed:
+            a[9].set_xlabel('Evaluation Cost (s)')
+            a[9].set_ylabel('regret')
+            a[9].set_yscale('log')
+            f[9].savefig(os.path.join(path,'out9.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-        a[10].set_xlabel('Evaluation+Acquisition Cost')
-        a[10].set_ylabel('Median IR')
-        a[10].set_yscale('log')
-        if logx:
-            a[10].set_xscale('log')
-        a[10].axis('tight')
-        f[10].savefig(os.path.join(path,'out10.png'),bbox_inches='tight', pad_inches=0.1)
+        if 10 in needed:
+            a[10].set_xlabel('Evaluation+Acquisition Cost')
+            a[10].set_ylabel('Median IR')
+            a[10].set_yscale('log')
+            if logx:
+                a[10].set_xscale('log')
+            a[10].axis('tight')
+            f[10].savefig(os.path.join(path,'out10.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-        a[11].legend()
-        a[11].set_xlabel('Steps')
-        a[11].set_ylabel('Median IR')
-        a[11].set_yscale('log')
-        if logx:
-            a[11].set_xscale('log')
-        a[11].axis('tight')
-        if 11 in axisset.keys():
-            a[11].axis(axisset[11],'tight')
-        a[11].set_xlim(0,140)
-        f[11].savefig(os.path.join(path,'out11.png'),bbox_inches='tight', pad_inches=0.1)
+        if 11 in needed:
+            a[11].legend(bbox_to_anchor=(1.14,1), loc="upper left")
 
-        a[12].legend()
-        a[12].set_xlabel('Evaluation Cost')
-        a[12].set_ylabel('Median IR')
-        a[12].set_yscale('log')
-        if logx:
-            a[12].set_xscale('log')
-        a[12].axis('tight')
-        if 12 in axisset.keys():
-            a[12].axis(axisset[12])
-        f[12].savefig(os.path.join(path,'out12.png'),bbox_inches='tight', pad_inches=0.1)
+            a[11].set_xlabel('Steps')
+            a[11].set_ylabel('Median IR')
+            a[11].set_yscale('log')
+            if logx:
+                a[11].set_xscale('log')
+            a[11].axis('tight')
+            if 11 in axisset.keys():
+                a[11].axis(axisset[11],'tight')
+            a[11].set_xlim(0,140)
+            f[11].savefig(os.path.join(path,'out11.pdf'),bbox_inches='tight', pad_inches=0.1)
 
-        a[13].legend()
-        a[13].set_xlabel('Total Clock Time (s)')
-        if thirteenylabel:
-            a[13].set_ylabel(thirteenylabel)
-        else:
-            a[13].set_ylabel('Median IR')
-        a[13].set_yscale('log')
-        if logx:
-            a[13].set_xscale('log')
-        a[13].axis('tight')
-        if 13 in axisset.keys():
-            a[13].axis(axisset[13],'tight')
-        f[13].savefig(os.path.join(path,'out13.png'),bbox_inches='tight', pad_inches=0.1)
+        if 12 in needed:
+            a[12].legend()
+            a[12].set_xlabel('Evaluation Cost')
+            a[12].set_ylabel('Median IR')
+            a[12].set_yscale('log')
+            if logx:
+                a[12].set_xscale('log')
+            a[12].axis('tight')
+            if 12 in axisset.keys():
+                a[12].axis(axisset[12])
+            f[12].savefig(os.path.join(path,'out12.pdf'),bbox_inches='tight', pad_inches=0.1)
+
+        if 13 in needed:
+            a[13].legend()
+            a[13].set_xlabel('Total Clock Time (s)')
+            if thirteenylabel:
+                a[13].set_ylabel(thirteenylabel)
+            else:
+                a[13].set_ylabel('Median IR')
+            a[13].set_yscale('log')
+            if logx:
+                a[13].set_xscale('log')
+            a[13].axis('tight')
+            if 13 in axisset.keys():
+                a[13].axis(axisset[13],'tight')
+            f[13].savefig(os.path.join(path,'out13.pdf'),bbox_inches='tight', pad_inches=0.1)
 
 def plotprofile(confs,nreps,path,tol=0.9,target=1e-6):
     f=[]
