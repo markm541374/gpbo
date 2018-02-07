@@ -64,8 +64,77 @@ if false; then
     (cd gpbo/exps/demo ; python2 gpfigs.py)
     cp gpbo/exps/demo/figs/gpdemo.pdf figures/theory/
 fi
-if $1; then
+if false; then
     cp matplotlibrc gpbo/exps/demo
     (cd gpbo/exps/demo ; python2 bayesoptfig.py)
     cp gpbo/exps/demo/figs/bayesoptdemo.pdf figures/theory/
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/stopping/hart4/noisedemo
+    (cd gpbo/exps/stopping/hart4/noisedemo ; python2 jitterplot.py)
+    cp gpbo/exps/stopping/hart4/noisedemo/results/out11.pdf figures/localstop/
+    cp gpbo/exps/stopping/hart4/noisedemo/results/out19.pdf figures/localstop/
+    mv figures/localstop/out11.pdf figures/localstop/conditionregret.pdf
+    mv figures/localstop/out19.pdf figures/localstop/conditionmagnitude.pdf
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/stopping/draws
+    (cd gpbo/exps/stopping/draws ; python2 meanregret.py)
+    cp gpbo/exps/stopping/draws/results2d/out20.pdf figures/localstop/
+    mv figures/localstop/out20.pdf figures/localstop/draw2mean.pdf
+fi
+
+if false; then
+    cp matplotlibrc gpbo/exps/biasopt/draw2d
+    (cd gpbo/exps/biasopt/draw2d ; python2 expicmlF3.py)
+    cp gpbo/exps/biasopt/draw2d/F3new/out13.pdf figures/variablefidelity/
+    mv figures/variablefidelity/out13.pdf figures/variablefidelity/badev.pdf
+    (cd gpbo/exps/biasopt/draw2d ; python2 expicmlF4.py)
+    cp gpbo/exps/biasopt/draw2d/F4new/out13.pdf figures/variablefidelity/
+    mv figures/variablefidelity/out13.pdf figures/variablefidelity/goodev.pdf
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/biasopt/offsetbranin
+    (cd gpbo/exps/biasopt/offsetbranin ; python2 expicmlF5a.py)
+    cp gpbo/exps/biasopt/offsetbranin/F5anew/out13.pdf figures/variablefidelity/
+    mv figures/variablefidelity/out13.pdf figures/variablefidelity/branin.pdf
+    cp gpbo/exps/biasopt/offsetbranin/F5anew/out12.pdf figures/variablefidelity/
+    mv figures/variablefidelity/out12.pdf figures/variablefidelity/branincost.pdf
+    (cd gpbo/exps/biasopt/offsetbranin ; python2 expicmlF1.py)
+    cp gpbo/exps/biasopt/offsetbranin/F1new/out11.pdf figures/variablefidelity/
+    mv figures/variablefidelity/out11.pdf figures/variablefidelity/argpost.pdf
+    (cd gpbo/exps/biasopt/offsetbranin ; python2 expicmlF2.py)
+    cp gpbo/exps/biasopt/offsetbranin/icmlF2/out11.pdf figures/variablefidelity/
+    cp gpbo/exps/biasopt/offsetbranin/icmlF2/out15.pdf figures/variablefidelity/
+    mv figures/variablefidelity/out11.pdf figures/variablefidelity/ofbcost0.pdf
+    mv figures/variablefidelity/out15.pdf figures/variablefidelity/ofbcost1.pdf
+
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/biasopt/hartmann3
+    (cd gpbo/exps/biasopt/hartmann3 ; python2 expicmlF5b.py)
+    cp gpbo/exps/biasopt/hartmann3/F5bnew/out13.pdf figures/variablefidelity/
+    mv figures/variablefidelity/out13.pdf figures/variablefidelity/hart3.pdf
+    cp gpbo/exps/biasopt/hartmann3/F5bnew/out12.pdf figures/variablefidelity/
+    mv figures/variablefidelity/out12.pdf figures/variablefidelity/hart3cost.pdf
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/biasopt/hartmann6
+    (cd gpbo/exps/biasopt/hartmann6 ; python2 expicmlF5c.py)
+    cp gpbo/exps/biasopt/hartmann6/F5cnew/out13.pdf figures/variablefidelity/
+    mv figures/variablefidelity/out13.pdf figures/variablefidelity/hart6.pdf
+    cp gpbo/exps/biasopt/hartmann6/F5cnew/out12.pdf figures/variablefidelity/
+    mv figures/variablefidelity/out12.pdf figures/variablefidelity/hart6cost.pdf
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/biasopt/mnist
+    (cd gpbo/exps/biasopt/mnist ; python2 expicmlF6.py)
+    cp gpbo/exps/biasopt/mnist/icmlF6/out13.pdf figures/variablefidelity/
+    mv figures/variablefidelity/out13.pdf figures/variablefidelity/mnist.pdf
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/biasopt/powseries
+    (cd gpbo/exps/biasopt/powseries ; python2 expicmlF7.py)
+    cp gpbo/exps/biasopt/powseries/norm/out6.pdf figures/variablefidelity/
+    mv figures/variablefidelity/out6.pdf figures/variablefidelity/powerfit.pdf
 fi

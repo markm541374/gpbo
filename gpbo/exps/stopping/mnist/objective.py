@@ -105,8 +105,11 @@ def objective_function(x):
 
 
 # Load the data
+reduce=60
 X_train, y_train, X_val, y_val, X_test, y_test = load_dataset()
-
+ntrain = int(X_train.shape[0]/10)
+X_train = X_train[:ntrain,:]
+y_train = y_train[:ntrain]
 # We optimize s on a log scale, as we expect that the performance varies
 # logarithmically across s
 s_min = 100

@@ -153,17 +153,17 @@ class eimlelearns():
         return
 
 class eihypdefault(object):
-    def __init__(self,f,D,n,s,path,fname):
+    def __init__(self,f,D,n,s,path,fname,nrandinit=10,kindex=GPdc.MAT52):
         self.aqfn = gpbo.core.acquisitions.eihypaq
         self.aqpara= {
             'ev': {'s': s, 'd': [sp.NaN]},
             'lb': [-1.]*D,
             'ub': [1.]*D,
-            'nrandinit': 10,
+            'nrandinit': nrandinit,
             #'maxf':500+100*D,
             'mprior': sp.array([1.]+[0.]*D),
             'sprior': sp.array([1.]*(D+1)),
-            'kindex': GPdc.MAT52,
+            'kindex': kindex,
             'DH_SAMPLES': 16+6*D,
             'drop':True,
             'noS': False,
@@ -263,6 +263,15 @@ class pesfsdefault(object):
         self.path = path
         self.fname = fname
         return
+
+class pesfsgamma(pesfsdefault):
+    def __init__(self,*args,**kwargs):
+        super(pesfsgamma,self).__init__(*args,**kwargs)
+        D = len(self.aqpara['lb'])
+        self.reccpara['kindex']=self.aqpara['kindex']= gpbo.core.GPdc.MAT52
+        self.reccpara['mprior']=self.aqpara['mprior']= sp.array([2.]+[3.]*D)
+        self.reccpara['sprior']=self.aqpara['sprior']= sp.array([0.5]+[0.15]*D)
+        self.reccpara['priorshape']=self.aqpara['priorshape']='gamma'
 
 class pesfspredictive(pesfsdefault):
     def __init__(self,*args,**kwargs):

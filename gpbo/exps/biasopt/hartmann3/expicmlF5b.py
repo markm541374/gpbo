@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sp
 #mode='run'
 
-mode=['run','plot'][0]
+mode=['run','plot'][1]
 nreps=1
 import argparse
 
@@ -24,14 +24,14 @@ from objective import f
 from objective import truemin
 all2confs=[]
 all3confs=[]
-rpath='tmp'
+rpath='F5bnew'
 #-----------------------
 #eimle
 C=gpbo.core.config.eimledefault(f,D,12,s,rpath,'null.csv')
 C.aqpara['nrandinit']=10
 C.stoppara = {'tmax': 60*60*10}
 C.stopfn = gpbo.core.optimize.totaltstopfn
-#all2confs.append(['eimle',C])
+all2confs.append(['eimle',C])
 
 
 #pesfs----------------------------
@@ -40,7 +40,7 @@ C.stoppara = {'tmax': 60 * 60 * 10}
 C.stopfn = gpbo.core.optimize.totaltstopfn
 C.aqpara['overhead']='predict'
 C.aqpara['nrandinit']=10
-#all2confs.append(['pesfs',C])
+all2confs.append(['pesfs',C])
 
 #pesbs----------------------------
 C=gpbo.core.config.pesbsdefault(f,D,50,s,rpath,'null.csv')
@@ -95,6 +95,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,16,rpath,trueopt=truemin,logx=True,labelfn=labelfn,axisset=axisset)
+    gpbo.plotall(all2confs+all3confs,16,rpath,trueopt=truemin,logx=True,labelfn=labelfn,axisset=axisset,needed=[12,13],legend=False)
 else:
     pass

@@ -292,8 +292,8 @@ def plottime(D):
 def plotops(D):
     print('plotting ops')
     f,a = plt.subplots(1)
-    [a.plot(d['npts'],np.array(d['touchedpts'])-np.array(d['newpts']),color=d['c'],label=d['name']+' Updates',linestyle='--') for d in D]
-    [a.plot(d['npts'],np.array(d['newpts']),color=d['c'],label=d['name']+' New') for d in D]
+    [a.plot(d['npts'],np.array(d['touchedpts'])-np.array(d['newpts']),color=d['c'],label=d['name']+' $\mathcal{O}(n^2)$ Updates',linestyle='--') for d in D]
+    [a.plot(d['npts'],np.array(d['newpts']),color=d['c'],label=d['name']+' $\mathcal{O}(n^3)$ Evaluations') for d in D]
     a.set_ylabel('Hyperparameter LLK Evaluations (s)')
     a.set_xlabel('Iteration')
     a.legend()

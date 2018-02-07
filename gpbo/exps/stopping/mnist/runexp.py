@@ -27,7 +27,7 @@ from objective import f
 truemin =0.
 all2confs=[]
 all3confs=[]
-rpath='results'
+rpath='r3'
 
 
 #eimle-------------------------------

@@ -32,18 +32,6 @@ rpath='results'
 
 
 #-----------------------
-#C=gpbo.core.config.eihypdefault(f,D,10,s,'results','null.csv')
-#C.stoppara = {'nmax': 50}
-#C.stopfn = gpbo.core.optimize.nstopfn
-#all2confs.append(['eihypdev',C])
-
-#-----------------------
-C=gpbo.core.config.eihypdefault(f,D,10,s,'results','null.csv')
-C.stoppara = {'nmax': 50}
-C.stopfn = gpbo.core.optimize.nstopfn
-#all2confs.append(['eihypbase',C])
-
-#-----------------------
 C=gpbo.core.config.pesfsdefault(f,D,10,s,'results','null.csv')
 C.stoppara = {'nmax': 50}
 C.stopfn = gpbo.core.optimize.nstopfn
@@ -55,6 +43,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,16,rpath,trueopt=truemin+1e-99,logx=False,showends=True)
+    gpbo.plotall(all2confs+all3confs,16,rpath,trueopt=truemin+1e-99,logx=False,showends=False,needed=[11,19],legend=False)
 else:
     pass
