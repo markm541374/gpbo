@@ -26,10 +26,6 @@ if false; then
     (cd gpbo/exps/stopping/hart4 ; python2 plot.py)
     cp gpbo/exps/stopping/hart4/figs/stopping_hart4.pdf figures/localstop/
 
-    cp matplotlibrc gpbo/exps/stopping/hart6
-    (cd gpbo/exps/stopping/hart6 ; python2 plot.py)
-    cp gpbo/exps/stopping/hart6/figs/stopping_hart6.pdf figures/localstop/
-
     cp matplotlibrc gpbo/exps/stopping/camel3
     (cd gpbo/exps/stopping/camel3 ; python2 plot.py)
     cp gpbo/exps/stopping/camel3/figs/stopping_camel3.pdf figures/localstop/
@@ -37,6 +33,11 @@ if false; then
     cp matplotlibrc gpbo/exps/stopping/camel6
     (cd gpbo/exps/stopping/camel6 ; python2 plot.py)
     cp gpbo/exps/stopping/camel6/figs/stopping_camel6.pdf figures/localstop/
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/stopping/hart6
+    (cd gpbo/exps/stopping/hart6 ; python2 plot.py)
+    cp gpbo/exps/stopping/hart6/figs/stopping_hart6.pdf figures/localstop/
 fi
 #branin separater from teh others because I aslo want the overhead plot
 if false; then
@@ -58,6 +59,11 @@ if false; then
     cp gpbo/exps/stopping/draws/results2d/out11.pdf figures/localstop/
     mv figures/localstop/out11.pdf figures/localstop/d2methods.pdf
 fi
+if false; then
+    cp matplotlibrc gpbo/exps/stopping/gphyp
+    (cd gpbo/exps/stopping/gphyp ; python2 plot.py)
+    cp gpbo/exps/stopping/gphyp/figs/stopping_GPhyp.pdf figures/localstop/
+fi
 #theory chap demo figs for gp and bayesopt
 if false; then
     cp matplotlibrc gpbo/exps/demo
@@ -70,12 +76,25 @@ if false; then
     cp gpbo/exps/demo/figs/bayesoptdemo.pdf figures/theory/
 fi
 if false; then
+    cp matplotlibrc gpbo/exps/demo
+    (cd gpbo/exps/demo ; python2 stoppingdemo.py)
+    cp gpbo/exps/demo/figs/stoppingdemo.pdf figures/localstop/
+fi
+if false; then
     cp matplotlibrc gpbo/exps/stopping/hart4/noisedemo
     (cd gpbo/exps/stopping/hart4/noisedemo ; python2 jitterplot.py)
     cp gpbo/exps/stopping/hart4/noisedemo/results/out11.pdf figures/localstop/
     cp gpbo/exps/stopping/hart4/noisedemo/results/out19.pdf figures/localstop/
     mv figures/localstop/out11.pdf figures/localstop/conditionregret.pdf
     mv figures/localstop/out19.pdf figures/localstop/conditionmagnitude.pdf
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/stopping/hart4/noisedemo
+    (cd gpbo/exps/stopping/hart4/noisedemo ; python2 jitterplotthin.py)
+    cp gpbo/exps/stopping/hart4/noisedemo/results/out11.pdf figures/localstop/
+    cp gpbo/exps/stopping/hart4/noisedemo/results/out19.pdf figures/localstop/
+    mv figures/localstop/out11.pdf figures/localstop/conditionregretthin.pdf
+    mv figures/localstop/out19.pdf figures/localstop/conditionmagnitudethin.pdf
 fi
 if false; then
     cp matplotlibrc gpbo/exps/stopping/draws

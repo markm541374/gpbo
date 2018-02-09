@@ -178,7 +178,7 @@ def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False,mean=False):
     a2.set_ylabel('fraction of optimizations still running')
     return
 
-def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False,showends=False,needed=None,legend=True):
+def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False,showends=False,needed=None,legend=True,forcefigsize=None,xmax=None):
     if showends:
         pq=plotquartsends
     else:
@@ -197,7 +197,11 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             return
     for i in range(pmax):
         if i in needed:
-            f_,a_ = plt.subplots(1)
+            if forcefigsize is None:
+                f_,a_ = plt.subplots(1)
+            else:
+                f_,a_ = plt.subplots(1,figsize=forcefigsize)
+
             f.append(f_)
             a.append(a_)
         else:
@@ -423,7 +427,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
         if legend:
             a[19].legend()
         a[19].set_xlabel('Steps')
-        a[19].set_ylabel('Conditioning Magnitude')
+        a[19].set_ylabel('Condition Number')
         f[19].savefig(os.path.join(path,'out19.pdf'),bbox_inches='tight', pad_inches=0.1)
 
     if trueopt:
@@ -450,8 +454,10 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
 
         if 11 in needed:
             if legend:
-                #a[11].legend(bbox_to_anchor=(1.14,1), loc="upper left")
-                a[11].legend()
+                if legend=='outside':
+                    a[11].legend(bbox_to_anchor=(1.14,1), loc="upper left")
+                else:
+                    a[11].legend()
 
             a[11].set_xlabel('Steps')
             a[11].set_ylabel('Median Immediate Regret')
@@ -461,7 +467,8 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             a[11].axis('tight')
             if 11 in axisset.keys():
                 a[11].axis(axisset[11],'tight')
-            #a[11].set_xlim(0,140)
+            if xmax:
+                a[11].set_xlim(0,xmax)
             f[11].savefig(os.path.join(path,'out11.pdf'),bbox_inches='tight', pad_inches=0.1)
 
         if 12 in needed:

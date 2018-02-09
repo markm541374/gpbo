@@ -64,9 +64,9 @@ all2confs.append(['pesfs_4',None])
 all2confs.append(['switching_direct',None])
 all2confs.append(['switching_cmaes',None])
 
-keys ={ 'switching_2':'Switching: $R_{global}=10^{-2}$',
-        'switching_4':'Switching: $R_{global}=10^{-4}$',
-        'switching_6':'Switching: $R_{global}=10^{-6}$',
+keys ={ 'switching_2':'BLOSSOM: $R_{global}=10^{-2}$',
+        'switching_4':'BLOSSOM: $R_{global}=10^{-4}$',
+        'switching_6':'BLOSSOM: $R_{global}=10^{-6}$',
         'eihyp_6':'EI: $PI_{stop}=10^{-6}$',
         'eihyp_12':'EI: $PI_{stop}=10^{-12}$',
         'pesfs_1':'PES: $AQ_{stop}=10^{-1}$',
@@ -80,6 +80,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin+1e-99,logx=False,labelfn=lfn,showends=True,needed=[11])
+    gpbo.plotall(all2confs+all3confs,10,rpath,trueopt=truemin+1e-99,logx=False,labelfn=lfn,showends=True,needed=[11],xmax=140,legend='outside')
 else:
     pass

@@ -23,8 +23,8 @@ lb = sp.array([-1.]*D)
 ub = sp.array([1.]*D)
 
 
-#forcefigsize=[3,4]
-forcefigsize=None
+forcefigsize=[3,4]
+#forcefigsize=None
 f = objectives.shifthart3
 
 truemin =0.

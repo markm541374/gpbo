@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 #plt.rc('font',serif='Times')
 
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-def stoppingplots(path,names,n,legendnames=None,fname='',title='',offset=0.,fpath=None,showlegend=False):
+def stoppingplots(path,names,n,legendnames=None,fname='',title='',offset=0.,fpath=None,showlegend=False,logy=True):
     if fpath is None:
         fpath=path
     if legendnames==None:
@@ -26,8 +26,9 @@ def stoppingplots(path,names,n,legendnames=None,fname='',title='',offset=0.,fpat
     f,a = plt.subplots(1)
     for j,name in enumerate(names):
         gpbo.opts.plotquartsends(a,[D[name][k]['index'] for k in range(n)],[D[name][k]['trueyatxrecc']-offset-min(0,D[name][k]['trueyatxrecc'].values[-1]) for k in range(n)],colors[j],0,legendnames[j])
-
-    a.set_yscale('log')
+    if logy:
+        a.set_yscale('log')
+    #a.set_ylim(10.01,10.02)
     a.set_xlabel('Steps')
     a.set_ylabel('Regret')
     a.set_title(title)
