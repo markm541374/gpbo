@@ -157,3 +157,17 @@ if false; then
     cp gpbo/exps/biasopt/powseries/norm/out6.pdf figures/variablefidelity/
     mv figures/variablefidelity/out6.pdf figures/variablefidelity/powerfit.pdf
 fi
+if false; then
+    cp matplotlibrc gpbo/exps/predictive/fixedPES
+    (cd gpbo/exps/predictive/fixedPES ; python2 plots.py)
+    cp gpbo/exps/predictive/fixedPES/figs/iterpes.pdf figures/predictive/
+    cp gpbo/exps/predictive/fixedPES/figs/evcostpes.pdf figures/predictive/
+    cp gpbo/exps/predictive/fixedPES/figs/aqcostpes.pdf figures/predictive/
+fi
+if $1; then
+    cp matplotlibrc gpbo/exps/predictive/fixedEI
+    (cd gpbo/exps/predictive/fixedEI ; python2 plots.py)
+    cp gpbo/exps/predictive/fixedEI/figs/iterei.pdf figures/predictive/
+    cp gpbo/exps/predictive/fixedEI/figs/evcostei.pdf figures/predictive/
+    cp gpbo/exps/predictive/fixedEI/figs/aqcostei.pdf figures/predictive/
+fi
