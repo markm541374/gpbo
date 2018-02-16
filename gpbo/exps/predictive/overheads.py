@@ -9,14 +9,12 @@ import pandas as pd
 import os
 import sys
 from matplotlib import pyplot as plt
-import GPflow as gpf
-import tensorflow as tf
 import tqdm
 import pickle
 
-rpath = 'fixedEI/results'
-fpath = 'fixedEI/figs'
-fnames=[i for i in os.listdir(rpath) if i.startswith('eihyp_3_500'.format(i)) ]
+rpath = 'fixedPES/results'
+fpath = 'fixedPES/figs'
+fnames=[i for i in os.listdir(rpath) if i.startswith('pes_3_500'.format(i)) ][-8:]
 
 def getT(fpath,fnames,N):
     n = len(fnames)
@@ -32,12 +30,12 @@ def getT(fpath,fnames,N):
         T[:,j] = tv[10:N]
     return T
 
-T = getT(rpath,fnames,250)
 
 gammalogpdf = lambda x,shape,scale: (shape-1)*np.log(x)-x/scale#-shape*np.log(scale)-np.log(gamma(shape))
 normlogpdf = lambda x,loc,scale: -0.5*((x-loc)/scale)**2-0.5*np.log(2*np.pi*scale**2)
 lognormlogpdf = lambda x,s,loc,scale: -((np.log(x)-loc)/scale)**2 - np.log(x)
 tlogpdf = lambda x,v,scale: -0.5*(v+1)*np.log(1+((x/scale)**2)/v)
+
 def ccmodel(x,theta):
     y0 = theta[1]
     g0 = theta[2]
@@ -45,9 +43,9 @@ def ccmodel(x,theta):
     g1 = theta[4]
     a=0.
     b=200.
-    r=200.
-    r2 = 40000.
-    r3 = 8000000.
+    r=b-a
+    r2 = r**2
+    r3 = r**3
     c0 = 3*y0/r2 + g0/r
     d0 = 2*y0/r3 + g0/r2
     c1 = 3*y1/r2 - g1/r
@@ -55,78 +53,99 @@ def ccmodel(x,theta):
     Y = ((d0*(x-b)+c0)*(x-b)**2 + (d1*(x-a)+c1)*(x-a)**2)
     return Y
 
-def plotmodel(ax,theta):
-    x = np.arange(250)
-    y = ccmodel(x,theta)
+def cvmodel(x,M):
+    m,v = M
+    a=0.
+    b=200.
+    r=b-a
+    r2=r**2
+    r3=r**3
+    T1 = np.array([[3./r2, 1./r,  0.,     0.],
+                  [2./r3, 1./r2, 0.,     0.],
+                  [0.,    0.,    3./r2, -1./r],
+                  [0.,    0.,   -2./r3,  1./r2]])
+    m2 = T1.dot(m[1:])
+    v2 = T1.dot(v[1:,1:].dot(T1.T))
 
-    ax.plot(x,y,'r')
-   # m0 = stats.norm.ppf(0.9,loc=0,scale=theta[0])-stats.norm.ppf(0.5,loc=0,scale=theta[0])
+    X = x.reshape([-1,1])
+    T2 = np.hstack([(X-b)**2, (X-b)**3, (X-a)**2, (X-a)**3])
 
-    #m2 = norm.ppf(0.9,loc=0,scale=theta[9])-norm.ppf(0.5,loc=0,scale=theta[9])
-    #ax.plot(x[:10],y[:10]+m2,'r--')
-    #ax.plot(x[:10],y[:10]-m2,'r--')
-    ax.plot(x,y+y*theta[0],'r--')
-    ax.plot(x,y-y*theta[0],'r--')
-    return
+    m3 = T2.dot(m2)
+    v3 = T2.dot(v2.dot(T2.T))
+
+    v4 = v3+np.diag((m[0]*m3)**2)
+
+    return m3,v4
+
 
 def fitT(Y):
-    theta0 = [0.1,Y[10:,0].min(),0.,Y[-1,0],0.5]
-    #theta0 = [0.1,20.5,1.]#,1.]
+    assert(len(Y)>=200)
+    theta0 = [0.1,Y[0],max(0.01,(Y[49]-Y[0])/50.),Y[199],(Y[199]-Y[0])/200.]
     X = np.arange(Y.shape[0])
     def llk(theta):
         pa =  gammalogpdf(theta[0],1.,0.1)
-        pa += gammalogpdf(theta[1],4.,1.)
-        pa += gammalogpdf(theta[2],1.,1.)
-        pa += gammalogpdf(theta[3],10.,6.)
-        pa += gammalogpdf(theta[4],1.,6.)
+        pa += gammalogpdf(theta[1],4.,Y[0]/4.)
+        pa += gammalogpdf(theta[2],4.,max(0.01,(Y[49]-Y[0])/50.)/4.)
+        pa += gammalogpdf(theta[3],4.,Y[199]/4.)
+        pa += gammalogpdf(theta[4],4.,(Y[199]-Y[0])/200./4.)
         Yh = ccmodel(X,theta)
-        #pa = gammalogpdf(theta[0],3,0.25)
-        #pa += gammalogpdf(theta[1],3,1.)
-        #pa += gammalogpdf(theta[2],1,1.)
-        L=-pa
-        #L=0
-
-        #Yh = theta[0]*X+theta[1]
-        for i in range(Y.shape[1]):
-            #E = (Y[:,i]-Yh)/Yh-1
-
-            #L-=np.sum(-0.5*((E[10:])/theta[0])**2-0.5*np.log(2*np.pi*theta[0]**2))
-            L-= np.sum(normlogpdf(Y[:,i],Yh,Yh*theta[0]))
+        L=0#-pa
+        L-= np.sum(normlogpdf(Y,Yh,Yh*theta[0]))
         return L
     bds = ((1e-9,np.Inf),(1e-9,np.Inf),(1e-9,np.Inf),(1e-9,np.Inf),
-              (1e-9,np.Inf))#,(1e-9,np.Inf),(1e-9,np.Inf),(1e-9,np.Inf),
-            # (1e-9,np.Inf),(1e-9,np.Inf))
+              (1e-9,np.Inf))
     res = minimize(llk,theta0,method='L-BFGS-B',bounds=bds)
     return res.x
 
-M = fitT(T)
+def buildmodel(data):
+    M = [fitT(data[:,i]) for i in range(data.shape[1])]
 
-print(M)
+    mean = np.mean(M,axis=0)
+    print(mean)
+    cov = np.cov(np.vstack(M).T)
+    return [mean,cov]
 
-
-f,a = plt.subplots(nrows=2,ncols=1,figsize=[5,8])
-for i in np.random.randint(0,T.shape[1],size=18):
-    a[0].plot(T[:,i],'g-',linewidth=0.5)
-    a[1].plot(np.cumsum(T[:,i]),'g-',linewidth=0.5)
-
-plotmodel(a[0],M)
-#tmean = np.mean(T,axis=1)
-#tupper = tmean+2*np.sqrt(np.var(T,axis=1))
-#tlower = tmean-(tupper-tmean)
-#tmed = np.percentile(T,50, axis=1)
-#tvar  = np.var(T,axis=1)
-#a[0].plot(tmean,'b')
-#a[0].plot(tupper,'b--')
-#a[0].plot(tlower,'b--')
-a[0].set_xlabel('Steps')
-a[0].set_ylabel('overhead time (s)')
-
-Xp = np.arange(0,250)
-Yp = ccmodel(Xp,M)
-a[1].plot(Xp,np.cumsum(Yp),'r')
-S = np.sqrt(np.cumsum((M[0]*Yp)**2))
-a[1].plot(Xp,np.cumsum(Yp)+S,'r--')
-a[1].plot(Xp,np.cumsum(Yp)-S,'r--')
+def stepprobs(s,b,M):
+    xmax = int(b/s)
+    Xp = np.arange(xmax)
+    pm,pv = cvmodel(Xp,M)
+    std = np.sqrt(np.array([np.sum(pv[:i,:i]) for i in range(pv.shape[0])]))
+    stepbudget = b-Xp*s
+    pgx = sp.stats.norm.cdf(stepbudget,loc=np.cumsum(pm),scale=std)
+    P = np.hstack([-np.diff(pgx),0])
+    return P
 
 
-f.savefig(os.path.join(fpath,'overheads.png'))
+def plotfull(T,M,B,s):
+    f,a = plt.subplots(nrows=2,ncols=1,figsize=[5,7])
+    for i in np.random.randint(0,T.shape[1],size=118):
+        a[0].plot(T[:,i],'g-',linewidth=0.5)
+        a[1].plot(np.cumsum(T[:,i]),'g-',linewidth=0.5)
+
+    Xp = np.arange(T.shape[0])
+    pm,pv = cvmodel(Xp,M)
+    std = np.sqrt(np.array([np.sum(pv[:i,:i]) for i in range(pv.shape[0])]))
+
+    a[0].plot(Xp,pm,'r')
+    a[0].plot(Xp,pm+2*np.sqrt(np.diagonal(pv)),'r--')
+    a[0].plot(Xp,pm-2*np.sqrt(np.diagonal(pv)),'r--')
+
+
+    a[1].plot(B-s*np.arange(int(B/s)),'k')
+    a[1].plot(Xp,np.cumsum(pm),'r')
+    a[1].plot(Xp,np.cumsum(pm)+2*std,'r--')
+    a[1].plot(Xp,np.cumsum(pm)-2*std,'r--')
+
+    a[1].twinx().plot(stepprobs(s,B,M),'b')
+
+    a[0].set_xlabel('Steps')
+    a[0].set_ylabel('overhead time (s)')
+
+    f.savefig(os.path.join(fpath,'overheads.png'))
+    return
+if __name__=="__main__":
+    T = getT(rpath,fnames,250)
+    M = buildmodel(T)
+    s = 60
+    B = 250*s
+    plotfull(T,M,B,s)

@@ -164,10 +164,16 @@ if false; then
     cp gpbo/exps/predictive/fixedPES/figs/evcostpes.pdf figures/predictive/
     cp gpbo/exps/predictive/fixedPES/figs/aqcostpes.pdf figures/predictive/
 fi
-if $1; then
+if false; then
     cp matplotlibrc gpbo/exps/predictive/fixedEI
     (cd gpbo/exps/predictive/fixedEI ; python2 plots.py)
     cp gpbo/exps/predictive/fixedEI/figs/iterei.pdf figures/predictive/
     cp gpbo/exps/predictive/fixedEI/figs/evcostei.pdf figures/predictive/
     cp gpbo/exps/predictive/fixedEI/figs/aqcostei.pdf figures/predictive/
+fi
+if $1; then
+    cp matplotlibrc gpbo/exps/predictive/
+    (cd gpbo/exps/predictive ; python2 plotoverhead.py)
+    cp gpbo/exps/predictive/plotfigs/overheadcum.pdf figures/predictive
+    cp gpbo/exps/predictive/plotfigs/overheadsingle.pdf figures/predictive
 fi
