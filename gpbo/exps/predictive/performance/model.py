@@ -11,6 +11,7 @@ import pickle
 def decay2model(X,x0,y0,m0,x1,y1,m1):
     a0 = (10**y0)/((10**x0)**m0)
     a1 = (10**y1)/((10**x1)**m1)
+    #return np.log(a0*X**m0 + a1*X**m1+1)
     return a0*X**m0 + a1*X**m1
 
 def flsmodel(X,theta):
@@ -19,6 +20,7 @@ def flsmodel(X,theta):
     grad0 = theta[1]
     grad1 = theta[4]
     c0 = theta[2]+X[:,1]*theta[3]
+    #softmax=np.exp(theta[5])
     return decay2model(X[:,0],1,yinit,grad0,0,c0,grad1)
 
 
@@ -30,7 +32,7 @@ colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 path = 'data/results24'
 files = os.listdir(path)
 
-speedsub=3
+speedsub=7
 def readdata(ls,ax):
     cachefile = os.path.join(path,'cache','{}_{}.p'.format(ls,speedsub))
     if os.path.isfile(cachefile):
@@ -65,28 +67,36 @@ def readdata(ls,ax):
     return X,Y
 #for ls in [100,200,300,500,700,900,1200]:
 
-def llk(X,Y,theta):
-    Yh = flsmodel(X,theta[:5]).reshape(-1,1)
-    e = np.log10(Yh) - np.log10(Y)
+def perfmodel(X,ls,t):
+    m,c = np.split(t,2)
+    tl = m*np.log(ls) + c
+    mu = flsmodel(X,tl)
+    stdlog = tl[-1]
+    return mu, stdlog
 
+def llk(X,Y,L,T):
+    Yp,std = perfmodel(X,L,T)
+    Ypl = np.log10(Yp).reshape(-1,1)
+    #Yh = flsmodel(X,theta[:5]).reshape(-1,1)
+    e = Ypl - np.log10(Y)
     #L = -np.sum(normlogpdf(e,0.,theta[5]))
     #L= -np.sum(normlogpdf(Y,Yh,Yh*theta[5]))
     #R = gammalogpdf(Y,theta[5],Yh/theta[5])
-    R =  normlogpdf(np.log10(Yh)-np.log10(Y),0.,theta[5])
+    R =  normlogpdf(Ypl-np.log10(Y),0.,std)
     L = -np.nansum(R[np.isfinite(R)])
     if np.isinf(L):
         pass
     return L
 
-def perlsllk(X,Y):
-    print('fitmodel')
-    theta0 = [-0.,-6,-0.25,0.5,-0.5,1.]
-    bds = ((-np.Inf,np.Inf),(-np.Inf,-1e-9),(-np.Inf,np.Inf),(1e-9,np.Inf),
-           (-np.Inf,-1e-9),(1e-9,np.Inf))
-    f = lambda t:llk(X,Y,t)
-    res = minimize(f,theta0,method='L-BFGS-B',bounds=bds)
-    print('{}'.format(res.x))
-    return res.x
+#def perlsllk(X,Y):
+#    print('fitmodel')
+#    theta0 = [-0.,-6,-0.25,0.5,-0.5,1.]
+#    bds = ((-np.Inf,np.Inf),(-np.Inf,-1e-9),(-np.Inf,np.Inf),(1e-9,np.Inf),
+#           (-np.Inf,-1e-9),(1e-9,np.Inf))
+#    f = lambda t:llk(X,Y,t)
+#    res = minimize(f,theta0,method='L-BFGS-B',bounds=bds)
+#    print('{}'.format(res.x))
+#    return res.x
 
 L = [100,200,300,500,700,900,1200,1500]
 def optfull():
@@ -105,16 +115,16 @@ def optfull():
 
     def fullllk(t):
         r=0
-        m,c = np.split(t,2)
+        #m,c = np.split(t,2)
         for i,ls in enumerate(L):
-            tl = m*np.log(ls/1000.) + c
-            r+=llk(X[i],Y[i],tl)
-        print(t,r)
+            #tl = m*np.log(ls/1000.) + c
+            r+=llk(X[i],Y[i],ls/1000.,t)
+        print(np.array_str(t,precision=3),r)
         return r
 
     print('fitmodel')
     theta0 = [0.,-1.,0.,0.,0.,0.,-0.,-6,-0.25,0.5,-0.5,1.]
-    bds =  ((-np.Inf,np.Inf),)*12
+    bds =  ((-np.Inf,np.Inf),)*len(theta0)
     print bds
     res = minimize(fullllk,theta0,method='L-BFGS-B',bounds=bds)
     print(res.x)
