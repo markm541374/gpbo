@@ -130,6 +130,42 @@ def plotquarts(a,data1,data2,col,line,lab,log=False):
     return
 
 
+def getquarts(data1,data2,log=False):
+    n=len(data1)
+    mx=-sp.Inf
+    mn=sp.Inf
+    for i in xrange(n):
+        mn = min(mn,min(data1[i]))
+        mx = max(mx,max(data1[i]))
+    if not log:
+        xaxis = sp.linspace(mn,mx,200)
+    else:
+        xaxis = sp.logspace(sp.log10(mn),sp.log10(mx),200)
+
+    low0, med0, upp0 = gpbo.core.ESutils.quartsirregular(data1,data2,xaxis)
+
+    return xaxis,low0,med0,upp0
+
+def getmvint(data1,data2,nstd=2,logx=False,logy=False):
+    n=len(data1)
+    mx=-sp.Inf
+    mn=sp.Inf
+    for i in xrange(n):
+        mn = min(mn,min(data1[i]))
+        mx = max(mx,max(data1[i]))
+    if not logx:
+        xaxis = sp.linspace(mn,mx,200)
+    else:
+        xaxis = sp.logspace(sp.log10(mn),sp.log10(mx),200)
+    if logy:
+        M,V = gpbo.core.ESutils.mvirregular(data1,[d.apply(sp.log) for d in data2],xaxis)
+        S = nstd*sp.sqrt(V)
+        return xaxis,sp.exp(M-S),sp.exp(M),sp.exp(M+S)
+    else:
+        M,V = gpbo.core.ESutils.mvirregular(data1,data2,xaxis)
+        S = nstd*sp.sqrt(V)
+        return xaxis,M-S,M,M+S
+
 def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False,mean=False):
     xdata = [sp.array(i) for i in xdata_]
     ydata = [sp.array(i) for i in ydata_]

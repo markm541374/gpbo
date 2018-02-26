@@ -730,6 +730,12 @@ def quartsirregular(xdata,ydata,xtarget):
         inters[i,:]= sp.interp(xtarget,xdata[i].values.flatten(),ydata[i].values.flatten(),left=sp.NaN,right=sp.NaN)
     return sp.percentile(inters,25,axis=0),sp.percentile(inters,50,axis=0),sp.percentile(inters,75,axis=0)
 
+def mvirregular(xdata,ydata,xtarget):
+    n = len(xdata)
+    inters=sp.empty(shape=[n,len(xtarget)])
+    for i in xrange(n):
+        inters[i,:]= sp.interp(xtarget,xdata[i].values.flatten(),ydata[i].values.flatten(),left=sp.NaN,right=sp.NaN)
+    return sp.mean(inters,axis=0),sp.var(inters,axis=0)
 
 def medianirregular(xdata,ydata,xtarget):
     return percentileirregular(xdata,ydata,xtarget,50)

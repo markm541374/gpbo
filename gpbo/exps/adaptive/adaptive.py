@@ -296,8 +296,9 @@ def plotops(D):
     [a.plot(d['npts'],np.array(d['newpts']),color=d['c'],label=d['name']+' $\mathcal{O}(n^3)$ Evaluations') for d in D]
     a.set_ylabel('Hyperparameter LLK Evaluations (s)')
     a.set_xlabel('Iteration')
+    a.set_ylim(0,2*1e4)
     a.legend()
-    a.set_yscale('symlog',linthreshy=10000)
+    #a.set_yscale('symlog',linthreshy=10000)
     f.savefig('figs/opcount.pdf')
 def plotuseful(D):
     print('plotting useful')

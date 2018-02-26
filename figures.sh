@@ -2,7 +2,7 @@
 export PYTHONPATH="/home/mark/Dropbox/workspace/gpbo:${PYTHONPATH}"
 
 #implementation plots
-if false; then
+if $1; then
     cp matplotlibrc gpbo/exps/adaptive/
     (cd gpbo/exps/adaptive ; python2 adaptive.py)
     cp gpbo/exps/adaptive/figs/overheadtime.pdf figures/implementation/
@@ -59,7 +59,7 @@ if false; then
     cp gpbo/exps/stopping/draws/results2d/out11.pdf figures/localstop/
     mv figures/localstop/out11.pdf figures/localstop/d2methods.pdf
 fi
-if false; then
+if $1; then
     cp matplotlibrc gpbo/exps/stopping/gphyp
     (cd gpbo/exps/stopping/gphyp ; python2 plot.py)
     cp gpbo/exps/stopping/gphyp/figs/stopping_GPhyp.pdf figures/localstop/
@@ -171,7 +171,7 @@ if false; then
     cp gpbo/exps/predictive/fixedEI/figs/evcostei.pdf figures/predictive/
     cp gpbo/exps/predictive/fixedEI/figs/aqcostei.pdf figures/predictive/
 fi
-if $1; then
+if false; then
     cp matplotlibrc gpbo/exps/predictive/
     (cd gpbo/exps/predictive ; python2 plotoverhead.py)
     cp gpbo/exps/predictive/plotfigs/overheadcum.pdf figures/predictive
