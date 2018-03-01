@@ -12,9 +12,6 @@ from matplotlib import pyplot as plt
 import tqdm
 import pickle
 
-rpath = 'fixedPES/results'
-fpath = 'fixedPES/figs'
-fnames=[i for i in os.listdir(rpath) if i.startswith('pes_3_500'.format(i)) ][-8:]
 
 def getT(fpath,fnames,N):
     n = len(fnames)
@@ -144,6 +141,9 @@ def plotfull(T,M,B,s):
     f.savefig(os.path.join(fpath,'overheads.png'))
     return
 if __name__=="__main__":
+    rpath = 'fixedPES/results'
+    fpath = 'fixedPES/figs'
+    fnames=[i for i in os.listdir(rpath) if i.startswith('pes_3_500'.format(i)) ][-8:]
     T = getT(rpath,fnames,250)
     M = buildmodel(T)
     s = 60

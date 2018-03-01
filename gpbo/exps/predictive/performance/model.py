@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 import os
 import gpbo
 import tqdm
-import pickle
+import dill as pickle
 
 def decay2model(X,x0,y0,m0,x1,y1,m1):
     a0 = (10**y0)/((10**x0)**m0)
@@ -29,10 +29,6 @@ gammalogpdf = lambda x,shape,scale: (shape-1)*np.log(x)-x/scale-np.log(gamma(sha
 tlogpdf = lambda x,v,scale: -0.5*(v+1)*np.log(1+((x/scale)**2)/v) + np.log(gamma(0.5*(v+1))/(np.sqrt(v*np.pi)*gamma(0.5*v))) - np.log(scale)
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-path = 'data/results24'
-files = os.listdir(path)
-
-speedsub=7
 def readdata(ls,ax):
     cachefile = os.path.join(path,'cache','{}_{}.p'.format(ls,speedsub))
     if os.path.isfile(cachefile):
@@ -72,6 +68,7 @@ def perfmodel(X,ls,t):
     tl = m*np.log(ls) + c
     mu = flsmodel(X,tl)
     stdlog = tl[-1]
+    #return is true value of median exp(mu), log10 value of std deviation (sigma/log10)^2
     return mu, stdlog
 
 def llk(X,Y,L,T):
@@ -88,17 +85,7 @@ def llk(X,Y,L,T):
         pass
     return L
 
-#def perlsllk(X,Y):
-#    print('fitmodel')
-#    theta0 = [-0.,-6,-0.25,0.5,-0.5,1.]
-#    bds = ((-np.Inf,np.Inf),(-np.Inf,-1e-9),(-np.Inf,np.Inf),(1e-9,np.Inf),
-#           (-np.Inf,-1e-9),(1e-9,np.Inf))
-#    f = lambda t:llk(X,Y,t)
-#    res = minimize(f,theta0,method='L-BFGS-B',bounds=bds)
-#    print('{}'.format(res.x))
-#    return res.x
 
-L = [100,200,300,500,700,900,1200,1500]
 def optfull():
     X=[]
     Y=[]
@@ -136,11 +123,24 @@ def optfull():
         print('model at {} : {}'.format(ls,tl))
         Xp = np.arange(X[i][:,0].min(),X[i][:,0].max()).reshape([-1,1])
         for j,noise in enumerate([-2,-3,-4,-5,-6,-7,-8]):
-            Yp = flsmodel(np.hstack([Xp,noise*np.ones_like(Xp)]),tl)
-            A[i].plot(Xp,Yp,'k--')
+            #Yp = flsmodel(np.hstack([Xp,noise*np.ones_like(Xp)]),tl)
+            Yp,l10std = perfmodel(np.hstack([Xp,noise*np.ones_like(Xp)]),ls/1000.,res.x)
+            mu = np.log(Yp)
+            ss = (np.log(10)*l10std)**2
+            A[i].plot(Xp,np.exp(mu+0*ss/2.),'k--')
+            #A[i].plot(Xp,Yp,'k--')
         A[i].set_xscale('log')
         A[i].set_yscale('log')
-        F[i].savefig('combine_{}.png'.format(ls))
+        F[i].savefig('figs/combine_{}.png'.format(ls))
     return res.x
+if __name__=="__main__":
 
-M = optfull()
+    path = 'data/results24'
+    files = os.listdir(path)
+
+    speedsub=7
+    L = [100,200,300,500,700,900,1200,1500]
+    MP = optfull()
+    def M(X,L):
+        return perfmodel(X,L,MP)
+    pickle.dump([M,MP],open('model.p','w'))

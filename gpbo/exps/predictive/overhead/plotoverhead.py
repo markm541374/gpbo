@@ -1,22 +1,25 @@
-import numpy as np
-import scipy as sp
 import os
+import dill as pickle
+import numpy as np
 from matplotlib import pyplot as plt
-import pickle
-import overheads
+
+import gpbo.exps.predictive.overhead.overheads as overheads
 
 rpath = 'plotfigs'
 fpath = 'plotfigs'
 fnames=[i for i in os.listdir(rpath) if i.startswith('eihyp_3_500'.format(i)) ]
 
-T = overheads.getT(rpath,fnames,250)
+T = overheads.getT(rpath, fnames, 250)
 if False:
     M = overheads.buildmodel(T)
-    pickle.dump([M],open('overmodel.p','w'))
+    def OM(X):
+        r= overheads.cvmodel(X, M)
+        return r
+    pickle.dump([OM,M],open('overmodel.p','w'))
 else:
-    M = pickle.load(open('overmodel.p','r'))[0]
+    OM,M = pickle.load(open('overmodel.p','r'))
 s = 60
-B = 250*s
+B = 550*s
 
 cols = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
@@ -26,8 +29,8 @@ for i in np.random.randint(0,T.shape[1],size=18):
     a0.plot(T[:,i],cols[0],linewidth=0.5)
     a1.plot(np.cumsum(T[:,i]),cols[0],linewidth=0.5)
 a0.plot([],[],cols[0],linewidth=0.5,label='Overhead samples')
-Xp = np.arange(T.shape[0])
-pm,pv = overheads.cvmodel(Xp,M)
+Xp = np.arange(550)#T.shape[0])
+pm,pv = OM(Xp)
 std = np.sqrt(np.array([np.sum(pv[:i,:i]) for i in range(pv.shape[0])]))
 
 a0.plot(Xp,pm,cols[1],label='Model mean')
@@ -45,7 +48,7 @@ a0.plot([],[],cols[2],linestyle=':',label='Available overhead budget')
 
 a1t = a1.twinx()
 a1t.grid(False)
-a1t.plot(overheads.stepprobs(s,B,M),cols[3])
+a1t.plot(overheads.stepprobs(s, B, M), cols[3])
 
 a0.set_xlabel('Steps')
 a1.set_xlabel('Steps')
