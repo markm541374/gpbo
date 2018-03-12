@@ -348,4 +348,5 @@ def readoptdata(fname,includetaq=False):
         df['cacc']=df['accEA']
     else:
         df['cacc']=df['accE']
+
     return df

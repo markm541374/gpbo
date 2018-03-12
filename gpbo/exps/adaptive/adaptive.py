@@ -267,9 +267,9 @@ if False:
     d2 = runslice(X,Y,100,200)
     pickle.dump([d2],open('data/slice.p','w'))
 else:
-    d0 = pickle.load(open('data/adapt.p','r'))[0]
-    d1 = pickle.load(open('data/grid.p','r'))[0]
-    d2 = pickle.load(open('data/slice.p','r'))[0]
+    d0 = pickle.load(open('dataheron/adapt.p','r'))[0]
+    d1 = pickle.load(open('dataheron/grid.p','r'))[0]
+    d2 = pickle.load(open('dataheron/slice.p','r'))[0]
 
 cmap = plt.rcParams['axes.prop_cycle'].by_key()['color']
 d0['name']='Adaptive Quad'

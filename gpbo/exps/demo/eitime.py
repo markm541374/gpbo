@@ -44,7 +44,7 @@ if False:
     D0  = timing(100,40)
     D1  = timing(20,40)
     pickle.dump([D0,D1],open('data/eitimedata.p','w'))
-D0,D1 = pickle.load(open('data/eitimedata.p','r'))
+D0,D1 = pickle.load(open('data/eitimedataheron.p','r'))
 f,a = plt.subplots(1)
 x,tb,ts  = D0
 cmap = plt.rcParams['axes.prop_cycle'].by_key()['color']

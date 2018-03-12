@@ -12,6 +12,31 @@ from matplotlib import pyplot as plt
 import tqdm
 import pickle
 
+def sumton2(a,n):
+    #sum from i=0 to n (x-a)^2
+    return (1/6.)*(n+1)*(6*a**2 - 6*a*n + 2*n**2 + n)
+def sumton3(a,n):
+    #sum from i=0 to n (x-a)^3
+    return -0.25*(n+1)*(2*a-n)*(2*a**2 - 2*a*n + n**2 + n)
+def sumton4(a,n):
+    #sum from i=0 to n (x-a)^4
+    return (1/30.)*(n + 1)*(30*a**4 - 60*(a**3)* n + 30. *(a**2)* n*(2* n + 1) - 30.* a* (n**2)* (n + 1) + n *(6 *n**3 + 9 *n**2 + n - 1))
+def sumton5(a,n):
+    #sum from i=0 to n (x-a)^5
+    return  -(1/12.)* (n + 1) *(2* a - n) *(6* a**4 - 12.* (a**3)* n + 2* (a**2)* n* (7* n + 5) - 2 *a* (n**2)* (4* n + 5) + n *(2* n**3 + 4* n**2 + n - 1))
+def sumton6(a,n):
+    #sum from i=0 to n (x-a)^6
+    return   (1/42.)*(n + 1)*(42*(a**6)-126.*(a**5)*n + 210.*(a**4)*(n**2)+ 105.*(a**4)*n-210.*(a**3)*(n**3)-210.*(a**3)*(n**2) +126.*(a**2)*(n**4) +189.*(a**2)*(n**3) + 21.*(a**2)*(n**2) - 21.*(a**2)*n - 42.*a*(n**5) - 84.*a*n**4 - 21.*a* n**3 + 21.*a*n**2 + 6.*n**6 + 15*n**5 + 6*n**4 - 6*n**3 - n**2 + n)
+def sumton3_3(a,b,n):
+    #sum from i=0 to n (x-a)^3 (x-b)^3
+    return 1/420.*(n + 1)*(420.*(a**3)*(b**3) - 630.*(a**3)*(b**2)*n + 420.*(a**3)*b*(n**2) + 210.*(a**3)*b*n - 105.*(a**3)*(n**3) - 105.*(a**3)*(n**2) - 630.*(a**2)*(b**3)*n + 1260.*(a**2)*(b**2)*(n**2) + 630.*(a**2)*(b**2)*n - 945.*(a**2)*b*(n**3) - 945.*(a**2)*b*(n**2) + 252.*(a**2)*(n**4) + 378.*(a**2)*(n**3) + 42.*(a**2)*(n**2) - 42.*(a**2)*n + 420.*a*(b**3)*(n**2) + 210.*a*(b**3)*n - 945.*a*(b**2)*(n**3) - 945.*a*(b**2)*(n**2) + 756.*a*b*(n**4) + 1134.*a*b*(n**3) + 126.*a*b*(n**2) - 126.*a*b*n - 210.*a*(n**5) - 420.*a*(n**4) - 105.*a*(n**3) + 105.*a*(n**2) - 105.*(b**3)*(n**3) - 105.*(b**3)*(n**2) + 252.*(b**2)*(n**4) + 378.*(b**2)*(n**3) + 42.*(b**2)*(n**2) - 42.*(b**2)*n - 210.*b*(n**5) - 420.*b*(n**4) - 105.*b*(n**3) + 105.*b*(n**2) + 60.*(n**6) + 150.*(n**5) + 60.*(n**4) - 60.*(n**3) - 10.*(n**2) + 10.*n)
+def sumton2_2(a,b,n):
+    #sum from i=0 to n (x-a)^2 (x-b)^2
+    return 1/30.*(n + 1)*(30.*(a**2)*(b**2) - 30.*(a**2)*b*n + 10.*(a**2)*(n**2) + 5.*(a**2)*n - 30.*a*(b**2)*n + 40.*a*b*(n**2) + 20.*a*b*n - 15.*a*(n**3) - 15.*a*(n**2) + 10.*(b**2)*(n**2) + 5.*(b**2)*n - 15.*b*(n**3) - 15.*b*(n**2) + 6.*(n**4) + 9.*(n**3) + (n**2) - n)
+def sumton2_3(a,b,n):
+    #sum from i=0 to n (x-a)^2 (x-b)^3
+    return 1/60.*(n + 1)*(-15.*(a**2)*(4.*(b**3) - 6.*(b**2)*n + 2.*b*n*(2.*n + 1) - (n**2)*(n + 1)) - 2.*a*n*(-30.*(b**3) + 30.*(b**2)*(2.*n + 1) - 45.*b*n*(n + 1) + 2.*(6.*(n**3) + 9.*(n**2) + n - 1)) + n*(-10.*(b**3)*(2.*n + 1) + 45.*(b**2)*n*(n + 1) - 6.*b*(6.*(n**3) + 9.*(n**2) + n - 1) + 5.*n*(2.*(n**3) + 4.*(n**2) + n - 1)))
+
 
 def getT(fpath,fnames,N):
     n = len(fnames)
@@ -32,14 +57,14 @@ gammalogpdf = lambda x,shape,scale: (shape-1)*np.log(x)-x/scale#-shape*np.log(sc
 normlogpdf = lambda x,loc,scale: -0.5*((x-loc)/scale)**2-0.5*np.log(2*np.pi*scale**2)
 lognormlogpdf = lambda x,s,loc,scale: -((np.log(x)-loc)/scale)**2 - np.log(x)
 tlogpdf = lambda x,v,scale: -0.5*(v+1)*np.log(1+((x/scale)**2)/v)
-
+support=390.
 def ccmodel(x,theta):
     y0 = theta[1]
     g0 = theta[2]
     y1 = theta[3]
     g1 = theta[4]
     a=0.
-    b=200.
+    b=support
     r=b-a
     r2 = r**2
     r3 = r**3
@@ -53,7 +78,7 @@ def ccmodel(x,theta):
 def cvmodel(x,M):
     m,v = M
     a=0.
-    b=200.
+    b=support
     r=b-a
     r2=r**2
     r3=r**3
@@ -69,22 +94,61 @@ def cvmodel(x,M):
 
     m3 = T2.dot(m2)
     v3 = T2.dot(v2.dot(T2.T))
+    #v3d = np.einsum('ij,ij->i', np.dot(T2, v2), T2)
 
     v4 = v3+np.diag((m[0]*m3)**2)
 
     return m3,v4
 
 
+def cvimodel(x,M):
+    m,v = M
+    a=0.
+    b=support
+    r=b-a
+    r2=r**2
+    r3=r**3
+    T1 = np.array([[3./r2, 1./r,  0.,     0.],
+                   [2./r3, 1./r2, 0.,     0.],
+                   [0.,    0.,    3./r2, -1./r],
+                   [0.,    0.,   -2./r3,  1./r2]])
+    m2 = T1.dot(m[1:])
+    v2 = T1.dot(v[1:,1:].dot(T1.T))
+
+    X = x.reshape([-1,1])
+    #T2 = np.hstack([((X+1-b)**3-0*(1-b)**3)/3., 0.25*((X+1-b)**4-0*(1-b)**4), ((X+1-a)**3 - 0*(1-a)**3)/3., 0.25*((X+1-a)**4-0*(1-a)**4)])
+    T2 = np.hstack([sumton2(b,X), sumton3(b,X), sumton2(a,X), sumton3(a,X)])
+
+    m3 = T2.dot(m2)
+    #v3 = T2.dot(v2.dot(T2.T))
+    v3d = np.einsum('ij,ij->i', np.dot(T2, v2), T2)
+    coef = np.outer(m2,m2)
+    #Tm = np.array([[coef[0,0]*sumton4(b,X), coef[0,1]*2*sumton5(b,X), coef[0,2]*2*sumton2_2(a,b,X), coef[0,3]*2*sumton2_3(b,a,X)],
+    #               [0.          ,   coef[1,1]*sumton6(b,X), coef[1,2]*2*sumton2_3(a,b,X), coef[1,3]*2*sumton3_3(a,b,X)],
+    #               [0.          , 0.            ,   coef[2,2]*sumton4(a,X)    , coef[2,3]*2*sumton5(a,X)    ],
+    #               [0.          , 0.            , 0.                ,   coef[3,3]*sumton6(a,X)    ]])
+
+    Tm = coef[0,0]*sumton4(b,X)+ coef[0,1]*2*sumton5(b,X)+ coef[0,2]*2*sumton2_2(a,b,X) + coef[0,3]*2*sumton2_3(b,a,X) + \
+                                 coef[1,1]*sumton6(b,X)  + coef[1,2]*2*sumton2_3(a,b,X) + coef[1,3]*2*sumton3_3(a,b,X) + \
+                                                           coef[2,2]*sumton4(a,X)       + coef[2,3]*2*sumton5(a,X)     + \
+                                                                                          coef[3,3]*sumton6(a,X)
+
+
+    v4 = v3d+Tm[:,0]*m[0]**2
+    #print('XXXXXXXXXXXX')
+    #print(Tm[-1],m[0]**2,v4[-1,-1],v3[-1,-1],v3[-1,-1]+Tm[-1]*m[0]**2)
+
+    return m3,v4
 def fitT(Y):
     assert(len(Y)>=200)
-    theta0 = [0.1,Y[0],max(0.01,(Y[49]-Y[0])/50.),Y[199],(Y[199]-Y[0])/200.]
+    theta0 = [0.1,Y[0],max(0.01,(Y[49]-Y[0])/50.),Y[int(support)-1],(Y[int(support)-1]-Y[0])/support]
     X = np.arange(Y.shape[0])
     def llk(theta):
         pa =  gammalogpdf(theta[0],1.,0.1)
         pa += gammalogpdf(theta[1],4.,Y[0]/4.)
         pa += gammalogpdf(theta[2],4.,max(0.01,(Y[49]-Y[0])/50.)/4.)
-        pa += gammalogpdf(theta[3],4.,Y[199]/4.)
-        pa += gammalogpdf(theta[4],4.,(Y[199]-Y[0])/200./4.)
+        pa += gammalogpdf(theta[3],4.,Y[int(support)-1]/4.)
+        pa += gammalogpdf(theta[4],4.,(Y[int(support)-1]-Y[0])/support/4.)
         Yh = ccmodel(X,theta)
         L=0#-pa
         L-= np.sum(normlogpdf(Y,Yh,Yh*theta[0]))

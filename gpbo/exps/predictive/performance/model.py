@@ -19,9 +19,9 @@ def flsmodel(X,theta):
     yinit = theta[0]
     grad0 = theta[1]
     grad1 = theta[4]
-    c0 = theta[2]+X[:,1]*theta[3]
+    c0 = theta[2]+X[:,1]*max(0.,theta[3])
     #softmax=np.exp(theta[5])
-    return decay2model(X[:,0],1,yinit,grad0,0,c0,grad1)
+    return decay2model(X[:,0],1,yinit,min(0.,grad0),0,c0,min(0.,grad1))
 
 
 normlogpdf = lambda x,loc,scale: -0.5*((x-loc)/scale)**2-0.5*np.log(2*np.pi*scale**2)
@@ -135,11 +135,11 @@ def optfull():
     return res.x
 if __name__=="__main__":
 
-    path = 'data/results24'
+    path = 'data/results16'
     files = os.listdir(path)
 
-    speedsub=7
-    L = [100,200,300,500,700,900,1200,1500]
+    speedsub=3
+    L = [100,200,300,400,500,600,700,800,900,1200,1500]
     MP = optfull()
     def M(X,L):
         return perfmodel(X,L,MP)
