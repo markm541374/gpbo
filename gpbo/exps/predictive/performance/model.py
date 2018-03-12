@@ -14,6 +14,7 @@ def decay2model(X,x0,y0,m0,x1,y1,m1):
     #return np.log(a0*X**m0 + a1*X**m1+1)
     return a0*X**m0 + a1*X**m1
 
+
 def flsmodel(X,theta):
 
     yinit = theta[0]
@@ -64,8 +65,9 @@ def readdata(ls,ax):
 #for ls in [100,200,300,500,700,900,1200]:
 
 def perfmodel(X,ls,t):
-    m,c = np.split(t,2)
-    tl = m*np.log(ls) + c
+    split = t.size/2
+    #m,c = np.split(t,2)
+    tl = t[:split]*np.log(ls) + t[split:]
     mu = flsmodel(X,tl)
     stdlog = tl[-1]
     #return is true value of median exp(mu), log10 value of std deviation (sigma/log10)^2

@@ -18,8 +18,12 @@ def OMI(X):
 _,PP = pickle.load(open('../performance/model.p'))
 from gpbo.exps.predictive.performance.model import perfmodel
 def PM(X,S,L):
-    X = X.reshape(-1,1)
-    truemean,log10std = perfmodel(np.hstack([X,np.log10(S)*np.ones_like(X)]),L,PP)
+    Xa = np.ones([X.size,2])*np.log10(S)
+    Xa[:,0] = X
+    #Xa[:,1] = np.log10(S)
+    #X = X.reshape(-1,1)
+    #truemean,log10std = perfmodel(np.hstack([X,np.log10(S)*np.ones_like(X)]),L,PP)
+    truemean,log10std = perfmodel(Xa,L,PP)
     natlogmu = np.log(truemean)
     natlogvar = (np.log(10)*log10std)**2
     return natlogmu,natlogvar
@@ -69,19 +73,20 @@ def probsteps(B,C,ax=None):
 def muss2mv(mu,ss):
     #natural log
     m = np.exp(mu+0.5*ss)
-    v = (np.exp(ss)-1)*np.exp(2*mu+ss)
+    v = (np.exp(ss)-1)*m**2#np.exp(2*mu+ss)
     return m,v
 def mv2muss(m,v):
     #natural log
-    mu = np.log(m/np.sqrt(1+v/m**2))
+    #mu = np.log(m/np.sqrt(1+v/m**2))
     ss = np.log(1+v/m**2)
+    mu = np.log(m)-0.5*ss
     return mu,ss
 
-def marginalizelognorm(mu,ss,p):
-    pn = p/np.sum(p)
+def marginalizelognorm(mu,ss,pn):
+    #pn = p/np.sum(p)
     m,v = muss2mv(mu,ss)
     margm = np.sum(pn*m)
-    margv = np.sum(pn*(m-margm)**2)+np.sum(pn*v)
+    margv = np.sum(pn*(m-margm)**2 + pn*v)
     margmu,margss = mv2muss(margm,margv)
     return margmu, margss
 
@@ -132,6 +137,7 @@ def perfatBCVL(B,C,V,L):
 
 def perfatBCVoverL(B,C,V,L,pL):
     nsteps,probn = probsteps(B,C)
+    print(len(nsteps))
     n = pL.size
     mu = np.empty(n)
     ss = np.empty(n)
