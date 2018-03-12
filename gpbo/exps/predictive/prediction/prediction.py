@@ -48,7 +48,7 @@ def probsteps(B,C,ax=None):
         cnstep[np.isnan(cnstep)]=1
         cnstep = np.minimum.accumulate(cnstep)
         #print(len(nsteps),cnstep[-1])
-        if cnstep[-1]<1e-6 or len(nsteps)<mx:
+        if cnstep[-1]<1e-4 or len(nsteps)<mx:
             break
         mx*=2
     #print('done')
@@ -131,13 +131,13 @@ def steps(nsteps,probn):
 
 def perfatBCVL(B,C,V,L):
     nsteps,probn = probsteps(B,C)
-    print(V,'steplen',len(nsteps))
+    #print(V,'steplen',len(nsteps))
     mu,ss = perfatl(nsteps,probn,V,L)
     return mu,ss,nsteps,probn
 
 def perfatBCVoverL(B,C,V,L,pL):
     nsteps,probn = probsteps(B,C)
-    print(len(nsteps))
+    #print(len(nsteps))
     n = pL.size
     mu = np.empty(n)
     ss = np.empty(n)
@@ -146,7 +146,7 @@ def perfatBCVoverL(B,C,V,L,pL):
     margmu, margss = marginalizelognorm(mu,ss,pL)
     return margmu, margss, nsteps, probn
 
-def optatBcfL(B,cfn,L,bnds=(-8,-2),ax=None,axt=None):
+def optatBcfL(B,cfn,L,bnds=(-6,-1),ax=None,axt=None):
     var = np.logspace(bnds[0],bnds[1],100)
 
     mu,ss =np.empty_like(var),np.empty_like(var)
@@ -177,7 +177,7 @@ def optatBcfL(B,cfn,L,bnds=(-8,-2),ax=None,axt=None):
 
     return vopt,muopt,ssopt,stepsopt
 
-def optatBcfoverL(B,cfn,L,pL,bnds=(-8,-2),ax=None,axt=None):
+def optatBcfoverL(B,cfn,L,pL,bnds=(-6,-1),ax=None,axt=None):
     var = np.logspace(bnds[0],bnds[1],100)
 
     mu,ss =np.empty_like(var),np.empty_like(var)
@@ -269,10 +269,10 @@ wts = wts/np.sum(wts)
 
 #plotmargdata('margresults','eihyp_3_',lset,wts,ax[3],axt[3])
 #L = sp.stats.gamma.rvs(3,scale=0.15,size=500)
-L = sp.stats.gamma.ppf(np.linspace(0,1,5002)[1:-1],3.,scale =0.2)
+L = sp.stats.gamma.ppf(np.linspace(0,1,1002)[1:-1],3.,scale =0.2)
 p = np.ones_like(L)/float(L.size)
 vopt,muopt,ssopt,stepsopt = optatBcfoverL(B,cfn,L,p,ax=ax[3],axt=axt[3])
-
+print(vopt,muopt,ssopt,stepsopt)
 fig.savefig('figs/rsprediction.png')
 plt.close(fig)
 
