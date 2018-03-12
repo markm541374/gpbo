@@ -22,7 +22,7 @@ if False:
 else:
     OM,OMI,M = pickle.load(open('overmodel.p','r'))
 s = 60
-B = 550*s
+B = 850*s
 
 cols = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
@@ -32,7 +32,7 @@ for i in np.random.randint(0,T.shape[1],size=18):
     a0.plot(T[:,i],cols[0],linewidth=0.5)
     a1.plot(np.cumsum(T[:,i]),cols[0],linewidth=0.5)
 a0.plot([],[],cols[0],linewidth=0.5,label='Overhead samples')
-Xp = np.arange(550)#T.shape[0])
+Xp = np.arange(850)#T.shape[0])
 pm,pv = OM(Xp)
 cm,cv = OMI(Xp)
 std = np.sqrt(np.array([np.sum(pv[:i+1,:i+1]) for i in range(pv.shape[0])]))
