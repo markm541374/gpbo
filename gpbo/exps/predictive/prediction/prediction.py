@@ -44,7 +44,8 @@ def probsteps_deprecated(B,C,ax=None):
         #cumulative mean and std
         #cmean = np.cumsum(pm)
         cstd = np.sqrt(cv)#np.sqrt(np.array([np.sum(pv[:i+1,:i+1]) for i in range(pv.shape[0])]))
-        cnstep = sp.stats.norm.cdf(bover,loc=cmean,scale=cstd)
+        cneg = sp.stats.norm.cdf(0.,loc=cmean,scale=cstd)
+        cnstep = (sp.stats.norm.cdf(bover,loc=cmean,scale=cstd)-cneg)/(1-cneg)
         cnstep[np.isnan(cnstep)]=1
         cnstep = np.minimum.accumulate(cnstep)
         #print(len(nsteps),cnstep[-1])
@@ -77,7 +78,8 @@ def probsteps(B,C,ax=None):
     bover = B-C*(nsteps+10)
     cmean,cv = OMI(nsteps)
     cstd = np.sqrt(cv)
-    cnstep = sp.stats.norm.cdf(bover,loc=cmean,scale=cstd)
+    cneg = sp.stats.norm.cdf(0.,loc=cmean,scale=cstd)
+    cnstep = (sp.stats.norm.cdf(bover,loc=cmean,scale=cstd)-cneg)/(1-cneg)
     cnstep[np.isnan(cnstep)]=1
     cnstep = np.minimum.accumulate(cnstep)
     if cnstep[-1]<1e-3:
@@ -92,7 +94,9 @@ def probsteps(B,C,ax=None):
             #print(step,pstop)
             step+=1
             cm,cv = OMI(step)
-            pstop = sp.stats.norm.cdf(B-C*(step+10),loc=cm,scale=np.sqrt(cv))
+            pneg = sp.stats.norm.cdf(0.,loc=cm,scale=np.sqrt(cv))
+            pstop = (sp.stats.norm.cdf(B-C*(step+10),loc=cm,scale=np.sqrt(cv))-pneg)/(1-pneg)
+            print(step,pstop)
             if last-1e-3>pstop:
                 extras.append(int((laststep+step)/2))
                 laststep=step
@@ -102,7 +106,8 @@ def probsteps(B,C,ax=None):
         bover = B-C*(nsteps+10)
         cmean,cv = OMI(nsteps)
         cstd = np.sqrt(cv)
-        cnstep = sp.stats.norm.cdf(bover,loc=cmean,scale=cstd)
+        cneg = sp.stats.norm.cdf(0.,loc=cmean,scale=cstd)
+        cnstep = (sp.stats.norm.cdf(bover,loc=cmean,scale=cstd)-cneg)/(1-cneg)
         cnstep[np.isnan(cnstep)]=1
         cnstep = np.minimum.accumulate(cnstep)
 
@@ -297,7 +302,7 @@ def plotmargdata(path,base,ls,lw,axR,axN):
 #############################################################
 fig,ax = plt.subplots(nrows=2,ncols=1)
 print('perfplot')
-B = 2*60*60
+B = 5*60*60
 C = 60.
 nsteps,probn = probsteps(B,C,ax=ax[0])
 print(len(nsteps))
@@ -315,7 +320,7 @@ print('rsplot')
 fig,ax = plt.subplots(nrows=4,ncols=1,figsize=[5,8],sharex=True)
 def cfn(v):
     #return 60*1e-6/v
-    return 2*60*60*0.01*1e-4/v
+    return B*0.01*1e-4/v
 axt = [a.twinx() for a in ax]
 vopt,muopt,ssopt,stepsopt = optatBcfL(B,cfn,0.1,ax=ax[0],axt=axt[0])
 vopt,muopt,ssopt,stepsopt = optatBcfL(B,cfn,0.5,ax=ax[1],axt=axt[1])
