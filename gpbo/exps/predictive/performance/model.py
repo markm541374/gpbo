@@ -7,10 +7,10 @@ import os
 import gpbo
 import tqdm
 import dill as pickle
-
+l10 = np.log(10.)
 def decay2model(X,x0,y0,m0,x1,y1,m1):
-    a0 = (10**y0)/((10**x0)**m0)
-    a1 = (10**y1)/((10**x1)**m1)
+    a0 = np.exp(l10*(y0-x0*m0))
+    a1 = np.exp(l10*(y1-x1*m1))
     #return np.log(a0*X**m0 + a1*X**m1+1)
     return a0*X**m0 + a1*X**m1
 
