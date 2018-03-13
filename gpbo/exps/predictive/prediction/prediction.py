@@ -29,87 +29,44 @@ def PM(X,S,L):
     return natlogmu,natlogvar
 
 
-def probsteps_deprecated(B,C,ax=None):
-    mx=10
-    while True:
-        #availabel step numbers are up to B/C
-        nsteps = np.arange(max(1,min(mx,1+(B-10*C)/C)))
-        if len(nsteps)==0:
-            return np.arange(0),np.zeros(0)
-        #overhead budget remaining at step
-        bover = B-C*(nsteps+10)
-        #perstep mean and cov for overhead
-        #pm,pv = OM(nsteps)
-        cmean,cv = OMI(nsteps)
-        #cumulative mean and std
-        #cmean = np.cumsum(pm)
-        cstd = np.sqrt(cv)#np.sqrt(np.array([np.sum(pv[:i+1,:i+1]) for i in range(pv.shape[0])]))
-        cneg = sp.stats.norm.cdf(0.,loc=cmean,scale=cstd)
-        cnstep = (sp.stats.norm.cdf(bover,loc=cmean,scale=cstd)-cneg)/(1-cneg)
-        cnstep[np.isnan(cnstep)]=1
-        cnstep = np.minimum.accumulate(cnstep)
-        #print(len(nsteps),cnstep[-1])
-        if cnstep[-1]<1e-4 or len(nsteps)<mx:
-            break
-        mx*=2
-    #print('done')
-    pnstep = np.nan_to_num(np.hstack([-np.diff(cnstep),0]))
-    if len(pnstep)==1:
-        pnstep=np.ones(1)
-    pnstep = pnstep/np.sum(pnstep)
-    #initialization offset
-    nsteps+=10
-    if not ax is None:
-        ax.plot(nsteps,cmean,cols[0])
-        ax.plot(nsteps,cmean-2*cstd,cols[0],linestyle='--')
-        ax.plot(nsteps,cmean+2*cstd,cols[0],linestyle='--')
-
-        ax.plot([0.,B/C],[B,0.],cols[0],linewidth=0.5)
-        axt = ax.twinx()
-        axt.plot(nsteps,cnstep,cols[1],linewidth=0.75)
-    #if np.any(np.isnan(pnstep)):
-    #    pass
-    return nsteps, pnstep
 
 def probsteps(B,C,ax=None):
-    nsteps = np.arange(max(1,min(200,1+(B-10*C)/C)))
+    def probstop(n):
+        cm,cv = OMI(n)
+        pneg = sp.stats.norm.cdf(0.,loc=cm,scale=np.sqrt(cv))
+        pstop = (sp.stats.norm.cdf(np.maximum(0,B-C*(n+10)),loc=cm,scale=np.sqrt(cv))-pneg)/(1-pneg)
+        return pstop
+
+    nstepslog = np.logspace(1,np.log10(max(10,1+(B-10*C)/C)),100)
+    probnlog = probstop(nstepslog)
+    approxmaxarg = np.argmax(probnlog<0.5*1e-3)
+    approxmax = nstepslog[approxmaxarg]
+    nsteps = np.arange(int(approxmax))
+
+    #nsteps = np.arange(max(1,min(200,1+(B-10*C)/C)))
+
+    #bover = np.maximum(0,B-C*(nsteps+10))
+    #cmean,cv = OMI(nsteps)
+    #cstd = np.sqrt(cv)
+    #cneg = sp.stats.norm.cdf(0.,loc=cmean,scale=cstd)
+    cnstep = probstop(np.arange(int(approxmax)))
+    last=1
+    nstepthin=[]
+    cnstepthin=[]
+    for i in range(int(approxmax)):
+        if cnstep[i]<last-1e-3:
+            last = cnstep[i]
+            nstepthin.append(i)
+            cnstepthin.append(cnstep[i])
+    cnstep = np.array(cnstepthin)
+    nsteps = np.array(nstepthin)
+
     if len(nsteps)==0:
-        return np.arange(0),np.zeros(0)
-    bover = B-C*(nsteps+10)
-    cmean,cv = OMI(nsteps)
-    cstd = np.sqrt(cv)
-    cneg = sp.stats.norm.cdf(0.,loc=cmean,scale=cstd)
-    cnstep = (sp.stats.norm.cdf(bover,loc=cmean,scale=cstd)-cneg)/(1-cneg)
+        return np.array([max(0,int(B/C))]),np.array([1])
+    #(sp.stats.norm.cdf(bover,loc=cmean,scale=cstd)-cneg)/(1-cneg)
+
     cnstep[np.isnan(cnstep)]=1
     cnstep = np.minimum.accumulate(cnstep)
-    if cnstep[-1]<1e-3:
-        pass
-    else:
-        extras=[]
-        last = cnstep[-1]
-        step=nsteps[-1]
-        laststep=step
-        pstop = cnstep[-1]
-        while pstop>0.5*1e-3:
-            #print(step,pstop)
-            step+=1
-            cm,cv = OMI(step)
-            pneg = sp.stats.norm.cdf(0.,loc=cm,scale=np.sqrt(cv))
-            pstop = (sp.stats.norm.cdf(B-C*(step+10),loc=cm,scale=np.sqrt(cv))-pneg)/(1-pneg)
-            print(step,pstop)
-            if last-1e-3>pstop:
-                extras.append(int((laststep+step)/2))
-                laststep=step
-                last = pstop
-        nsteps = np.hstack([nsteps,np.array(extras)])
-
-        bover = B-C*(nsteps+10)
-        cmean,cv = OMI(nsteps)
-        cstd = np.sqrt(cv)
-        cneg = sp.stats.norm.cdf(0.,loc=cmean,scale=cstd)
-        cnstep = (sp.stats.norm.cdf(bover,loc=cmean,scale=cstd)-cneg)/(1-cneg)
-        cnstep[np.isnan(cnstep)]=1
-        cnstep = np.minimum.accumulate(cnstep)
 
     pnstep = np.nan_to_num(np.hstack([-np.diff(cnstep),0]))
     if len(pnstep)==1:
@@ -118,9 +75,11 @@ def probsteps(B,C,ax=None):
     #initialization offset
     nsteps+=10
     if not ax is None:
-        ax.plot(nsteps,cmean,cols[0])
-        ax.plot(nsteps,cmean-2*cstd,cols[0],linestyle='--')
-        ax.plot(nsteps,cmean+2*cstd,cols[0],linestyle='--')
+        ns = np.linspace(0,nsteps[-1],150)
+        cm,cv = OMI(ns)
+        ax.plot(ns,cm,cols[0])
+        ax.plot(ns,cm-2*np.sqrt(cv),cols[0],linestyle='--')
+        ax.plot(ns,cm+2*np.sqrt(cv),cols[0],linestyle='--')
 
         ax.plot([0.,B/C],[B,0.],cols[0],linewidth=0.5)
         axt = ax.twinx()
@@ -155,10 +114,6 @@ def perfatl(nsteps,probn,S,L,ax=None):
     mu,ss = PM(nsteps,S,L)
     #lognormal mean variance in natural log
 
-    #m,v = muss2mv(mu,ss)
-    #margm = np.sum(probn*m)
-    #margv = np.sum(probn*(m-margm)**2)+np.sum(probn*v)
-    #margmu,margss = mv2muss(margm,margv)
     margmu,margss = marginalizelognorm(mu,ss,probn)
 
     if not ax is None:
@@ -302,7 +257,7 @@ def plotmargdata(path,base,ls,lw,axR,axN):
 #############################################################
 fig,ax = plt.subplots(nrows=2,ncols=1)
 print('perfplot')
-B = 5*60*60
+B = 100*60*60
 C = 60.
 nsteps,probn = probsteps(B,C,ax=ax[0])
 print(len(nsteps))
