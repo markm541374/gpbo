@@ -1,5 +1,6 @@
 import numpy as np
 import scipy as sp
+from scipy.optimize import minimize_scalar
 from matplotlib import pyplot as plt
 import dill as pickle
 import sys
@@ -111,19 +112,21 @@ def marginalizelognorm(mu,ss,pn):
 def perfatl(nsteps,probn,S,L,ax=None):
     #probn = np.zeros_like(probn)
     #probn[10]=1.
-    mu,ss = PM(nsteps,S,L)
+    xsteps = np.linspace(0,nsteps[-1],150)
+    mu,ss = PM(xsteps,S,L)
     #lognormal mean variance in natural log
 
-    margmu,margss = marginalizelognorm(mu,ss,probn)
+    mum,ssm = PM(nsteps,S,L)
+    margmu,margss = marginalizelognorm(mum,ssm,probn)
 
     if not ax is None:
-        ax.plot(nsteps,np.exp(mu),cols[0])
-        ax.plot(nsteps,np.exp(mu+2*np.sqrt(ss)),cols[0],linestyle='--')
-        ax.plot(nsteps,np.exp(mu-2*np.sqrt(ss)),cols[0],linestyle='--')
-        ax.plot(nsteps,np.exp(mu+0.5*ss),cols[0],linestyle='-.')
+        ax.plot(xsteps,np.exp(mu),cols[0])
+        ax.plot(xsteps,np.exp(mu+2*np.sqrt(ss)),cols[0],linestyle='--')
+        ax.plot(xsteps,np.exp(mu-2*np.sqrt(ss)),cols[0],linestyle='--')
+        ax.plot(xsteps,np.exp(mu+0.5*ss),cols[0],linestyle='-.')
 
         axt = ax.twinx()
-        axt.plot(nsteps,probn,cols[1],linewidth=0.75)
+        axt.plot(nsteps,probn/np.hstack([nsteps[0],np.diff(nsteps)]),cols[1],linewidth=0.75)
 
         ax.set_yscale('log')
         iplt = np.argmax(probn)
@@ -161,22 +164,29 @@ def perfatBCVoverL(B,C,V,L,pL):
     return margmu, margss, nsteps, probn
 
 def optatBcfL(B,cfn,L,bnds=(-6,-1),ax=None,axt=None):
-    var = np.logspace(bnds[0],bnds[1],100)
+    def minfn(v):
+        c = cfn(10**v)
+        mu,ss,nsteps,probn = perfatBCVL(B,c,10**v,L)
+        m,v = muss2mv(mu,ss)
+        return m
+    print('optimize...')
+    res = minimize_scalar(minfn, bounds=bnds, method='bounded',options={'maxiter':40})
+    vopt = 10**res.x
+    print('vopt = {}'.format(vopt))
+    copt = cfn(vopt)
+    muopt,ssopt,nsteps,probn = perfatBCVL(B,copt,vopt,L)
+    m,v = muss2mv(muopt,ssopt)
+    stepsopt = steps(nsteps,probn)
+    Eover = B-np.sum(nsteps*probn*copt)
 
-    mu,ss =np.empty_like(var),np.empty_like(var)
-    psteps = np.empty([3,var.size])
-
-    for i,v in tqdm.tqdm(enumerate(var),total=len(var)):
-        c = cfn(v)
-        mu[i],ss[i],nsteps,probn = perfatBCVL(B,c,v,L)
-        psteps[:,i] = steps(nsteps,probn)
-
-    iopt = np.argmin(np.exp(mu+0.5*ss))
-    vopt = var[iopt]
-    muopt = mu[iopt]
-    ssopt = ss[iopt]
-    stepsopt = psteps[:,iopt]
     if not ax is None:
+        var = np.logspace(bnds[0],bnds[1],200)
+        mu,ss =np.empty_like(var),np.empty_like(var)
+        psteps = np.empty([3,var.size])
+        for i,v in tqdm.tqdm(enumerate(var),total=len(var)):
+            c = cfn(v)
+            mu[i],ss[i],nsteps,probn = perfatBCVL(B,c,v,L)
+            psteps[:,i] = steps(nsteps,probn)
         ax.plot(var,np.exp(mu),cols[0])
         ax.plot(var,np.exp(mu+2*np.sqrt(ss)),cols[0],linestyle='--')
         ax.plot(var,np.exp(mu-2*np.sqrt(ss)),cols[0],linestyle='--')
@@ -189,38 +199,45 @@ def optatBcfL(B,cfn,L,bnds=(-6,-1),ax=None,axt=None):
         ax.set_xscale('log')
         ax.set_yscale('log')
 
-    return vopt,muopt,ssopt,stepsopt
+    R = {'mu':muopt, 'ss':ssopt, 'Eover':Eover, 'Esteps':stepsopt[1], 'B':B, 'c':copt, 'obsvar':vopt,'Rmean':m,'Rvar':v}
+    return R
 
 def optatBcfoverL(B,cfn,L,pL,bnds=(-6,-1),ax=None,axt=None):
-    var = np.logspace(bnds[0],bnds[1],100)
 
-    mu,ss =np.empty_like(var),np.empty_like(var)
-    psteps = np.empty([3,var.size])
-
-    for i,v in tqdm.tqdm(enumerate(var),total=len(var)):
-        c = cfn(v)
-        mu[i],ss[i],nsteps,probn = perfatBCVoverL(B,c,v,L,pL)
-        psteps[:,i] = steps(nsteps,probn)
-
-    iopt = np.argmin(np.exp(mu+0.5*ss))
-    vopt = var[iopt]
-    muopt = mu[iopt]
-    ssopt = ss[iopt]
-    stepsopt = psteps[:,iopt]
+    def minfn(v):
+        c = cfn(10**v)
+        mu,ss,nsteps,probn = perfatBCVoverL(B,c,10**v,L,pL)
+        m,v = muss2mv(mu,ss)
+        return m
+    print('optimize...')
+    res = minimize_scalar(minfn, bounds=bnds, method='bounded',options={'maxiter':40})
+    vopt = 10**res.x
+    print('vopt = {}'.format(vopt))
+    copt = cfn(vopt)
+    muopt,ssopt,nsteps,probn = perfatBCVoverL(B,copt,vopt,L,pL)
+    m,v = muss2mv(muopt,ssopt)
+    stepsopt = steps(nsteps,probn)
+    Eover = B-np.sum(nsteps*probn*copt)
     if not ax is None:
+        var = np.logspace(bnds[0],bnds[1],200)
+        mu,ss =np.empty_like(var),np.empty_like(var)
+        psteps = np.empty([3,var.size])
+        for i,v in tqdm.tqdm(enumerate(var),total=len(var)):
+            c = cfn(v)
+            mu[i],ss[i],nsteps,probn = perfatBCVoverL(B,c,v,L,pL)
+            psteps[:,i] = steps(nsteps,probn)
         ax.plot(var,np.exp(mu),cols[0])
-        ax.plot(var,np.exp(mu+2*np.sqrt(ss)),cols[0],linestyle='--')
-        ax.plot(var,np.exp(mu-2*np.sqrt(ss)),cols[0],linestyle='--')
+        ax.fill_between(var,np.exp(mu-2*np.sqrt(ss)),np.exp(mu+2*np.sqrt(ss)),facecolor=cols[0],edgecolor='None',alpha=0.2)
         ax.plot(var,np.exp(mu+0.5*ss),cols[0],linestyle='-.')
         ax.plot(vopt,np.exp(muopt+0.5*ssopt),color=cols[0],marker='o')
         #axt = ax.twinx()
         axt.plot(var,psteps[1,:],cols[1])
-        axt.plot(var,psteps[0,:],cols[1],linestyle='--',)
-        axt.plot(var,psteps[2,:],cols[1],linestyle='--')
+        axt.fill_between(var,psteps[0,:],psteps[2,:],facecolor=cols[1],edgecolor='None',alpha=0.2)
         ax.set_xscale('log')
         ax.set_yscale('log')
 
-    return vopt,muopt,ssopt,stepsopt
+    R = {'mu':muopt, 'ss':ssopt, 'Eover':Eover, 'Esteps':stepsopt[1], 'B':B, 'c':copt, 'obsvar':vopt,'Rmean':m,'Rvar':v}
+    return R
 
 def plottruedata(path,base,axR,axN):
 
@@ -251,81 +268,80 @@ def plotmargdata(path,base,ls,lw,axR,axN):
         numstep = np.sum(data[:,1]*data[:,2]/np.sum(data[:,2]))
         axR.plot(k,mean,'b.')
         axN.plot(k,numstep,'r.')
-
-
     return
-#############################################################
-fig,ax = plt.subplots(nrows=2,ncols=1)
-print('perfplot')
-B = 100*60*60
-C = 60.
-nsteps,probn = probsteps(B,C,ax=ax[0])
-print(len(nsteps))
-#print(probsteps2(60*60,60)[0])
-#print(probsteps2(60*60,6)[0])
-#print(probsteps2(3*60*60,6)[0])
+
+if __name__ == "__main__":
+    #############################################################
+    fig,ax = plt.subplots(nrows=2,ncols=1,sharex=True)
+    B = 10*3600
+    C = 60.
+    nsteps,probn = probsteps(B,C,ax=ax[0])
+    #print(len(nsteps))
+    #print(probsteps2(60*60,60)[0])
+    #print(probsteps2(60*60,6)[0])
+    #print(probsteps2(3*60*60,6)[0])
 
 
-#sys.exit(0)
-perfatl(nsteps,probn,1e-6,0.5,ax=ax[1])
-fig.savefig('figs/perfplot.png')
-plt.close(fig)
-#############################################################
-print('rsplot')
-fig,ax = plt.subplots(nrows=4,ncols=1,figsize=[5,8],sharex=True)
-def cfn(v):
-    #return 60*1e-6/v
-    return B*0.01*1e-4/v
-axt = [a.twinx() for a in ax]
-vopt,muopt,ssopt,stepsopt = optatBcfL(B,cfn,0.1,ax=ax[0],axt=axt[0])
-vopt,muopt,ssopt,stepsopt = optatBcfL(B,cfn,0.5,ax=ax[1],axt=axt[1])
-vopt,muopt,ssopt,stepsopt = optatBcfL(B,cfn,1.2,ax=ax[2],axt=axt[2])
+    #sys.exit(0)
+    perfatl(nsteps,probn,1e-4,0.5,ax=ax[1])
+    fig.savefig('figs/perfplot.png')
+    plt.close(fig)
+    #############################################################
+    print('rsplot')
+    fig,ax = plt.subplots(nrows=4,ncols=1,figsize=[5,8],sharex=True)
+    def cfn(v):
+        #return 60*1e-6/v
+        return B*0.01*1e-6/v
+    axt = [a.twinx() for a in ax]
+    #vopt,muopt,ssopt,stepsopt = optatBcfL(B,cfn,0.1,ax=ax[0],axt=axt[0])
+    #vopt,muopt,ssopt,stepsopt = optatBcfL(B,cfn,0.5,ax=ax[1],axt=axt[1])
+    #vopt,muopt,ssopt,stepsopt = optatBcfL(B,cfn,1.2,ax=ax[2],axt=axt[2])
 
-#plottruedata('results','eihyp_3_100_',ax[0],axt[0])
-#plottruedata('results','eihyp_3_500_',ax[1],axt[1])
-#plottruedata('results','eihyp_3_1200_',ax[2],axt[2])
-lset = np.array([100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400])
-wts = sp.stats.gamma.pdf(lset/1000.,3.,scale =0.2)
-wts = wts/np.sum(wts)
+    #plottruedata('results','eihyp_3_100_',ax[0],axt[0])
+    #plottruedata('results','eihyp_3_500_',ax[1],axt[1])
+    #plottruedata('results','eihyp_3_1200_',ax[2],axt[2])
+    #lset = np.array([100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400])
+    #wts = sp.stats.gamma.pdf(lset/1000.,3.,scale =0.2)
+    #wts = wts/np.sum(wts)
 
-#plotmargdata('margresults','eihyp_3_',lset,wts,ax[3],axt[3])
-#L = sp.stats.gamma.rvs(3,scale=0.15,size=500)
-L = sp.stats.gamma.ppf(np.linspace(0,1,1002)[1:-1],3.,scale =0.2)
-p = np.ones_like(L)/float(L.size)
-vopt,muopt,ssopt,stepsopt = optatBcfoverL(B,cfn,L,p,ax=ax[3],axt=axt[3])
-print(vopt,muopt,ssopt,stepsopt)
-fig.savefig('figs/rsprediction.png')
-plt.close(fig)
-
-
-sys.exit(0)
-#############################################################
-fig,ax = plt.subplots(nrows=3,ncols=1,sharex=True)
-
-L = np.logspace(np.log10(0.1),np.log10(1.5),150)
-var = np.empty_like(L)
-mu  = np.empty_like(L)
-ss  = np.empty_like(L)
-step= np.empty([3,L.size])
-
-for i,ls in tqdm.tqdm(enumerate(L),total=L.size):
-    var[i], mu[i], ss[i], step[:,i] = optatBcfL(B,cfn,ls)
-
-#overfrac = np.array([np.sum(OM(np.arange(s))[0]) for s in step[1,:]])/float(B)
+    #plotmargdata('margresults','eihyp_3_',lset,wts,ax[3],axt[3])
+    #L = sp.stats.gamma.rvs(3,scale=0.15,size=500)
+    L = sp.stats.gamma.ppf(np.linspace(0,1,1002)[1:-1],3.,scale =0.2)
+    p = np.ones_like(L)/float(L.size)
+    R = optatBcfoverL(B,cfn,L,p,ax=ax[3],axt=axt[3])
+    print(R)
+    fig.savefig('figs/rsprediction.png')
+    plt.close(fig)
 
 
-ax[1].plot(L,var,cols[2])
-ax[1].set_yscale('log')
+    sys.exit(0)
+    #############################################################
+    fig,ax = plt.subplots(nrows=3,ncols=1,sharex=True)
 
-#ax[1].twinx().plot(L,overfrac,cols[3])
-ax[2].plot(L, step[1,:],cols[1])
-ax[2].plot(L, step[0,:],cols[1],linestyle='--',)
-ax[2].plot(L, step[2,:],cols[1],linestyle='--')
+    L = np.logspace(np.log10(0.1),np.log10(1.5),150)
+    var = np.empty_like(L)
+    mu  = np.empty_like(L)
+    ss  = np.empty_like(L)
+    step= np.empty([3,L.size])
 
-ax[0].plot(L,np.exp(mu),cols[0])
-ax[0].plot(L,np.exp(mu+2*np.sqrt(ss)),cols[0],linestyle='--')
-ax[0].plot(L,np.exp(mu-2*np.sqrt(ss)),cols[0],linestyle='--')
-ax[0].plot(L,np.exp(mu+0.5*ss),cols[0],linestyle='-.')
-ax[0].set_yscale('log')
-ax[0].set_xscale('log')
-fig.savefig('figs/lsprediction')
+    for i,ls in tqdm.tqdm(enumerate(L),total=L.size):
+        var[i], mu[i], ss[i], step[:,i] = optatBcfL(B,cfn,ls)
+
+    #overfrac = np.array([np.sum(OM(np.arange(s))[0]) for s in step[1,:]])/float(B)
+
+
+    ax[1].plot(L,var,cols[2])
+    ax[1].set_yscale('log')
+
+    #ax[1].twinx().plot(L,overfrac,cols[3])
+    ax[2].plot(L, step[1,:],cols[1])
+    ax[2].plot(L, step[0,:],cols[1],linestyle='--',)
+    ax[2].plot(L, step[2,:],cols[1],linestyle='--')
+
+    ax[0].plot(L,np.exp(mu),cols[0])
+    ax[0].plot(L,np.exp(mu+2*np.sqrt(ss)),cols[0],linestyle='--')
+    ax[0].plot(L,np.exp(mu-2*np.sqrt(ss)),cols[0],linestyle='--')
+    ax[0].plot(L,np.exp(mu+0.5*ss),cols[0],linestyle='-.')
+    ax[0].set_yscale('log')
+    ax[0].set_xscale('log')
+    fig.savefig('figs/lsprediction')
