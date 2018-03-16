@@ -11,12 +11,12 @@ import gpbo
 from collections import defaultdict
 cols = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-_,__,OP = pickle.load(open('../overhead/overmodel.p'))
+_,__,OP = pickle.load(open('/home/mark/gpbo/exps/predictive/overhead/overmodel.p'))
 from gpbo.exps.predictive.overhead.overheads import cvimodel
 def OMI(X):
     return cvimodel(X, OP)
 
-_,PP = pickle.load(open('../performance/model.p'))
+_,PP = pickle.load(open('/home/mark/gpbo/exps/predictive/performance/model.p'))
 from gpbo.exps.predictive.performance.model import perfmodel
 def PM(X,S,L):
     Xa = np.ones([X.size,2])*np.log10(S)
@@ -191,11 +191,12 @@ def optatBcfL(B,cfn,L,bnds=(-6,-1),ax=None,axt=None):
         ax.plot(var,np.exp(mu+2*np.sqrt(ss)),cols[0],linestyle='--')
         ax.plot(var,np.exp(mu-2*np.sqrt(ss)),cols[0],linestyle='--')
         ax.plot(var,np.exp(mu+0.5*ss),cols[0],linestyle='-.')
-        ax.plot(vopt,np.exp(muopt+0.5*ssopt),color=cols[0],marker='o')
+        ax.plot(vopt,np.exp(muopt+0.5*ssopt),color=cols[0],marker='o',linestyle='None')
         #axt = ax.twinx()
         axt.plot(var,psteps[1,:],cols[1])
         axt.plot(var,psteps[0,:],cols[1],linestyle='--',)
         axt.plot(var,psteps[2,:],cols[1],linestyle='--')
+        axt.grid('False')
         ax.set_xscale('log')
         ax.set_yscale('log')
 
@@ -226,15 +227,15 @@ def optatBcfoverL(B,cfn,L,pL,bnds=(-6,-1),ax=None,axt=None):
             c = cfn(v)
             mu[i],ss[i],nsteps,probn = perfatBCVoverL(B,c,v,L,pL)
             psteps[:,i] = steps(nsteps,probn)
-        ax.plot(var,np.exp(mu),cols[0])
+        ax.plot(var,np.exp(mu),cols[0],label='Log Mean Regret Prediction')
         ax.fill_between(var,np.exp(mu-2*np.sqrt(ss)),np.exp(mu+2*np.sqrt(ss)),facecolor=cols[0],edgecolor='None',alpha=0.2)
-        ax.plot(var,np.exp(mu+0.5*ss),cols[0],linestyle='-.')
-        ax.plot(vopt,np.exp(muopt+0.5*ssopt),color=cols[0],marker='o')
+        ax.plot(var,np.exp(mu+0.5*ss),cols[0],linestyle='-.',label='Mean Regret Prediction')
+        ax.plot(vopt,np.exp(muopt+0.5*ssopt),color=cols[0],marker='o',label='Optimum Prediction',linestyle=None)
         #axt = ax.twinx()
         axt.plot(var,psteps[1,:],cols[1])
         axt.fill_between(var,psteps[0,:],psteps[2,:],facecolor=cols[1],edgecolor='None',alpha=0.2)
-        ax.set_xscale('log')
-        ax.set_yscale('log')
+        #print(var,np.exp(mu))
+        ax.plot([],[],color=cols[1],label='Mean Iteration Predition')
 
     R = {'mu':muopt, 'ss':ssopt, 'Eover':Eover, 'Esteps':stepsopt[1], 'B':B, 'c':copt, 'obsvar':vopt,'Rmean':m,'Rvar':v}
     return R
@@ -291,11 +292,11 @@ if __name__ == "__main__":
     fig,ax = plt.subplots(nrows=4,ncols=1,figsize=[5,8],sharex=True)
     def cfn(v):
         #return 60*1e-6/v
-        return B*0.01*1e-6/v
+        return B*0.01*1e-4/v
     axt = [a.twinx() for a in ax]
-    #vopt,muopt,ssopt,stepsopt = optatBcfL(B,cfn,0.1,ax=ax[0],axt=axt[0])
-    #vopt,muopt,ssopt,stepsopt = optatBcfL(B,cfn,0.5,ax=ax[1],axt=axt[1])
-    #vopt,muopt,ssopt,stepsopt = optatBcfL(B,cfn,1.2,ax=ax[2],axt=axt[2])
+    R = optatBcfL(B,cfn,0.1,ax=ax[0],axt=axt[0],bnds=(-8,-2))
+    R = optatBcfL(B,cfn,0.5,ax=ax[1],axt=axt[1],bnds=(-8,-2))
+    R = optatBcfL(B,cfn,1.2,ax=ax[2],axt=axt[2],bnds=(-8,-2))
 
     #plottruedata('results','eihyp_3_100_',ax[0],axt[0])
     #plottruedata('results','eihyp_3_500_',ax[1],axt[1])
@@ -306,10 +307,11 @@ if __name__ == "__main__":
 
     #plotmargdata('margresults','eihyp_3_',lset,wts,ax[3],axt[3])
     #L = sp.stats.gamma.rvs(3,scale=0.15,size=500)
-    L = sp.stats.gamma.ppf(np.linspace(0,1,1002)[1:-1],3.,scale =0.2)
+    L = sp.stats.gamma.ppf(np.linspace(0,1,1002)[1:-1],4.,scale =0.2)
     p = np.ones_like(L)/float(L.size)
-    R = optatBcfoverL(B,cfn,L,p,ax=ax[3],axt=axt[3])
-    print(R)
+    R = optatBcfoverL(B,cfn,L,p,ax=ax[3],axt=axt[3],bnds=(-8,-2))
+
+    #print(R)
     fig.savefig('figs/rsprediction.png')
     plt.close(fig)
 

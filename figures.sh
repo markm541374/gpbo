@@ -2,7 +2,7 @@
 export PYTHONPATH="/home/mark/Dropbox/workspace/gpbo:${PYTHONPATH}"
 
 #implementation plots
-if $1; then
+if false; then
     cp matplotlibrc gpbo/exps/adaptive/
     (cd gpbo/exps/adaptive ; python2 adaptive.py)
     cp gpbo/exps/adaptive/figs/overheadtime.pdf figures/implementation/
@@ -59,7 +59,7 @@ if false; then
     cp gpbo/exps/stopping/draws/results2d/out11.pdf figures/localstop/
     mv figures/localstop/out11.pdf figures/localstop/d2methods.pdf
 fi
-if $1; then
+if false; then
     cp matplotlibrc gpbo/exps/stopping/gphyp
     (cd gpbo/exps/stopping/gphyp ; python2 plot.py)
     cp gpbo/exps/stopping/gphyp/figs/stopping_GPhyp.pdf figures/localstop/
@@ -158,22 +158,34 @@ if false; then
     mv figures/variablefidelity/out6.pdf figures/variablefidelity/powerfit.pdf
 fi
 if false; then
-    cp matplotlibrc gpbo/exps/predictive/fixedPES
-    (cd gpbo/exps/predictive/fixedPES ; python2 plots.py)
-    cp gpbo/exps/predictive/fixedPES/figs/iterpes.pdf figures/predictive/
-    cp gpbo/exps/predictive/fixedPES/figs/evcostpes.pdf figures/predictive/
-    cp gpbo/exps/predictive/fixedPES/figs/aqcostpes.pdf figures/predictive/
+    cp matplotlibrc gpbo/exps/predictive/overhead/fixedPES
+    (cd gpbo/exps/predictive/overhead/fixedPES ; python2 plots.py)
+    cp gpbo/exps/predictive/overhead/fixedPES/figs/iterpes.pdf figures/predictive/
+    cp gpbo/exps/predictive/overhead/fixedPES/figs/evcostpes.pdf figures/predictive/
+    cp gpbo/exps/predictive/overhead/fixedPES/figs/aqcostpes.pdf figures/predictive/
 fi
 if false; then
-    cp matplotlibrc gpbo/exps/predictive/fixedEI
-    (cd gpbo/exps/predictive/fixedEI ; python2 plots.py)
-    cp gpbo/exps/predictive/fixedEI/figs/iterei.pdf figures/predictive/
-    cp gpbo/exps/predictive/fixedEI/figs/evcostei.pdf figures/predictive/
-    cp gpbo/exps/predictive/fixedEI/figs/aqcostei.pdf figures/predictive/
+    cp matplotlibrc gpbo/exps/predictive/overhead/fixedEI
+    (cd gpbo/exps/predictive/overhead/fixedEI ; python2 plots.py)
+    cp gpbo/exps/predictive/overhead/fixedEI/figs/iterei.pdf figures/predictive/
+    cp gpbo/exps/predictive/overhead/fixedEI/figs/evcostei.pdf figures/predictive/
+    cp gpbo/exps/predictive/overhead/fixedEI/figs/aqcostei.pdf figures/predictive/
 fi
 if false; then
     cp matplotlibrc gpbo/exps/predictive/
     (cd gpbo/exps/predictive ; python2 plotoverhead.py)
     cp gpbo/exps/predictive/plotfigs/overheadcum.pdf figures/predictive
     cp gpbo/exps/predictive/plotfigs/overheadsingle.pdf figures/predictive
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/predictive/prediction
+    (cd gpbo/exps/predictive/prediction ; python2 predplots.py)
+    cp gpbo/exps/predictive/prediction/figs/margpredictions.pdf figures/predictive
+fi
+if $1; then
+    cp matplotlibrc gpbo/exps/predictive/performance
+    (cd gpbo/exps/predictive/performance ; python2 plots.py)
+    cp gpbo/exps/predictive/performance/figs/evcostei_300.pdf figures/predictive/perfmodelshort.pdf
+    cp gpbo/exps/predictive/performance/figs/evcostei_800.pdf figures/predictive/perfmodelmedium.pdf
+    cp gpbo/exps/predictive/performance/figs/evcostei_1500.pdf figures/predictive/perfmodellong.pdf
 fi
