@@ -4,8 +4,8 @@ import os
 from matplotlib import pyplot as plt
 import gpbo
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-
-path = 'results'
+from gpbo import datapath
+path = os.path.join(datapath,'exps/predictive/overhead/fixedPES/results')
 files = os.listdir(path)
 base = 'pes_3_500_'
 

@@ -4,8 +4,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 import gpbo.exps.predictive.overhead.overheads as overheads
-
-rpath = 'fixedEI/results'
+from gpbo import datapath
+rpath = os.path.join(datapath,'exps/predictive/overhead/fixedEI/results')
 fpath = 'plotfigs'
 fnames=[i for i in os.listdir(rpath) if i.startswith('eihyp_3_500'.format(i)) ]
 

@@ -15,3 +15,4 @@ logging.basicConfig(level=logging.DEBUG)
 def about():
     return "I'm a function in __init__.py"
 
+datapath = '/home/mark/Documents/gpbodata'

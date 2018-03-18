@@ -18,8 +18,9 @@ def PM(X,S,L):
     natlogmu = np.log(truemean)
     natlogvar = (np.log(10)*log10std)**2
     return natlogmu,natlogvar
+from gpbo import datapath
 
-path = 'data/results16'
+path = os.path.join(datapath,'exps/predictive/performance/data/results16')
 files = os.listdir(path)
 for il,ls in enumerate([300,800,1500]):
     base = 'eihyp_3_{}_'.format(ls)
