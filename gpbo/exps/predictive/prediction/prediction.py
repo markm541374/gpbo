@@ -170,7 +170,7 @@ def optatBcfL(B,cfn,L,bnds=(-6,-1),ax=None,axt=None):
         m,v = muss2mv(mu,ss)
         return m
     print('optimize...')
-    res = minimize_scalar(minfn, bounds=bnds, method='bounded',options={'maxiter':40})
+    res = minimize_scalar(minfn, bounds=bnds, method='bounded',options={'maxiter':140})
     vopt = 10**res.x
     print('vopt = {}'.format(vopt))
     copt = cfn(vopt)
@@ -204,16 +204,18 @@ def optatBcfL(B,cfn,L,bnds=(-6,-1),ax=None,axt=None):
     return R
 
 def optatBcfoverL(B,cfn,L,pL,bnds=(-6,-1),ax=None,axt=None):
-
-    def minfn(v):
-        c = cfn(10**v)
-        mu,ss,nsteps,probn = perfatBCVoverL(B,c,10**v,L,pL)
-        m,v = muss2mv(mu,ss)
-        return m
-    print('optimize...')
-    res = minimize_scalar(minfn, bounds=bnds, method='bounded',options={'maxiter':40})
+    sys.stdout.flush()
+    with tqdm.tqdm() as pbar:
+        def minfn(v):
+            pbar.update()
+            c = cfn(10**v)
+            mu,ss,nsteps,probn = perfatBCVoverL(B,c,10**v,L,pL)
+            m,v = muss2mv(mu,ss)
+            return m
+        res = minimize_scalar(minfn, bounds=bnds, method='bounded',options={'maxiter':40})
     vopt = 10**res.x
-    print('vopt = {}'.format(vopt))
+    sys.stdout.flush()
+    print('vopt = {}\n'.format(vopt))
     copt = cfn(vopt)
     muopt,ssopt,nsteps,probn = perfatBCVoverL(B,copt,vopt,L,pL)
     m,v = muss2mv(muopt,ssopt)
