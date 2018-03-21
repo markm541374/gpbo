@@ -182,10 +182,18 @@ if false; then
     (cd gpbo/exps/predictive/prediction ; python2 predplots.py)
     cp gpbo/exps/predictive/prediction/figs/margpredictions.pdf figures/predictive
 fi
-if $1; then
+if false; then
     cp matplotlibrc gpbo/exps/predictive/performance
     (cd gpbo/exps/predictive/performance ; python2 plots.py)
     cp gpbo/exps/predictive/performance/figs/evcostei_300.pdf figures/predictive/perfmodelshort.pdf
     cp gpbo/exps/predictive/performance/figs/evcostei_800.pdf figures/predictive/perfmodelmedium.pdf
     cp gpbo/exps/predictive/performance/figs/evcostei_1500.pdf figures/predictive/perfmodellong.pdf
+fi
+if $1; then
+    cp matplotlibrc gpbo/exps/predictive/prediction
+    (cd gpbo/exps/predictive/prediction ; python2 plotcontour.py)
+    cp gpbo/exps/predictive/prediction/figs/Rmeancontour.pdf figures/predictive/Rmeancontour.pdf
+    cp gpbo/exps/predictive/prediction/figs/obsvarcontour.pdf figures/predictive/obsvarcontour.pdf
+    cp gpbo/exps/predictive/prediction/figs/Estepscontour.pdf figures/predictive/Estepscontour.pdf
+    cp gpbo/exps/predictive/prediction/figs/overheadcontour.pdf figures/predictive/overheadcontour.pdf
 fi

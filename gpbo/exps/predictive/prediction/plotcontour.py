@@ -77,28 +77,21 @@ def xeqtoyeq(xeq,A):
     yeq = A * 10**xeq
     return yeq
 yeq = [xeqtoyeq(xeq[0],10000./1e-4),xeqtoyeq(xeq[1],10000./1e-6)]
+def plotcontour(title,data,fname):
+    fig,ax = plt.subplots()
+    plt.plot([-6.75,-3.],[-0.75,3.],'--',color='grey',linewidth=0.25)
+    plt.plot([-7.,-5.],[1.,3.],'--',color='grey',linewidth=0.25)
+    plt.plot([-4.75,-3.],[-0.75,1.],'--',color='grey',linewidth=0.25)
+    CS = ax.contour(np.log10(vaxis),np.log10(baxis/3600.),data,10)
+    plt.clabel(CS, inline=1, fontsize=10)
+    ax.set_title(title)
+    ax.set_xlabel('$\\mathrm{log}_{10}$ cost scale')
+    ax.set_ylabel('$\\mathrm{log}_{10}$ Budget (hours)')
+    fig.savefig('figs/{}contour.pdf'.format(fname))
+    plt.close(fig)
 
-for k in ['Rmean','obsvar','c']:
-    fig,ax = plt.subplots()
-    CS = ax.contour(np.log10(vaxis),np.log10(baxis),np.log10(R[k]),10)
-    plt.clabel(CS, inline=1, fontsize=10)
-    #plt.plot(xeq[0],yeq[0],'k--')
-    #plt.plot(xeq[1],yeq[1],'k--')
-    fig.savefig('figs/{}contour.png'.format(k))
-    plt.close(fig)
-for k in ['Esteps','Eover','B']:
-    fig,ax = plt.subplots()
-    CS = ax.contour(np.log10(vaxis),np.log10(baxis),R[k],10)
-    plt.clabel(CS, inline=1, fontsize=10)
-    #plt.plot(xeq[0],yeq[0],'k--')
-    #plt.plot(xeq[1],yeq[1],'k--')
-    fig.savefig('figs/{}contour.png'.format(k))
-    plt.close(fig)
-for k in [1]:
-    fig,ax = plt.subplots()
-    CS = ax.contour(np.log10(vaxis),np.log10(baxis),R['Eover']/R['B'])
-    plt.clabel(CS, inline=1, fontsize=10)
-    #plt.plot(xeq[0],yeq[0],'k--')
-    #plt.plot(xeq[1],yeq[1],'k--')
-    fig.savefig('figs/{}contour.png'.format('overhead'))
-    plt.close(fig)
+plotcontour('$\\mathrm{log}_{10}$ Expected Regret',np.log10(R['Rmean']),'Rmean')
+plotcontour('$\\mathrm{log}_{10}$ Predicted Optimum Variance',np.log10(R['obsvar']),'obsvar')
+plotcontour('Expected Number of Steps',R['Esteps'],'Esteps')
+plotcontour('Expected Overhead Fraction',R['Eover']/R['B'],'overhead')
+
