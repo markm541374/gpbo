@@ -38,9 +38,9 @@ def probsteps(B,C,ax=None):
         pstop = (sp.stats.norm.cdf(np.maximum(0,B-C*(n+10)),loc=cm,scale=np.sqrt(cv))-pneg)/(1-pneg)
         return pstop
 
-    nstepslog = np.logspace(1,np.log10(max(10,1+(B-10*C)/C)),100)
+    nstepslog = np.logspace(1,np.log10(max(10,1+(B-10*C)/C)),250)
     probnlog = probstop(nstepslog)
-    approxmaxarg = np.argmax(probnlog<0.5*1e-3)
+    approxmaxarg = np.argmax(probnlog<0.125*1e-3)
     approxmax = nstepslog[approxmaxarg]
     nsteps = np.arange(int(approxmax))
 
@@ -55,7 +55,7 @@ def probsteps(B,C,ax=None):
     nstepthin=[]
     cnstepthin=[]
     for i in range(int(approxmax)):
-        if cnstep[i]<last-1e-3:
+        if cnstep[i]<last-0.25*1e-3:
             last = cnstep[i]
             nstepthin.append(i)
             cnstepthin.append(cnstep[i])
@@ -205,17 +205,17 @@ def optatBcfL(B,cfn,L,bnds=(-6,-1),ax=None,axt=None):
 
 def optatBcfoverL(B,cfn,L,pL,bnds=(-6,-1),ax=None,axt=None):
     sys.stdout.flush()
-    with tqdm.tqdm() as pbar:
-        def minfn(v):
-            pbar.update()
-            c = cfn(10**v)
-            mu,ss,nsteps,probn = perfatBCVoverL(B,c,10**v,L,pL)
-            m,v = muss2mv(mu,ss)
-            return m
-        res = minimize_scalar(minfn, bounds=bnds, method='bounded',options={'maxiter':40})
+    #with tqdm.tqdm() as pbar:
+    def minfn(v):
+ #       pbar.update()
+        c = cfn(10**v)
+        mu,ss,nsteps,probn = perfatBCVoverL(B,c,10**v,L,pL)
+        m,v = muss2mv(mu,ss)
+        return m
+    res = minimize_scalar(minfn, bounds=bnds, method='bounded',options={'maxiter':40})
     vopt = 10**res.x
     sys.stdout.flush()
-    print('vopt = {}\n'.format(vopt))
+    #print('vopt = {}\n'.format(vopt))
     copt = cfn(vopt)
     muopt,ssopt,nsteps,probn = perfatBCVoverL(B,copt,vopt,L,pL)
     m,v = muss2mv(muopt,ssopt)

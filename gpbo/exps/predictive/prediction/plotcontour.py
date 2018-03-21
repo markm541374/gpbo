@@ -4,7 +4,8 @@ from matplotlib import pyplot as plt
 import prediction
 from collections import defaultdict
 import pickle
-
+from multiprocessing import Pool
+import tqdm
 class keydefaultdict(defaultdict):
     def __missing__(self, key):
         if self.default_factory is None:
@@ -27,42 +28,77 @@ def rfn(x):
 try:
     D = pickle.load(open('rcache.p','r'))[0]
 except:
-    D = keydefaultdict(rfn)
-nb=80
-nv=41
-baxis = np.linspace(0.25*3600,20*3600,nb)
-vaxis = np.logspace(-6,-2,nv)
+    D = dict()
+nb=21
+nv=21
+#baxis = np.linspace(0.25*3600,40.25*3600,nb)
+baxis = np.logspace(np.log10(3600/6.),np.log10(3600.*1000),nb)
+vaxis = np.logspace(-7,-3,nv)
 
-rk = D[(3600.,1e-2)]
+rk = rfn((3600.,1e-2))
 R = dict()
 for k in rk.keys():
     R[k] = np.empty([nb,nv])
-try:
-    for i,b in enumerate(baxis):
-        for j,v in enumerate(vaxis):
-            print('i={} j={} : b={} v={}'.format(i,j,b,np.log10(v)))
-            r = D[(b,v)]
-            for k in R.keys():
-                R[k][i,j] = r[k]
+existing = D.keys()
+newlist = []
+for i,b in enumerate(baxis):
+    for j,v in enumerate(vaxis):
+        #print('i={} j={} : b={} v={}'.format(i,j,b,np.log10(v)))
+        if not (b,v) in existing:
+            newlist.append((b,v))
 
-except KeyboardInterrupt:
-    pass
+#p = Pool(4)
+#newvals = p.map(rfn,newlist)
+#for i in range(len(newlist)):
+#    D[newlist[i]] = newvals[i]
+
+result = []
+def do_work(X):
+    i,x = X
+    return i,rfn(x)
+pool = Pool(processes=4)
+for rv in tqdm.tqdm(pool.imap_unordered(do_work, zip(range(len(newlist)),newlist)), total=len(newlist)):
+    result.append(rv)
+newvals  = [x for _,x in sorted(result)]
+
+for i in range(len(newlist)):
+    D[newlist[i]] = newvals[i]
 pickle.dump([D],open('rcache.p','w'))
+
+for i,b in enumerate(baxis):
+    for j,v in enumerate(vaxis):
+        #print('i={} j={} : b={} v={}'.format(i,j,b,np.log10(v)))
+        r = D[(b,v)]
+        for k in R.keys():
+            R[k][i,j] = r[k]
+xeq = [np.linspace(-4.5,-2.85,20),np.linspace(-6.,-4.85,20)]
+def xeqtoyeq(xeq,A):
+    x0 = 10**xeq[0]
+    yeq = A * 10**xeq
+    return yeq
+yeq = [xeqtoyeq(xeq[0],10000./1e-4),xeqtoyeq(xeq[1],10000./1e-6)]
+
 for k in ['Rmean','obsvar','c']:
     fig,ax = plt.subplots()
-    CS = ax.contour(np.log10(vaxis),baxis,np.log10(R[k]),10)
+    CS = ax.contour(np.log10(vaxis),np.log10(baxis),np.log10(R[k]),10)
     plt.clabel(CS, inline=1, fontsize=10)
+    #plt.plot(xeq[0],yeq[0],'k--')
+    #plt.plot(xeq[1],yeq[1],'k--')
     fig.savefig('figs/{}contour.png'.format(k))
     plt.close(fig)
 for k in ['Esteps','Eover','B']:
     fig,ax = plt.subplots()
-    CS = ax.contour(np.log10(vaxis),baxis,R[k],10)
+    CS = ax.contour(np.log10(vaxis),np.log10(baxis),R[k],10)
     plt.clabel(CS, inline=1, fontsize=10)
+    #plt.plot(xeq[0],yeq[0],'k--')
+    #plt.plot(xeq[1],yeq[1],'k--')
     fig.savefig('figs/{}contour.png'.format(k))
     plt.close(fig)
 for k in [1]:
     fig,ax = plt.subplots()
-    CS = ax.contour(np.log10(vaxis),baxis,R['Eover']/R['B'])
+    CS = ax.contour(np.log10(vaxis),np.log10(baxis),R['Eover']/R['B'])
     plt.clabel(CS, inline=1, fontsize=10)
+    #plt.plot(xeq[0],yeq[0],'k--')
+    #plt.plot(xeq[1],yeq[1],'k--')
     fig.savefig('figs/{}contour.png'.format('overhead'))
     plt.close(fig)

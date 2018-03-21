@@ -611,3 +611,4 @@ def plotprofile(confs,nreps,path,tol=0.9,target=1e-6):
         a[0].legend()
 
     f[0].savefig(os.path.join(path,'profile_{}.png'.format(sp.log10(target))),bbox_inches='tight', pad_inches=0.1)
+
