@@ -228,14 +228,24 @@ def optatBcfoverL(B,cfn,L,pL,bnds=(-6,-1),ax=None,axt=None):
         for i,v in tqdm.tqdm(enumerate(var),total=len(var)):
             c = cfn(v)
             mu[i],ss[i],nsteps,probn = perfatBCVoverL(B,c,v,L,pL)
-            psteps[:,i] = steps(nsteps,probn)
+            ovm,ovv = OMI(nsteps)
+            meanover = np.sum(probn*ovm)
+            varover = np.sum(probn*ovv)+np.sum(probn*(ovm-meanover)**2)
+            #psteps[:,i] = steps(nsteps,probn)
+            if 2*np.sqrt(varover)>meanover:
+                pass
+            psteps[1,i] = min(1.,meanover/float(B))
+            psteps[2,i] = max(0.,min(1.,(meanover-2*np.sqrt(varover))/float(B)))
+            psteps[0,i] = max(0.,min(1.,(meanover+2*np.sqrt(varover))/float(B)))
         ax.plot(var,np.exp(mu),cols[0],label='Log Mean Regret Prediction')
         ax.fill_between(var,np.exp(mu-2*np.sqrt(ss)),np.exp(mu+2*np.sqrt(ss)),facecolor=cols[0],edgecolor='None',alpha=0.2)
         ax.plot(var,np.exp(mu+0.5*ss),cols[0],linestyle='-.',label='Mean Regret Prediction')
         ax.plot(vopt,np.exp(muopt+0.5*ssopt),color=cols[0],marker='o',label='Optimum Prediction',linestyle=None)
         #axt = ax.twinx()
+        am = np.argmax(vopt<var)
         axt.plot(var,psteps[1,:],cols[1])
         axt.fill_between(var,psteps[0,:],psteps[2,:],facecolor=cols[1],edgecolor='None',alpha=0.2)
+        axt.plot(var[am],psteps[1,am],color=cols[1],marker='o')
         #print(var,np.exp(mu))
         ax.plot([],[],color=cols[1],label='Mean Iteration Predition')
 

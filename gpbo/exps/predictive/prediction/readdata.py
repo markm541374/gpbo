@@ -16,10 +16,12 @@ def readscenario(path):
 
     Rmu = np.empty_like(Vrange)
     Rva = np.empty_like(Vrange)
+    TRmu = np.empty_like(Vrange)
     for i,v in enumerate(Vrange):
         norm=0
         R = []
         W = []
+        TR = []
         for j,l in enumerate(Lrange):
             names = [f for f in os.listdir(path) if f.startswith('{}_{}_{}'.format(base,Lfiles[j],Vfiles[i]))]
             for n in names:
@@ -34,21 +36,26 @@ def readscenario(path):
 
                 R.append(D['trueyatxrecc'].values[-1])
                 W.append(Lwts[j])
+                taq = np.sum(D['taq'].values)
+                tec = np.sum(D['c'].values)
+                TR.append(taq/(taq+tec))
         R = np.array(R)
-        W = np.array(W)
-        Rmu[i] = np.mean(R*W)
-        Rva[i] = np.mean(W*(R-Rmu[i])**2)
-    return Vrange,Rmu, Rva
+        W = np.array(W)/np.sum(W)
+        TR = np.array(TR)
+        Rmu[i] = np.sum(R*W)
+        Rva[i] = np.sum(W*(R-Rmu[i])**2)/R.size
+        TRmu[i] = np.sum(TR*W)
+    return Vrange,Rmu, Rva, TRmu
 
+#path = os.path.join(datapath,'exps/predictive/prediction/scenarios/results_1h_v4')
 path = os.path.join(datapath,'exps/predictive/prediction/scenarios/results_1h_v4')
-Vrange,Rmu, Rva = readscenario(path)
+#path = os.path.join(datapath,'exps/predictive/prediction/scenarios/results_2h_v6')
+Vrange,Rmu, Rva, TRmu = readscenario(path)
 fig,ax = plt.subplots()
 ax.plot(Vrange,Rmu)
 ax.fill_between(Vrange,Rmu-2*np.sqrt(Rva),Rmu+2*np.sqrt(Rva),alpha=0.2)
 ax.set_yscale('log')
+ax.twinx().plot(Vrange,TRmu, 'r')
 fig.savefig('figs/tmp.png')
 
-#path = os.path.join(datapath,'exps/predictive/prediction/scenarios/results_2h_v6')
-#readscenario(path)
-#path = os.path.join(datapath,'exps/predictive/prediction/scenarios/results_1h_v4')
-#readscenario(path)
+pickle.dump([10**Vrange,Rmu,TRmu],open(os.path.join(path,'cache/out.p'),'w'))
