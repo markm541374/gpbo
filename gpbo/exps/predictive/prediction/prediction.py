@@ -228,15 +228,27 @@ def optatBcfoverL(B,cfn,L,pL,bnds=(-6,-1),ax=None,axt=None):
         for i,v in tqdm.tqdm(enumerate(var),total=len(var)):
             c = cfn(v)
             mu[i],ss[i],nsteps,probn = perfatBCVoverL(B,c,v,L,pL)
-            ovm,ovv = OMI(nsteps)
-            meanover = np.sum(probn*ovm)
-            varover = np.sum(probn*ovv)+np.sum(probn*(ovm-meanover)**2)
+            #ovm,ovv = OMI(nsteps-10)
+            #meanover = np.sum(probn*ovm)
+            #varover = np.sum(probn*ovv)+np.sum(probn*(ovm-meanover)**2)
             #psteps[:,i] = steps(nsteps,probn)
-            if 2*np.sqrt(varover)>meanover:
-                pass
-            psteps[1,i] = min(1.,meanover/float(B))
-            psteps[2,i] = max(0.,min(1.,(meanover-2*np.sqrt(varover))/float(B)))
-            psteps[0,i] = max(0.,min(1.,(meanover+2*np.sqrt(varover))/float(B)))
+            alow = np.argmax(np.cumsum(probn)>0.025)
+            ahigh = np.argmax(np.cumsum(probn)>0.975)
+            evc = min(B,np.sum(c*nsteps*probn))
+            psteps[1,i] = (B-evc)/float(B)
+            evl = min(B,np.sum(c*nsteps[alow]))
+            evh = min(B,np.sum(c*nsteps[ahigh]))
+            psteps[0,i] = (B-evl)/float(B)
+            psteps[2,i] = (B-evh)/float(B)
+            #if 2*np.sqrt(varover)>meanover:
+            #    pass
+            #psteps[1,i] = meanover
+            #psteps[2,i] = max(0.,min(1.,(meanover-2*np.sqrt(varover))/float(B)))
+            #psteps[0,i] = max(0.,min(1.,(meanover+2*np.sqrt(varover))/float(B)))
+            #psteps[2,i] = max(0.,min(1.,eqgamma.ppf(0.35)))
+            #psteps[0,i] = max(0.,min(1.,eqgamma.ppf(0.65)))
+            #psteps[2,i] = eqgamma.ppf(0.35)
+            #psteps[0,i] = eqgamma.ppf(0.65)
         ax.plot(var,np.exp(mu),cols[0],label='Log Mean Regret Prediction')
         ax.fill_between(var,np.exp(mu-2*np.sqrt(ss)),np.exp(mu+2*np.sqrt(ss)),facecolor=cols[0],edgecolor='None',alpha=0.2)
         ax.plot(var,np.exp(mu+0.5*ss),cols[0],linestyle='-.',label='Mean Regret Prediction')
@@ -321,6 +333,7 @@ if __name__ == "__main__":
     #L = sp.stats.gamma.rvs(3,scale=0.15,size=500)
     L = sp.stats.gamma.ppf(np.linspace(0,1,1002)[1:-1],4.,scale =0.2)
     p = np.ones_like(L)/float(L.size)
+
     R = optatBcfoverL(B,cfn,L,p,ax=ax[3],axt=axt[3],bnds=(-8,-2))
 
     #print(R)

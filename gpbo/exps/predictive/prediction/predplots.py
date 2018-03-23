@@ -11,10 +11,11 @@ print(sys.executable)
 basevar=1e-4
 basenum=100.
 
-Lsupport = sp.stats.gamma.ppf(np.linspace(0,1,1002)[1:-1],4.,scale = 0.2)
+Lsupport = sp.stats.gamma.ppf(np.linspace(0,1,202)[1:-1],4.,scale = 0.2)
 Lprior = np.ones_like(Lsupport)/float(Lsupport.size)
-
-
+#Lsupport = np.linspace(0.05,1.25,25)
+#Lprior = sp.stats.gamma.pdf(Lsupport,4.,scale=0.2)
+#Lprior = Lprior/np.sum(Lprior)
 B = np.array([1.,1.,1.])*3600
 A = np.array([1e-2,1e-4,1e-6])*36.
 R=[]
@@ -34,12 +35,14 @@ for i in range(len(B)):
 
 
 #################
-V,R,TR = pickle.load(open(os.path.join(datapath,'exps/predictive/prediction/scenarios/results_1h_v4/cache/out.p'),'r'))
-ax[1].plot(V,R,'g')
-am = np.argmin(R)
-ax[1].plot(V[am],R[am],'go')
-axt[1].plot(V,TR,'g')
-axt[1].plot(V[am],TR[am],'go')
+ind = [[0,1,2],[1,1,4],[2,1,6]]
+for e in ind:
+    V,R,TR = pickle.load(open(os.path.join(datapath,'exps/predictive/prediction/scenarios/results_{}h_v{}/cache/out.p'.format(e[1],e[2])),'r'))
+    ax[e[0]].plot(V,R,'g')
+    am = np.argmin(R)
+    ax[e[0]].plot(V[am],R[am],'go')
+    axt[e[0]].plot(V,TR,'g')
+    axt[e[0]].plot(V[am],TR[am],'go')
 #################
 
 ax[-1].legend(loc=8,ncol=4,bbox_to_anchor=[0.5,-0.35])
@@ -48,21 +51,21 @@ fig.text(0.95, 0.5, 'Expected Overhead Fraction', ha='center', va='center', rota
 ax[0].set_xlim(1e-6,1e-1)
 
 fig.savefig('figs/margpredictions.pdf')
-print('header\n')
-for i in range(len(B)):
-    s = "{:.3g} & $ \\frac{{ {:.3g} }}{{\\sigma^2}}$ & {:.3g} & {:.3g} & {:.3g} & {:.3g} \\\\".format(B[i],B[i]*basevar/basenum, R[i]['obsvar'],R[i]['Esteps'],R[i]['Rmean'],R[i]['Eover']/B[i])
-    print(s)
+#print('header\n')
+#for i in range(len(B)):
+#    s = "{:.3g} & $ \\frac{{ {:.3g} }}{{\\sigma^2}}$ & {:.3g} & {:.3g} & {:.3g} & {:.3g} \\\\".format(B[i],B[i]*basevar/basenum, R[i]['obsvar'],R[i]['Esteps'],R[i]['Rmean'],R[i]['Eover']/B[i])
+#    print(s)
+#
+#B = np.array([1.,2.])*3600
+#R=[]
 
-B = np.array([1.,2.])*3600
-R=[]
 
-
-for i in range(len(B)):
-    b = B[i]
-    cfn = lambda v: B[0]*basevar/basenum/v
-
-    r = prediction.optatBcfoverL(b,cfn,Lsupport,Lprior,bnds=(-5,-1))
-    R.append(r)
+#for i in range(len(B)):
+#    b = B[i]
+#    cfn = lambda v: B[0]*basevar/basenum/v
+#
+ #   r = prediction.optatBcfoverL(b,cfn,Lsupport,Lprior,bnds=(-5,-1))
+ #   R.append(r)
 
 print('header\n')
 #for i in range(len(B)):
