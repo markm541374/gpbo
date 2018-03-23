@@ -240,26 +240,17 @@ def optatBcfoverL(B,cfn,L,pL,bnds=(-6,-1),ax=None,axt=None):
             evh = min(B,np.sum(c*nsteps[ahigh]))
             psteps[0,i] = (B-evl)/float(B)
             psteps[2,i] = (B-evh)/float(B)
-            #if 2*np.sqrt(varover)>meanover:
-            #    pass
-            #psteps[1,i] = meanover
-            #psteps[2,i] = max(0.,min(1.,(meanover-2*np.sqrt(varover))/float(B)))
-            #psteps[0,i] = max(0.,min(1.,(meanover+2*np.sqrt(varover))/float(B)))
-            #psteps[2,i] = max(0.,min(1.,eqgamma.ppf(0.35)))
-            #psteps[0,i] = max(0.,min(1.,eqgamma.ppf(0.65)))
-            #psteps[2,i] = eqgamma.ppf(0.35)
-            #psteps[0,i] = eqgamma.ppf(0.65)
-        ax.plot(var,np.exp(mu),cols[0],label='Log Mean Regret Prediction')
+        ax.plot(var,np.exp(mu),cols[0],label=' Mean $\\log_{10}$ Regret Prediction')
         ax.fill_between(var,np.exp(mu-2*np.sqrt(ss)),np.exp(mu+2*np.sqrt(ss)),facecolor=cols[0],edgecolor='None',alpha=0.2)
         ax.plot(var,np.exp(mu+0.5*ss),cols[0],linestyle='-.',label='Mean Regret Prediction')
-        ax.plot(vopt,np.exp(muopt+0.5*ssopt),color=cols[0],marker='o',label='Optimum Prediction',linestyle=None)
+        ax.plot(vopt,np.exp(muopt+0.5*ssopt),color=cols[0],marker='o',linestyle=None)
         #axt = ax.twinx()
         am = np.argmax(vopt<var)
-        axt.plot(var,psteps[1,:],cols[1])
+        axt.plot(var,psteps[1,:],cols[1],label='Overhead Fraction Prediction')
         axt.fill_between(var,psteps[0,:],psteps[2,:],facecolor=cols[1],edgecolor='None',alpha=0.2)
         axt.plot(var[am],psteps[1,am],color=cols[1],marker='o')
+        axt.set_ylim(0,1)
         #print(var,np.exp(mu))
-        ax.plot([],[],color=cols[1],label='Mean Iteration Predition')
 
     R = {'mu':muopt, 'ss':ssopt, 'Eover':Eover, 'Esteps':stepsopt[1], 'B':B, 'c':copt, 'obsvar':vopt,'Rmean':m,'Rvar':v}
     return R

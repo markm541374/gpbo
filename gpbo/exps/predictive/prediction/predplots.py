@@ -27,7 +27,7 @@ for i in range(len(B)):
     b = B[i]
     #cfncoef = b*basevar/basenum
     cfn = lambda v: A[i]/v
-    ax[i].set_title('$B = {} $, $c(\sigma)= \\frac{{ {:.3g} }}{{\\sigma^2}}$'.format(b,A[i]))
+    ax[i].set_title('$B = {} $, $c(\sigma)= {:.3g} /\\sigma^2$'.format(b,A[i]))
     r = prediction.optatBcfoverL(b,cfn,Lsupport,Lprior,ax=ax[i],axt=axt[i],bnds=(-6,-1))
     ax[i].set_xscale('log')
     ax[i].set_yscale('log')
@@ -38,16 +38,19 @@ for i in range(len(B)):
 ind = [[0,1,2],[1,1,4],[2,1,6]]
 for e in ind:
     V,R,TR = pickle.load(open(os.path.join(datapath,'exps/predictive/prediction/scenarios/results_{}h_v{}/cache/out.p'.format(e[1],e[2])),'r'))
-    ax[e[0]].plot(V,R,'g')
+    ax[e[0]].plot(V,R,'g',label='Observed mean regret')
     am = np.argmin(R)
     ax[e[0]].plot(V[am],R[am],'go')
-    axt[e[0]].plot(V,TR,'g')
+    axt[e[0]].plot(V,TR,'g',label='Observed overhead fraction')
     axt[e[0]].plot(V[am],TR[am],'go')
 #################
 
-ax[-1].legend(loc=8,ncol=4,bbox_to_anchor=[0.5,-0.35])
-fig.text(0.05, 0.5, 'Expected Regret', ha='center', va='center', rotation='vertical')
-fig.text(0.95, 0.5, 'Expected Overhead Fraction', ha='center', va='center', rotation='vertical')
+ax[0].legend(loc='lower left')
+axt[0].legend(loc='upper left')
+ax[-1].set_xlabel('Observartion Variance')
+axt[-1].set_xlabel('Observartion Variance')
+fig.text(0.05, 0.5, 'Regret', ha='center', va='center', rotation='vertical')
+fig.text(0.95, 0.5, 'Overhead Fraction', ha='center', va='center', rotation='vertical')
 ax[0].set_xlim(1e-6,1e-1)
 
 fig.savefig('figs/margpredictions.pdf')

@@ -9,7 +9,7 @@ from gpbo import datapath
 def readscenario(path):
     Lrange = np.linspace(0.05,1.25,25)
     Lfiles = (1000*Lrange).astype(np.int)
-    Vrange = np.linspace(-4,-6,21)
+    Vrange = np.linspace(-1,-3,21)
     Vfiles = (1000*Vrange).astype(np.int)
     base = 'eihyp_3'
     Lwts = sp.stats.gamma.pdf(Lrange,4.,scale=0.2)
@@ -48,7 +48,7 @@ def readscenario(path):
     return Vrange,Rmu, Rva, TRmu
 
 #path = os.path.join(datapath,'exps/predictive/prediction/scenarios/results_1h_v4')
-path = os.path.join(datapath,'exps/predictive/prediction/scenarios/results_1h_v6')
+path = os.path.join(datapath,'exps/predictive/prediction/scenarios/results_1h_v2')
 #path = os.path.join(datapath,'exps/predictive/prediction/scenarios/results_2h_v6')
 Vrange,Rmu, Rva, TRmu = readscenario(path)
 fig,ax = plt.subplots()
