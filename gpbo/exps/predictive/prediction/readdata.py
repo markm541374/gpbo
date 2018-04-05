@@ -9,7 +9,8 @@ from gpbo import datapath
 def readscenario(path):
     Lrange = np.linspace(0.05,1.25,25)
     Lfiles = (1000*Lrange).astype(np.int)
-    Vrange = np.linspace(-1,-3,21)
+    #Vrange = np.linspace(-6,-4,21)
+    Vrange = np.linspace(-3,-1,21)
     Vfiles = (1000*Vrange).astype(np.int)
     base = 'eihyp_3'
     Lwts = sp.stats.gamma.pdf(Lrange,4.,scale=0.2)
