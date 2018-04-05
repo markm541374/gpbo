@@ -56,7 +56,8 @@ class logcfnobjfull():
 
 def traincfn1d(x,c):
     n = x.size
-    g = GPdc.GPcore(x, c, sp.array([1e-1] * n), [[sp.NaN]] * n, GPdc.kernel(GPdc.MAT52, 1, [1., 0.2]))
+    g = GPdc.GPcore(x, c, sp.ones([n,1])*1e-1, [[sp.NaN]] * n, GPdc.kernel(GPdc.MAT52, 1, [1., 0.2]))
+
 
     if gpbo.core.debugoutput['cost1d']:
         print( 'plotting cost1d...')

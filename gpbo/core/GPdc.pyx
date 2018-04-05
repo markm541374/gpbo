@@ -95,14 +95,15 @@ class GPcore:
         Ynorm = Y__s-mask.reshape(Y__s.shape)*trueYmean
         #print(Y__s,Ynorm)
         perm = sp.flip(sp.argsort(Dx_),axis=0)
-        try:
-            X_s = X__s[perm,:]
-            Y_s = Ynorm[perm,:]
-            S_s = S__s[perm,:]
-            Dx = [Dx_[i] for i in perm]
-        except:
-            import traceback
-            print(traceback.format_exc())
+        #try:
+        X_s = X__s[perm,:]
+        Y_s = Ynorm[perm,:]
+        S_s = S__s[perm,:]
+        Dx = [Dx_[i] for i in perm]
+        #except:
+        #    import traceback
+        #    print(traceback.format_exc())
+        #    print(S__s.shape,'XXXXXXXX')
         self.s = libGP.newGP_hypset(cint(self.D),cint(self.n),cint(kf[0].Kindex),X_s.ctypes.data_as(ctpd),Y_s.ctypes.data_as(ctpd),S_s.ctypes.data_as(ctpd),(cint*len(Dx))(*Dx),allhyp.ctypes.data_as(ctpd),cint(self.size))
         self.Y_s=Y_s
         
