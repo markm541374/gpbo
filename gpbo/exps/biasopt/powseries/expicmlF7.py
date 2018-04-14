@@ -100,6 +100,6 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,7,rpath,logx=True,labelfn=labelfn,axisset=axisset,sixylabel='Transformed GP Log-Likelihood',needed=[6])
+    gpbo.plotall(all2confs+all3confs,7,rpath,logx=True,labelfn=labelfn,axisset=axisset,sixylabel='Transformed GP Log-Likelihood',needed=[5,6])
 else:
     pass

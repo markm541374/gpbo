@@ -118,12 +118,12 @@ class optimizer:
             logger.info("AQ returned {} : {}    aqtime: {}\nevaluate:".format(x,ev,t1-t0))
             if not self.ojfchar['batchgrad']:
 
-                t2 = time.clock()
                 y,c,ojaux  = self.ojf(x,**ev)
+                t2 = time.clock()
                 logger.info("EV returned {} : {}     evaltime: {}".format(y,c,t2-t1))
             else:
-                t2 = time.clock()
                 F,c,ojaux  = self.ojf(x,**ev)
+                t2 = time.clock()
                 logger.info("EV returned {} : {}     evaltime: {}".format(F,c,t2-t1))
                 y = F[0]
                 for k in range(len(F)-1):

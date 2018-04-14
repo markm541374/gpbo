@@ -19,12 +19,12 @@ lb = sp.array([-1.]*D)
 ub = sp.array([1.]*D)
 
 from objective import f
-#def f(x,**ev):
-#    return -np.cos(2*x[0])-np.cos(2*x[1]),1.,{}
-#rawf = objectives.camel3
+def f(x,**ev):
+    return -np.cos(2*x[0])-np.cos(2*x[1]),1.,{}
+rawf = objectives.camel3
 #def f(x,**kwargs):
 #    y,c,aux = rawf(x,**kwargs)
- #   return np.log(y+1),c,aux
+#    return np.log(y+1),c,aux
 truemin =0.
 rpath='results'
 

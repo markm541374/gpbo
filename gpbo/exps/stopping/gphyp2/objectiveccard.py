@@ -15,7 +15,7 @@ t0 = time.clock()
 df = pd.read_csv('data/combinecycle.csv',sep=',').as_matrix()
 t1 = time.clock()
 print( 'read time {0:e}'.format(t1 - t0))
-N = 2000#df.shape[0]
+N = df.shape[0]
 dim = df.shape[1]-1
 print( '{}D data with {} points'.format(dim,N))
 

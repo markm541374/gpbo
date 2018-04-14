@@ -18,7 +18,7 @@ def f(x, **ev):
     print( 'f inputs x:{} ev:{} outputs y:{}  c:{}'.format(x, ev, y ,c))
     return y , c, dict()
 
-def optfabolas(fn,lb,ub,n,ninit,fname='results.csv',fpath='.',mod=False,switchestimator=False,switchkernel=False):
+def optfabolas(fn,lb,ub,n,ninit,fname='results.csv',fpath='.',mod=False,switchestimator=False,switchkernel=False,timelimit=np.Inf):
     D=len(ub)
     log=[]
     tinit=time.clock()
@@ -40,7 +40,7 @@ def optfabolas(fn,lb,ub,n,ninit,fname='results.csv',fpath='.',mod=False,switches
     s_min = 100
     s_max = 1000000
     if mod:
-        res = fabolas_mod(objective_function, lower=lb, upper=ub, s_min=s_min,s_max=s_max,n_init=ninit,num_iterations=n,switchestimator=switchestimator,switchkernel=switchkernel)
+        res = fabolas_mod(objective_function, lower=lb, upper=ub, s_min=s_min,s_max=s_max,n_init=ninit,num_iterations=n,switchestimator=switchestimator,switchkernel=switchkernel,timelimit=timelimit)
     else:
         res = fabolas(objective_function, lower=lb, upper=ub, s_min=s_min,s_max=s_max,n_init=ninit,num_iterations=n)
     print( res)
@@ -55,7 +55,7 @@ def optfabolas(fn,lb,ub,n,ninit,fname='results.csv',fpath='.',mod=False,switches
     ylast = -9999
     if not 'recctimes' in res.keys():
         res['recctimes']=[0.]*n
-    for i in xrange(n):
+    for i in xrange(len(log)):
         st=''
         st+=str(i)+','
 
@@ -86,8 +86,8 @@ def optfabolas(fn,lb,ub,n,ninit,fname='results.csv',fpath='.',mod=False,switches
         lf.write(st)
     lf.close()
 
-def optfabolas_mod(fn, lb, ub, n, ninit, fname='results.csv', fpath='.',switchkernel=False,switchestimator=False):
-    return optfabolas(fn, lb, ub, n, ninit, fname=fname, fpath=fpath,mod=True,switchestimator=switchestimator,switchkernel=switchkernel)
+def optfabolas_mod(fn, lb, ub, n, ninit, fname='results.csv', fpath='.',switchkernel=False,switchestimator=False,timelimit=np.Inf):
+    return optfabolas(fn, lb, ub, n, ninit, fname=fname, fpath=fpath,mod=True,switchestimator=switchestimator,switchkernel=switchkernel,timelimit=timelimit)
 
 #lb=sp.array([-1.,-1.])
 #ub=sp.array([ 1., 1.])

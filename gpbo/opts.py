@@ -17,8 +17,8 @@ import scipy as sp
 print('removed robo import in opts.py l17 due to theano errors')
 #try:
 #    from gpbo.exps.thirdwrap.mtbowrap import optmtbo
-#    from gpbo.exps.thirdwrap.fabwrap import optfabolas
-#    from gpbo.exps.thirdwrap.fabwrap import optfabolas_mod
+from gpbo.exps.thirdwrap.fabwrap import optfabolas
+from gpbo.exps.thirdwrap.fabwrap import optfabolas_mod
 #except:
 #    print('\n\ndidnt import robo!!!!!!\n\n')
 def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
@@ -100,12 +100,12 @@ def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
                 try:
                     optfabolas(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path)
                 except:
-                    pass
+                    raise
             elif C[0][:6]=='fabmod':
                 try:
-                    optfabolas_mod(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path,switchestimator=C[1]['switchestimator'],switchkernel=C[1]['switchkernel'])
+                    optfabolas_mod(f,lb,ub,C[1]['nsteps'],C[1]['ninit'],fname='{}_{}.csv'.format(C[0],ii), fpath=path,switchestimator=C[1]['switchestimator'],switchkernel=C[1]['switchkernel'],timelimit=C[1]['timelimit'])
                 except:
-                    pass
+                    raise
             else:
                 print( "not an optimization method")
 def plotquarts(a,data1,data2,col,line,lab,log=False):
@@ -246,6 +246,8 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
     colorlist = plt.rcParams['axes.prop_cycle'].by_key()['color']
     #['b','r','g','purple','k','grey','orange','c','lightgreen','lightblue','pink','b','r','g','purple','k','grey','orange','c','lightgreen','lightblue','pink']
     ci=-1
+
+    allmomin=sp.Inf
     for C in confs:
         if  C[0][:5]=='pesbs' or C[0][:3]=='fab':
             ninit=0
@@ -259,7 +261,9 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
         #collect the data
         data=[]
         for ii in range(nreps):
-            data.append(gpbo.optimize.readoptdata(os.path.join(path,'{}_{}.csv'.format(C[0],ii))))
+            thisdata = gpbo.optimize.readoptdata(os.path.join(path,'{}_{}.csv'.format(C[0],ii)))
+            allmomin = min(allmomin,thisdata['trueyatxrecc'].values.min())
+            data.append(thisdata)
 
         #if True:
             #first plot is all the opts per step
@@ -358,6 +362,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             if 20 in needed:
                 #and averaged
                 pq(a[20],[data[k]['n'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,line,labelfn(C[0]),mean=True)
+    print('allmomin {}'.format(allmomin))
     if 0 in needed:
         a[0].legend()
         a[0].set_xlabel('Steps')
