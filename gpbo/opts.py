@@ -214,7 +214,7 @@ def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False,mean=False):
     a2.set_ylabel('fraction of optimizations still running')
     return
 
-def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False,showends=False,needed=None,legend=True,forcefigsize=None,xmax=None):
+def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False,allylabel=False,showends=False,needed=None,legend=True,forcefigsize=None,xmax=None):
     if showends:
         pq=plotquartsends
     else:
@@ -402,9 +402,15 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
         f[4].savefig(os.path.join(path,'out4.pdf'),bbox_inches='tight', pad_inches=0.1)
 
     if 5 in needed:
-        a[5].legend()
+        if legend:
+            a[5].legend()
         a[5].set_xlabel('Evaluation Cost (s)')
-        a[5].set_ylabel('result')
+        if sixylabel:
+            a[5].set_ylabel(sixylabel)
+        elif allylabel:
+            a[5].set_ylabel(allylabel)
+        else:
+            a[5].set_ylabel('Result')
         if logx:
             a[5].set_xscale('log')
         a[5].axis('tight')
@@ -413,10 +419,13 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
         f[5].savefig(os.path.join(path,'out5.pdf'),bbox_inches='tight', pad_inches=0.1)
 
     if 6 in needed:
-        a[6].legend()
+        if legend:
+            a[6].legend()
         a[6].set_xlabel('Total Clock Time (s)')
         if sixylabel:
             a[6].set_ylabel(sixylabel)
+        elif allylabel:
+            a[6].set_ylabel(allylabel)
         else:
             a[6].set_ylabel('Result')
         if logx:
@@ -516,7 +525,10 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             if legend:
                 a[12].legend()
             a[12].set_xlabel('Evaluation Cost')
-            a[12].set_ylabel('Median Immediate Regret')
+            if allylabel:
+                a[12].set_ylabel(allylabel)
+            else:
+                a[12].set_ylabel('Median Immediate Regret')
             a[12].set_yscale('log')
             if logx:
                 a[12].set_xscale('log')
@@ -531,6 +543,8 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             a[13].set_xlabel('Total Clock Time (s)')
             if thirteenylabel:
                 a[13].set_ylabel(thirteenylabel)
+            elif allylabel:
+                a[13].set_ylabel(allylabel)
             else:
                 a[13].set_ylabel('Median Immediate Regret')
             a[13].set_yscale('log')

@@ -75,6 +75,7 @@ if mode=='run':
     else:
         gpbo.runexp(f,lb,ub,rpath,nreps,all3confs,indexoffset=args.offset*nreps)
 elif mode=='plot':
-    gpbo.plotall(all2confs+all3confs,7,rpath,trueopt=1e-99,logx=True,labelfn=labelfn,skipinit=True,axisset=axisset,thirteenylabel='Classifier Error',needed=[13,12,5,6],legend=True)
+    gpbo.plotall(all2confs+all3confs,7,rpath,trueopt=1e-99,logx=True,labelfn=labelfn,skipinit=True,axisset=axisset,allylabel='Classifier Error',needed=[13,6],legend=True)
+    gpbo.plotall(all2confs+all3confs,7,rpath,trueopt=1e-99,logx=True,labelfn=labelfn,skipinit=True,axisset=axisset,allylabel='Classifier Error',needed=[12,5],legend=False)
 else:
     pass

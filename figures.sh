@@ -145,17 +145,17 @@ if false; then
     cp gpbo/exps/biasopt/hartmann6/F5cnew/out12.pdf figures/variablefidelity/
     mv figures/variablefidelity/out12.pdf figures/variablefidelity/hart6cost.pdf
 fi
-if false; then
+if $1; then
     cp matplotlibrc gpbo/exps/biasopt/mnist
     (cd gpbo/exps/biasopt/mnist ; python2 expicmlF6.py)
-    cp gpbo/exps/biasopt/mnist/icmlF6/out13.pdf figures/variablefidelity/
-    mv figures/variablefidelity/out13.pdf figures/variablefidelity/mnist.pdf
+    cp gpbo/exps/biasopt/mnist/icmlF6/out13.pdf figures/variablefidelity/mnist.pdf
+    cp gpbo/exps/biasopt/mnist/icmlF6/out12.pdf figures/variablefidelity/mnistev.pdf
 fi
 if false; then
     cp matplotlibrc gpbo/exps/biasopt/powseries
     (cd gpbo/exps/biasopt/powseries ; python2 expicmlF7.py)
-    cp gpbo/exps/biasopt/powseries/norm/out6.pdf figures/variablefidelity/
-    mv figures/variablefidelity/out6.pdf figures/variablefidelity/powerfit.pdf
+    cp gpbo/exps/biasopt/powseries/norm/out6.pdf figures/variablefidelity/powerfit.pdf
+    cp gpbo/exps/biasopt/powseries/norm/out5.pdf figures/variablefidelity/powerfitev.pdf
 fi
 if false; then
     cp matplotlibrc gpbo/exps/predictive/overhead/fixedPES
@@ -197,8 +197,32 @@ if false; then
     cp gpbo/exps/predictive/prediction/figs/Estepscontour.pdf figures/predictive/Estepscontour.pdf
     cp gpbo/exps/predictive/prediction/figs/overheadcontour.pdf figures/predictive/overheadcontour.pdf
 fi
-if $1; then
+if false; then
     cp matplotlibrc gpbo/exps/predictive/prediction
     (cd gpbo/exps/predictive/prediction ; python2 predplots.py)
     cp gpbo/exps/predictive/prediction/figs/margpredictions.pdf figures/predictive/margpredictions.pdf
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/biasopt/denmark
+    (cd gpbo/exps/biasopt/denmark ; python2 plotfigs.py)
+    cp gpbo/exps/biasopt/denmark/results/out5.pdf figures/variablefidelity/denmarkev.pdf
+    cp gpbo/exps/biasopt/denmark/results/out6.pdf figures/variablefidelity/denmarkfc.pdf
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/biasopt/casp
+    (cd gpbo/exps/biasopt/casp ; python2 plotfigs.py)
+    cp gpbo/exps/biasopt/casp/results/out5.pdf figures/variablefidelity/caspev.pdf
+    cp gpbo/exps/biasopt/casp/results/out6.pdf figures/variablefidelity/caspfc.pdf
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/biasopt/cciso
+    (cd gpbo/exps/biasopt/cciso ; python2 plotfigs.py)
+    cp gpbo/exps/biasopt/cciso/results/out12.pdf figures/variablefidelity/ccisoev.pdf
+    cp gpbo/exps/biasopt/cciso/results/out13.pdf figures/variablefidelity/ccisofc.pdf
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/biasopt/ccard
+    (cd gpbo/exps/biasopt/ccard ; python2 plotfigs.py)
+    cp gpbo/exps/biasopt/ccard/results/out12.pdf figures/variablefidelity/ccardev.pdf
+    cp gpbo/exps/biasopt/ccard/results/out13.pdf figures/variablefidelity/ccardfc.pdf
 fi
