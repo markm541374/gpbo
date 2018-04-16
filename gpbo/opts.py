@@ -214,7 +214,7 @@ def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False,mean=False):
     a2.set_ylabel('fraction of optimizations still running')
     return
 
-def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False,allylabel=False,showends=False,needed=None,legend=True,forcefigsize=None,xmax=None):
+def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False,allylabel=False,showends=False,needed=None,legend=True,forcefigsize=None,xmax=None,legendreplace=None):
     if showends:
         pq=plotquartsends
     else:
@@ -556,7 +556,11 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
             f[13].savefig(os.path.join(path,'out13.pdf'),bbox_inches='tight', pad_inches=0.1)
 
         if 20 in needed:
-            if legend:
+            if legend=='override':
+                a[20].legend(loc="lower left",handles=legendreplace)
+            elif not legend:
+                pass
+            else:
                 a[20].legend(loc="lower left")
 
             a[20].set_xlabel('Steps')

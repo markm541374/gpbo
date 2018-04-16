@@ -11,13 +11,14 @@ parser.add_argument('-o', '--offset', dest='offset', action='store', default=0,t
 args = parser.parse_args()
 
 
-D=2
+D=6
 
 s=0.
 lb = sp.array([-1.]*D)
 ub = sp.array([1.]*D)
 
 rawf = objectives.camel3
+rawf = objectives.shifthart6
 
 truemin =0.
 rpath='results'

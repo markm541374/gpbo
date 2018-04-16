@@ -96,7 +96,7 @@ if false; then
     mv figures/localstop/out11.pdf figures/localstop/conditionregretthin.pdf
     mv figures/localstop/out19.pdf figures/localstop/conditionmagnitudethin.pdf
 fi
-if false; then
+if $1; then
     cp matplotlibrc gpbo/exps/stopping/draws
     (cd gpbo/exps/stopping/draws ; python2 meanregret.py)
     cp gpbo/exps/stopping/draws/results2d/out20.pdf figures/localstop/
@@ -145,7 +145,7 @@ if false; then
     cp gpbo/exps/biasopt/hartmann6/F5cnew/out12.pdf figures/variablefidelity/
     mv figures/variablefidelity/out12.pdf figures/variablefidelity/hart6cost.pdf
 fi
-if $1; then
+if false; then
     cp matplotlibrc gpbo/exps/biasopt/mnist
     (cd gpbo/exps/biasopt/mnist ; python2 expicmlF6.py)
     cp gpbo/exps/biasopt/mnist/icmlF6/out13.pdf figures/variablefidelity/mnist.pdf

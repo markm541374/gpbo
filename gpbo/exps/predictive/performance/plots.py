@@ -26,7 +26,7 @@ for il,ls in enumerate([300,800,1500]):
     base = 'eihyp_3_{}_'.format(ls)
 
     #fig0,a0 = plt.subplots(1)
-    fig1,a1 = plt.subplots(1)
+    fig1,a1 = plt.subplots(1,figsize=(4,3.5))
     for i,noise in enumerate([-2,-4,-6,-8]):
         #print(noise)
         names = [f for f in files if f.startswith(base+str(1000*noise))]
@@ -67,8 +67,10 @@ for il,ls in enumerate([300,800,1500]):
     a1.set_title('L = {}'.format(ls/1000.))
     a1.set_yscale('log')
     a1.set_xscale('log')
-    a1.set_ylabel('Immediate Regret')
+    if il==0:
+        a1.set_ylabel('Immediate Regret')
     a1.set_xlabel('Evaluation Cost')
+    fig1.tight_layout(pad=0.5)
     fig1.savefig('figs/evcostei_{}.pdf'.format(ls))
 
     #a2.set_title('Expected Improvement ls = {}'.format(ls/1000.))
