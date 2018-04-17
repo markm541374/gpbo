@@ -38,6 +38,7 @@ for i in range(len(B)):
 ind = [[0,1,2],[1,1,4],[2,1,6]]
 for e in ind:
     V,R,TR = pickle.load(open(os.path.join(datapath,'exps/predictive/prediction/scenarios/results_{}h_v{}/cache/out.p'.format(e[1],e[2])),'r'))
+    print(V,R,TR)
     ax[e[0]].plot(V,R,'g',label='Observed mean regret')
     am = np.argmin(R)
     ax[e[0]].plot(V[am],R[am],'go')

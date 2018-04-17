@@ -199,7 +199,7 @@ if false; then
 fi
 if false; then
     cp matplotlibrc gpbo/exps/predictive/prediction
-    (cd gpbo/exps/predictive/prediction ; python2 predplots.py)
+    #(cd gpbo/exps/predictive/prediction ; python2 predplots.py)
     cp gpbo/exps/predictive/prediction/figs/margpredictions.pdf figures/predictive/margpredictions.pdf
 fi
 if false; then
@@ -208,7 +208,7 @@ if false; then
     cp gpbo/exps/biasopt/denmark/results/out5.pdf figures/variablefidelity/denmarkev.pdf
     cp gpbo/exps/biasopt/denmark/results/out6.pdf figures/variablefidelity/denmarkfc.pdf
 fi
-if $1; then
+if false; then
     cp matplotlibrc gpbo/exps/biasopt/casp
     (cd gpbo/exps/biasopt/casp ; python2 plotfigs.py)
     cp gpbo/exps/biasopt/casp/results/out5.pdf figures/variablefidelity/caspev.pdf
