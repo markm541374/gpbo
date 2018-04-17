@@ -25,8 +25,8 @@ def optfabolas(fn,lb,ub,n,ninit,fname='results.csv',fpath='.',mod=False,switches
     def objective_function(x, s):
         t0=time.clock()
         #adjust s to 0-1 where 0 is full
-        sn=1-np.log10(s)/4.+0.5
-
+        #sn=1-np.log10(s)/4.+0.5
+        sn = 1-(s-100.)/(1000000.-100.)
         y,c,aux = fn(x,**{'xa':sn})
 
         t1=time.clock()

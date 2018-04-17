@@ -84,7 +84,7 @@ C={'lowtask':64,
 #fabolas
 C={'ninit':20,
    'nsteps':40}
-#all3confs.append(['fabmod2',C])
+all3confs.append(['fabmod2',C])
 
 #fabolas
 C={'ninit':20,
