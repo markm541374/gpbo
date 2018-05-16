@@ -235,3 +235,4 @@ results/
 /gpbo/exps/thirdwrap/outcmaesaxlen.dat
 /gpbo/core/optutils.so
 !/rebuild.sh
+/figures/predictive/margpredictions.pdf
