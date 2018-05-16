@@ -1,102 +1,32 @@
-#optimize on draw from matern kernel
+#example code to optimize using PES adapted for biased  variable fidelity evaluations
 
 import gpbo
-import gpbo.core.objectives as objectives
 import scipy as sp
-import copy
-import os
-import time
-from matplotlib import pyplot as plt
-import re
-import pandas as pd
 
-
-run=True
-plot=True
 D=2
-lb = [-1., -1.]
-ub = [1., 1.]
 s=1e-6
+n=100
 
+#define a simple 2d objective in x which also varies with respect to the environmental variable
+def f(x, **ev):
+    #ev['xa'] is the environmental variable which varies from 0 (true objective) to 1. cost has an exponential decay away from xa=0
+    c=45*sp.exp(-10.*ev['xa'])
+    y = -sp.cos(x[0]) - sp.cos(x[1]) + 2.
+    b = ev['xa'] ** 2
+    n = sp.random.normal() * sp.sqrt(s)
+    if 'cheattrue' in ev.keys():
+        if ev['cheattrue']:
+            b = 0
+            n = 0
+    print('f inputs x:{} ev:{} outputs y:{} (b:{} n:{}) c:{}'.format(x, ev, y + n + b, b, n, c))
+    return y + b + n, c, dict()
 
-nopts=1
-if run:
-    for k in xrange(nopts):
-        with open('results/pesbsdemo{}.txt'.format(k),'w') as o:
-            xmin=[0.,0.]
-            ymin=0.
-            o.write('reported truemin x {} ; y {}'.format(xmin,ymin))
-
-
-        def f(x, **ev):
-            #c = 1 - 0.5* ev['xa']
-            c=45*sp.exp(-10.*ev['xa'])
-            y = -sp.cos(x[0]) - sp.cos(x[1]) + 2. +0.1*s**2.
-            b = ev['xa'] ** 2
-            n = sp.random.normal() * sp.sqrt(s)
-            if 'cheattrue' in ev.keys():
-                if ev['cheattrue']:
-                    b = 0
-                    n = 0
-            print('f inputs x:{} ev:{} outputs y:{} (b:{} n:{}) c:{}'.format(x, ev, y + n + b, b, n, c))
-            return y + b + n, c, dict()
-
-
-        def f_inplane(x,**ev):
-            e = copy.deepcopy(ev)
-            e['xa']=0
-            y, c, aux = f(x, **e)
-            return y,c,aux
-
-
-
-        C=gpbo.core.config.pesbsdefault(f,D,50,s,'results','pesbsdemo{}.csv'.format(k))
-        C.stoppara = {'tmax': 60 * 60*3}
-        C.stopfn = gpbo.core.optimize.totaltstopfn
-        C.aqpara['overhead']='predict'
-        #C.aqpara['cmax']=C.stoppara['cmax']
-        out = gpbo.search(C)
-
-
-
-if plot:
-    import seaborn as sns
-    f,a = plt.subplots(1)
-    y=sp.empty(nopts)
-    r = re.compile('y (-?\d.\d+)')
-
-    d0 = [gpbo.optimize.readoptdata('results/pesbsdemo{}.csv'.format(k),includetaq=True) for k in xrange(nopts)]
-
-    for k in range(nopts):
-        txt = open('results/pesbsdemo{}.txt'.format(k)).read()
-        y[k] = float(r.findall(txt)[0])
-
-        d0[k]['trueyatxrecc'] -=y[k]
-
-        a.semilogy(d0[k]['cacc'], d0[k]['trueyatxrecc'], 'b')
-
-    f, a = plt.subplots(1)
-
-    xaxis = sp.linspace(0,max(d0[0]['cacc']),100)
-    low0, med0, upp0 = gpbo.core.ESutils.quartsirregular([d0[k]['cacc'] for k in range(nopts)],
-                                                         [d0[k]['trueyatxrecc'] for k in range(nopts)], xaxis)
-
-    a.fill_between(xaxis, low0, upp0, facecolor='lightblue', edgecolor='lightblue', alpha=0.5)
-    a.plot(xaxis, med0, 'b')
-
-
-    a.set_yscale('log')
-    a.set_xlabel('accumulated cost')
-    a.set_ylabel('regret')
-    f.savefig('plots/out0.pdf')
-    f,a = plt.subplots(1)
-    low0, med0, upp0 = gpbo.core.ESutils.quartsirregular([d0[k]['cacc'] for k in range(nopts)],
-                                                         [d0[k]['c'] for k in range(nopts)], xaxis)
-    a.fill_between(xaxis, low0, upp0, facecolor='lightblue', edgecolor='lightblue', alpha=0.5)
-    a.plot(xaxis, med0, 'b')
-
-    a.set_xlabel('accumulated cost')
-    a.set_ylabel('per-step cost')
-    f.savefig('plots/out1.pdf')
-    plt.show()
-
+#arguments to generate default config are objective function, dimensionality, number of steps, noise variance, result directory and result filename
+C=gpbo.core.config.pesbsdefault(f,D,n,s,'results','pesfs.csv')
+#replace the default behaviour of stopping after n steps with stopping after a total evaluation and acquisition budget is exceeded
+C.stoppara = {'tmax': 60 * 60 * 24}
+C.stopfn = gpbo.core.optimize.totaltstopfn
+#use the prediced average overhead over hte remaining optimization steps in the acquisition function
+C.aqpara['overhead']='predict'
+out = gpbo.search(C)
+print(out)
