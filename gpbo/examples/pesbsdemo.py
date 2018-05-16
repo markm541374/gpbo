@@ -29,7 +29,7 @@ def f(x, **ev):
     return y + b + n, c, dict()
 
 #arguments to generate default config are objective function, dimensionality, number of steps, noise variance, result directory and result filename
-C=gpbo.core.config.pesbsdefault(f,D,n,s,'results','pesfs.csv')
+C=gpbo.core.config.pesbsdefault(f,D,n,s,'results','pesbs.csv')
 #replace the default behaviour of stopping after n steps with stopping after a total evaluation and acquisition budget is exceeded
 C.stoppara = {'tmax': 60 * 60 * 24}
 C.stopfn = gpbo.core.optimize.totaltstopfn
