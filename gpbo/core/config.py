@@ -364,6 +364,7 @@ class pesbsdefault():
             'xau':1.,
             'xal':0.,
             'startmode':'inline',
+            'overhead':'last',
             'initpoints':[0.5,0.75,0.875],
             'dpara': {'user_data': [],
                       'algmethod': 1,

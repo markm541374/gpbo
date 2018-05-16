@@ -2,18 +2,25 @@
 
 import gpbo
 import scipy as sp
-
+#dimensionality
 D=2
+#noise variance
 s=1e-6
+#number of step to take
 n=100
 
 #define a simple 2d objective in x which also varies with respect to the environmental variable
 def f(x, **ev):
-    #ev['xa'] is the environmental variable which varies from 0 (true objective) to 1. cost has an exponential decay away from xa=0
+    #ev['xa'] is the environmental variable which varies from 0 (true objective) to 1.
+    #cost has an exponential decay away from xa=0
     c=45*sp.exp(-10.*ev['xa'])
+    #base objective value
     y = -sp.cos(x[0]) - sp.cos(x[1]) + 2.
+    #bias due to environmental variable
     b = ev['xa'] ** 2
+    #noise
     n = sp.random.normal() * sp.sqrt(s)
+    #we want to check the noiseless value when evaluating performance
     if 'cheattrue' in ev.keys():
         if ev['cheattrue']:
             b = 0
