@@ -94,5 +94,5 @@ C={'ninit':20,
 
 #axisset={6:[1000,100000,10.5,10.7]}
 labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs_ls':'EnvPES2','pesbs':'EnvPES','fabmod2':'FabolasM'}[x]
-gpbo.plotall(all2confs+all3confs,10,rpath,logx=True,labelfn=labelfn,sixylabel='Normalized Squared Prediciton Error',needed=[6],legend=True)
-gpbo.plotall(all2confs+all3confs,10,rpath,logx=True,labelfn=labelfn,sixylabel='Normalized Squared Prediction Error',needed=[4,5],legend=False)
+gpbo.plotall(all2confs+all3confs,5,rpath,logx=True,labelfn=labelfn,sixylabel='Normalized Squared Prediciton Error',needed=[6],legend=True)
+gpbo.plotall(all2confs+all3confs,5,rpath,logx=True,labelfn=labelfn,sixylabel='Normalized Squared Prediction Error',needed=[4,5],legend=False)

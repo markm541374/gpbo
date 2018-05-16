@@ -92,7 +92,7 @@ C={'ninit':20,
 #all3confs.append(['fabolas',C])
 
 
-axisset={6:[1000,100000,12.,19.],5:[1000,100000,12.,19.]}
+axisset={6:[1e2,1e5,12.,18.],5:[1e2,1e5,12.,18.]}
 labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs_ls':'EnvPES2','pesbs':'EnvPES','fabmod2':'FabolasM'}[x]
-gpbo.plotall(all2confs+all3confs,10,rpath,logx=True,labelfn=labelfn,sixylabel='Transformed GP Log-Likelihood',needed=[6,11,12,13],legend=True,axisset=axisset,trueopt=12.0828281226)
-gpbo.plotall(all2confs+all3confs,10,rpath,logx=True,labelfn=labelfn,sixylabel='Transformed GP Log-Likelihood',needed=[4,5],legend=False,axisset=axisset)
+gpbo.plotall(all2confs+all3confs,9,rpath,logx=True,labelfn=labelfn,sixylabel='Transformed GP Log-Likelihood',needed=[6,11,12,13],legend=True,trueopt=12.0828281226,axisset=axisset)
+gpbo.plotall(all2confs+all3confs,9,rpath,logx=True,labelfn=labelfn,sixylabel='Transformed GP Log-Likelihood',needed=[4,5],legend=False,axisset=axisset)

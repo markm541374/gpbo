@@ -92,8 +92,9 @@ C={'ninit':20,
 #all3confs.append(['fabolas',C])
 
 
-axisset={13:[10,100000,0.001,10.],12:[10,100000,0.001,10.]}
+#axisset={13:[10,100000,0.001,10.],12:[10,100000,0.001,10.]}
+axisset={12:[1,100000,1e-4,10.],13:[1,1e5,1e-4,10.]}
 labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs_ls':'EnvPES2','pesbs':'EnvPES','fabmod2':'FabolasM'}[x]
 #gpbo.plotall(all2confs+all3confs,5,rpath,logx=True,labelfn=labelfn,sixylabel='cciso',needed=[6,5,4,11,12,13],trueopt=10.5253051831)
-gpbo.plotall(all2confs+all3confs,10,rpath,logx=True,labelfn=labelfn,allylabel='Pseudo-Regret',needed=[6,13],legend=True,trueopt=10.5253051831,axisset=axisset)
-gpbo.plotall(all2confs+all3confs,10,rpath,logx=True,labelfn=labelfn,allylabel='Pseudo-Regret',needed=[4,5,12],legend=False,trueopt=10.5253051381)
+gpbo.plotall(all2confs+all3confs,9,rpath,logx=True,labelfn=labelfn,allylabel='Pseudo-Regret',needed=[6,13],legend=True,trueopt=10.5253051831,axisset=axisset)
+gpbo.plotall(all2confs+all3confs,9,rpath,logx=True,labelfn=labelfn,allylabel='Pseudo-Regret',needed=[4,5,11,12],legend=False,trueopt=10.5253051381,axisset=axisset)

@@ -93,6 +93,7 @@ C={'ninit':20,
 
 
 labelfn = lambda x: {'eimle':'EI','pesfs':'PES','pesbs_ls':'EnvPES2','pesbs':'EnvPES','fabmod2':'FabolasM'}[x]
-axisset={6:[800,4*1e4,10.5,16]}
+#axisset={6:[800,4*1e4,10.5,16]}
+axisset={5:[500,5*1e4,10.5,16],6:[500,5*1e4,10.5,16]}
 gpbo.plotall(all2confs+all3confs,7,rpath,logx=True,labelfn=labelfn,axisset=axisset,allylabel='Transformed GP Log-Likelihood',needed=[6],legend=True)
 gpbo.plotall(all2confs+all3confs,7,rpath,logx=True,labelfn=labelfn,axisset=axisset,allylabel='Transformed GP Log-Likelihood',needed=[5],legend=False)

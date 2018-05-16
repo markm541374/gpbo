@@ -119,6 +119,9 @@ if false; then
     mv figures/variablefidelity/out13.pdf figures/variablefidelity/branin.pdf
     cp gpbo/exps/biasopt/offsetbranin/F5anew/out12.pdf figures/variablefidelity/
     mv figures/variablefidelity/out12.pdf figures/variablefidelity/branincost.pdf
+fi
+if false; then
+    cp matplotlibrc gpbo/exps/biasopt/offsetbranin
     (cd gpbo/exps/biasopt/offsetbranin ; python2 expicmlF1.py)
     cp gpbo/exps/biasopt/offsetbranin/F1new/out11.pdf figures/variablefidelity/
     mv figures/variablefidelity/out11.pdf figures/variablefidelity/argpost.pdf
@@ -151,7 +154,7 @@ if false; then
     cp gpbo/exps/biasopt/mnist/icmlF6/out13.pdf figures/variablefidelity/mnist.pdf
     cp gpbo/exps/biasopt/mnist/icmlF6/out12.pdf figures/variablefidelity/mnistev.pdf
 fi
-if false; then
+if $1; then
     cp matplotlibrc gpbo/exps/biasopt/powseries
     (cd gpbo/exps/biasopt/powseries ; python2 expicmlF7.py)
     cp gpbo/exps/biasopt/powseries/norm/out6.pdf figures/variablefidelity/powerfit.pdf

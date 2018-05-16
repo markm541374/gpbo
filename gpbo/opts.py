@@ -118,7 +118,7 @@ def plotquarts(a,data1,data2,col,line,lab,log=False):
     if not log:
         xaxis = sp.linspace(mn,mx,200)
     else:
-        xaxis = sp.logspace(sp.log10(mn),sp.log10(mx),200)
+        xaxis = sp.logspace(sp.log10(mn),sp.log10(mx),200)+1e-9
 ##    print( data1)
 #    print( data2)
 #    print( xaxis)
@@ -143,7 +143,6 @@ def getquarts(data1,data2,log=False):
         xaxis = sp.logspace(sp.log10(mn),sp.log10(mx),200)
 
     low0, med0, upp0 = gpbo.core.ESutils.quartsirregular(data1,data2,xaxis)
-
     return xaxis,low0,med0,upp0
 
 def getmvint(data1,data2,nstd=2,logx=False,logy=False):
@@ -281,7 +280,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
                 a[1].plot(data[ii]['accE'],data[ii]['trueyatxrecc'],color=col, linestyle=line,label=labelfn(C[0]))
             #and averaged
         if 5 in needed:
-            pq(a[5],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,line,labelfn(C[0]))
+            pq(a[5],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,line,labelfn(C[0]),log=logx)
 
         if 2 in needed:
             #third is all the opts per evaluation + acquisition cost
@@ -289,7 +288,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
                 a[2].plot(data[ii]['accEA'],data[ii]['trueyatxrecc'],color=col, linestyle=line,label=labelfn(C[0]))
         if 6 in needed:
             #and averaged
-            pq(a[6],[data[k]['accEA'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,line,labelfn(C[0]))
+            pq(a[6],[data[k]['accEA'] for k in range(nreps)],[data[k]['trueyatxrecc'] for k in range(nreps)],col,line,labelfn(C[0]),log=logx)
 
         if 3 in needed:
             #fourth is evcost per step
@@ -349,7 +348,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
                     a[9].plot(data[ii]['accE'],data[ii]['trueyatxrecc']-trueopt,color=col, linestyle=line,label=labelfn(C[0]))
             if 12 in needed:
                 #and averaged
-                pq(a[12],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,line,labelfn(C[0]))
+                pq(a[12],[data[k]['accE'] for k in range(nreps)],[data[k]['trueyatxrecc']-trueopt for k in range(nreps)],col,line,labelfn(C[0]),log=True)
 
             if 10 in needed:
                 #third is all the opts per evaluation + acquisition cost
