@@ -1,7 +1,7 @@
 Practical Bayesian Optimization for Variable Cost Objectives
 =================================================
 
-This repository contains the implementation of the work in [Practical Bayesian Optimization for Variable Cost Objectives](https://arxiv.org/abs/1703.04335) and [Optimization, fast and slow: optimally switching between local and Bayesian optimization] (https://arxiv.org/abs/1805.08610).
+This repository contains the implementation of the work in [Practical Bayesian Optimization for Variable Cost Objectives](https://arxiv.org/abs/1703.04335) and [Optimization, fast and slow: optimally switching between local and Bayesian optimization](https://arxiv.org/abs/1805.08610).
 
 
 Installation
