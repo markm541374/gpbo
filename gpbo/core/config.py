@@ -364,6 +364,7 @@ class pesbsdefault():
             'xau':1.,
             'xal':0.,
             'startmode':'inline',
+            'overhead':'last',
             'initpoints':[0.5,0.75,0.875],
             'dpara': {'user_data': [],
                       'algmethod': 1,
@@ -459,11 +460,11 @@ class switchdefault():
 
     def __init__(self, f, D, ninit,nstop, s, path, fname):
 
-
+        #the first acquisition function is standard PES
         C = gpbo.core.config.pesfspredictive(f, D, 10, s, 'results', 'introspection.csv',ninit=ninit)
         aq0 = C.aqfn
         aq0para = C.aqpara
-
+        #the second acquisition is local exploitation with BFGS
         aq1 = gpbo.core.acquisitions.splocalaq
         aq1para = {
             'ev': {'s': s, 'd': [sp.NaN]},
@@ -471,6 +472,7 @@ class switchdefault():
             'ub': [1.] * D,
             'start': [0.] * D
         }
+        #finally the third acquisition is EI using sampled hyperparameters, which will be passed a modified incumbent value to use at each step
         C2 = gpbo.core.config.eihypdefault(f, D, ninit, s, 'results', 'introspection.csv')
 
         aq2 = C2.aqfn
@@ -479,7 +481,7 @@ class switchdefault():
         aq2para['mprior']= aq0para['mprior']
         aq2para['sprior']= aq0para['sprior']
         aq2para['kindex']= aq0para['kindex']
-
+        #the chooser will secet which acquisition is used at each step
         self.chooser = gpbo.core.choosers.globallocalregret
         self.choosepara = {
             'ev': aq0para['ev'],

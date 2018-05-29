@@ -1,42 +1,30 @@
+#example code to optimize using EI and slice sampled hyperparameters under an independent gamma prior  with fixed noise and bias
 import gpbo
 import scipy as sp
 
 
-D=4
-n=10
-s=0.
+#dimensionality
+D=2
+#noise variance
+s=1e-6
+#number of step to take
+n=100
 
-def f(x, **ev):
-    y = -sp.cos(x[0]) - sp.cos(x[1]) + 2
-    c = 1.
-    n = sp.random.normal() * sp.sqrt(s)
+#define a simple 2d objective in x which also varies with respect to the environmental variable
+def f(x,**ev):
+    y=-sp.cos(x[0])-sp.cos(x[1])+2
+    #fixed cost
+    c=1.
+    #noise
+    n = sp.random.normal()*1e-3
+    #we want to check the noiseless value when evaluating performance
     if 'cheattrue' in ev.keys():
         if ev['cheattrue']:
             n=0
-    print('f inputs x:{} ev:{} outputs y:{} (n:{}) c:{}'.format(x, ev, y + n, n, c))
-    return y + n, c, dict()
+    print('f inputs x:{} ev:{} outputs y:{} (n:{}) c:{}'.format(x,ev,y+n,n,c))
+    return y+n,c,dict()
 
-def fdf(x, **ev):
-    y = -sp.cos(x[0]) - sp.cos(x[1]) + 2
-    dx0 = sp.sin(x[0])
-    dx1 = sp.sin(x[1])
-    F = sp.array([y,dx0,dx1])
-    c = 1.
-    n = sp.random.normal(size=3) * sp.sqrt(s)
-    if 'cheattrue' in ev.keys():
-        if ev['cheattrue']:
-            n=0
-    print('f inputs x:{} ev:{} outputs y:{} (n:{}) c:{}'.format(x, ev, y + n, n, c))
-    return F + n, c, dict()
-f = gpbo.core.objectives.colville
-q=f([0.1,0.1,0.1,0.1],**{})
-#C=gpbo.core.config.eihypdefault(f,D,n,s,'results','eihyp3.csv')
-C=gpbo.core.config.pesfspredictive(f,D,n,s,'results','pesfs.csv')
-C.aqpara['nrandinit']=C.reccpara['onlyafter']=20
-#C.ojfchar['batchgrad']=True
-C.stoppara = {'nmax': 250}
-C.stopfn = gpbo.core.optimize.nstopfn
-#C.aqpara['mprior']= sp.array([2.,1.,2.])
-
+#arguments to generate default config are objective function, dimensionality, number of steps, noise variance, result directory and result filename
+C=gpbo.core.config.eihypgamma(f,D,n,s,'results','eihyp.csv')
 out = gpbo.search(C)
 print(out)
