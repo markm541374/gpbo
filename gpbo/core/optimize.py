@@ -60,7 +60,7 @@ class optimizer:
         self.dx = ojfchar['dx']
         self.dev = ojfchar['dev']
         if initdata:
-            self.state=pickle.load(open(initdata))
+            self.state=pickle.load(open(initdata))[0]
             print('init with \n{} \n{}'.format(self.state.x,self.state.y))
         else:
             self.state=optstate()
@@ -99,7 +99,7 @@ class optimizer:
         lf = open(os.path.join(self.dirpath,self.name),'w')
         lf.write(''.join(['n, ']+['x'+str(i)+', ' for i in xrange(self.dx)]+[i+', ' for i in self.aqpara[0]['ev'].keys()]+['y, c, ']+['rx'+str(i)+', ' for i in xrange(self.dx)]+['truey at xrecc, taq, tev, trc, realtime, condition, aqauxdata'])+'\n')
 #        self.state = optstate()
-        stepn=0
+        stepn=self.state.n
         checky=sp.NaN
         rxlast=[sp.NaN]*self.dx
         while not self.stopfn(self.state,**self.stoppara):
