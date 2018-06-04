@@ -165,7 +165,7 @@ def getmvint(data1,data2,nstd=2,logx=False,logy=False):
         S = nstd*sp.sqrt(V)
         return xaxis,M-S,M,M+S
 
-def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False,mean=False):
+def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False,mean=False,median=False, noends=False,linestyle='-',notwin=False):
     xdata = [sp.array(i) for i in xdata_]
     ydata = [sp.array(i) for i in ydata_]
     n = len(xdata)
@@ -196,6 +196,8 @@ def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False,mean=False):
     #print(x)
     if mean:
         a.plot(x, map(lambda x: sp.mean([i(x) for i in ints]), x), color=col,label=lab)
+    elif median:
+        a.plot(x, map(lambda x: sp.percentile([i(x) for i in ints], 50), x), color=col,linestyle=linestyle)
     else:
         a.plot(x, map(lambda x: sp.percentile([i(x) for i in ints], 50), x), color=col,label=lab)
         #m = map(lambda x: sp.mean([i(x) for i in ints]), x)
@@ -207,10 +209,12 @@ def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False,mean=False):
         a.fill_between(x,y25,y75,edgecolor=col, facecolor=col,lw=0.0,alpha=0.1)
     #a.plot(ends[yendorder], yends[yendorder], '.',color=col ,linestyle=line)
     #print("endvalues: {}".format(yends))
-    a2 = a.twinx()
-    a2.grid(False)
-    a2.plot(ends[sp.argsort(ends)],sp.linspace(1,0,n),color=col, linestyle='--',linewidth=0.4)
-    a2.set_ylabel('fraction of optimizations still running')
+    if not notwin:
+        a2 = a.twinx()
+        a2.grid(False)
+        if not noends:
+            a2.plot(ends[sp.argsort(ends)],sp.linspace(1,0,n),color=col, linestyle='--',linewidth=0.4)
+        a2.set_ylabel('fraction of optimizations still running')
     return
 
 def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False,allylabel=False,showends=False,needed=None,legend=True,forcefigsize=None,xmax=None,legendreplace=None):

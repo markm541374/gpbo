@@ -3,7 +3,7 @@ xrange=range
 
 import scipy as sp
 import numpy as np
-
+import pandas as pd
 import gpbo
 import os
 import matplotlib
@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 #plt.rc('font',serif='Times')
 
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-def stoppingplots(path,names,n,legendnames=None,fname='',title='',offset=0.,fpath=None,showlegend=False,logy=True):
+def stoppingplots(path,names,n,legendnames=None,fname='',title='',offset=0.,fpath=None,showlegend=False,logy=True,r2path=False):
     if fpath is None:
         fpath=path
     if legendnames==None:
@@ -22,10 +22,24 @@ def stoppingplots(path,names,n,legendnames=None,fname='',title='',offset=0.,fpat
         D[name]=[]
         for i in range(n):
             D[name].append(gpbo.optimize.readoptdata(os.path.join(path,'{}_{}.csv'.format(name,i))))
+    if r2path:
+        Dno = dict()
+        for name in names:
+            if name.startswith('switch'):
+                Dno[name]=[]
+                for i in range(n):
+                    d0 = D[name][i]
+                    d1 = gpbo.optimize.readoptdata(os.path.join(r2path,'{}_{}.csv'.format(name,i)))
+                    dc = pd.concat([d0[:int(d1['n'][0])-1],d1])
+                    Dno[name].append(dc)
 
     f,a = plt.subplots(1)
     for j,name in enumerate(names):
         gpbo.opts.plotquartsends(a,[D[name][k]['index'] for k in range(n)],[D[name][k]['trueyatxrecc']-offset-min(0,D[name][k]['trueyatxrecc'].values[-1]) for k in range(n)],colors[j],0,legendnames[j])
+    if r2path:
+        for j,name in enumerate(names):
+            if name.startswith('switch'):
+                gpbo.opts.plotquartsends(a,[Dno[name][k]['n']-1 for k in range(n)],[Dno[name][k]['trueyatxrecc']-offset-min(0,Dno[name][k]['trueyatxrecc'].values[-1]) for k in range(n)],colors[j],0,legendnames[j],median=True,noends=True,linestyle=':',notwin=True)
     if logy:
         a.set_yscale('log')
     #a.set_ylim(10.01,10.02)
