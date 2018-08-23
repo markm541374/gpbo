@@ -7,7 +7,7 @@ with open('gpbo/VERSION') as version_file:
     version = version_file.read().strip()
 
 def readme():
-    with open('gpbo/README.md') as f:
+    with open('README.md') as f:
         return f.read()
 
 compile_flags = ['-O3']
