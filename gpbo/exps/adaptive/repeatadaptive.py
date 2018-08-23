@@ -203,7 +203,7 @@ def plots(Data,K0):
     f.savefig('figs/adaptivefrac.png')
 
 if __name__=="__main__":
-    if True:
+    if False:
         #run the experiment
         Data,K0 = experiment()
         pickle.dump([Data,K0],open('data/expdata.p','w'))

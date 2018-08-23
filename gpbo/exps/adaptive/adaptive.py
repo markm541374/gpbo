@@ -294,7 +294,7 @@ def plotops(D):
     f,a = plt.subplots(1)
     [a.plot(d['npts'],np.array(d['touchedpts'])-np.array(d['newpts']),color=d['c'],label=d['name']+' $\mathcal{O}(n^2)$ Updates',linestyle='--') for d in D]
     [a.plot(d['npts'],np.array(d['newpts']),color=d['c'],label=d['name']+' $\mathcal{O}(n^3)$ Evaluations') for d in D]
-    a.set_ylabel('Hyperparameter LLK Evaluations (s)')
+    a.set_ylabel('Hyperparameter LLK Evaluations')
     a.set_xlabel('Iteration')
     a.set_ylim(0,2*1e4)
     a.legend()
@@ -318,7 +318,7 @@ def plotmeanupdate(d):
     a.set_ylabel('Mean Update Order')
     f.savefig('figs/updateorder.pdf')
 
-plottime([d0,d1,d2])
+#plottime([d0,d1,d2])
 plotops([d0,d1,d2])
-plotuseful([d0,d1,d2])
-plotmeanupdate(d0)
+#plotuseful([d0,d1,d2])
+#plotmeanupdate(d0)

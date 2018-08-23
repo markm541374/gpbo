@@ -217,7 +217,7 @@ def plotquartsends(a,xdata_, ydata_,col,line,lab,log=False,mean=False,median=Fal
         a2.set_ylabel('fraction of optimizations still running')
     return
 
-def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False,allylabel=False,showends=False,needed=None,legend=True,forcefigsize=None,xmax=None,legendreplace=None):
+def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axisset=dict(),skipinit=False,sixylabel=False,thirteenylabel=False,allylabel=False,showends=False,needed=None,legend=True,forcefigsize=None,xmax=None,legendreplace=None,offs=0):
     if showends:
         pq=plotquartsends
     else:
@@ -263,7 +263,7 @@ def plotall(confs,nreps,path,trueopt=False,logx=False,labelfn = lambda x:x,axiss
         line = 'solid'#lslist[ci]
         #collect the data
         data=[]
-        for ii in range(nreps):
+        for ii in range(offs,nreps+offs):
             thisdata = gpbo.optimize.readoptdata(os.path.join(path,'{}_{}.csv'.format(C[0],ii)))
             allmomin = min(allmomin,thisdata['trueyatxrecc'].values.min())
             data.append(thisdata)
