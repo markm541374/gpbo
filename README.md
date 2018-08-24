@@ -10,7 +10,14 @@ The project should install for linux via
 ```bash
 pip install git+https://github.com/markm541374/gpbo@master
 ```
-I reccomend using a virtualenv. On ubuntu 14.04 64bit this should be all that is required. It may be necessary to recompile the code in /gpbo/cproj which is a custom Gaussian Process library allowing observation and inference of first of second derivatives for any kernels that have all the necessary higher order derivatives defined in kernels.ccp (so far only squared exponential and Matern 5/2). 
+if you have the required dependencies already installed. I reccomend using a virtualenv. On a clean installation of ubuntu 18.04 64bit these can be installed via
+
+```angular2html
+sudo apt install python-pip python-tk git gfortran libopenblas-dev liblapack-dev liblapacke-dev
+pip install numpy
+```
+
+It may be necessary to recompile the code in /gpbo/cproj which is a custom Gaussian Process library allowing observation and inference of first of second derivatives for any kernels that have all the necessary higher order derivatives defined in kernels.ccp (so far only squared exponential and Matern 5/2). 
 Assuming g++ is available and all libraries are in the default path this can be done using the script /gpbo/cproj/build.sh . Otherwise the script /gpbo/cproj/buildgrey.sh will need to be modified to suit your system by explicitly providing paths to lapack, cblas and any other libraries that may not be found by defalt.
 
 Examples
