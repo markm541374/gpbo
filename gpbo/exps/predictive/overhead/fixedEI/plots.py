@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 import gpbo
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-path = 'results'
+path = os.path.join(gpbo.datapath,'exps/predictive/overhead/fixedEI/results')
 files = os.listdir(path)
 base = 'eihyp_3_500_'
 
@@ -17,7 +17,7 @@ for i,noise in enumerate([-2,-3,-4,-5,-6,-7,-8]):
     names = [f for f in files if f.startswith(base+str(1000*noise))]
 
     D = [gpbo.optimize.readoptdata(os.path.join(path,n)) for n in names]
-    gpbo.opts.plotquarts(a0,[D[k]['index'] for k in range(len(D))],[D[k]['trueyatxrecc'] for k in range(len(D))],colors[i],'-','$\sigma^2={}$'.format(noise))
+    gpbo.opts.plotquarts(a0,[D[k]['index'] for k in range(len(D))],[D[k]['trueyatxrecc'] for k in range(len(D))],colors[i],'-','$\sigma^2=10^{{{}}}$'.format(noise))
     gpbo.opts.plotquarts(a1,[np.cumsum(D[k]['c']) for k in range(len(D))],[D[k]['trueyatxrecc'] for k in range(len(D))],colors[i],'-',str(noise))
     gpbo.opts.plotquarts(a2,[np.cumsum(D[k]['c']+D[k]['taq']) for k in range(len(D))],[D[k]['trueyatxrecc'] for k in range(len(D))],colors[i],'-',str(noise))
 

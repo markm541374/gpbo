@@ -154,7 +154,7 @@ if false; then
     cp gpbo/exps/biasopt/mnist/icmlF6/out13.pdf figures/variablefidelity/mnist.pdf
     cp gpbo/exps/biasopt/mnist/icmlF6/out12.pdf figures/variablefidelity/mnistev.pdf
 fi
-if $1; then
+if false; then
     cp matplotlibrc gpbo/exps/biasopt/powseries
     (cd gpbo/exps/biasopt/powseries ; python2 expicmlF7.py)
     cp gpbo/exps/biasopt/powseries/norm/out6.pdf figures/variablefidelity/powerfit.pdf
@@ -167,7 +167,7 @@ if false; then
     cp gpbo/exps/predictive/overhead/fixedPES/figs/evcostpes.pdf figures/predictive/
     cp gpbo/exps/predictive/overhead/fixedPES/figs/aqcostpes.pdf figures/predictive/
 fi
-if false; then
+if $1; then
     cp matplotlibrc gpbo/exps/predictive/overhead/fixedEI
     (cd gpbo/exps/predictive/overhead/fixedEI ; python2 plots.py)
     cp gpbo/exps/predictive/overhead/fixedEI/figs/iterei.pdf figures/predictive/
