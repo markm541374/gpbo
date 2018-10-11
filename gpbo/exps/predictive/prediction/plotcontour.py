@@ -79,14 +79,19 @@ def xeqtoyeq(xeq,A):
 yeq = [xeqtoyeq(xeq[0],10000./1e-4),xeqtoyeq(xeq[1],10000./1e-6)]
 def plotcontour(title,data,fname):
     fig,ax = plt.subplots()
-    plt.plot([-6.75,-3.],[-0.75,3.],'--',color='grey',linewidth=0.25)
-    plt.plot([-7.,-5.],[1.,3.],'--',color='grey',linewidth=0.25)
-    plt.plot([-4.75,-3.],[-0.75,1.],'--',color='grey',linewidth=0.25)
+    plt.plot([-6.75,-3.],[-0.75,3.],'--',dashes=(50,10),color='grey',linewidth=0.25)
+    plt.plot([-7.,-5.],[1.,3.],'--',dashes=(50,10),color='grey',linewidth=0.25)
+    plt.plot([-4.75,-3.],[-0.75,1.],'--',dashes=(50,10),color='grey',linewidth=0.25)
+    plt.plot([-6.5],[-0.5],'k.')
+    plt.annotate('A',(-6.65,-0.5))
+    plt.plot([-3.02],[2.98],'k.')
+    plt.annotate('B',(-3.25,2.85))
     CS = ax.contour(np.log10(vaxis),np.log10(baxis/3600.),data,10)
     plt.clabel(CS, inline=1, fontsize=10)
     ax.set_title(title)
     ax.set_xlabel('$\\mathrm{log}_{10}$ cost scale')
     ax.set_ylabel('$\\mathrm{log}_{10}$ Budget (hours)')
+
     fig.savefig('figs/{}contour.pdf'.format(fname))
     plt.close(fig)
 

@@ -167,7 +167,7 @@ if false; then
     cp gpbo/exps/predictive/overhead/fixedPES/figs/evcostpes.pdf figures/predictive/
     cp gpbo/exps/predictive/overhead/fixedPES/figs/aqcostpes.pdf figures/predictive/
 fi
-if $1; then
+if false; then
     cp matplotlibrc gpbo/exps/predictive/overhead/fixedEI
     (cd gpbo/exps/predictive/overhead/fixedEI ; python2 plots.py)
     cp gpbo/exps/predictive/overhead/fixedEI/figs/iterei.pdf figures/predictive/
@@ -228,4 +228,15 @@ if false; then
     (cd gpbo/exps/biasopt/ccard ; python2 plotfigs.py)
     cp gpbo/exps/biasopt/ccard/results/out12.pdf figures/variablefidelity/ccardev.pdf
     cp gpbo/exps/biasopt/ccard/results/out13.pdf figures/variablefidelity/ccardfc.pdf
+fi
+if $1; then
+    cp matplotlibrc gpbo/exps/stopping/normailty
+    (cd gpbo/exps/stopping/normality; python2 refplot.py)
+    (cd gpbo/exps/stopping/normality; python2 normplot.py)
+    cp gpbo/exps/stopping/normality/figs/refdist.pdf figures/localstop/refdist.pdf
+    cp gpbo/exps/stopping/normality/figs/jb_branin.pdf figures/localstop/jb_branin.pdf
+    cp gpbo/exps/stopping/normality/figs/jb_camel3.pdf figures/localstop/jb_camel3.pdf
+    cp gpbo/exps/stopping/normality/figs/jb_camel6.pdf figures/localstop/jb_camel6.pdf
+    cp gpbo/exps/stopping/normality/figs/jb_hart3.pdf figures/localstop/jb_hart3.pdf
+    cp gpbo/exps/stopping/normality/figs/jb_hart4.pdf figures/localstop/jb_hart4.pdf
 fi
