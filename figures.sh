@@ -229,7 +229,7 @@ if false; then
     cp gpbo/exps/biasopt/ccard/results/out12.pdf figures/variablefidelity/ccardev.pdf
     cp gpbo/exps/biasopt/ccard/results/out13.pdf figures/variablefidelity/ccardfc.pdf
 fi
-if $1; then
+if false; then
     cp matplotlibrc gpbo/exps/stopping/normailty
     (cd gpbo/exps/stopping/normality; python2 refplot.py)
     (cd gpbo/exps/stopping/normality; python2 normplot.py)
@@ -240,3 +240,11 @@ if $1; then
     cp gpbo/exps/stopping/normality/figs/jb_hart3.pdf figures/localstop/jb_hart3.pdf
     cp gpbo/exps/stopping/normality/figs/jb_hart4.pdf figures/localstop/jb_hart4.pdf
 fi
+if $1; then
+    cp matplotlibrc gpbo/exps/adaptive
+    (cd gpbo/exps/adaptive; python2 images.py)
+    cp gpbo/exps/adaptive/figs/grid.pdf figures/implementation/grid.pdf
+    cp gpbo/exps/adaptive/figs/slice.pdf figures/implementation/slice.pdf
+    cp gpbo/exps/adaptive/figs/quad.pdf figures/implementation/quad.pdf
+fi
+
