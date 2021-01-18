@@ -356,7 +356,7 @@ def overheadregression(X,Y):
         return -l,-g
 
     res = minimize(f,[1.,2.,1.,1.],method='L-BFGS-B',jac=True,bounds=((1e-6,None),(1.,None),(1e-6,None),(1e-6,None)))#,bounds=((0.,1e3),(0.,1e3),(0.,1e3),(0.,1e3)))
-    para = map(abs,res.x)
+    para = list(map(abs,res.x))
     print( 'fit model {}*x^{} + {} +N(0,{})'.format(*para))
     return para
 

@@ -17,8 +17,8 @@ import scipy as sp
 print('removed robo import in opts.py l17 due to theano errors')
 #try:
 #    from gpbo.exps.thirdwrap.mtbowrap import optmtbo
-from gpbo.exps.thirdwrap.fabwrap import optfabolas
-from gpbo.exps.thirdwrap.fabwrap import optfabolas_mod
+# from gpbo.exps.thirdwrap.fabwrap import optfabolas
+# from gpbo.exps.thirdwrap.fabwrap import optfabolas_mod
 #except:
 #    print('\n\ndidnt import robo!!!!!!\n\n')
 def runexp(f,lb,ub,path,nreps,confs,indexoffset=0):
