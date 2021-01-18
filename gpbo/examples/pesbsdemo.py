@@ -21,7 +21,7 @@ s=1e-6
 
 nopts=1
 if run:
-    for k in xrange(nopts):
+    for k in range(nopts):
         with open('results/pesbsdemo{}.txt'.format(k),'w') as o:
             xmin=[0.,0.]
             ymin=0.

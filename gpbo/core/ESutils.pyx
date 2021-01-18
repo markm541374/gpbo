@@ -598,7 +598,7 @@ def draw_support_inplane(g,lb,ub,n,method,axis,value,para=1.):
     lb_red = sp.hstack([lb[:axis],lb[axis+1:]])
     ub_red = sp.hstack([ub[:axis],ub[axis+1:]])
     X = draw_support(gf,lb_red,ub_red,n,method,para=para)
-    return sp.hstack([X[:,:axis],sp.ones([n,1])*value,X[:,axis:]])
+    return sp.hstack([X[:,:axis],sp.ones([int(n),1])*value,X[:,axis:]])
     
 
 def plot_gp(g,axis,x,d):

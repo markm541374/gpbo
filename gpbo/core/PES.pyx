@@ -64,7 +64,7 @@ def drawmins(G,n,lb,ub,SUPPORT=300,mode = [ESutils.SUPPORT_SLICELCB],SLICELCB_PA
     return R
 
 def drawmins_inplane(G,n,lb,ub,axis,value, SUPPORT=300, mode=ESutils.SUPPORT_SLICELCB, SLICELCB_PARA=1.):
-    W = sp.vstack([ESutils.draw_support_inplane(G, lb,ub,SUPPORT/len(mode),m, axis,value,para = SLICELCB_PARA) for m in mode])
+    W = sp.vstack([ESutils.draw_support_inplane(G, lb,ub,int(SUPPORT/len(mode)),m, axis,value,para = SLICELCB_PARA) for m in mode])
     #draw in samples on the support
     R = ESutils.draw_min(G,W,n)
     return R
@@ -89,7 +89,7 @@ def addmins(G,X,Y,S,D,xmin,mode=OFFHESSZERO, GRADNOISE=1e-9,EP_SOFTNESS=1e-9,int
             Sg[i,0]=1e9
 
     #offdiag hessian elements
-    nh = ((dim-1)*dim)/2
+    nh = ((dim-1)*dim)//2
     Xh = sp.vstack([sp.empty([0,dim])]+[xmin]*nh)
     class MJMError(Exception):
         pass
